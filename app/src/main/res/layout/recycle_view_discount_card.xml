@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardRecViewHoneProduct"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_lighter"
+    android:paddingTop="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_marginBottom="2dp"
+        android:background="@color/white">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineDiscountMain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="1"/>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="7dp"
+                android:paddingVertical="5dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/guidelineDiscountMain"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineDiscountCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.7"/>
+
+                <TextView
+                    android:id="@+id/txtDiscountDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:gravity="left|center"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    tools:text="I'm testing this text fiewidl now so dont ask me "
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/guidelineDiscountCount"
+                    app:layout_constraintBottom_toTopOf="@id/txtDiscountEndDate"/>
+
+                <TextView
+                    android:id="@+id/lblDiscountEndDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:gravity="left"
+                    android:text="Until "
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtDiscountDescription"/>
+
+                <TextView
+                    android:id="@+id/txtDiscountEndDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:gravity="left"
+                    android:text="Jul 12, 2021"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintLeft_toRightOf="@id/lblDiscountEndDate"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtDiscountDescription"/>
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutDiscountPercentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/lblDiscountOFF">
+
+                    <TextView
+                        android:id="@+id/txtDiscountPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:gravity="left"
+                        android:text="000.000d"
+                        android:paddingHorizontal="2dp"
+                        android:textColor="@color/red"
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:gravity="left"
+                        android:text=""
+                        android:textColor="@color/red"
+                        android:textStyle="bold"
+                        android:textSize="20sp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/lblDiscountOFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:gravity="left"
+                    android:text="OFF"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/linearLayoutDiscountPercentage"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>

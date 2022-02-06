@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.activities.ordering.OrderInfoActivity"
+    android:background="@color/gray_lighter">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutCheckoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="15dp"
+        android:background="@color/blue_main"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgBackFromCheckout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_left"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/imgCheckoutHome"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_home"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/imgCheckoutMessage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_message"
+            android:layout_marginHorizontal="15dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/imgCheckoutHome"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/layoutCheckoutHeader"
+        app:layout_constraintBottom_toTopOf="@id/layoutCheckout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutDeliveryInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="15dp"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/lblDeliveryInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left"
+                android:text="Delivery Information"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+
+            <RelativeLayout
+                android:id="@+id/layoutPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/gray_lighter"
+                android:paddingVertical="2dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@id/lblDeliveryInfo"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelinePhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.24"/>
+
+                    <TextView
+                        android:text="Number"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info"
+                        android:paddingVertical="10dp"
+                        android:paddingLeft="10dp"
+                        android:textSize="16sp"/>
+
+                    <EditText
+                        android:id="@+id/editPhoneNumber"
+                        android:hint="@string/number_hint"
+                        android:textSize="16sp"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelinePhone"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </RelativeLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:id="@+id/layoutAddress"
+                android:paddingVertical="0dp"
+                android:background="@color/white"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.24"/>
+
+                <TextView
+                    android:text="Address"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingVertical="10dp"
+                    android:paddingLeft="10dp"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtDeliveryAddress"
+                    android:gravity="center|left"
+                    android:textSize="16sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    app:layout_constraintLeft_toRightOf="@+id/guidelineAddress"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/imgEditAddress"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+                <ImageView
+                    android:id="@+id/imgEditAddress"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_direction_right"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="15dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_marginBottom="2dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/imgEditPayment"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_direction_right"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/lblPaymentMethod"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="monospace"
+                    android:gravity="left"
+                    android:text="Payment Method"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"/>
+
+                <TextView
+                    android:id="@+id/txtPaymentDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:fontFamily="monospace"
+                    android:gravity="left"
+                    android:text="Payment on Delivery"
+                    android:textColor="@color/gray"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/lblPaymentMethod"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/imgEditPayment"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingHorizontal="10dp"
+                android:paddingBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/gray_light">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="10dp"
+                        android:background="@color/white">
+
+                        <TextView
+                            android:id="@+id/lblReceipt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:gravity="left"
+                            android:text="Receipt"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"/>
+
+                    </RelativeLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recViewOrderProductPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:paddingBottom="10dp"/>
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        android:background="@color/white">
+
+                        <TextView
+                            android:id="@+id/lblDeliveryPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:gravity="left"
+                            android:text="Delivery Cost"
+                            android:textColor="@color/gray_darker"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/txtDeliveryPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:text="0.000d"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        android:layout_marginTop="1dp"
+                        android:background="@color/white">
+
+                        <TextView
+                            android:id="@+id/lblTotalPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:gravity="left"
+                            android:text="Total Price"
+                            android:textColor="@color/gray_darker"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/txtTotalPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:text="0.000d"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutDiscount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="10dp"
+                        android:paddingHorizontal="10dp"
+                        android:background="@color/white">
+
+                        <TextView
+                            android:id="@+id/lblDiscountPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:gravity="left"
+                            android:text="Discount Price"
+                            android:textColor="@color/gray_darker"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/lblDiscountOFF"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="3dp"
+                            android:fontFamily="monospace"
+                            android:text="-"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/txtDiscountPrice"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/txtDiscountPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:text="0.000d"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:id="@+id/layoutCampaignDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <TextView
+                                android:id="@+id/lblCampaignDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
+                                android:fontFamily="monospace"
+                                android:gravity="left"
+                                android:text="End on"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"/>
+
+                            <TextView
+                                android:id="@+id/txtDiscountEndDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:gravity="right"
+                                android:text="Jul 12, 2021"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:paddingHorizontal="10dp"
+                        android:paddingTop="10dp"
+                        android:background="@color/white">
+
+                        <TextView
+                            android:id="@+id/txtFinalPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:text="0.000d"
+                            android:textColor="@color/red"
+                            android:textSize="20dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/layoutCheckout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnConfirmOrder"
+            android:text="CONFIRM"
+            style="@style/style_button_account"
+            android:layout_marginVertical="10dp"
+            android:layout_marginHorizontal="5dp"/>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

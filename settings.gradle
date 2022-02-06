@@ -1,0 +1,2 @@
+rootProject.name = "WSGroup"
+include ':app'

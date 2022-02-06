@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutParent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.activities.account.AccountDetailActivity"
+    android:orientation="vertical"
+    android:background="@color/gray_lighter">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutAccountDetailRegisterHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="15dp"
+        android:background="@color/blue_main"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgBackFromAccountDetailRegister"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_left"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/imgAccountInfoHome"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_home"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:paddingHorizontal="5dp"
+            android:text="ACCOUNT\nINFORMATION"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/layoutAccountDetailRegisterHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/gray_lighter">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="25dp"
+                    android:layout_marginBottom="2dp"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:text="ALMOST DONE!"
+                    android:background="@color/white"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineUsername"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="Username"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editUsername"
+                        android:hint="@string/username_hint"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelineUsername"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelinePhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="Number"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editPhoneNumber"
+                        android:hint="@string/number_hint"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelinePhone"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelinePassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="Password"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editLoginPassword"
+                        style="@style/style_txt_account_info"
+                        android:hint="@string/password_hint"
+                        android:layout_marginRight="5dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelinePassword"
+                        app:layout_constraintRight_toLeftOf="@id/imgDisplayPassword"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
+
+                    <ImageView
+                        android:id="@+id/imgDisplayPassword"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_visibility_off"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineConfirmPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="Confirm\nPassword"
+                        android:gravity="left"
+                        android:paddingVertical="5dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editPasswordConfirm"
+                        android:hint="@string/password_hint"
+                        android:layout_marginRight="5dp"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelineConfirmPassword"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/imgDisplayPasswordConfirm"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                    <ImageView
+                        android:id="@+id/imgDisplayPasswordConfirm"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_visibility_off"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineFirstName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="First name"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editFirstName"
+                        android:hint="@string/first_name_hint"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelineFirstName"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineLastName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="Last name"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editLastName"
+                        android:hint="@string/last_name_hint"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelineLastName"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/style_profile_tab"
+                    android:paddingVertical="0dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:text="Email"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_label_account_info" />
+
+                    <EditText
+                        android:id="@+id/editMail"
+                        android:hint="@string/mail_hint"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelineEmail"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:background="@color/white">
+
+                    <Button
+                        android:id="@+id/btnConfirm"
+                        android:text="CONFIRM"
+                        style="@style/style_button_account"
+                        android:layout_marginTop="25dp"
+                        android:layout_marginHorizontal="50dp"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

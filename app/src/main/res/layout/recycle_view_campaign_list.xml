@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="5dp"
+    app:cardCornerRadius="5dp"
+    android:layout_marginBottom="5dp">
+
+    <RelativeLayout
+        android:id="@+id/layoutRecViewCampaign"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue_main">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="5dp"
+            android:layout_margin="2dp"
+            app:cardElevation="5dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayoutCampaign"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:background="@color/gray_lighter">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginRight="5dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="5dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="5dp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <TextView
+                                android:id="@+id/txtCampaignPrice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:text="10.000d"
+                                android:textColor="@color/red"
+                                android:textSize="20dp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintLeft_toLeftOf="parent"/>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginVertical="5dp"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintRight_toRightOf="parent">
+
+                                <TextView
+                                    android:id="@+id/lblCampaignQuantity"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="monospace"
+                                    android:gravity="left"
+                                    android:text="Quantity:"
+                                    android:textColor="@color/black"
+                                    android:textSize="17sp"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/txtCampaignQuantity"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp"
+                                    android:fontFamily="monospace"
+                                    android:gravity="left"
+                                    android:text="100"
+                                    android:textColor="@color/black"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toRightOf="@id/lblCampaignQuantity"/>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/txtCampaignPrice">
+
+                                <TextView
+                                    android:id="@+id/lblDiscountDate"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="monospace"
+                                    android:gravity="left"
+                                    android:text="End on"
+                                    android:textColor="@color/black"
+                                    android:textSize="17sp"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/txtDiscountEndDate"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="5dp"
+                                    android:fontFamily="monospace"
+                                    android:gravity="left"
+                                    android:text="Jul 12, 2021"
+                                    android:textColor="@color/black"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toRightOf="@id/lblDiscountDate"/>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginVertical="5dp"
+                        android:paddingHorizontal="5dp">
+
+                        <ProgressBar
+                            android:id="@+id/progressBarQuantityCount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:max="100"
+                            android:progress="100"
+                            android:scaleY="3"
+                            android:progressTint="@color/gray"/>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_gravity="right"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent">
+
+                                <TextView
+                                    android:id="@+id/txtCampaignOrderCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center|top"
+                                    android:textStyle="bold"
+                                    android:fontFamily="monospace"
+                                    tools:text="60"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/black"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/lblProductOrderCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center|top"
+                                    android:textStyle="bold"
+                                    android:fontFamily="monospace"
+                                    android:paddingLeft="5dp"
+                                    tools:text="orders"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/black"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_gravity="right"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent">
+
+                                <TextView
+                                    android:id="@+id/txtCampaignQuantityCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center|top"
+                                    android:textStyle="bold"
+                                    android:fontFamily="monospace"
+                                    tools:text="60"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/black"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/lblCampaignQuantitySeparator"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center|top"
+                                    android:textStyle="bold"
+                                    android:fontFamily="monospace"
+                                    tools:text="/"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/black"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/txtCampaignQuantityBar"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center|top"
+                                    android:textStyle="bold"
+                                    android:fontFamily="monospace"
+                                    tools:text="100"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/black"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toRightOf="@id/txtCampaignQuantityCount"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            </LinearLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="5dp"
+    android:background="@color/gray_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/gray_light">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white">
+
+            <RelativeLayout
+                android:id="@+id/layoutSupplierIndicator"
+                android:layout_width="15dp"
+                android:layout_height="0dp"
+                android:background="@color/blue_main"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ImageView
+                android:id="@+id/checkboxCartSupplier"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginVertical="5dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_checkbox_unchecked"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtRecViewCartSupplierName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:paddingLeft="10dp"
+                android:paddingVertical="10dp"
+                android:gravity="left|center"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:text="testing"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/layoutSupplierIndicator"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/checkboxCartSupplier"/>
+
+            <TextView
+                android:id="@+id/lblDeleteCartSuppliers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete All"
+                android:fontFamily="monospace"
+                android:textSize="15sp"
+                android:textColor="@color/red"
+                android:gravity="center"
+                android:layout_marginHorizontal="5dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutCheckout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="2dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutBasePrice"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:background="@color/white"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:id="@+id/layoutTotalPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="left|center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:gravity="center"
+                        android:text="Total: "
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/txtTotalCartPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="10.000.000d"
+                        android:textColor="@color/red"
+                        android:textSize="20dp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnCheckout"
+                    style="@style/style_button_dialog_box"
+                    android:layout_width="wrap_content"
+                    android:text="Checkout"
+                    android:textSize="15dp"
+                    android:paddingVertical="10dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recViewCartProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"/>
+
+    </LinearLayout>
+
+</LinearLayout>

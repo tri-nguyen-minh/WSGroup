@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">WSGroup</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--    <font color="#FF0000">*</font>-->
+
+    <string name="login_hint">
+        <font color="#7D7D7D">Username or Number (required)</font>
+    </string>
+    <string name="number_hint">
+        <font color="#7D7D7D">Number (required)</font>
+    </string>
+    <string name="username_hint">
+        <font color="#7D7D7D">Username (required)</font>
+    </string>
+    <string name="first_name_hint">
+        <font color="#7D7D7D">First Name (required)</font>
+    </string>
+    <string name="last_name_hint">
+        <font color="#7D7D7D">Last Name (required)</font>
+    </string>
+    <string name="mail_hint">
+        <font color="#7D7D7D">Email</font>
+    </string>
+    <string name="password_hint">
+        <font color="#7D7D7D">Password (required)</font>
+    </string>
+    <string name="confirm_password_hint">
+        <font color="#7D7D7D">Confirm Password (required)</font>
+    </string>
+    <string name="quantity_hint">
+        <font color="#7D7D7D" size="14sp">0</font>
+    </string>
+</resources>
