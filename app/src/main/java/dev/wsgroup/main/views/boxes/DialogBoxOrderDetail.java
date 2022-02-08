@@ -40,7 +40,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.ordering.OrderConfirmActivity;
+import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 
 public class DialogBoxOrderDetail extends Dialog{
 
@@ -170,7 +170,7 @@ public class DialogBoxOrderDetail extends Dialog{
                     public void onYesClicked() {
                         super.onYesClicked();
                         dismiss();
-                        Intent checkoutActivity = new Intent(context, OrderConfirmActivity.class);
+                        Intent checkoutActivity = new Intent(context, ConfirmActivity.class);
                         checkoutActivity.putExtra("ORDER", (Serializable) order);
                         checkoutActivity.putExtra("PROCESS", 1);
                         activity.startActivityForResult(checkoutActivity, IntegerUtils.REQUEST_COMMON);

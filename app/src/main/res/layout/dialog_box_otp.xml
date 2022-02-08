@@ -86,28 +86,68 @@
             android:layout_marginTop="20dp"
             android:layout_marginHorizontal="50dp"/>
 
-        <TextView
-            android:id="@+id/lblResentOTP"
+        <LinearLayout
+            android:id="@+id/layoutResendOTP"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:fontFamily="monospace"
-            android:gravity="center"
-            android:text="Haven't received your OTP?"
-            android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/txtResendOTP"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txtResendOTP"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="Re-send a new OTP"
+                android:textColor="@color/blue_dark"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutOTPCountdown"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:fontFamily="monospace"
-            android:gravity="center"
-            android:text="Re-send a new OTP"
-            android:textColor="@color/blue_dark"
-            android:textSize="17sp"
-            android:textStyle="bold"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="7dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="Wait"
+                android:textColor="@color/black"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/txtCountdownClock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="00"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="7dp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="to get a new OTP"
+                android:textColor="@color/black"
+                android:textSize="15sp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

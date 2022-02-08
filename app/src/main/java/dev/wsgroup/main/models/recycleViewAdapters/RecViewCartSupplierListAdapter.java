@@ -37,8 +37,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.ordering.OrderConfirmActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
+import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
 
 public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecViewCartSupplierListAdapter.ViewHolder> {
@@ -80,7 +79,6 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        System.out.println("bind");
         holder.txtRecViewCartSupplierName.setText(supplierList.get(position).getName());
         holder.checkboxCartSupplier.setVisibility(View.GONE);
         holder.lblDeleteCartSuppliers.setVisibility(View.GONE);
@@ -139,7 +137,7 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
                 Supplier supplier = supplierList.get(position);
                 Order order = getSelectedCartProduct(supplier.getId());
                 order.setSupplier(supplier);
-                Intent checkoutActivity = new Intent(context, OrderConfirmActivity.class);
+                Intent checkoutActivity = new Intent(context, ConfirmActivity.class);
                 checkoutActivity.putExtra("ORDER", (Serializable) order);
                 activity.startActivityForResult(checkoutActivity, IntegerUtils.REQUEST_COMMON);
             }

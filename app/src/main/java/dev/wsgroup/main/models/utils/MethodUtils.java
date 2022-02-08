@@ -32,6 +32,10 @@ public class MethodUtils {
         return phone.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "$1 $2 $3");
     }
 
+    public static String formatPhoneNumberWithCountryCode(String phone) {
+        return "+84 " + phone.substring(1);
+    }
+
     public static String formatDate(String dateString){
         String returnedDate = "";
         SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");

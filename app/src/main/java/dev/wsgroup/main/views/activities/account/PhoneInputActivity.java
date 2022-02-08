@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -20,6 +22,7 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.dtos.User;
+import dev.wsgroup.main.models.services.FirebasePhoneAuthService;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
@@ -38,6 +41,9 @@ public class PhoneInputActivity extends AppCompatActivity {
     private int requestCode;
     private String errorMessage;
     private DialogBoxLoading dialogBoxLoading;
+    private FirebasePhoneAuthService firebaseService;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,9 @@ public class PhoneInputActivity extends AppCompatActivity {
 
         requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_REGISTER);
 
-        editPhone.setText("094700949");
+        editPhone.setText("091392173");
+        btnSendOTP.setEnabled(false);
+        btnSendOTP.setBackground(getResources().getDrawable(R.color.gray_light));
 
         editPhone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -63,6 +71,29 @@ public class PhoneInputActivity extends AppCompatActivity {
                 if (!hasFocus) {
                     hideKeyboard(v);
                 }
+            }
+        });
+        editPhone.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String stringPhone = editPhone.getText().toString();
+                if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
+                    btnSendOTP.setEnabled(false);
+                    btnSendOTP.setBackground(getResources().getDrawable(R.color.gray_light));
+                } else {
+                    btnSendOTP.setEnabled(true);
+                    btnSendOTP.setBackground(getResources().getDrawable(R.color.blue_main));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
 
@@ -98,51 +129,49 @@ public class PhoneInputActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 String stringPhone = editPhone.getText().toString();
-                if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
-                    dialogBoxLoading.dismiss();
-                    errorMessage = StringUtils.MES_ERROR_INVALID_NUMBER;
-                    displayError();
-                } else {
-                    APIUserCaller.findUserByPhoneNumber(stringPhone, getApplication(), new APIListener() {
-                        @Override
-                        public void onUserFound(User user) {
-                            super.onUserFound(user);
-                            dialogBoxLoading.dismiss();
-                            if(requestCode != IntegerUtils.REQUEST_REGISTER) {
-                                sendOTP(stringPhone);
-                            } else {
-                                errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
+
+                APIUserCaller.findUserByPhoneNumber(stringPhone, getApplication(), new APIListener() {
+                    @Override
+                    public void onUserFound(User user) {
+                        super.onUserFound(user);
+                        if(requestCode != IntegerUtils.REQUEST_REGISTER) {
+                            sendOTP(stringPhone);
+                        } else {
+                            if (dialogBoxLoading.isShowing()) {
+                                dialogBoxLoading.dismiss();
+                            }
+                            errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
+                            displayError();
+                        }
+                    }
+                    @Override
+                    public void onFailedAPICall(int errorCode) {
+                        super.onFailedAPICall(errorCode);
+                        switch (errorCode) {
+                            case IntegerUtils.ERROR_API:
+                            case IntegerUtils.ERROR_PARSING_JSON: {
+                                if (dialogBoxLoading.isShowing()) {
+                                    dialogBoxLoading.dismiss();
+                                }
+                                errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
                                 displayError();
+                                break;
+                            }
+                            case IntegerUtils.ERROR_NO_USER: {
+                                if (dialogBoxLoading.isShowing()) {
+                                    dialogBoxLoading.dismiss();
+                                }
+                                if(requestCode != IntegerUtils.REQUEST_REGISTER) {
+                                    errorMessage = StringUtils.MES_ERROR_NO_NUMBER_FOUND;
+                                    displayError();
+                                } else {
+                                    sendOTP(stringPhone);
+                                }
+                                break;
                             }
                         }
-                        @Override
-                        public void onFailedAPICall(int errorCode) {
-                            super.onFailedAPICall(errorCode);
-                            dialogBoxLoading.dismiss();
-                            switch (errorCode) {
-                                case IntegerUtils.ERROR_API:
-                                case IntegerUtils.ERROR_PARSING_JSON: {
-                                    DialogBoxAlert dialogBox =
-                                            new DialogBoxAlert(PhoneInputActivity.this,
-                                                    IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                                                    StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                                    dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                    dialogBox.show();
-                                    break;
-                                }
-                                case IntegerUtils.ERROR_NO_USER: {
-                                    if(requestCode != IntegerUtils.REQUEST_REGISTER) {
-                                        errorMessage = StringUtils.MES_ERROR_NO_NUMBER_FOUND;
-                                        displayError();
-                                    } else {
-                                        sendOTP(stringPhone);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                }
+                    }
+                });
             }
         });
 
@@ -156,7 +185,31 @@ public class PhoneInputActivity extends AppCompatActivity {
     }
 
     private void sendOTP(String stringPhone) {
-        DialogBoxOTP dialogBoxOTP = new DialogBoxOTP(PhoneInputActivity.this, getApplicationContext(), stringPhone, requestCode);
+
+        firebaseService = new FirebasePhoneAuthService(this, stringPhone) {
+            @Override
+            public void onOTPSent() {
+                super.onOTPSent();
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+            }
+        };
+
+        DialogBoxOTP dialogBoxOTP =
+                new DialogBoxOTP(PhoneInputActivity.this, getApplicationContext(), stringPhone, requestCode) {
+//                    @Override
+//                    public void generateOTP() {
+////                        setLabel();
+////
+////                        setLabel();
+////                        resetCountDown();
+////                        if (dialogBoxLoading.isShowing()) {
+////                            dialogBoxLoading.dismiss();
+////                        }
+//                    }
+
+                };
         dialogBoxOTP.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxOTP.show();
     }

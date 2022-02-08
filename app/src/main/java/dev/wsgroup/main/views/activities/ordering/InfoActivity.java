@@ -40,7 +40,7 @@ import dev.wsgroup.main.views.boxes.DialogBoxAlert;
 import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
 import dev.wsgroup.main.views.boxes.DialogBoxLoading;
 
-public class OrderInfoActivity extends AppCompatActivity {
+public class InfoActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutMessage, imgCheckoutHome;
     private ConstraintLayout layoutDeliveryInfo, layoutPayment, layoutAddress;
@@ -65,7 +65,7 @@ public class OrderInfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order_info);
+        setContentView(R.layout.activity_ordering_info);
         this.getSupportActionBar().hide();
 
         imgBackFromCheckout = findViewById(R.id.imgBackFromCheckout);
@@ -159,7 +159,7 @@ public class OrderInfoActivity extends AppCompatActivity {
         btnConfirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogBoxConfirm = new DialogBoxConfirm(OrderInfoActivity.this, StringUtils.MES_CONFIRM_ORDER) {
+                dialogBoxConfirm = new DialogBoxConfirm(InfoActivity.this, StringUtils.MES_CONFIRM_ORDER) {
                     @Override
                     public void onYesClicked() {
                         super.onYesClicked();
@@ -189,7 +189,7 @@ public class OrderInfoActivity extends AppCompatActivity {
     }
 
     private void processOrder() {
-            dialogBoxLoading = new DialogBoxLoading(OrderInfoActivity.this);
+            dialogBoxLoading = new DialogBoxLoading(InfoActivity.this);
             dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxLoading.show();
             order.setAddressId(currentAddress.getId());
@@ -221,7 +221,7 @@ public class OrderInfoActivity extends AppCompatActivity {
     }
 
     private void onSuccessfulOrdering() {
-        DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(OrderInfoActivity.this,
+        DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(InfoActivity.this,
                 IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS, StringUtils.MES_SUCCESSFUL_ORDER, "") {
             @Override
             public void onClickAction() {

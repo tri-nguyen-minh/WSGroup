@@ -9,6 +9,8 @@ public class IntegerUtils {
     public static final int ERROR_PARSING_JSON = 2;
     public static final int ERROR_NO_USER = 3;
     public static final int ERROR_NO_CONNECTION = 4;
+    public static final int ERROR_OTP_REQUEST_INVALID = 1;
+    public static final int ERROR_OTP_REQUEST_FULL = 2;
 
     public static final int REQUEST_REGISTER = 1;
     public static final int REQUEST_CHANGE_PASSWORD = 2;

@@ -90,7 +90,6 @@ public class APIOrderCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -120,7 +119,6 @@ public class APIOrderCaller {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
-        System.out.println(url);
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override

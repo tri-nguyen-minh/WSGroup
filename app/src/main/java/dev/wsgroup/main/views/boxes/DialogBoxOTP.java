@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -24,24 +26,31 @@ import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 
 import dev.wsgroup.main.R;
+import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APIUserCaller;
+import dev.wsgroup.main.models.dtos.User;
+import dev.wsgroup.main.models.services.FirebasePhoneAuthService;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.account.AccountDetailActivity;
 import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
 import dev.wsgroup.main.views.activities.account.PhoneInputActivity;
 
 public class DialogBoxOTP extends Dialog {
 
-    private TextView txtOTPHeader, txtPhoneNumber, txtResendOTP;
+    private TextView txtOTPHeader, txtPhoneNumber, txtResendOTP, txtCountdownClock;
     private EditText editOTP;
     private Button btnConfirmOTP;
     private ProgressBar progressBarLoadOTP;
     private CardView cardViewParent;
+    private LinearLayout layoutResendOTP, layoutOTPCountdown;
 
     private Context context;
     private Activity activity;
     private String phoneNumber, otp;
     private int requestCode;
+    private FirebasePhoneAuthService service;
 
     public DialogBoxOTP(Activity activity, Context context, String phoneNumber, int requestCode) {
         super(activity);
@@ -61,14 +70,93 @@ public class DialogBoxOTP extends Dialog {
         txtOTPHeader = findViewById(R.id.txtOTPHeader);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
         txtResendOTP = findViewById(R.id.txtResendOTP);
+        txtCountdownClock = findViewById(R.id.txtCountdownClock);
         editOTP = findViewById(R.id.editOTP);
         btnConfirmOTP = findViewById(R.id.btnConfirmOTP);
         progressBarLoadOTP = findViewById(R.id.progressBarLoadOTP);
         cardViewParent = findViewById(R.id.cardViewParent);
+        layoutResendOTP = findViewById(R.id.layoutResendOTP);
+        layoutOTPCountdown = findViewById(R.id.layoutOTPCountdown);
 
-        txtPhoneNumber.setText(MethodUtils.formatPhoneNumber(phoneNumber));
+        txtPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phoneNumber)));
         btnConfirmOTP.setEnabled(false);
         btnConfirmOTP.setBackground(context.getResources().getDrawable(R.color.gray_light));
+
+        setLabel(false);
+
+        service = new FirebasePhoneAuthService(activity, MethodUtils.formatPhoneNumberWithCountryCode(phoneNumber)) {
+            @Override
+            public void onOTPSent() {
+                super.onOTPSent();
+                setLabel(true);
+                resetCountDown();
+            }
+
+            @Override
+            public void onVerificationComplete(boolean result) {
+                super.onVerificationComplete(result);
+                if(result) {
+                    DialogBoxAlert dialogBox =
+                            new DialogBoxAlert(activity,
+                                    IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS, StringUtils.MES_SUCCESSFUL_OTP,"") {
+                                @Override
+                                public void onClickAction() {
+                                    super.onClickAction();
+                                    Intent nextIntent;
+                                    if (requestCode == IntegerUtils.REQUEST_REGISTER) {
+                                        nextIntent = new Intent(context, AccountDetailActivity.class);
+                                    } else {
+                                        nextIntent = new Intent(context, PasswordChangeActivity.class);
+                                    }
+                                    nextIntent.putExtra("PHONE", phoneNumber);
+                                    activity.startActivityForResult(nextIntent, requestCode);
+                                }
+                            };
+                    dialogBox.show();
+                } else {
+                    displayError(StringUtils.MES_ERROR_INVALID_OTP);
+                }
+            }
+        };
+
+//        dialogBoxLoading = new DialogBoxLoading(activity);
+//        dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        dialogBoxLoading.show();
+//        APIUserCaller.findUserByPhoneNumber(phoneNumber, activity.getApplication(), new APIListener() {
+//            @Override
+//            public void onUserFound(User user) {
+//                super.onUserFound(user);
+//                dialogBoxLoading.dismiss();
+//                if(requestCode != IntegerUtils.REQUEST_REGISTER) {
+//                    cardViewParent.setVisibility(View.VISIBLE);
+//                } else {
+//                    displayError(StringUtils.MES_ERROR_DUPLICATE_NUMBER);
+//                    dismiss();
+//                }
+//            }
+//            @Override
+//            public void onFailedAPICall(int errorCode) {
+//                super.onFailedAPICall(errorCode);
+//                dialogBoxLoading.dismiss();
+//                switch (errorCode) {
+//                    case IntegerUtils.ERROR_API:
+//                    case IntegerUtils.ERROR_PARSING_JSON: {
+//                        displayError(StringUtils.MES_ERROR_FAILED_API_CALL);
+//                        dismiss();
+//                        break;
+//                    }
+//                    case IntegerUtils.ERROR_NO_USER: {
+//                        if(requestCode != IntegerUtils.REQUEST_REGISTER) {
+//                            displayError(StringUtils.MES_ERROR_NO_NUMBER_FOUND);
+//                            dismiss();
+//                        } else {
+//                            cardViewParent.setVisibility(View.VISIBLE);
+//                        }
+//                        break;
+//                    }
+//                }
+//            }
+//        });
 
         txtResendOTP.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,46 +207,58 @@ public class DialogBoxOTP extends Dialog {
         btnConfirmOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                txtOTPHeader.setVisibility(View.INVISIBLE);
-                progressBarLoadOTP.setVisibility(View.VISIBLE);
+                setLabel(true);
                 String OTPInput = getOTPString();
-                if(otp.equals(OTPInput)) {
-                    Intent nextIntent;
-                    if (requestCode == IntegerUtils.REQUEST_REGISTER) {
-                        nextIntent = new Intent(context, AccountDetailActivity.class);
-                    } else {
-                        nextIntent = new Intent(context, PasswordChangeActivity.class);
-                    }
-                    nextIntent.putExtra("PHONE", phoneNumber);
-                    activity.startActivityForResult(nextIntent, requestCode);
-                } else {
-                    generateOTP();
-                    editOTP.setText("");
-                }
+                service.signInWithPhoneAuthCredential(OTPInput);
             }
         });
         generateOTP();
+    }
+
+    private void displayError(String errorMessage) {
+        DialogBoxAlert dialogBox =
+                new DialogBoxAlert(activity,
+                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
+        dialogBox.show();
     }
 
     private String getOTPString() {
         return editOTP.getText().toString();
     }
 
-    private void generateOTP() {
-        txtOTPHeader.setVisibility(View.INVISIBLE);
-        progressBarLoadOTP.setVisibility(View.VISIBLE);
-        otp = "111111";
-//Work with getting OTP
+    public void generateOTP() {
+        setLabel(false);
+        service.sendOTP();
+    }
 
-//        Random rnd = new Random();
-//        int number = 0;
-//        while (number < 100000) {
-//            number = rnd.nextInt(999999);
-//        }
-//        OTP = String.format("%06d", number);
+    public void setLabel(boolean OTPSent) {
+        if (OTPSent) {
+            txtOTPHeader.setVisibility(View.VISIBLE);
+            progressBarLoadOTP.setVisibility(View.INVISIBLE);
+        } else {
+            txtOTPHeader.setVisibility(View.INVISIBLE);
+            progressBarLoadOTP.setVisibility(View.VISIBLE);
+        }
+    }
 
-        txtOTPHeader.setVisibility(View.VISIBLE);
-        progressBarLoadOTP.setVisibility(View.INVISIBLE);
+
+    public void resetCountDown() {
+        layoutOTPCountdown.setVisibility(View.VISIBLE);
+        layoutResendOTP.setVisibility(View.GONE);
+        new CountDownTimer(60000, 1000) {
+            @Override
+            public void onTick(long l) {
+                int timer = (int) (l / 1000);
+                String timerString = (timer > 9) ? "" + timer : "0" + timer;
+                txtCountdownClock.setText(timerString);
+            }
+
+            @Override
+            public void onFinish() {
+                layoutOTPCountdown.setVisibility(View.GONE);
+                layoutResendOTP.setVisibility(View.VISIBLE);
+            }
+        }.start();
     }
 
     private void hideKeyboard(View view) {

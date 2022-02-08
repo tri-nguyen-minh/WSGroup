@@ -123,9 +123,11 @@ public class SignInActivity extends AppCompatActivity {
                 if(s.length() > 0) {
                     if (!editPassword.getText().toString().isEmpty()) {
                         btnSignIn.setEnabled(true);
+                        btnSignIn.setBackground(getResources().getDrawable(R.color.blue_main));
                     }
                 } else {
                     btnSignIn.setEnabled(false);
+                    btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
                 }
             }
 

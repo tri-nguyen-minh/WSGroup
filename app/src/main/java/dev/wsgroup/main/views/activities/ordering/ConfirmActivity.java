@@ -1,15 +1,11 @@
 package dev.wsgroup.main.views.activities.ordering;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -38,7 +34,7 @@ import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
 
-public class OrderConfirmActivity extends AppCompatActivity {
+public class ConfirmActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
     private TextView txtSupplierName, txtSupplierAddress, lblOrderingProduct,
@@ -65,7 +61,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order_confirm);
+        setContentView(R.layout.activity_ordering_confirm);
         this.getSupportActionBar().hide();
 
         imgBackFromCheckout = findViewById(R.id.imgBackFromCheckout);
@@ -187,14 +183,14 @@ public class OrderConfirmActivity extends AppCompatActivity {
         btnConfirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(OrderConfirmActivity.this, StringUtils.MES_CONFIRM_CHECKOUT) {
+                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(ConfirmActivity.this, StringUtils.MES_CONFIRM_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
                         super.onYesClicked();
                         if (customerDiscount != null) {
                             order.setCustomerDiscount(customerDiscount);
                         }
-                        Intent orderInfoIntent = new Intent(getApplicationContext(), OrderInfoActivity.class);
+                        Intent orderInfoIntent = new Intent(getApplicationContext(), InfoActivity.class);
                         orderInfoIntent.putExtra("ORDER", order);
                         orderInfoIntent.putExtra("PROCESS", process);
                         startActivityForResult(orderInfoIntent, IntegerUtils.REQUEST_COMMON);
@@ -224,7 +220,7 @@ public class OrderConfirmActivity extends AppCompatActivity {
     }
 
     private void setupRecViewOrderList() {
-        adapter = new RecViewOrderProductListAdapter(getApplicationContext(), OrderConfirmActivity.this);
+        adapter = new RecViewOrderProductListAdapter(getApplicationContext(), ConfirmActivity.this);
         adapter.setOrder(order);
         recViewCheckoutOrderProduct.setAdapter(adapter);
         recViewCheckoutOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),

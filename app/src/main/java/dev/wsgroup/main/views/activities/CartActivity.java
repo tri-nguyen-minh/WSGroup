@@ -105,7 +105,7 @@ public class CartActivity extends AppCompatActivity {
 //                                checkoutList.put(supplier.getId(), orderProductList);
 //                            }
 //                        }
-//                        Intent checkoutActivity = new Intent(getApplicationContext(), OrderConfirmActivity.class);
+//                        Intent checkoutActivity = new Intent(getApplicationContext(), ConfirmActivity.class);
 //                        checkoutActivity.putExtra("SUPPLIER_LIST", (Serializable) orderSupplierList);
 //                        checkoutActivity.putExtra("CHECKOUT_LIST", (Serializable) checkoutList);
 //                        startActivityForResult(checkoutActivity, IntegerUtils.REQUEST_COMMON);

@@ -153,7 +153,6 @@ public class APIAddressCaller {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -247,7 +246,6 @@ public class APIAddressCaller {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };

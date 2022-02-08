@@ -38,6 +38,7 @@ public class StringUtils {
     public static final String MES_ERROR_INVALID_MAIL = "Your Email is invalid.";
     public static final String MES_ERROR_INVALID_PASSWORD = "Your password is invalid.";
     public static final String MES_ERROR_INCORRECT_CONFIRM_PASSWORD = "Please re-enter your password correctly.";
+    public static final String MES_ERROR_INVALID_OTP = "The OTP is incorrect.";
 
     public static final String MES_ALERT_CAMPAIGN_CART_ORDER = "Order within Campaign can only be completed individually.";
 
@@ -47,4 +48,5 @@ public class StringUtils {
     public static final String MES_SUCCESSFUL_UPDATE_PASSWORD = "Your password has been reset!";
     public static final String MES_SUCCESSFUL_UPDATE_PROFILE = "Your profile has been updated!";
     public static final String MES_SUCCESSFUL_ORDER = "Your order has been processed!";
+    public static final String MES_SUCCESSFUL_OTP = "Your number has been successfully confirmed!";
 }

@@ -63,12 +63,10 @@ public class OrderFragment extends Fragment {
             public void onOrderFound(List<Order> orderList) {
                 super.onOrderFound(orderList);
                 if (orderList.size() > 0) {
-                    System.out.println("found " + orderStatus);
                     layoutLoading.setVisibility(View.INVISIBLE);
                     layoutNoOrder.setVisibility(View.INVISIBLE);
                     layoutOrderView.setVisibility(View.VISIBLE);
                 } else {
-                    System.out.println("found " + orderStatus);
                     layoutLoading.setVisibility(View.INVISIBLE);
                     layoutNoOrder.setVisibility(View.VISIBLE);
                     layoutOrderView.setVisibility(View.INVISIBLE);
@@ -78,7 +76,6 @@ public class OrderFragment extends Fragment {
             @Override
             public void onFailedAPICall(int code) {
                 super.onFailedAPICall(code);
-                System.out.println("not found " + orderStatus);
                 layoutLoading.setVisibility(View.INVISIBLE);
                 layoutNoOrder.setVisibility(View.VISIBLE);
                 layoutOrderView.setVisibility(View.INVISIBLE);

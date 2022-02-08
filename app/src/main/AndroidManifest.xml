@@ -12,11 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WSGroup"
         android:usesCleartextTraffic="true">
-        <activity android:name=".views.activities.OrderActivity"></activity>
-        <activity android:name=".views.activities.account.DeliveryAddressActivity" />
-        <activity android:name=".views.activities.ordering.OrderInfoActivity" />
-        <activity android:name=".views.activities.ordering.OrderConfirmActivity" />
-        <activity android:name=".views.activities.SupplierActivity" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -32,16 +27,35 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="Test message" />
 
-        <activity android:name=".views.activities.CartActivity" />
-        <activity android:name=".views.activities.account.AccountInformationActivity" />
-        <activity android:name=".views.activities.ProductDetailActivity" />
-        <activity android:name=".views.activities.account.AccountDetailActivity" />
-        <activity android:name=".views.activities.account.PasswordChangeActivity" />
-        <activity android:name=".views.activities.account.OTPConfirmActivity" />
-        <activity android:name=".views.activities.account.PhoneInputActivity" />
-        <activity android:name=".views.activities.account.SignInActivity" />
+        <activity android:name=".views.activities.OrderActivity"
+            android:exported="true"/>
+        <activity android:name=".views.activities.account.DeliveryAddressActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.ordering.InfoActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.ordering.ConfirmActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.SupplierActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.CartActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.account.AccountInformationActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.ProductDetailActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.account.AccountDetailActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.account.PasswordChangeActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.account.OTPConfirmActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.account.PhoneInputActivity"
+            android:exported="true" />
+        <activity android:name=".views.activities.account.SignInActivity"
+            android:exported="true" />
         <activity
             android:name=".views.activities.MainActivity"
+            android:exported="true"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +63,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <service
             android:name=".models.services.FirebaseMessageService"
             android:exported="false">
