@@ -49,6 +49,19 @@ public class MethodUtils {
         return returnedDate;
     }
 
+    public static String formatDateWithTime(String dateString){
+        String returnedDate = "";
+        SimpleDateFormat format = new SimpleDateFormat("HH:MM MMM dd, yyyy");
+        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-dd-MM'T'HH:mm:ss.SSS'Z'");
+        try {
+            returnedDate = format.format(dateParse.parse(dateString));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return returnedDate;
+    }
+
     public static void main(String[] args) {
         try {
             String fullDate = "2022-10-01T00:00:00.000Z";

@@ -81,7 +81,7 @@ public class PhoneInputActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String stringPhone = editPhone.getText().toString();
+                String stringPhone = "0" + editPhone.getText().toString();
                 if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
                     btnSendOTP.setEnabled(false);
                     btnSendOTP.setBackground(getResources().getDrawable(R.color.gray_light));
@@ -128,7 +128,7 @@ public class PhoneInputActivity extends AppCompatActivity {
                 dialogBoxLoading = new DialogBoxLoading(PhoneInputActivity.this);
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                String stringPhone = editPhone.getText().toString();
+                String stringPhone = "0" + editPhone.getText().toString();
 
                 APIUserCaller.findUserByPhoneNumber(stringPhone, getApplication(), new APIListener() {
                     @Override
@@ -185,31 +185,8 @@ public class PhoneInputActivity extends AppCompatActivity {
     }
 
     private void sendOTP(String stringPhone) {
-
-        firebaseService = new FirebasePhoneAuthService(this, stringPhone) {
-            @Override
-            public void onOTPSent() {
-                super.onOTPSent();
-                if (dialogBoxLoading.isShowing()) {
-                    dialogBoxLoading.dismiss();
-                }
-            }
-        };
-
         DialogBoxOTP dialogBoxOTP =
-                new DialogBoxOTP(PhoneInputActivity.this, getApplicationContext(), stringPhone, requestCode) {
-//                    @Override
-//                    public void generateOTP() {
-////                        setLabel();
-////
-////                        setLabel();
-////                        resetCountDown();
-////                        if (dialogBoxLoading.isShowing()) {
-////                            dialogBoxLoading.dismiss();
-////                        }
-//                    }
-
-                };
+                new DialogBoxOTP(PhoneInputActivity.this, getApplicationContext(), stringPhone, requestCode);
         dialogBoxOTP.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxOTP.show();
     }
