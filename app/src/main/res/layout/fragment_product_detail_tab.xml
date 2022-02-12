@@ -107,7 +107,7 @@
                             android:gravity="center"
                             android:fontFamily="monospace"
                             android:text="0.0"
-                            android:textColor="@color/black"
+                            android:textColor="@color/gray_dark"
                             android:textSize="22sp"
                             android:textStyle="bold"
                             app:layout_constraintTop_toTopOf="parent"
@@ -132,7 +132,7 @@
                                 android:fontFamily="monospace"
                                 android:gravity="left"
                                 android:text="Orders:"
-                                android:textColor="@color/black"
+                                android:textColor="@color/gray_dark"
                                 android:textSize="15sp"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintLeft_toLeftOf="parent"
@@ -146,7 +146,7 @@
                                 android:fontFamily="monospace"
                                 android:gravity="right|center"
                                 android:text="0K"
-                                android:textColor="@color/black"
+                                android:textColor="@color/gray_dark"
                                 android:textSize="15sp"
                                 android:textStyle="bold"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -161,7 +161,7 @@
                                 android:fontFamily="monospace"
                                 android:gravity="left"
                                 android:text="Reviews:"
-                                android:textColor="@color/black"
+                                android:textColor="@color/gray_dark"
                                 android:textSize="15sp"
                                 app:layout_constraintTop_toBottomOf="@id/lblProductOrderCount"
                                 app:layout_constraintLeft_toLeftOf="parent"
@@ -175,7 +175,7 @@
                                 android:fontFamily="monospace"
                                 android:gravity="right|center"
                                 android:text="0K"
-                                android:textColor="@color/black"
+                                android:textColor="@color/gray_dark"
                                 android:textSize="15sp"
                                 android:textStyle="bold"
                                 app:layout_constraintTop_toBottomOf="@id/txtProductOrderCount"
@@ -206,7 +206,7 @@
                             android:fontFamily="monospace"
                             android:gravity="left"
                             android:text=" Discount"
-                            android:textColor="@color/black"
+                            android:textColor="@color/gray_dark"
                             android:textSize="15sp"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toLeftOf="@id/guidelineDiscount"
@@ -229,8 +229,7 @@
                         android:id="@+id/layoutBasePrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="15dp"
-                        android:paddingHorizontal="10dp"
+                        android:padding="10dp"
                         android:layout_marginBottom="2dp"
                         android:background="@color/white">
 
@@ -241,7 +240,7 @@
                             android:gravity="left"
                             android:text="Base Price: "
                             android:textColor="@color/black"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -255,7 +254,7 @@
                             android:gravity="left"
                             android:text="0.000d"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintBottom_toTopOf="@id/txtProductRetailPrice" />
 
@@ -267,12 +266,28 @@
                             android:gravity="left"
                             android:text="0.000d"
                             android:textColor="@color/red"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/txtProductRetailPriceORG" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/txtCampaignDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="7dp"
+                        android:paddingHorizontal="15dp"
+                        android:fontFamily="monospace"
+                        android:gravity="left"
+                        android:text="Ongoing Campaign"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintLayoutCampaign"
@@ -298,17 +313,21 @@
                                 app:layout_constraintTop_toTopOf="parent">
 
                                 <TextView
-                                    android:id="@+id/txtCampaignDescription"
-                                    android:layout_width="wrap_content"
+                                    android:id="@+id/txtCampaignNote"
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:paddingRight="10dp"
                                     android:fontFamily="monospace"
                                     android:gravity="left"
                                     android:text="Ongoing Campaign"
                                     android:textColor="@color/black"
-                                    android:textSize="18sp"
+                                    android:textSize="16sp"
                                     android:textStyle="bold"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
                                     app:layout_constraintLeft_toLeftOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintRight_toLeftOf="@id/txtCampaignPrice"
                                     app:layout_constraintBottom_toBottomOf="parent"/>
 
                                 <TextView
@@ -318,7 +337,7 @@
                                     android:fontFamily="monospace"
                                     android:text="0.000d"
                                     android:textColor="@color/red"
-                                    android:textSize="18dp"
+                                    android:textSize="16dp"
                                     android:textStyle="bold"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:layout_constraintRight_toRightOf="parent"
@@ -350,7 +369,7 @@
                                         android:fontFamily="monospace"
                                         android:gravity="left"
                                         android:text="Quantity:"
-                                        android:textColor="@color/black"
+                                        android:textColor="@color/gray_dark"
                                         android:textSize="14sp"/>
 
                                     <TextView
@@ -361,7 +380,7 @@
                                         android:fontFamily="monospace"
                                         android:gravity="left"
                                         android:text="00"
-                                        android:textColor="@color/black"
+                                        android:textColor="@color/gray_dark"
                                         android:textSize="14sp"
                                         android:textStyle="bold"/>
 
@@ -392,7 +411,7 @@
                                         android:fontFamily="monospace"
                                         android:gravity="right"
                                         android:text=""
-                                        android:textColor="@color/black"
+                                        android:textColor="@color/gray_dark"
                                         android:textSize="14sp"
                                         android:textStyle="bold"/>
 
@@ -439,7 +458,7 @@
                                             android:fontFamily="monospace"
                                             tools:text="0"
                                             android:textSize="14sp"
-                                            android:textColor="@color/black"/>
+                                            android:textColor="@color/gray_dark"/>
 
                                         <TextView
                                             android:id="@+id/lblCampaignOrderCount"
@@ -451,7 +470,7 @@
                                             android:paddingLeft="7dp"
                                             tools:text="orders"
                                             android:textSize="14sp"
-                                            android:textColor="@color/black"/>
+                                            android:textColor="@color/gray_dark"/>
 
                                     </LinearLayout>
 
@@ -473,7 +492,7 @@
                                             android:fontFamily="monospace"
                                             tools:text="0"
                                             android:textSize="14sp"
-                                            android:textColor="@color/black"/>
+                                            android:textColor="@color/gray_dark"/>
 
                                         <TextView
                                             android:id="@+id/lblCampaignQuantitySeparator"
@@ -485,7 +504,7 @@
                                             android:fontFamily="monospace"
                                             tools:text="/"
                                             android:textSize="14sp"
-                                            android:textColor="@color/black"/>
+                                            android:textColor="@color/gray_dark"/>
 
                                         <TextView
                                             android:id="@+id/txtCampaignQuantityBar"
@@ -496,7 +515,7 @@
                                             android:fontFamily="monospace"
                                             tools:text="0"
                                             android:textSize="14sp"
-                                            android:textColor="@color/black"/>
+                                            android:textColor="@color/gray_dark"/>
 
                                     </LinearLayout>
 
@@ -586,7 +605,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:orientation="vertical"
-                            app:layout_constraintGuide_percent="0.15"/>
+                            app:layout_constraintGuide_percent="0.16"/>
 
                         <TextView
                             android:id="@+id/txtProductQuantity"
@@ -650,7 +669,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:orientation="vertical"
-                                app:layout_constraintGuide_percent="0.15"/>
+                                app:layout_constraintGuide_percent="0.16"/>
 
                             <TextView
                                 android:id="@+id/txtProductQuantityWithCampaign"
@@ -697,7 +716,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:orientation="vertical"
-                                app:layout_constraintGuide_percent="0.15"/>
+                                app:layout_constraintGuide_percent="0.16"/>
 
                             <TextView
                                 android:id="@+id/txtProductQuantityTotalWithCampaign"

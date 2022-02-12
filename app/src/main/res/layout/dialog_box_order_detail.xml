@@ -153,7 +153,7 @@
                     android:fontFamily="monospace"
                     android:gravity="right|center"
                     android:text="0000"
-                    android:textColor="@color/black"
+                    android:textColor="@color/gray_dark"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintRight_toRightOf="parent"/>
@@ -319,7 +319,7 @@
                 android:layout_gravity="center"
                 android:fontFamily="monospace"
                 android:text="Total"
-                android:textColor="@color/black"
+                android:textColor="@color/gray_dark"
                 android:textSize="17dp"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"
