@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                         productIdList.add(product.getProduct().getProductId());
                     }
                 }
-                APICampaignCaller.getCampaignListById(productIdList, getApplication(), new APIListener() {
+                APICampaignCaller.getCampaignListByProductId(productIdList,null, getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> campaignList) {
                         super.onCampaignListFound(campaignList);
@@ -215,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.clearOnTabSelectedListeners();
         viewPager.clearOnPageChangeListeners();
         viewPager.setEnabled(false);
+        viewPager.setOffscreenPageLimit(0);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

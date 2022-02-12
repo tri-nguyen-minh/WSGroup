@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/gray_lighter"
@@ -15,30 +16,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/blue_main"
             android:orientation="vertical"
             android:paddingHorizontal="10dp"
             android:paddingVertical="5dp">
-
-            <TextView
-                android:id="@+id/txtOrderTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:fontFamily="monospace"
-                android:gravity="center|left"
-                android:text="HH:MM MMM DD, YYYY"
-                android:textColor="@color/gray_dark"
-                android:textSize="17sp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <ImageView
                 android:id="@+id/imgDiscount"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:src="@drawable/ic_direction_right"
+                android:tint="@color/white"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -46,158 +34,161 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutOrderSupplier"
+            android:id="@+id/constraintLayoutOrderPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:orientation="vertical"
-            android:layout_marginTop="2dp"
-            android:padding="10dp">
+            android:layout_marginTop="2dp">
 
-            <ImageView
-                android:id="@+id/imgSupplierAvatar"
-                android:layout_width="60dp"
-                android:layout_height="0dp"
-                android:src="@drawable/img_unavailable"
-                app:layout_constraintLeft_toLeftOf="parent"
+
+            <TextView
+                android:id="@+id/lblTotal"
+                android:text="Total"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/style_label_account_info"
+                android:paddingHorizontal="10dp"
+                android:textSize="15sp"
+                android:gravity="left"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center|left"
-                android:paddingLeft="10dp"
-                app:layout_constraintLeft_toRightOf="@id/imgSupplierAvatar"
-                app:layout_constraintRight_toRightOf="parent">
-
-                <TextView
-                    android:id="@+id/txtSupplierName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
-                    android:gravity="left"
-                    android:text=""
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <TextView
-                    android:id="@+id/txtSupplierAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="monospace"
-                    android:text=""
-                    android:textColor="@color/gray_dark"
-                    android:textSize="15dp"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    app:layout_constraintTop_toBottomOf="@id/txtSupplierName"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/txtOrderPrice"
+                android:gravity="center|right"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:text="0.000d"
+                android:fontFamily="monospace"
+                android:textColor="@color/red"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toRightOf="@+id/lblTotal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/style_txt_account_info" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutDiscountSelect"
+            android:id="@+id/constraintLayoutProductCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:orientation="vertical"
-            android:padding="10dp"
             android:layout_marginTop="2dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutDiscount"
+            <TextView
+                android:id="@+id/lblProductCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center|left"
-                app:layout_constraintTop_toTopOf="parent"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Number of Product"
+                android:textColor="@color/black"
+                android:textSize="15sp"
                 app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/layoutOrderProductCount"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutOrderProductCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                app:layout_constraintLeft_toRightOf="@id/lblProductCount"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardViewDiscountSelect"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/txtProductCount"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="5dp"
-                    android:visibility="gone"
-                    android:backgroundTint="@color/gray"
-                    app:layout_constraintBottom_toTopOf="@id/layoutDiscountDescription"
-                    app:layout_constraintLeft_toLeftOf="parent">
+                    android:layout_marginRight="7dp"
+                    android:paddingRight="5dp"
+                    android:paddingVertical="10dp"
+                    android:fontFamily="monospace"
+                    android:gravity="right|center"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:text="2"
+                    app:layout_constraintRight_toLeftOf="@id/lblProduct"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:cardCornerRadius="5dp"
-                        android:layout_margin="1dp"
-                        android:backgroundTint="@color/gray_lighter">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="9dp"
-                            android:layout_marginVertical="4dp"
-                            android:fontFamily="monospace"
-                            android:gravity="left"
-                            android:text="Saved Discounts"
-                            android:textColor="@color/black"
-                            android:textSize="15sp"
-                            android:textStyle="bold"/>
-
-                    </androidx.cardview.widget.CardView>
-
-                </androidx.cardview.widget.CardView>
-
-                <LinearLayout
-                    android:id="@+id/layoutDiscountDescription"
+                <TextView
+                    android:id="@+id/lblProduct"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center|left"
-                    android:orientation="horizontal"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintRight_toRightOf="parent">
-
-                    <TextView
-                        android:id="@+id/lblDiscountCode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="7dp"
-                        android:fontFamily="monospace"
-                        android:gravity="center|left"
-                        android:text="Discount Code"
-                        android:textColor="@color/gray"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/txtDiscountCode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:gravity="center|left"
-                        android:text="000000"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"/>
-
-
-                </LinearLayout>
+                    android:paddingRight="5dp"
+                    android:paddingVertical="10dp"
+                    android:fontFamily="monospace"
+                    android:gravity="right|center"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:text="Product"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutDiscount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/lblDiscount"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Discount"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/layoutDiscount"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutDiscount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:padding="10dp"
+                app:layout_constraintLeft_toRightOf="@+id/lblDiscount"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/txtDiscountCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:gravity="center|left"
+                    android:text="000000"
+                    android:textColor="@color/black"
+                    android:textSize="17sp"
+                    android:layout_marginBottom="5dp"
+                    android:textStyle="bold"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/layoutDiscountPrice"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <LinearLayout
                     android:id="@+id/layoutDiscountPrice"
@@ -205,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center|right"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtDiscountCode"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
 
@@ -215,8 +206,8 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
                         android:text="0.000d"
-                        android:textColor="@color/red"
-                        android:textSize="17dp"
+                        android:textColor="@color/gray_dark"
+                        android:textSize="16dp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -225,8 +216,8 @@
                         android:paddingLeft="7dp"
                         android:fontFamily="monospace"
                         android:text="OFF"
-                        android:textColor="@color/red"
-                        android:textSize="17dp"
+                        android:textColor="@color/gray_dark"
+                        android:textSize="16dp"
                         android:textStyle="bold"/>
 
                 </LinearLayout>
@@ -239,7 +230,8 @@
             android:id="@+id/layoutCampaign"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -435,57 +427,254 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutProductCount"
+            android:id="@+id/constraintLayoutAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:background="@color/white"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:layout_marginTop="2dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <TextView
+                android:id="@+id/lblAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center|left"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Deliver to"
+                android:textColor="@color/black"
+                android:textSize="15sp"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/txtAddress"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center|left"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent">
+            <TextView
+                android:id="@+id/txtAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:fontFamily="monospace"
+                android:gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                app:layout_constraintLeft_toRightOf="@+id/lblAddress"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-                    <TextView
-                        android:id="@+id/txtProductCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:gravity="center|left"
-                        android:text="00"
-                        android:textColor="@color/black"
-                        android:textSize="15sp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <TextView
-                        android:id="@+id/lblProductCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="7dp"
-                        android:fontFamily="monospace"
-                        android:gravity="center|left"
-                        android:text="Ordered Product"
-                        android:textColor="@color/gray_dark"
-                        android:textSize="15sp" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutSupplierName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="2dp">
 
+            <TextView
+                android:id="@+id/lblPayment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Payment"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/txtPayment"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-                </LinearLayout>
+            <TextView
+                android:id="@+id/txtPayment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:fontFamily="monospace"
+                android:gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toRightOf="@+id/lblPayment"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutOrderDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/lblOrderDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Ordered on"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/txtOrderDate"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtOrderDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:text="HH:MM MMM DD, YYYY"
+                android:fontFamily="monospace"
+                android:gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toRightOf="@+id/lblOrderDate"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutDeliverDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/lblDeliverDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Delivered on"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/txtDeliverDate"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtDeliverDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:text="HH:MM MMM DD, YYYY"
+                android:fontFamily="monospace"
+                android:gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toRightOf="@+id/lblDeliverDate"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutReturnDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/lblReturnDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Returned on"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/txtReturnDate"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtReturnDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:text="HH:MM MMM DD, YYYY"
+                android:fontFamily="monospace"
+                android:gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toRightOf="@+id/lblReturnDate"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutCancelDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/lblCancelDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:fontFamily="monospace"
+                android:gravity="left|center"
+                android:text="Cancelled on"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/txtCancelDate"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtCancelDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:paddingRight="5dp"
+                android:paddingVertical="10dp"
+                android:text="HH:MM MMM DD, YYYY"
+                android:fontFamily="monospace"
+                android:gravity="right|center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toRightOf="@+id/lblCancelDate"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

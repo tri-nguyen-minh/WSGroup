@@ -34,7 +34,8 @@ public class RecViewOrderProductPriceAdapter extends RecyclerView.Adapter<RecVie
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtProductName.setText(orderProductList.get(position).getProduct().getName());
-        holder.txtProductPrice.setText(MethodUtils.convertPriceString(orderProductList.get(position).getPrice()));
+        holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
+        holder.txtQuantityCount.setText(orderProductList.get(position).getQuantity() + "");
     }
 
     @Override
@@ -43,12 +44,13 @@ public class RecViewOrderProductPriceAdapter extends RecyclerView.Adapter<RecVie
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtProductName, txtProductPrice;
+        private TextView txtProductName, txtProductPrice, txtQuantityCount;
 
         public ViewHolder(View view) {
             super(view);
             txtProductName = view.findViewById(R.id.txtProductName);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
+            txtQuantityCount = view.findViewById(R.id.txtQuantityCount);
         }
     }
 }

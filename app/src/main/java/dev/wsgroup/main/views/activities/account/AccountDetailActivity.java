@@ -22,10 +22,11 @@ import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
-import dev.wsgroup.main.views.boxes.DialogBoxLoading;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class AccountDetailActivity extends AppCompatActivity {
 
@@ -65,8 +66,16 @@ public class AccountDetailActivity extends AppCompatActivity {
         activity = this;
         passwordDisplayed = false;
         passwordConfirmedDisplayed = false;
-        String phoneNumber = getIntent().getStringExtra("PHONE_NUMBER");
+        String phoneNumber = getIntent().getStringExtra("PHONE");
+        System.out.println(phoneNumber);
+        if(phoneNumber != null) {
+            String phoneDisplay = MethodUtils.formatPhoneNumber(phoneNumber);
+            editPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(phoneDisplay));
+            editPhoneNumber.setEnabled(false);
+        }
 
+        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         btnConfirm.setEnabled(false);
 
         editPassword.setText("Password1!");
@@ -143,14 +152,6 @@ public class AccountDetailActivity extends AppCompatActivity {
                 }
             }
         });
-
-        if(phoneNumber != null) {
-            editPhoneNumber.setText(phoneNumber);
-            editPhoneNumber.setEnabled(false);
-        }
-
-        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
         imgBackFromAccountDetailRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -387,7 +388,7 @@ public class AccountDetailActivity extends AppCompatActivity {
         if (!editUsername.getText().toString().matches(StringUtils.USERNAME_REGEX)) {
             return StringUtils.MES_ERROR_INVALID_USERNAME;
         }
-        if (!editPhoneNumber.getText().toString().matches(StringUtils.PHONE_REGEX)) {
+        if (!MethodUtils.revertPhoneNumber(editPhoneNumber.getText().toString()).matches(StringUtils.PHONE_REGEX)) {
             return StringUtils.MES_ERROR_INVALID_NUMBER;
         }
         if(!editMail.getText().toString().isEmpty()) {

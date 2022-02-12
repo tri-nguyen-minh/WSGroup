@@ -3,6 +3,8 @@ package dev.wsgroup.main.models.recycleViewAdapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +27,9 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.ProductDetailActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
+import dev.wsgroup.main.views.activities.account.AccountDetailActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProductListAdapter.ViewHolder> {
 
@@ -33,6 +37,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
     private List<Product> productsList;
     private Context context;
     private Activity activity;
+    private DialogBoxLoading dialogBoxLoading;
 
     public void setProductsList(List<Product> productsList) {
         this.productsList = productsList;
@@ -60,18 +65,22 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
         if(productsList.get(position).getImageList() != null) {
             Glide.with(context).load(productsList.get(position).getImageList().get(0)).into(holder.imgProduct);
         }
-        holder.txtProductOrderCount.setText(MethodUtils.convertOrderOrReviewCount(productOrderCount));
-        holder.txtRetailPrice.setText(MethodUtils.convertPriceString(productsList.get(position).getRetailPrice()));
+        holder.txtProductOrderCount.setText(MethodUtils.formatOrderOrReviewCount(productOrderCount));
+        holder.txtRetailPrice.setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
         holder.lblProductOrderCount.setText(" order(s)");
 //        holder.lblRetailPrice.setText("Retail:");
         holder.ratingProduct.setRating((float)productsList.get(position).getRating());
         holder.productCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialogBoxLoading = new DialogBoxLoading(activity);
+                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.show();
                 APIProductCaller.getProductById(productId, activity.getApplication(), new APIListener() {
                     @Override
                     public void onProductFound(Product product) {
                         super.onProductFound(product);
+                        dialogBoxLoading.dismiss();
                         Intent intent = new Intent(activity.getApplicationContext(), ProductDetailActivity.class);
                         intent.putExtra("PRODUCT", product);
                         activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);

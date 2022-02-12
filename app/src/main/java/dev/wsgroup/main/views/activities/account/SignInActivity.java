@@ -1,7 +1,6 @@
 package dev.wsgroup.main.views.activities.account;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
@@ -21,19 +20,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.HashMap;
-import java.util.List;
-
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -69,6 +63,10 @@ public class SignInActivity extends AppCompatActivity {
         editUsername.setText("Customer");
         editPassword.setText("Password1!");
 
+        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        btnSignIn.setEnabled(false);
+        btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
+
         editUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -94,8 +92,6 @@ public class SignInActivity extends AppCompatActivity {
                 editPassword.clearFocus();
             }
         });
-
-        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
         imgBackFromSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,9 +143,11 @@ public class SignInActivity extends AppCompatActivity {
                 if(s.length() > 0) {
                     if (!editUsername.getText().toString().isEmpty()) {
                         btnSignIn.setEnabled(true);
+                        btnSignIn.setBackground(getResources().getDrawable(R.color.blue_main));
                     }
                 } else {
                     btnSignIn.setEnabled(false);
+                    btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
                 }
             }
 
@@ -176,7 +174,6 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        btnSignIn.setEnabled(false);
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

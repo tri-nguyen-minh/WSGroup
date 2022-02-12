@@ -7,10 +7,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,9 +17,9 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.views.boxes.DialogBoxDiscountSingle;
+import dev.wsgroup.main.views.dialogbox.DialogBoxDiscountSingle;
 
-public class RecViewDiscountSimpleAdapter extends RecyclerView.Adapter<RecViewDiscountSimpleAdapter.ViewHolder>  {
+public class RecViewDiscountSimpleAdapter extends RecyclerView.Adapter<RecViewDiscountSimpleAdapter.ViewHolder> {
 
     private List<Discount> discountList;
     private Context context;
@@ -47,7 +45,7 @@ public class RecViewDiscountSimpleAdapter extends RecyclerView.Adapter<RecViewDi
 
     @Override
     public void onBindViewHolder(RecViewDiscountSimpleAdapter.ViewHolder holder, int position) {
-        holder.txtRecViewDiscountPrice.setText(MethodUtils.convertPriceString(discountList.get(position).getDiscountPrice()));
+        holder.txtRecViewDiscountPrice.setText(MethodUtils.formatPriceString(discountList.get(position).getDiscountPrice()));
         holder.lblDiscountOFF.setText("OFF");
         holder.txtDiscountEndDate.setText(MethodUtils.formatDate(discountList.get(position).getEndDate()));
         holder.cardRecViewDiscountSimple.setOnClickListener(new View.OnClickListener() {

@@ -1,4 +1,4 @@
-package dev.wsgroup.main.views.boxes;
+package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 

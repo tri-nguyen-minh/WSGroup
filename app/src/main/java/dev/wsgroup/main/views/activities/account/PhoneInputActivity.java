@@ -1,7 +1,6 @@
 package dev.wsgroup.main.views.activities.account;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
@@ -26,9 +25,9 @@ import dev.wsgroup.main.models.services.FirebasePhoneAuthService;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
-import dev.wsgroup.main.views.boxes.DialogBoxLoading;
-import dev.wsgroup.main.views.boxes.DialogBoxOTP;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
+import dev.wsgroup.main.views.dialogbox.DialogBoxOTP;
 
 public class PhoneInputActivity extends AppCompatActivity {
 

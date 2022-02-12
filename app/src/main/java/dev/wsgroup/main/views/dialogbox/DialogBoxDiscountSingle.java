@@ -1,8 +1,7 @@
-package dev.wsgroup.main.views.boxes;
+package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Discount;
@@ -57,7 +54,7 @@ public class DialogBoxDiscountSingle extends Dialog {
 
         txtDiscountDescription.setText(discount.getDescription());
         txtDiscountCode.setText(discount.getCode());
-        txtDiscountPrice.setText(MethodUtils.convertPriceString(discount.getDiscountPrice()));
+        txtDiscountPrice.setText(MethodUtils.formatPriceString(discount.getDiscountPrice()));
         txtDiscountQuantity.setText(discount.getQuantity() + "");
 
         imgCloseDialogBox.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +77,7 @@ public class DialogBoxDiscountSingle extends Dialog {
                 linearLayoutQuantityCondition.setVisibility(View.GONE);
             }
             if(discount.getMinPrice() > 0) {
-                txtDiscountMinPrice.setText(MethodUtils.convertPriceString(discount.getMinPrice()));
+                txtDiscountMinPrice.setText(MethodUtils.formatPriceString(discount.getMinPrice()));
                 linearLayoutPriceCondition.setVisibility(View.VISIBLE);
             } else {
                 linearLayoutPriceCondition.setVisibility(View.GONE);

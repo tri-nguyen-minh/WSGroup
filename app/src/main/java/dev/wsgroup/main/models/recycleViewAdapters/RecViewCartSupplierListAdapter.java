@@ -38,7 +38,8 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
+import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecViewCartSupplierListAdapter.ViewHolder> {
 
@@ -51,6 +52,7 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
     private Context context;
     private RecViewCartProductListAdapter cartAdapter;
     private SharedPreferences sharedPreferences;
+    private DialogBoxLoading dialogBoxLoading;
 
     public RecViewCartSupplierListAdapter(Context context, Activity activity) {
         sharedPreferences = activity.getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
@@ -149,7 +151,7 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         double totalPrice = getTotalPriceCart(position);
         if(totalPrice > 0) {
             holder.layoutTotalPrice.setVisibility(View.VISIBLE);
-            holder.txtTotalCartPrice.setText(MethodUtils.convertPriceString(totalPrice));
+            holder.txtTotalCartPrice.setText(MethodUtils.formatPriceString(totalPrice));
             holder.btnCheckout.setEnabled(true);
             holder.btnCheckout.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
         } else {
@@ -196,7 +198,12 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
                 orderProduct = new OrderProduct();
                 orderProduct.setProductId(cartProduct.getProduct().getProductId());
                 orderProduct.setQuantity(cartProduct.getQuantity());
-                orderProduct.setPrice(getProductTotalPrice(cartProduct));
+                if (cartProduct.getCampaignId().isEmpty()) {
+                    orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
+                } else {
+                    orderProduct.setPrice(cartProduct.getProduct().getCampaign().getPrice());
+                }
+                orderProduct.setTotalPrice(getProductTotalPrice(cartProduct));
                 orderProduct.setCampaignId(cartProduct.getCampaignId());
                 orderProduct.setProductType(cartProduct.getProductType());
                 orderProduct.setProduct(cartProduct.getProduct());
@@ -216,6 +223,9 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         cartAdapter = new RecViewCartProductListAdapter(context, activity) {
             @Override
             public void onRemoveProduct(int productPosition) {
+                dialogBoxLoading = new DialogBoxLoading(activity);
+                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.show();
                 CartProduct cartProduct = shoppingCart.get(supplierList.get(position).getId()).get(productPosition);
                 APICartCaller.deleteCartItem(sharedPreferences.getString("TOKEN", "" ), cartProduct.getId(),
                         activity.getApplication(), new APIListener() {
@@ -245,6 +255,7 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
                                         e.printStackTrace();
                                     }
                                 }
+                                dialogBoxLoading.dismiss();
                                 notifyDataSetChanged();
                             }
                         });

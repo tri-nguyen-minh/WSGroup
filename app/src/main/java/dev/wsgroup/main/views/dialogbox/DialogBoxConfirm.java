@@ -1,4 +1,4 @@
-package dev.wsgroup.main.views.boxes;
+package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;

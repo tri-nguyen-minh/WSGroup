@@ -10,10 +10,13 @@ import java.util.List;
 public class Order implements Serializable {
 
     private List<OrderProduct> orderProductList;
-    private String id, campaignId, addressId, paymentId, customerId, code, status;
+    private String id, campaignId, customerId, code, status;
     private double discountPrice, shippingFee, totalPrice;
     private Supplier supplier;
+    private Address address;
     private CustomerDiscount customerDiscount;
+    private Payment payment;
+    private String dateCreated, dateUpdated;
 
     public Order() {
     }
@@ -40,22 +43,6 @@ public class Order implements Serializable {
 
     public void setCampaignId(String campaignId) {
         this.campaignId = campaignId;
-    }
-
-    public String getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(String addressId) {
-        this.addressId = addressId;
-    }
-
-    public String getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(String paymentId) {
-        this.paymentId = paymentId;
     }
 
     public String getCustomerId() {
@@ -114,6 +101,14 @@ public class Order implements Serializable {
         this.supplier = supplier;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
     public CustomerDiscount getCustomerDiscount() {
         return customerDiscount;
     }
@@ -122,34 +117,66 @@ public class Order implements Serializable {
         this.customerDiscount = customerDiscount;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(String dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
+
     public static Order getOrderFromJSON(JSONObject jsonObject) throws Exception {
         Order order = new Order();
         order.setId(jsonObject.getString("id"));
-        String jsonString = jsonObject.getString("customerdiscountcodeid");
-        CustomerDiscount customerDiscount = null;
-        if (jsonString != null) {
-            customerDiscount = new CustomerDiscount();
-            customerDiscount.setId(jsonString);
-        }
+
+        String stringObject = jsonObject.getString("customerdiscountcodeid");
+        CustomerDiscount customerDiscount = new CustomerDiscount();
+        customerDiscount.setId((!stringObject.equals("null")) ? stringObject : "");
         order.setCustomerDiscount(customerDiscount);
+
         order.setStatus(jsonObject.getString("status"));
-        jsonString = jsonObject.getString("campaignid");
-        order.setCampaignId((jsonString != null) ? jsonString : "");
-        jsonString = jsonObject.getString("addressid");
-        order.setAddressId((jsonString != null) ? jsonString : "");
-        jsonString = jsonObject.getString("id");
-        order.setPaymentId((jsonString != null) ? jsonString : "");
+        stringObject = jsonObject.getString("campaignid");
+        order.setCampaignId((!stringObject.equals("null")) ? stringObject : "");
+        stringObject = jsonObject.getString("addressid");
+        Address address = new Address();
+        address.setId((!stringObject.equals("null")) ? stringObject : "");
+        address.setAddressString(jsonObject.getString("address"));
+        order.setAddress(address);
+
+        stringObject = jsonObject.getString("paymentid");
+        Payment payment = new Payment();
+        payment.setId((!stringObject.equals("null")) ? stringObject : "");
+        order.setPayment(payment);
         order.setDiscountPrice(jsonObject.getDouble("discountprice"));
         order.setShippingFee(jsonObject.getDouble("shippingfee"));
         order.setTotalPrice(jsonObject.getDouble("totalprice"));
+        order.setDateCreated(jsonObject.getString("createdat"));
+        order.setDateUpdated(jsonObject.getString("updatedat"));
 
         order.setCode(jsonObject.getString("ordercode"));
         Supplier supplier = new Supplier();
         supplier.setId(jsonObject.getString("supplierid"));
+        supplier.setName(jsonObject.getString("suppliername"));
         order.setSupplier(supplier);
 
         List<OrderProduct> orderProductList = new ArrayList<>();
-        OrderProduct orderProduct = null;
+        OrderProduct orderProduct;
         JSONArray jsonArray = jsonObject.getJSONArray("details");
         for (int i = 0; i < jsonArray.length(); i++) {
             orderProduct = OrderProduct.getOrderProductFromJSON(jsonArray.getJSONObject(i));

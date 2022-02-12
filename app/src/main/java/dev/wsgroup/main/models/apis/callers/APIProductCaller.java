@@ -25,29 +25,33 @@ public class APIProductCaller {
 
     private static RequestQueue requestQueue;
     private static Product product;
+    private static List<Product> productList;
 
-    public static void getAllProduct(Application application, APIListener APIListener) {
+    public static void getAllProduct(List<Product> list, Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-
                 @Override
                 public void onResponse(JSONObject response) {
                     JSONObject jsonObject = null;
                     product = null;
-                    List<Product> productList = new ArrayList<>();
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
-                        for (int i = 0; i < jsonArray.length();i++) {
-                            jsonObject = jsonArray.getJSONObject(i);
-                            product = Product.getProductFromJSON(jsonObject);
-                            if(product.getStatus().equals("active")) {
-                                productList.add(product);
+                        if (jsonArray.length() > 0) {
+                            productList = (list == null) ? new ArrayList<>() : list;
+                            for (int i = 0; i < jsonArray.length();i++) {
+                                jsonObject = jsonArray.getJSONObject(i);
+                                product = Product.getProductFromJSON(jsonObject);
+                                if(!product.getStatus().equals("deactivated")) {
+                                    productList.add(product);
+                                }
                             }
+                            APIListener.onProductListFound(productList);
+                        } else {
+                            APIListener.onProductListFound(new ArrayList<>());
                         }
-                        APIListener.onProductListFound(productList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -88,7 +92,7 @@ public class APIProductCaller {
                         JSONObject jsonObject = response.getJSONObject("data");
                         if(jsonObject != null) {
                             product = Product.getProductFromJSON(jsonObject);
-                            APICampaignCaller.getCampaignById(productId, application, new APIListener() {
+                            APICampaignCaller.getCampaignByProductId(productId, application, new APIListener() {
                                 @Override
                                 public void onCampaignFound(Campaign campaign) {
                                     super.onCampaignFound(campaign);

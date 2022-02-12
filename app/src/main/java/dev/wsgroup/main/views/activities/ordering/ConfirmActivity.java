@@ -32,21 +32,21 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
+import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
 public class ConfirmActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
     private TextView txtSupplierName, txtSupplierAddress, lblOrderingProduct,
             txtPrice, txtCampaignOrderCount, txtCampaignOrderQuantityCount,
-            txtCampaignQuantityCount, txtDiscountPrice, lblDiscountCode;
+            txtCampaignQuantityCount, txtDiscountPrice, txtDiscountDescription;
     private ProgressBar progressBarQuantityCount;
     private RecyclerView recViewCheckoutOrderProduct;
     private Button btnConfirmOrder;
     private LinearLayout layoutCampaign, layoutScreen;
     private EditText editDiscount;
     private ConstraintLayout layoutDiscountSelect;
-    private LinearLayout layoutDiscountPrice;
+    private LinearLayout layoutDiscountDescription;
     private ProgressBar progressBarLoading;
 
     private Supplier supplier;
@@ -74,7 +74,7 @@ public class ConfirmActivity extends AppCompatActivity {
         txtCampaignOrderQuantityCount = findViewById(R.id.txtCampaignOrderQuantityCount);
         txtCampaignQuantityCount = findViewById(R.id.txtCampaignQuantityCount);
         txtDiscountPrice = findViewById(R.id.txtDiscountPrice);
-//        lblDiscountCode = findViewById(R.id.lblDiscountCode);
+        txtDiscountDescription = findViewById(R.id.txtDiscountDescription);
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
         recViewCheckoutOrderProduct = findViewById(R.id.recViewCheckoutOrderProduct);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
@@ -82,13 +82,11 @@ public class ConfirmActivity extends AppCompatActivity {
         layoutScreen = findViewById(R.id.layoutScreen);
         editDiscount = findViewById(R.id.editDiscount);
         layoutDiscountSelect = findViewById(R.id.layoutDiscountSelect);
-        layoutDiscountPrice = findViewById(R.id.layoutDiscountPrice);
+        layoutDiscountDescription = findViewById(R.id.layoutDiscountDescription);
         progressBarLoading = findViewById(R.id.progressBarLoading);
 
-        discountPrice = 0;
-        txtDiscountPrice.setText(setDiscountPrice());
         order = (Order) getIntent().getSerializableExtra("ORDER");
-        process = getIntent().getIntExtra("PROCESS", 0);
+        process = getIntent().getIntExtra("PROCESS", IntegerUtils.REQUEST_COMMON);
         supplier = order.getSupplier();
 
         if(supplier != null) {
@@ -104,7 +102,7 @@ public class ConfirmActivity extends AppCompatActivity {
             } else {
                 campaign = order.getOrderProductList().get(0).getProduct().getCampaign();;
                 layoutCampaign.setVisibility(View.VISIBLE);
-                txtPrice.setText(MethodUtils.convertPriceString(campaign.getPrice()));
+                txtPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
                 txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
                 txtCampaignOrderQuantityCount.setText(campaign.getQuantityCount() + "");
                 txtCampaignQuantityCount.setText(campaign.getQuantity() + "");
@@ -115,11 +113,11 @@ public class ConfirmActivity extends AppCompatActivity {
         }
 
 //        discount
-        List<CustomerDiscount> customerDiscountList = getDiscountList();
+        discountPrice = 0;
         discountCode = "";
-
+        List<CustomerDiscount> customerDiscountList = getDiscountList();
         progressBarLoading.setVisibility(View.INVISIBLE);
-        layoutDiscountPrice.setVisibility(View.INVISIBLE);
+        layoutDiscountDescription.setVisibility(View.INVISIBLE);
 
 
 
@@ -132,20 +130,22 @@ public class ConfirmActivity extends AppCompatActivity {
                     if (!discountCode.equals(currentDiscountCode)) {
                         if (!currentDiscountCode.isEmpty()) {
                             progressBarLoading.setVisibility(View.VISIBLE);
+                            layoutDiscountDescription.setVisibility(View.INVISIBLE);
                             discountCode = currentDiscountCode;
                             customerDiscount = findDiscountByCode(discountCode, customerDiscountList);
                             if (customerDiscount != null) {
                                 discountPrice = customerDiscount.getDiscount().getDiscountPrice();
-                                txtDiscountPrice.setText(MethodUtils.convertPriceString(discountPrice));
+                                txtDiscountDescription.setText(customerDiscount.getDiscount().getDescription());
+                                txtDiscountPrice.setText(MethodUtils.formatPriceString(discountPrice));
                                 progressBarLoading.setVisibility(View.INVISIBLE);
-                                layoutDiscountPrice.setVisibility(View.VISIBLE);
+                                layoutDiscountDescription.setVisibility(View.VISIBLE);
                             } else {
                                 progressBarLoading.setVisibility(View.INVISIBLE);
-                                layoutDiscountPrice.setVisibility(View.INVISIBLE);
+                                layoutDiscountDescription.setVisibility(View.INVISIBLE);
                             }
                         } else {
                             progressBarLoading.setVisibility(View.INVISIBLE);
-                            layoutDiscountPrice.setVisibility(View.INVISIBLE);
+                            layoutDiscountDescription.setVisibility(View.INVISIBLE);
                         }
                     }
                 }
@@ -209,14 +209,6 @@ public class ConfirmActivity extends AppCompatActivity {
             }
         }
         return null;
-    }
-
-    private String setDiscountPrice() {
-        String price = "";
-        if (discountPrice != 0) {
-            price = MethodUtils.convertPriceString(discountPrice);
-        }
-        return price;
     }
 
     private void setupRecViewOrderList() {

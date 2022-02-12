@@ -1,4 +1,4 @@
-package dev.wsgroup.main.views.boxes;
+package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -8,21 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Campaign;
-import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Product;
-import dev.wsgroup.main.models.recycleViewAdapters.RecViewCampaignListAdapter;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
 public class DialogBoxCampaign extends Dialog {
@@ -66,7 +59,7 @@ public class DialogBoxCampaign extends Dialog {
 
         campaign = product.getCampaign();
 
-        txtCampaignPrice.setText(MethodUtils.convertPriceString(campaign.getPrice()));
+        txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
         txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate()));
         txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
         txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");

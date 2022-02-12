@@ -40,7 +40,7 @@ public class OTPConfirmActivity extends AppCompatActivity {
         btnConfirmOTP = findViewById(R.id.btnConfirmOTP);
         CardView cardViewBackFromOTP = findViewById(R.id.cardViewBackFromOTP);
 
-        String phoneNumber = getIntent().getStringExtra("PHONE_NUMBER");
+        String phoneNumber = getIntent().getStringExtra("PHONE");
 
         generateOTP();
 //        String ID = Settings.Secure.getString(getContentResolver(),
@@ -88,7 +88,7 @@ public class OTPConfirmActivity extends AppCompatActivity {
                     } else {
                         nextIntent = new Intent(getApplicationContext(), PasswordChangeActivity.class);
                     }
-                    nextIntent.putExtra("PHONE_NUMBER", phoneNumber);
+                    nextIntent.putExtra("PHONE", phoneNumber);
                     startActivityForResult(nextIntent, requestCode);
                 } else {
                     generateOTP();

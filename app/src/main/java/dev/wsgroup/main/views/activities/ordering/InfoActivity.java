@@ -30,15 +30,16 @@ import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
+import dev.wsgroup.main.models.dtos.Payment;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderProductPriceAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.activities.account.DeliveryAddressActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
-import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
-import dev.wsgroup.main.views.boxes.DialogBoxLoading;
+import dev.wsgroup.main.views.activities.account.DeliveryAddressSelectActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class InfoActivity extends AppCompatActivity {
 
@@ -60,6 +61,7 @@ public class InfoActivity extends AppCompatActivity {
     private Order order;
     private CustomerDiscount customerDiscount;
     private Address currentAddress;
+    private Payment currentPayment;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -88,7 +90,7 @@ public class InfoActivity extends AppCompatActivity {
         phone = sharedPreferences.getString("PHONE", "");
         token = sharedPreferences.getString("TOKEN", "");
         order = (Order) getIntent().getSerializableExtra("ORDER");
-        process = getIntent().getIntExtra("PROCESS", 0);
+        process = getIntent().getIntExtra("PROCESS", IntegerUtils.REQUEST_COMMON);
 
         if (order != null) {
             totalPrice = 0; discountPrice = 0; finalPrice = 0; deliveryPrice = 0;
@@ -97,16 +99,16 @@ public class InfoActivity extends AppCompatActivity {
                 totalPrice += orderProduct.getPrice();
             }
             totalPrice -= deliveryPrice;
-            txtDeliveryPrice.setText(MethodUtils.convertPriceString(deliveryPrice));
+            txtDeliveryPrice.setText(MethodUtils.formatPriceString(deliveryPrice));
 
-            txtTotalPrice.setText(MethodUtils.convertPriceString(totalPrice));
+            txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
             customerDiscount = order.getCustomerDiscount();
             if (customerDiscount != null) {
                 discountPrice = customerDiscount.getDiscount().getDiscountPrice();
             }
-            txtDiscountPrice.setText(MethodUtils.convertPriceString(discountPrice));
+            txtDiscountPrice.setText(MethodUtils.formatPriceString(discountPrice));
             finalPrice = totalPrice - discountPrice;
-            txtFinalPrice.setText(MethodUtils.convertPriceString(finalPrice));
+            txtFinalPrice.setText(MethodUtils.formatPriceString(finalPrice));
 
             RecViewOrderProductPriceAdapter adapter = new RecViewOrderProductPriceAdapter();
             adapter.setOrderProductList(orderProductList);
@@ -127,10 +129,9 @@ public class InfoActivity extends AppCompatActivity {
 
         btnConfirmOrder.setEnabled(false);
         btnConfirmOrder.getBackground().setTint(getResources().getColor(R.color.gray_light));
-        editPhoneNumber.setText(MethodUtils.formatPhoneNumber(phone));
+        editPhoneNumber.setText(MethodUtils
+                .formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phone)));
         editPhoneNumber.setEnabled(false);
-
-//        get Default Address
 
         imgBackFromCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,7 +151,7 @@ public class InfoActivity extends AppCompatActivity {
         layoutAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent addressIntent = new Intent(getApplicationContext(), DeliveryAddressActivity.class);
+                Intent addressIntent = new Intent(getApplicationContext(), DeliveryAddressSelectActivity.class);
                 addressIntent.putExtra("ADDRESS", currentAddress);
                 startActivityForResult(addressIntent, IntegerUtils.REQUEST_COMMON);
             }
@@ -192,12 +193,18 @@ public class InfoActivity extends AppCompatActivity {
             dialogBoxLoading = new DialogBoxLoading(InfoActivity.this);
             dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxLoading.show();
-            order.setAddressId(currentAddress.getId());
+            order.setAddress(currentAddress);
+
+//            set Payment
+            currentPayment = new Payment();
+            currentPayment.setId("");
+            order.setPayment(currentPayment);
+
             APIOrderCaller.addOrder(token, order, getApplication(), new APIListener() {
                 @Override
                 public void onOrderSuccessful() {
                     super.onOrderSuccessful();
-                    if (process == 0) {
+                    if (process == IntegerUtils.REQUEST_COMMON) {
                         orderCount = 0;
                         for (OrderProduct orderProduct : order.getOrderProductList()) {
                             APICartCaller.deleteCartItem(token, orderProduct.getCartProduct().getId(), getApplication(), new APIListener() {

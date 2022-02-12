@@ -92,6 +92,7 @@ public class HistoryTab extends Fragment {
         historyViewPager.setAdapter(adapter);
         historyTabLayout.clearOnTabSelectedListeners();
         historyViewPager.clearOnPageChangeListeners();
+        historyViewPager.setEnabled(false);
         historyViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(historyTabLayout));
         historyTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

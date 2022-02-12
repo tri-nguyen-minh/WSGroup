@@ -43,7 +43,7 @@ public class RecViewDiscountAdapter extends RecyclerView.Adapter<RecViewDiscount
     public void onBindViewHolder(RecViewDiscountAdapter.ViewHolder holder, int position) {
         holder.txtDiscountDescription.setText(discountList.get(position).getDescription());
         holder.txtDiscountEndDate.setText(MethodUtils.formatDate(discountList.get(position).getEndDate()));
-        holder.txtDiscountPrice.setText(MethodUtils.convertPriceString(discountList.get(position).getDiscountPrice()));
+        holder.txtDiscountPrice.setText(MethodUtils.formatPriceString(discountList.get(position).getDiscountPrice()));
         if(discountList.get(position).getStatus()) {
             holder.btnSave.setEnabled(true);
             holder.btnSave.setText("SAVE");

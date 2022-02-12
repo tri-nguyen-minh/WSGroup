@@ -7,10 +7,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -20,13 +23,17 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
 import dev.wsgroup.main.models.dtos.Order;
+import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderListAdapter;
 
 public class OrderFragment extends Fragment {
 
-    private RelativeLayout layoutLoading, layoutNoOrder, layoutOrderView;
+    private RelativeLayout layoutLoading, layoutNoOrder;
+    private LinearLayout layoutOrderView;
+    private RecyclerView recViewOrderView;
 
     private SharedPreferences sharedPreferences;
     private String orderStatus, token;
+    private RecViewOrderListAdapter adapter;
 
     public OrderFragment(String orderStatus) {
         if (orderStatus.toLowerCase().equals("ordered")) {
@@ -53,19 +60,22 @@ public class OrderFragment extends Fragment {
         layoutLoading = view.findViewById(R.id.layoutLoading);
         layoutNoOrder = view.findViewById(R.id.layoutNoOrder);
         layoutOrderView = view.findViewById(R.id.layoutOrderView);
+        recViewOrderView = view.findViewById(R.id.recViewOrderView);
 
         layoutLoading.setVisibility(View.VISIBLE);
         layoutNoOrder.setVisibility(View.INVISIBLE);
         layoutOrderView.setVisibility(View.INVISIBLE);
 
-        APIOrderCaller.getAllOrder(token, orderStatus, getActivity().getApplication(), new APIListener() {
+        APIOrderCaller.getAllOrder(token, orderStatus,null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onOrderFound(List<Order> orderList) {
                 super.onOrderFound(orderList);
+                System.out.println("size " + orderList.size());
                 if (orderList.size() > 0) {
                     layoutLoading.setVisibility(View.INVISIBLE);
                     layoutNoOrder.setVisibility(View.INVISIBLE);
                     layoutOrderView.setVisibility(View.VISIBLE);
+                    setupOrderList(orderList);
                 } else {
                     layoutLoading.setVisibility(View.INVISIBLE);
                     layoutNoOrder.setVisibility(View.VISIBLE);
@@ -81,5 +91,12 @@ public class OrderFragment extends Fragment {
                 layoutOrderView.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    private void setupOrderList(List<Order> orderList) {
+        adapter = new RecViewOrderListAdapter(getContext(), getActivity());
+        adapter.setOrderList(orderList);
+        recViewOrderView.setAdapter(adapter);
+        recViewOrderView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
     }
 }

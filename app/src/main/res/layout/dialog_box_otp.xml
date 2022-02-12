@@ -143,7 +143,7 @@
                 android:layout_marginLeft="7dp"
                 android:fontFamily="monospace"
                 android:gravity="center"
-                android:text="to get a new OTP"
+                android:text="to re-send OTP"
                 android:textColor="@color/black"
                 android:textSize="15sp"/>
 

@@ -30,6 +30,7 @@ import dev.wsgroup.main.models.utils.StringUtils;
 public class APICartCaller {
 
     private static RequestQueue requestQueue;
+    private static List<CartProduct> cartProductList;
 
     public static void getCartList(String token, Application application, APIListener APIListener) {
         if(requestQueue == null) {
@@ -41,7 +42,7 @@ public class APICartCaller {
                 public void onResponse(JSONObject response) {
                     CartProduct cartProduct = null;
                     Supplier supplier = null;
-                    List<CartProduct> cartProductList = null;
+                    cartProductList = new ArrayList<>();
                     HashMap<String, List<CartProduct>> shoppingCart = new HashMap<>();
                     List<Supplier> supplierList = new ArrayList<>();
                     try {

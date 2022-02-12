@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class Address implements Serializable {
-    private String id, customerId, province, street;
+    private String id, customerId, province, street, addressString;
     private boolean defaultFlag, selectedFlag;
 
     public Address() {
@@ -59,18 +59,23 @@ public class Address implements Serializable {
         this.selectedFlag = selectedFlag;
     }
 
+    public String getAddressString() {
+        return addressString;
+    }
+
+    public void setAddressString(String addressString) {
+        this.addressString = addressString;
+    }
+
     public static Address getAddressFromJSON(JSONObject jsonObject) throws Exception {
         Address address = new Address();
         address.setId(jsonObject.getString("id"));
         address.setCustomerId(jsonObject.getString("customerid"));
         address.setProvince(jsonObject.getString("province"));
         address.setStreet(jsonObject.getString("street"));
+        address.setAddressString(address.getStreet() + " " + address.getProvince());
         address.setDefaultFlag(jsonObject.getBoolean("isdefault"));
         address.setSelectedFlag(false);
         return address;
-    }
-
-    public String getAddressString() {
-        return street + ", " + province;
     }
 }

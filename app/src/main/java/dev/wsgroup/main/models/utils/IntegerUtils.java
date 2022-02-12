@@ -4,6 +4,8 @@ public class IntegerUtils {
     public static final int REQUEST_COMMON = 1;
     public static final int REQUEST_LOGIN = 1;
     public static final int REQUEST_LOGIN_FOR_CART = 2;
+    public static final int REQUEST_SELECT_ADDRESS = 2;
+    public static final int REQUEST_INSTANT_CHECKOUT = 2;
 
     public static final int ERROR_API = 1;
     public static final int ERROR_PARSING_JSON = 2;

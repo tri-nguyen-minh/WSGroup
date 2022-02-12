@@ -5,12 +5,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,7 +58,7 @@ public class RecViewCampaignListAdapter extends RecyclerView.Adapter<RecViewCamp
                 }
             });
             holder.constraintLayoutCampaign.setVisibility(View.VISIBLE);
-            holder.txtCampaignPrice.setText(MethodUtils.convertPriceString(campaignList.get(position).getPrice()));
+            holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaignList.get(position).getPrice()));
             holder.txtCampaignQuantity.setText(campaignList.get(position).getQuantity() + "");
             holder.txtDiscountEndDate.setText(MethodUtils.formatDate(campaignList.get(position).getEndDate()));
             holder.txtCampaignOrderCount.setText(campaignList.get(position).getOrderCount() + "");

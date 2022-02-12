@@ -1,4 +1,4 @@
-package dev.wsgroup.main.views.boxes;
+package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -172,7 +172,7 @@ public class DialogBoxOrderDetail extends Dialog{
                         dismiss();
                         Intent checkoutActivity = new Intent(context, ConfirmActivity.class);
                         checkoutActivity.putExtra("ORDER", (Serializable) order);
-                        checkoutActivity.putExtra("PROCESS", 1);
+                        checkoutActivity.putExtra("PROCESS", IntegerUtils.REQUEST_INSTANT_CHECKOUT);
                         activity.startActivityForResult(checkoutActivity, IntegerUtils.REQUEST_COMMON);
                     }
                 };
@@ -239,7 +239,7 @@ public class DialogBoxOrderDetail extends Dialog{
         Campaign campaign = product.getCampaign();
         editTotalPrice();
 
-        txtProductPrice.setText(MethodUtils.convertPriceString(product.getRetailPrice()));
+        txtProductPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         if (campaign == null) {
             layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(true);
@@ -249,7 +249,7 @@ public class DialogBoxOrderDetail extends Dialog{
         } else {
             layoutCampaign.setVisibility(View.VISIBLE);
             setBasePriceSelected(true);
-            txtCampaignPrice.setText(MethodUtils.convertPriceString(campaign.getPrice()));
+            txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
             layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -344,7 +344,7 @@ public class DialogBoxOrderDetail extends Dialog{
         } else {
             totalPrice *= product.getCampaign().getPrice();
         }
-        txtTotalPrice.setText(MethodUtils.convertPriceString(totalPrice));
+        txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
     }
 
     private int getMaximumQuantity() {

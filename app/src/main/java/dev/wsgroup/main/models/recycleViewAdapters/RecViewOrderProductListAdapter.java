@@ -48,23 +48,24 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
         if(orderProductList.get(position).getProduct().getImageList() != null) {
             Glide.with(context).load(orderProductList.get(position).getProduct().getImageList().get(0)).into(holder.imgRecViewProduct);
         }
         holder.txtRecViewProductOrderName.setText(orderProductList.get(position).getProduct().getName());
-        if (order.getCampaignId().isEmpty()) {
-            holder.layoutBasePrice.setVisibility(View.VISIBLE);
-        }
+//        if (order.getCampaignId().isEmpty()) {
+//            holder.layoutBasePrice.setVisibility(View.VISIBLE);
+//        }
         if (order.getCampaignId().isEmpty()) {
             holder.lblPrice.setText("Base Price");
-            holder.txtProductPrice.setText(MethodUtils.convertPriceString(orderProductList.get(position).getProduct().getRetailPrice()));
+//            holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getProduct().getRetailPrice()));
         } else {
             holder.lblPrice.setText("Campaign Price");
-            holder.txtProductPrice.setText(MethodUtils.convertPriceString(orderProductList.get(position).getProduct().getCampaign().getPrice()));
+//            holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getProduct().getCampaign().getPrice()));
+//            holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getProduct().getCampaign().getPrice()));
         }
+        holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
         holder.txtOrderQuantity.setText(orderProductList.get(position).getQuantity() + "");
-        holder.txtTotalPrice.setText(MethodUtils.convertPriceString(orderProductList.get(position).getPrice()));
+        holder.txtTotalPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getTotalPrice()));
 
         RecViewProductTypeAdapter adapter =
                 new RecViewProductTypeAdapter(context, activity, IntegerUtils.IDENTIFIER_PRODUCT_TYPE_SELECTED);

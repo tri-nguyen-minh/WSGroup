@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.activities.account.DeliveryAddressActivity"
+    tools:context=".views.activities.account.DeliveryAddressSelectActivity"
     android:background="@color/gray_lighter">
 
     <RelativeLayout
@@ -154,7 +154,7 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="parent"
                         android:layout_marginLeft="5dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/checkboxDefaultAddress"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent">
 
@@ -190,6 +190,15 @@
                             app:layout_constraintBottom_toBottomOf="parent"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <ImageView
+                        android:id="@+id/checkboxDefaultAddress"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:src="@drawable/ic_checkbox_unchecked"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"/>
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

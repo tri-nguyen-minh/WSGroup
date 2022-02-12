@@ -32,6 +32,8 @@ import dev.wsgroup.main.models.utils.StringUtils;
 public class APIOrderCaller {
 
     private static RequestQueue requestQueue;
+    private static List<Order> orderList;
+    private static int count;
 
     public  static void addOrder(String token, Order order, Application application, APIListener APIListener) {
         if(requestQueue == null) {
@@ -65,16 +67,18 @@ public class APIOrderCaller {
                 productArray.put(jsonObjectProduct);
             }
             jsonObjectOrder.put("campaignId", order.getCampaignId().isEmpty() ? null : order.getCampaignId());
-            jsonObjectOrder.put("addressId", order.getAddressId());
-            jsonObjectOrder.put("paymentId", order.getPaymentId());
+            jsonObjectOrder.put("addressId", order.getAddress().getId());
+            jsonObjectOrder.put("paymentId", order.getPayment().getId());
             jsonObjectOrder.put("discountPrice", order.getDiscountPrice());
             jsonObjectOrder.put("shippingFee", order.getShippingFee());
             jsonObjectOrder.put("supplierId", order.getSupplier().getId());
+
 //            if (order.getCustomerDiscount() != null) {
 //                jsonObjectOrder.put("customerDiscountCodeId", order.getCustomerDiscount().getId());
 //            } else {
                 jsonObjectOrder.put("customerDiscountCodeId", null);
 //            }
+
             jsonObjectOrder.put("isWholesale", order.getCampaignId().isEmpty() ? false : true);
             jsonObjectOrder.put("products", productArray);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
@@ -114,26 +118,43 @@ public class APIOrderCaller {
     }
 
 
-    public static void getAllOrder(String token, String status, Application application, APIListener APIListener) {
+    public static void getAllOrder(String token, String status, List<Order> list, Application application, APIListener APIListener) {
         String url = StringUtils.ORDER_API_URL + "customer?status=" + status;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
+        System.out.println("test " + status);
+        System.out.println("test1 " + (list == null));
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        List<Order> orderList = new ArrayList<>();
+                        System.out.println(response);
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
+                            orderList = (list == null) ? new ArrayList<>() : list;
+                            List<Integer> orderWithCampaignIndexList = new ArrayList<>();
                             Order order;
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 order = Order.getOrderFromJSON(jsonArray.getJSONObject(i));
-                                orderList.add(order);
+                                if (order.getStatus().equals(status)) {
+                                    orderList.add(order);
+                                    if (!order.getCampaignId().isEmpty()) {
+                                        orderWithCampaignIndexList.add(orderList.indexOf(order));
+                                    }
+                                }
+//                                if (orderWithCampaignIndexList.size() > 0) {
+//                                    count = 0;
+//                                    for (int index : orderWithCampaignIndexList) {
+//
+//                                    }
+//                                }
                             }
+                            APIListener.onOrderFound(orderList);
+                        } else {
+                            APIListener.onOrderFound(new ArrayList<>());
                         }
-                        APIListener.onOrderFound(orderList);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();

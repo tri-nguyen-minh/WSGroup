@@ -1,12 +1,9 @@
-package dev.wsgroup.main.views.boxes;
+package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Editable;
@@ -17,25 +14,19 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.apis.callers.APIUserCaller;
-import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.services.FirebasePhoneAuthService;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.account.AccountDetailActivity;
 import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
-import dev.wsgroup.main.views.activities.account.PhoneInputActivity;
 
 public class DialogBoxOTP extends Dialog {
 
@@ -83,12 +74,14 @@ public class DialogBoxOTP extends Dialog {
         btnConfirmOTP.setBackground(context.getResources().getDrawable(R.color.gray_light));
 
         setLabel(false);
+        layoutOTPCountdown.setVisibility(View.INVISIBLE);
 
         service = new FirebasePhoneAuthService(activity, MethodUtils.formatPhoneNumberWithCountryCode(phoneNumber)) {
             @Override
             public void onOTPSent() {
                 super.onOTPSent();
                 setLabel(true);
+                layoutOTPCountdown.setVisibility(View.VISIBLE);
                 resetCountDown();
             }
 
@@ -113,6 +106,7 @@ public class DialogBoxOTP extends Dialog {
                                 }
                             };
                     dialogBox.show();
+                    dismiss();
                 } else {
                     displayError(StringUtils.MES_ERROR_INVALID_OTP);
                 }
@@ -208,6 +202,7 @@ public class DialogBoxOTP extends Dialog {
             @Override
             public void onClick(View v) {
                 setLabel(true);
+                layoutOTPCountdown.setVisibility(View.VISIBLE);
                 String OTPInput = getOTPString();
                 service.signInWithPhoneAuthCredential(OTPInput);
             }
@@ -228,6 +223,7 @@ public class DialogBoxOTP extends Dialog {
 
     public void generateOTP() {
         setLabel(false);
+        layoutOTPCountdown.setVisibility(View.GONE);
         service.sendOTP();
     }
 

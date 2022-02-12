@@ -103,6 +103,7 @@
             android:paddingVertical="5dp"
             android:layout_marginTop="2dp"
             android:background="@color/white"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
@@ -115,7 +116,7 @@
                 android:gravity="left"
                 android:text="Base Price"
                 android:textColor="@color/black"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -150,7 +151,7 @@
                     android:gravity="right"
                     android:text="0.000d"
                     android:textColor="@color/red"
-                    android:textSize="17sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
 
             </LinearLayout>
@@ -189,7 +190,7 @@
                     android:gravity="left|center"
                     android:text="Quantity: "
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="15sp"/>
 
                 <TextView
                     android:id="@+id/txtOrderQuantity"
@@ -199,7 +200,7 @@
                     android:gravity="right|center"
                     android:text="000"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"/>
 
             </LinearLayout>
@@ -212,7 +213,7 @@
                 android:fontFamily="monospace"
                 android:text="0.000.000d"
                 android:textColor="@color/red"
-                android:textSize="17dp"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

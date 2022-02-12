@@ -28,12 +28,9 @@ import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.apis.callers.APIAddressCaller;
 import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
-import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
-import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Product;
@@ -96,7 +93,7 @@ public class HomeTab extends Fragment {
         imgProductDetailMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                APIOrderCaller.getAllOrder(token, "created", getActivity().getApplication(), new APIListener());
+//                APICampaignCaller.getCampaignById(token,"ce179be8-c93a-4627-b3d1-0f7be42fcc22", getActivity().getApplication(), new APIListener());
             }
         });
 
@@ -129,7 +126,7 @@ public class HomeTab extends Fragment {
     }
 
     private void getProductList() {
-        APIProductCaller.getAllProduct(getActivity().getApplication(), new APIListener() {
+        APIProductCaller.getAllProduct(null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onProductListFound(List<Product> productList) {
                 super.onProductListFound(productList);
@@ -190,7 +187,7 @@ public class HomeTab extends Fragment {
                         productIdList.add(product.getProduct().getProductId());
                     }
                 }
-                APICampaignCaller.getCampaignListById(productIdList, getActivity().getApplication(), new APIListener() {
+                APICampaignCaller.getCampaignListByProductId(productIdList,null, getActivity().getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> campaignList) {
                         super.onCampaignListFound(campaignList);

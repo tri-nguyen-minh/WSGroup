@@ -27,8 +27,9 @@ public class APIAddressCaller {
 
     private static RequestQueue requestQueue;
     private static String url;
+    private static List<Address> addressList;
 
-    public static void getAllAddress(String token, Application application, APIListener APIListener) {
+    public static void getAllAddress(String token, List<Address> list, Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + "All";
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -39,17 +40,18 @@ public class APIAddressCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         Address address;
-                        List<Address> addressList;
                         JSONArray jsonArray = response.getJSONArray("data");
-                        if (jsonArray != null) {
+                        if (jsonArray.length() > 0) {
+                            addressList = (list == null) ? new ArrayList<>() : list;
                             if (jsonArray.length() > 0) {
-                                addressList = new ArrayList<>();
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     address = Address.getAddressFromJSON(jsonArray.getJSONObject(i));
                                     addressList.add(address);
                                 }
-                            APIListener.onAddressListFound(addressList);
                             }
+                            APIListener.onAddressListFound(addressList);
+                        } else {
+                            APIListener.onAddressListFound(new ArrayList<>());
                         }
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);

@@ -39,7 +39,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
         activity = this;
         passwordDisplayed = false;
         passwordConfirmedDisplayed = false;
-        phoneNumber = getIntent().getStringExtra("PHONE_NUMBER");
+        phoneNumber = getIntent().getStringExtra("PHONE");
 
         txtPasswordError.setVisibility(View.INVISIBLE);
         editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);

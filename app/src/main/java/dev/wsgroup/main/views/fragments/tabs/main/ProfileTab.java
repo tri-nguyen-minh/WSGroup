@@ -23,15 +23,16 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
-import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
+import dev.wsgroup.main.views.activities.account.DeliveryAddressActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
 public class ProfileTab extends Fragment {
 
     private TextView txtProfileTabUsername;
-    private LinearLayout layoutAccountInfo, layoutLogout;
+    private LinearLayout layoutAccountInfo, layoutDeliveryAddress, layoutLogout;
 
     private SharedPreferences sharedPreferences;
-    private String username, token;
+    private String token;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +47,7 @@ public class ProfileTab extends Fragment {
 
         txtProfileTabUsername = view.findViewById(R.id.txtProfileTabUsername);
         layoutAccountInfo = view.findViewById(R.id.layoutAccountInfo);
+        layoutDeliveryAddress = view.findViewById(R.id.layoutDeliveryAddress);
         layoutLogout = view.findViewById(R.id.layoutLogout);
 
         token = sharedPreferences.getString("TOKEN", "");
@@ -67,6 +69,15 @@ public class ProfileTab extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent accountInfoIntent = new Intent(getActivity().getApplicationContext(), AccountInformationActivity.class);
+                accountInfoIntent.putExtra("MAIN_TAB_POSITION", 2);
+                startActivityForResult(accountInfoIntent, IntegerUtils.REQUEST_COMMON);
+            }
+        });
+
+        layoutDeliveryAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent accountInfoIntent = new Intent(getActivity().getApplicationContext(), DeliveryAddressActivity.class);
                 accountInfoIntent.putExtra("MAIN_TAB_POSITION", 2);
                 startActivityForResult(accountInfoIntent, IntegerUtils.REQUEST_COMMON);
             }

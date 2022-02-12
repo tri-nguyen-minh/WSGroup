@@ -9,11 +9,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -29,13 +26,9 @@ import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewCartSupplierListAdapter;
-import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
-import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
 
 public class CartActivity extends AppCompatActivity {
 
@@ -182,7 +175,7 @@ public class CartActivity extends AppCompatActivity {
                         productIdList.add(product.getProduct().getProductId());
                     }
                 }
-                APICampaignCaller.getCampaignListById(productIdList, getApplication(), new APIListener() {
+                APICampaignCaller.getCampaignListByProductId(productIdList,null, getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> campaignList) {
                         super.onCampaignListFound(campaignList);

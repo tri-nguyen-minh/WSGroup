@@ -10,7 +10,7 @@ public class OrderProduct implements Serializable {
     private String id, productId, productType, note,
             campaignId, addressId, paymentId, status;
     private int quantity;
-    private double price;
+    private double price, totalPrice;
     private Product product;
     private CartProduct cartProduct;
     private List<String> typeList;
@@ -104,6 +104,14 @@ public class OrderProduct implements Serializable {
         this.price = price;
     }
 
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     public Product getProduct() {
         return product;
     }
@@ -133,6 +141,7 @@ public class OrderProduct implements Serializable {
         orderProduct.setId(jsonObject.getString("id"));
         orderProduct.setNote(jsonObject.getString("notes"));
         orderProduct.setPrice(jsonObject.getDouble("price"));
+        orderProduct.setTotalPrice(jsonObject.getDouble("totalprice"));
         orderProduct.setQuantity(jsonObject.getInt("quantity"));
         Product product = new Product();
         product.setImageLink(jsonObject.getString("image"));

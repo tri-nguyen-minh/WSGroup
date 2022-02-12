@@ -34,9 +34,9 @@ import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.boxes.DialogBoxAlert;
-import dev.wsgroup.main.views.boxes.DialogBoxCampaign;
-import dev.wsgroup.main.views.boxes.DialogBoxConfirm;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxCampaign;
+import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
 public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewCartProductListAdapter.ViewHolder> {
 
@@ -200,7 +200,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         Campaign campaign = product.getCampaign();
         editTotalPrice(holder, cartProduct);
 
-        holder.txtProductPrice.setText(MethodUtils.convertPriceString(product.getRetailPrice()));
+        holder.txtProductPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         if (campaign == null) {
             holder.layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(holder, true);
@@ -214,7 +214,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
             } else {
                 setBasePriceSelected(holder, false);
             }
-            holder.txtCampaignPrice.setText(MethodUtils.convertPriceString(campaign.getPrice()));
+            holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
             holder.layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -337,7 +337,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         } else {
             totalPrice *= cartProduct.getProduct().getCampaign().getPrice();
         }
-        holder.txtTotalPrice.setText(MethodUtils.convertPriceString(totalPrice));
+        holder.txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
     }
 
     private void setBasePriceSelected(ViewHolder viewHolder, boolean selected) {

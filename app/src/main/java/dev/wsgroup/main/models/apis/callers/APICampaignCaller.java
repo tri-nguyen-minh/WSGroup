@@ -29,8 +29,9 @@ import dev.wsgroup.main.models.utils.StringUtils;
 public class APICampaignCaller {
 
     private static RequestQueue requestQueue;
+    private static List<Campaign> campaignList;
 
-    public static void getCampaignById(String productId, Application application, APIListener APIListener) {
+    public static void getCampaignByProductId(String productId, Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -77,7 +78,7 @@ public class APICampaignCaller {
         }
     }
 
-    public static void getCampaignListById(List<String> productIdList, Application application, APIListener APIListener) {
+    public static void getCampaignListByProductId(List<String> productIdList, List<Campaign> list, Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -95,7 +96,7 @@ public class APICampaignCaller {
                     try {
                         JSONArray data = response.getJSONArray("data");
                         if(data.length() > 0) {
-                            List<Campaign> campaignList = new ArrayList<>();
+                            campaignList = (list == null) ? new ArrayList<>() : list;
                             Campaign campaign;
                             for (int i = 0; i < data.length(); i++) {
                                 campaign = Campaign.getCampaignFromJSON(data.getJSONObject(i));
@@ -119,6 +120,50 @@ public class APICampaignCaller {
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
                     jsonObject, listener, errorListener) {
+
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getCampaignById(String campaignId, Application application, APIListener APIListener) {
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        String url = StringUtils.CAMPAIGN_API_URL + campaignId;
+        try {
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        System.out.println("get camapign: " + response);
+                        JSONObject data = response.getJSONObject("data");
+                        if(data!= null) {
+                            Campaign campaign = Campaign.getCampaignFromJSON(data);
+                            APIListener.onCampaignFound(campaign);
+                        } else {
+                            APIListener.onNoCampaignFound();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
+                    new JSONObject(), listener, errorListener) {
 
                 @Override
                 public String getBodyContentType() {
