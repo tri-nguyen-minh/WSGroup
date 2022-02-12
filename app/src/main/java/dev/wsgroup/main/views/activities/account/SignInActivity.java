@@ -183,6 +183,7 @@ public class SignInActivity extends AppCompatActivity {
                     DialogBoxAlert dialogBox =
                             new DialogBoxAlert(SignInActivity.this,
                                     IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FIELD_EMPTY, "");
+                    dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBox.show();
                 } else {
                     loginWithUsernameAndPassword(username, password);

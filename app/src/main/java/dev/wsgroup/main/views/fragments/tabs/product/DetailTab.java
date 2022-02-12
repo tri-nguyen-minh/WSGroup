@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -48,12 +49,13 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.ProductDetailActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxCampaign;
 import dev.wsgroup.main.views.dialogbox.DialogBoxOrderDetail;
 
 public class DetailTab extends Fragment {
 
-    private TextView txtProductQuantity, txtProductCategory, txtProductDescription,
-            txtSupplierName, txtMoreSuppliersProductsName;
+    private TextView txtProductQuantity, txtProductQuantityWithCampaign, txtProductQuantityCampaign,
+            txtProductCategory, txtProductDescription, txtSupplierName, txtMoreSuppliersProductsName;
     private RecyclerView recViewMoreSuppliersProducts, recViewDiscountSimple;
     private ViewFlipper viewFlipperProduct;
     private ImageView imgCommonFlipper;
@@ -63,8 +65,9 @@ public class DetailTab extends Fragment {
             txtCampaignOrderCount, txtCampaignQuantityCount, txtCampaignQuantityBar,
             lblCampaignOrderCount, lblCampaignQuantitySeparator;
     private RatingBar ratingProduct;
-    private ConstraintLayout constraintLayoutCampaign;
+    private ConstraintLayout constraintLayoutCampaign, layoutRetailQuantity, layoutCampaignQuantity;
     private ProgressBar progressBarQuantityCount;
+    private LinearLayout layoutProductQuantityWithCampaign;
 
     private SharedPreferences sharedPreferences;
     private Intent intent;
@@ -84,6 +87,8 @@ public class DetailTab extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         txtProductQuantity = view.findViewById(R.id.txtProductQuantity);
+        txtProductQuantityWithCampaign = view.findViewById(R.id.txtProductQuantityWithCampaign);
+        txtProductQuantityCampaign = view.findViewById(R.id.txtProductQuantityTotalWithCampaign);
         txtProductCategory = view.findViewById(R.id.txtProductCategory);
         txtProductDescription = view.findViewById(R.id.txtProductDescription);
         txtSupplierName = view.findViewById(R.id.txtSupplierName);
@@ -108,7 +113,10 @@ public class DetailTab extends Fragment {
         lblCampaignQuantitySeparator = view.findViewById(R.id.lblCampaignQuantitySeparator);
         ratingProduct = view.findViewById(R.id.ratingProduct);
         constraintLayoutCampaign = view.findViewById(R.id.constraintLayoutCampaign);
+        layoutRetailQuantity = view.findViewById(R.id.layoutRetailQuantity);
+        layoutCampaignQuantity = view.findViewById(R.id.layoutCampaignQuantity);
         progressBarQuantityCount = view.findViewById(R.id.progressBarQuantityCount);
+        layoutProductQuantityWithCampaign = view.findViewById(R.id.layoutProductQuantityWithCampaign);
 
         sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
@@ -117,70 +125,9 @@ public class DetailTab extends Fragment {
 
         if(product != null) {
             campaign = product.getCampaign();
-
             setProduct();
-
-            getDiscountList();
-            RecViewDiscountSimpleAdapter adapter = new RecViewDiscountSimpleAdapter(getContext(), getActivity(), userId);
-            adapter.setDiscountList(discountList);
-            recViewDiscountSimple.setAdapter(adapter);
-            recViewDiscountSimple.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-
-            if(campaign != null) {
-                if (campaign.getStatus().equals("active")) {
-                    int quantity = product.getQuantity() - campaign.getQuantity();
-                    txtProductQuantity.setText(quantity + "");
-                } else {
-                    txtProductQuantity.setText(product.getQuantity() + "");
-                }
-            } else {
-                txtProductQuantity.setText(product.getQuantity() + "");
-            }
-            txtProductDescription.setText(product.getDescription());
-            txtSupplierName.setText(product.getSupplier().getName());
-            txtMoreSuppliersProductsName.setText(product.getSupplier().getName());
-
-            APICategoryCaller.getCategoryById(product.getCategoryId(), getActivity().getApplication(), new APIListener() {
-                @Override
-                public void onCategoryFound(Category category) {
-                    super.onCategoryFound(category);
-                    txtProductCategory.setText(category.getName());
-                }
-            });
-            getProductList();
         }
 
-    }
-
-    private void getProductList() {
-        APIProductCaller.getAllProduct(null, getActivity().getApplication(), new APIListener() {
-            @Override
-            public void onProductListFound(List<Product> productList) {
-                super.onProductListFound(productList);
-                if(!productList.isEmpty()) {
-                    setupMoreProductView(productList);
-                } else {
-                    setupNoProductView();
-                }
-            }
-            @Override
-            public void onFailedAPICall(int errorCode) {
-                super.onFailedAPICall(errorCode);
-                setupNoProductView();
-            }
-        });
-    }
-
-    private String getOrderCountByProductId(String productId) {
-        int count = 12000;
-//        API get total order count by productId
-        return MethodUtils.formatOrderOrReviewCount(count);
-    }
-
-    private String getReviewCountByProductId(String productId) {
-        int count = 12000;
-//        API get total review count by productId
-        return MethodUtils.formatOrderOrReviewCount(count);
     }
 
     private void setProduct() {
@@ -231,9 +178,86 @@ public class DetailTab extends Fragment {
                 lblCampaignOrderCount.setText("waiting order");
             }
             lblCampaignQuantitySeparator.setText("/");
+
+            if (campaign.getStatus().equals("active")) {
+                txtProductQuantity.setVisibility(View.GONE);
+                layoutRetailQuantity.setVisibility(View.GONE);
+                layoutProductQuantityWithCampaign.setVisibility(View.VISIBLE);
+                int quantity = product.getQuantity() - campaign.getQuantity();
+                if (quantity < 0) {
+                    quantity = 0;
+                }
+                txtProductQuantityWithCampaign.setText(quantity + "");
+                txtProductQuantityCampaign.setText(product.getQuantity() + "");
+                layoutCampaignQuantity.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(getActivity(), getContext(), product);
+                        dialogBoxCampaign.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialogBoxCampaign.show();
+                    }
+                });
+            } else {
+                txtProductQuantity.setVisibility(View.VISIBLE);
+                layoutRetailQuantity.setVisibility(View.VISIBLE);
+                layoutProductQuantityWithCampaign.setVisibility(View.GONE);
+                txtProductQuantity.setText(product.getQuantity() + "");
+            }
         } else {
             constraintLayoutCampaign.setVisibility(View.GONE);
+            txtProductQuantity.setVisibility(View.VISIBLE);
+            layoutProductQuantityWithCampaign.setVisibility(View.GONE);
+            txtProductQuantity.setText(product.getQuantity() + "");
         }
+        getDiscountList();
+        RecViewDiscountSimpleAdapter adapter = new RecViewDiscountSimpleAdapter(getContext(), getActivity(), userId);
+        adapter.setDiscountList(discountList);
+        recViewDiscountSimple.setAdapter(adapter);
+        recViewDiscountSimple.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        txtProductDescription.setText(product.getDescription());
+        txtSupplierName.setText(product.getSupplier().getName());
+        txtMoreSuppliersProductsName.setText(product.getSupplier().getName());
+
+        APICategoryCaller.getCategoryById(product.getCategoryId(), getActivity().getApplication(), new APIListener() {
+            @Override
+            public void onCategoryFound(Category category) {
+                super.onCategoryFound(category);
+                txtProductCategory.setText(category.getName());
+            }
+        });
+        getProductList();
+    }
+
+    private void getProductList() {
+        APIProductCaller.getAllProduct(null, getActivity().getApplication(), new APIListener() {
+            @Override
+            public void onProductListFound(List<Product> productList) {
+                super.onProductListFound(productList);
+                if(!productList.isEmpty()) {
+                    setupMoreProductView(productList);
+                } else {
+                    setupNoProductView();
+                }
+            }
+            @Override
+            public void onFailedAPICall(int errorCode) {
+                super.onFailedAPICall(errorCode);
+                setupNoProductView();
+            }
+        });
+    }
+
+    private String getOrderCountByProductId(String productId) {
+        int count = 12000;
+//        API get total order count by productId
+        return MethodUtils.formatOrderOrReviewCount(count);
+    }
+
+    private String getReviewCountByProductId(String productId) {
+        int count = 12000;
+//        API get total review count by productId
+        return MethodUtils.formatOrderOrReviewCount(count);
     }
 
     private void getDiscountList() {

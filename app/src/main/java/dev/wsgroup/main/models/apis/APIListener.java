@@ -40,7 +40,7 @@ public class APIListener {
 
     public void onNoCampaignFound() {}
 
-    public void onOrderSuccessful() {}
+    public void onOrderSuccessful(Order order) {}
 
     public void onOrderFound(List<Order> orderList) {}
 

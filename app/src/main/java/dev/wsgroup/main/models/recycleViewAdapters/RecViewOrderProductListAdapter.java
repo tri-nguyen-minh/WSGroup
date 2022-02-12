@@ -2,9 +2,12 @@ package dev.wsgroup.main.models.recycleViewAdapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +24,7 @@ import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.views.dialogbox.DialogBoxOrderNote;
 
 public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecViewOrderProductListAdapter.ViewHolder> {
 
@@ -28,10 +32,12 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
     private List<OrderProduct> orderProductList;
     private Context context;
     private Activity activity;
+    private int requestCode;
 
-    public RecViewOrderProductListAdapter(Context context, Activity activity) {
+    public RecViewOrderProductListAdapter(Context context, Activity activity, int requestCode) {
         this.context = context;
         this.activity = activity;
+        this.requestCode = requestCode;
     }
 
     public void setOrder(Order order) {
@@ -72,7 +78,22 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
         adapter.setTypeList(orderProductList.get(position).getTypeList());
         holder.recViewProductTypeTag.setAdapter(adapter);
         holder.recViewProductTypeTag.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false));
+        holder.btnNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogBoxOrderNote dialogBox = new DialogBoxOrderNote(activity, context,
+                        orderProductList.get(position), requestCode) {
+                    @Override
+                    public void onConfirmNote(String note) {
+                        super.onConfirmNote(note);
+                        orderProductList.get(position).setNote(note);
+                    }
+                };
+                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.show();
 
+            }
+        });
     }
 
     @Override
@@ -86,6 +107,7 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
                 txtOrderQuantity, txtTotalPrice;
         private ConstraintLayout layoutBasePrice;
         private RecyclerView recViewProductTypeTag;
+        private Button btnNote;
 
         public ViewHolder(View view) {
             super(view);
@@ -97,6 +119,7 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
             txtTotalPrice = view.findViewById(R.id.txtTotalPrice);
             layoutBasePrice = view.findViewById(R.id.layoutBasePrice);
             recViewProductTypeTag = view.findViewById(R.id.recViewProductTypeTag);
+            btnNote = view.findViewById(R.id.btnNote);
         }
     }
 }

@@ -212,7 +212,8 @@ public class ConfirmActivity extends AppCompatActivity {
     }
 
     private void setupRecViewOrderList() {
-        adapter = new RecViewOrderProductListAdapter(getApplicationContext(), ConfirmActivity.this);
+        adapter = new RecViewOrderProductListAdapter(getApplicationContext(),
+                ConfirmActivity.this, IntegerUtils.REQUEST_COMMON);
         adapter.setOrder(order);
         recViewCheckoutOrderProduct.setAdapter(adapter);
         recViewCheckoutOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),

@@ -74,6 +74,7 @@ public class DialogBoxAddress extends Dialog {
                     dismiss();
                 }
             });
+
         cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,6 +169,7 @@ public class DialogBoxAddress extends Dialog {
                     address = new Address();
                     address.setStreet(editStreet.getText().toString());
                     address.setProvince(editProvince.getText().toString());
+                    address.setAddressStringAuto();
                     APIAddressCaller.AddAddress(token, address, activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {

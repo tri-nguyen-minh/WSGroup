@@ -20,11 +20,11 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
     private TextView lblConfirmText, lblDescription;
     private ImageView imgDialogConfirm;
     private String message, description;
-    private int actionCode;
+    private int requestCode;
 
-    public DialogBoxAlert(Activity activity, int actionCode, String message, String description) {
+    public DialogBoxAlert(Activity activity, int requestCode, String message, String description) {
         super(activity);
-        this.actionCode = actionCode;
+        this.requestCode = requestCode;
         this.message = message;
         this.description = description;
     }
@@ -39,7 +39,7 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
         lblDescription = findViewById(R.id.lblDescription);
         imgDialogConfirm = findViewById(R.id.imgDialogConfirm);
         btnConfirmRegister.setOnClickListener(this);
-        switch (actionCode) {
+        switch (requestCode) {
             case IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS: {
                 imgDialogConfirm.setImageResource(R.drawable.ic_check);
                 lblDescription.setVisibility(View.GONE);

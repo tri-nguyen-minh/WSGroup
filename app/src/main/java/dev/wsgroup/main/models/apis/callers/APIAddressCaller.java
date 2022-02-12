@@ -42,6 +42,7 @@ public class APIAddressCaller {
                         Address address;
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
+                            System.out.println("large");
                             addressList = (list == null) ? new ArrayList<>() : list;
                             if (jsonArray.length() > 0) {
                                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -51,6 +52,7 @@ public class APIAddressCaller {
                             }
                             APIListener.onAddressListFound(addressList);
                         } else {
+                            System.out.println("zero");
                             APIListener.onAddressListFound(new ArrayList<>());
                         }
                     } catch (Exception e) {

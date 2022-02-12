@@ -40,6 +40,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
+import dev.wsgroup.main.views.activities.account.SignInActivity;
 import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 
 public class DialogBoxOrderDetail extends Dialog{
@@ -58,10 +59,12 @@ public class DialogBoxOrderDetail extends Dialog{
     private Context context;
     private String userId;
     private Product product;
+    private Campaign campaign;
     private SharedPreferences sharedPreferences;
     private int maxQuantity;
     private String campaignId;
     private DialogBoxLoading dialogBoxLoading;
+    private boolean retailPurchaseOutOfStock;
 
     public DialogBoxOrderDetail(Activity activity, Context context, String userId, Product product) {
         super(activity);
@@ -94,8 +97,14 @@ public class DialogBoxOrderDetail extends Dialog{
         layoutBasePrice = findViewById(R.id.layoutBasePrice);
         layoutCampaign = findViewById(R.id.layoutCampaign);
         cardViewParent = findViewById(R.id.cardViewParent);
-        
+
         editProductQuantity.setText("1");
+        if(product != null) {
+            setupCampaign();
+            maxQuantity = getMaximumQuantity();
+            txtNumberInStorage.setText(maxQuantity + "");
+            editProductQuantity.setText("1");
+        }
 
         cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +112,7 @@ public class DialogBoxOrderDetail extends Dialog{
                 editProductQuantity.clearFocus();
             }
         });
+
         editProductQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -111,13 +121,6 @@ public class DialogBoxOrderDetail extends Dialog{
                 }
             }
         });
-
-        if(product != null) {
-            maxQuantity = product.getQuantity();
-            campaignId = "";
-            txtNumberInStorage.setText(product.getQuantity() + "");
-            setupCampaign();
-        }
 
         btnConfirmAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,7 +207,7 @@ public class DialogBoxOrderDetail extends Dialog{
             @Override
             public void onClick(View v) {
                 int quantityCount = Integer.parseInt(editProductQuantity.getText().toString());
-                if(quantityCount < product.getQuantity())
+                if(quantityCount < maxQuantity)
                 quantityCount += 1;
                 editProductQuantity.setText(quantityCount + "");
                 editTotalPrice();
@@ -232,36 +235,53 @@ public class DialogBoxOrderDetail extends Dialog{
 
             }
         });
+
         editTotalPrice();
     }
 
     private void setupCampaign() {
-        Campaign campaign = product.getCampaign();
-        editTotalPrice();
+        campaign = product.getCampaign();
 
         txtProductPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         if (campaign == null) {
+            campaignId = "";
             layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(true);
         } else if (!campaign.getStatus().equals("active")) {
+            campaignId = "";
             layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(true);
         } else {
+            retailPurchaseOutOfStock = (product.getQuantity() <= campaign.getQuantity());
+            if (retailPurchaseOutOfStock) {
+                campaignId = campaign.getId();
+                setBasePriceSelected(false);
+            } else {
+                campaignId = "";
+                setBasePriceSelected(true);
+            }
             layoutCampaign.setVisibility(View.VISIBLE);
-            setBasePriceSelected(true);
             txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
             layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!campaignId.isEmpty()) {
-                        campaignId = "";
-                        maxQuantity = getMaximumQuantity();
-                        txtNumberInStorage.setText(maxQuantity + "");
-                        if(Integer.parseInt(editProductQuantity.getText().toString()) > maxQuantity) {
-                            editProductQuantity.setText(maxQuantity + "");
+                    if (retailPurchaseOutOfStock) {
+                        DialogBoxAlert dialogBox =
+                                new DialogBoxAlert(activity,
+                                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_OUT_OF_STOCK, "");
+                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialogBox.show();
+                    } else {
+                        if(!campaignId.isEmpty()) {
+                            campaignId = "";
+                            maxQuantity = getMaximumQuantity();
+                            txtNumberInStorage.setText(maxQuantity + "");
+                            if(Integer.parseInt(editProductQuantity.getText().toString()) > maxQuantity) {
+                                editProductQuantity.setText(maxQuantity + "");
+                            }
+                            setBasePriceSelected(true);
+                            editTotalPrice();
                         }
-                        setBasePriceSelected(true);
-                        editTotalPrice();
                     }
                 }
             });

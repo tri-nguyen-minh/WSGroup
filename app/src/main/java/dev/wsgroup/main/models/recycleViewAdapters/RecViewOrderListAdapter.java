@@ -22,6 +22,7 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.Order;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.OrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
@@ -110,6 +111,7 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
     private void goToOrderDetail(Order order) {
         Intent orderDetailIntent = new Intent(context, OrderActivity.class);
         orderDetailIntent.putExtra("ORDER", order);
+        orderDetailIntent.putExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         activity.startActivity(orderDetailIntent);
     }
 

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderProductListAdapter;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 
@@ -22,10 +23,11 @@ public class OrderActivity extends AppCompatActivity {
 
     private ImageView imgBackFromOrderDetail, imgOrderDetailMessage, imgOrderDetailHome, imgSupplierAvatar;
     private TextView txtPhoneNumber, txtDeliveryAddress, txtPayment, txtStatus,
-            txtSupplierName, txtSupplierAddress, txtTotalPrice, txtNote;
+            txtSupplierName, txtSupplierAddress, txtTotalPrice;
     private RecyclerView recViewOrderProduct;
 
     private String phone, token;
+    private int requestCode;
     private Order order;
     private SharedPreferences sharedPreferences;
     private RecViewOrderProductListAdapter adapter;
@@ -47,10 +49,11 @@ public class OrderActivity extends AppCompatActivity {
         txtSupplierName = findViewById(R.id.txtSupplierName);
         txtSupplierAddress = findViewById(R.id.txtSupplierAddress);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
-        txtNote = findViewById(R.id.txtNote);
+//        txtNote = findViewById(R.id.txtNote);
         recViewOrderProduct = findViewById(R.id.recViewOrderProduct);
 
         order = (Order) getIntent().getSerializableExtra("ORDER");
+        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         phone = sharedPreferences.getString("PHONE", "");
         token = sharedPreferences.getString("TOKEN", "");
@@ -66,15 +69,18 @@ public class OrderActivity extends AppCompatActivity {
         }
         txtStatus.setText(MethodUtils.displayStatus(order.getStatus()));
         txtSupplierName.setText(order.getSupplier().getName());
-        txtDeliveryAddress.setVisibility(View.GONE);
+        txtSupplierAddress.setVisibility(View.GONE);
         txtTotalPrice.setText(MethodUtils.formatPriceString(order.getTotalPrice()));
-//        txtNote.setText(order.get);
         setupRecViewOrderList();
 
         imgBackFromOrderDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                if (requestCode == IntegerUtils.REQUEST_ORDER_AFTER_CHECKOUT) {
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                } else {
+                    finish();
+                }
             }
         });
 
@@ -87,7 +93,8 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void setupRecViewOrderList() {
-        adapter = new RecViewOrderProductListAdapter(getApplicationContext(), OrderActivity.this);
+        adapter = new RecViewOrderProductListAdapter(getApplicationContext(),
+                OrderActivity.this, IntegerUtils.REQUEST_NOTE_READ_ONLY);
         adapter.setOrder(order);
         recViewOrderProduct.setAdapter(adapter);
         recViewOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),

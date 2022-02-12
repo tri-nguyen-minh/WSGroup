@@ -85,7 +85,9 @@ public class APIOrderCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        APIListener.onOrderSuccessful();
+                        JSONObject data = response.getJSONObject("data");
+                        order.setStatus(data.getString("status"));
+                        APIListener.onOrderSuccessful(order);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

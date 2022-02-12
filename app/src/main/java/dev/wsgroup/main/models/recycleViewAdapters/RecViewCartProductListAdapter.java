@@ -80,13 +80,6 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
             }
         });
         holder.txtRecViewCartProductName.setText(shoppingCart.get(position).getProduct().getName());
-        quantity = getMaximumQuantity(position);
-        holder.txtNumberInStorage.setText(quantity + "");
-        if(shoppingCart.get(position).getQuantity() > quantity) {
-            holder.editProductQuantity.setText(quantity + "");
-        } else {
-            holder.editProductQuantity.setText(shoppingCart.get(position).getQuantity() + "");
-        }
 
         RecViewProductTypeAdapter adapter = new RecViewProductTypeAdapter(context, activity, IntegerUtils.IDENTIFIER_PRODUCT_TYPE_SELECTED);
         adapter.setTypeList(shoppingCart.get(position).getTypeList());
@@ -192,43 +185,56 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         });
 
         setupCampaign(position, holder);
+//        String campaignId = "";
+//        if (campaign != null) {
+//            if (campaign.getStatus().equals("active") &&
+//                    shoppingCart.get(position).getProduct().getQuantity() <= campaign.getQuantity()) {
+//                shoppingCart.get(position).setCampaignId(shoppingCart.get(position).getProduct().getCampaign().getId());
+//            }
+//        }
     }
 
     private void setupCampaign(int position, ViewHolder holder) {
         CartProduct cartProduct = shoppingCart.get(position);
         Product product = cartProduct.getProduct();
         Campaign campaign = product.getCampaign();
-        editTotalPrice(holder, cartProduct);
 
         holder.txtProductPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         if (campaign == null) {
             holder.layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(holder, true);
+            holder.txtNumberInStorage.setText(product.getQuantity() + "");
+            holder.editProductQuantity.setText(cartProduct.getQuantity() + "");
         } else if (!campaign.getStatus().equals("active")) {
             holder.layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(holder, true);
+            holder.txtNumberInStorage.setText(product.getQuantity() + "");
+            holder.editProductQuantity.setText(cartProduct.getQuantity() + "");
         } else {
             holder.layoutCampaign.setVisibility(View.VISIBLE);
-            if (cartProduct.getCampaignId().isEmpty()) {
-                setBasePriceSelected(holder, true);
-            } else {
-                setBasePriceSelected(holder, false);
-            }
             holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
             holder.layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!cartProduct.getCampaignId().isEmpty()) {
-                        cartProduct.setCampaignId("");
-                        quantity = getMaximumQuantity(position);
-                        holder.txtNumberInStorage.setText(quantity + "");
-                        if(cartProduct.getQuantity() > quantity) {
-                            holder.editProductQuantity.setText(quantity + "");
+                    if (cartProduct.getProduct().getQuantity() <= campaign.getQuantity()) {
+                        DialogBoxAlert dialogBox =
+                                new DialogBoxAlert(activity,
+                                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_OUT_OF_STOCK, "");
+                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialogBox.show();
+                    } else {
+                        if(!cartProduct.getCampaignId().isEmpty()) {
+                            cartProduct.setCampaignId("");
+                            quantity = getMaximumQuantity(position);
+                            holder.txtNumberInStorage.setText(quantity + "");
+                            if(cartProduct.getQuantity() > quantity) {
+                                holder.editProductQuantity.setText(quantity + "");
+                            }
+                            setBasePriceSelected(holder, true);
+                            editTotalPrice(holder, cartProduct);
+                            onPriceMethodChange("", position);
+                            setupSelectableProduct();
                         }
-                        setBasePriceSelected(holder, true);
-                        editTotalPrice(holder, cartProduct);
-                        onPriceMethodChange("", position);
-                        setupSelectableProduct();
                     }
                 }
             });
@@ -236,7 +242,6 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                 @Override
                 public void onClick(View v) {
                     if(cartProduct.getCampaignId().isEmpty()) {
-                        CartProduct cartProduct = shoppingCart.get(position);
                         String campaignId = cartProduct.getProduct().getCampaign().getId();
                         if (!campaignId.isEmpty() && cartProduct.getSelected()
                                 && (checkNormalProductSelected(shoppingCart) > 1)) {
@@ -295,6 +300,25 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                     return true;
                 }
             });
+            if (product.getQuantity() <= campaign.getQuantity()) {
+                shoppingCart.get(position).setCampaignId(campaign.getId());
+                holder.txtNumberInStorage.setText(campaign.getQuantity() + "");
+                holder.editProductQuantity.setText(cartProduct.getQuantity() + "");
+            setBasePriceSelected(holder, false);
+            } else {
+                quantity = getMaximumQuantity(position);
+                holder.txtNumberInStorage.setText(quantity + "");
+                if(shoppingCart.get(position).getQuantity() > quantity) {
+                    holder.editProductQuantity.setText(quantity + "");
+                } else {
+                    holder.editProductQuantity.setText(shoppingCart.get(position).getQuantity() + "");
+                }
+                if (cartProduct.getCampaignId().isEmpty()) {
+                    setBasePriceSelected(holder, true);
+                } else {
+                    setBasePriceSelected(holder, false);
+                }
+            }
         }
     }
 
@@ -341,6 +365,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
     }
 
     private void setBasePriceSelected(ViewHolder viewHolder, boolean selected) {
+        System.out.println(selected);
         if(selected) {
             viewHolder.checkboxBasePrice.setImageResource(R.drawable.ic_checkbox_checked);
             viewHolder.checkboxBasePrice.setColorFilter(context.getResources().getColor(R.color.blue_main));

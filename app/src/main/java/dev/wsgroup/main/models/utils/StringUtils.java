@@ -39,6 +39,7 @@ public class StringUtils {
     public static final String MES_ERROR_INVALID_PASSWORD = "Your password is invalid.";
     public static final String MES_ERROR_INCORRECT_CONFIRM_PASSWORD = "Please re-enter your password correctly.";
     public static final String MES_ERROR_INVALID_OTP = "The OTP is incorrect.";
+    public static final String MES_ERROR_OUT_OF_STOCK = "There are not enough products in stock to make this purchase.";
 
     public static final String MES_ALERT_CAMPAIGN_CART_ORDER = "Order within Campaign can only be completed individually.";
 

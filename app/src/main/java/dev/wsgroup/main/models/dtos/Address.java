@@ -67,6 +67,10 @@ public class Address implements Serializable {
         this.addressString = addressString;
     }
 
+    public void setAddressStringAuto() {
+        addressString = street + " " + province;
+    }
+
     public static Address getAddressFromJSON(JSONObject jsonObject) throws Exception {
         Address address = new Address();
         address.setId(jsonObject.getString("id"));

@@ -36,6 +36,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
+import dev.wsgroup.main.views.activities.OrderActivity;
 import dev.wsgroup.main.views.activities.account.DeliveryAddressSelectActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
@@ -202,8 +203,9 @@ public class InfoActivity extends AppCompatActivity {
 
             APIOrderCaller.addOrder(token, order, getApplication(), new APIListener() {
                 @Override
-                public void onOrderSuccessful() {
-                    super.onOrderSuccessful();
+                public void onOrderSuccessful(Order result) {
+                    super.onOrderSuccessful(result);
+                    order = result;
                     if (process == IntegerUtils.REQUEST_COMMON) {
                         orderCount = 0;
                         for (OrderProduct orderProduct : order.getOrderProductList()) {
@@ -233,9 +235,10 @@ public class InfoActivity extends AppCompatActivity {
             @Override
             public void onClickAction() {
                 super.onClickAction();
-                Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
-                mainIntent.putExtra("MAIN_TAB_POSITION", 1);
-                startActivity(mainIntent);
+                Intent orderDetailIntent = new Intent(getApplicationContext(), OrderActivity.class);
+                orderDetailIntent.putExtra("ORDER", order);
+                orderDetailIntent.putExtra("REQUEST_CODE", IntegerUtils.REQUEST_ORDER_AFTER_CHECKOUT);
+                startActivity(orderDetailIntent);
             }
         };
         dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

@@ -70,6 +70,8 @@ public class DeliveryAddressActivity extends AppCompatActivity {
             public void onAddressListFound(List<Address> addressList) {
                 super.onAddressListFound(addressList);
                 customerAddressList = addressList;
+                layoutLoading.setVisibility(View.INVISIBLE);
+                layoutScreen.setVisibility(View.VISIBLE);
                 if (customerAddressList.size() == 0) {
                     onNoAddress(true);
                 } else {
@@ -84,8 +86,6 @@ public class DeliveryAddressActivity extends AppCompatActivity {
 //                currentAddress = defaultAddress;
                     customerAddressList.remove(defaultAddress);
                     setupAddressList();
-                    layoutLoading.setVisibility(View.INVISIBLE);
-                    layoutScreen.setVisibility(View.VISIBLE);
                 }
             }
         });

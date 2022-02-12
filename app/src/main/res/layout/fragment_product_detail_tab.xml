@@ -226,6 +226,7 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutBasePrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingVertical="15dp"
@@ -536,7 +537,6 @@
                     android:id="@+id/constraintLayoutProductQuantity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:layout_marginBottom="2dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -560,69 +560,183 @@
                         android:text="Quantity"
                         android:textColor="@color/black"
                         android:textSize="15sp"
-                        android:background="@drawable/background_separator_right"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantity"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutRetailQuantity"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
+                        android:gravity="left"
+                        android:background="@color/white"
                         android:paddingVertical="10dp"
+                        android:layout_marginLeft="1dp"
                         app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent">
 
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/guidelineProductQuantityRetailOnly"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.15"/>
+
                         <TextView
                             android:id="@+id/txtProductQuantity"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:paddingRight="5dp"
+                            android:paddingLeft="10dp"
+                            android:fontFamily="monospace"
+                            android:gravity="right"
+                            android:textColor="@color/gray_darker"
+                            android:textSize="14sp"
+                            android:text="0000"
+                            android:background="@color/white"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityRetailOnly"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="7dp"
                             android:fontFamily="monospace"
                             android:gravity="left"
-                            android:textColor="@color/black"
+                            android:textColor="@color/gray_dark"
                             android:textSize="14sp"
-                            android:text="50"
-                            app:layout_constraintBottom_toTopOf="@id/layoutProductQuantityCampaign"/>
+                            android:text="for retail purchase"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantityRetailOnly"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
-                        <LinearLayout
-                            android:id="@+id/layoutProductQuantityCampaign"
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutProductQuantityWithCampaign"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginLeft="1dp"
+                        android:visibility="gone"
+                        app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="5dp"
                             android:gravity="left"
+                            android:background="@color/white"
+                            android:paddingVertical="10dp"
+                            android:layout_marginBottom="1dp"
                             app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/txtProductQuantity"
                             app:layout_constraintBottom_toBottomOf="parent">
 
-                            <TextView
-                                android:id="@+id/txtProductQuantityCampaign"
+                            <androidx.constraintlayout.widget.Guideline
+                                android:id="@+id/guidelineProductQuantityRetail"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                android:gravity="left"
-                                android:textColor="@color/black"
-                                android:textSize="14sp"
-                                android:text="100"/>
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                app:layout_constraintGuide_percent="0.15"/>
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="7dp"
+                                android:id="@+id/txtProductQuantityWithCampaign"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:fontFamily="monospace"
+                                android:gravity="right"
+                                android:textColor="@color/gray_darker"
+                                android:textSize="14sp"
+                                android:text="5000"
+                                android:background="@color/white"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityRetail" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="7dp"
                                 android:fontFamily="monospace"
                                 android:gravity="left"
-                                android:textColor="@color/black"
+                                android:textColor="@color/gray_dark"
                                 android:textSize="14sp"
-                                android:text="if joining campaign"/>
+                                android:text="for retail purchase"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantityRetail" />
 
-                        </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutCampaignQuantity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="left"
+                            android:paddingVertical="4dp"
+                            android:background="@color/white"
+                            app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/txtProductQuantity"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <androidx.constraintlayout.widget.Guideline
+                                android:id="@+id/guidelineProductQuantityCampaign"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                app:layout_constraintGuide_percent="0.15"/>
+
+                            <TextView
+                                android:id="@+id/txtProductQuantityTotalWithCampaign"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="monospace"
+                                android:gravity="right|center"
+                                android:textColor="@color/gray_darker"
+                                android:textSize="14sp"
+                                android:text="100"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityCampaign"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="7dp"
+                                android:fontFamily="monospace"
+                                android:gravity="left|center"
+                                android:textColor="@color/gray_dark"
+                                android:textSize="14sp"
+                                android:text="if joining campaign"
+                                app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantityCampaign"
+                                app:layout_constraintRight_toLeftOf="@id/imgSelectCampaign"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <ImageView
+                                android:id="@+id/imgSelectCampaign"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_direction_right"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </LinearLayout>
 
@@ -632,7 +746,6 @@
                     android:id="@+id/constraintLayoutProductCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:layout_marginBottom="2dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -656,38 +769,52 @@
                         android:text="Category"
                         android:textColor="@color/black"
                         android:textSize="15sp"
-                        android:background="@drawable/background_separator_right"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/guidelineProductCategory"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <TextView
-                        android:id="@+id/txtProductCategory"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:paddingRight="5dp"
-                        android:paddingVertical="10dp"
-                        android:fontFamily="monospace"
-                        android:gravity="left"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
+                        android:orientation="horizontal"
+                        android:layout_marginLeft="1dp"
+                        android:paddingLeft="10dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toRightOf="@+id/guidelineProductCategory"
-                        app:layout_constraintRight_toLeftOf="@id/icProductCategory"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <ImageView
-                        android:id="@+id/icProductCategory"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_direction_right"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/txtProductCategory"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingRight="5dp"
+                            android:paddingVertical="10dp"
+                            android:fontFamily="monospace"
+                            android:gravity="left"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="14sp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/icProductCategory"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <ImageView
+                            android:id="@+id/icProductCategory"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:src="@drawable/ic_direction_right"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -695,7 +822,6 @@
                     android:id="@+id/constraintLayoutProductDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:layout_marginBottom="2dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -719,7 +845,8 @@
                         android:text="Description"
                         android:textColor="@color/black"
                         android:textSize="15sp"
-                        android:background="@drawable/background_separator_right"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/guidelineProductDescription"
@@ -729,13 +856,16 @@
                         android:id="@+id/txtProductDescription"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+                        android:paddingLeft="10dp"
                         android:paddingRight="5dp"
                         android:paddingVertical="10dp"
                         android:fontFamily="monospace"
                         android:gravity="left"
-                        android:textColor="@color/black"
+                        android:textColor="@color/gray_dark"
                         android:textSize="14sp"
+                        android:text="test"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toRightOf="@+id/guidelineProductDescription"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -747,7 +877,6 @@
                     android:id="@+id/constraintLayoutSupplierName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:layout_marginBottom="2dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -771,89 +900,104 @@
                         android:text="Suppliers"
                         android:textColor="@color/black"
                         android:textSize="14sp"
-                        android:background="@drawable/background_separator_right"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/guidelineSupplierName"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <TextView
-                        android:id="@+id/txtSupplierName"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:paddingRight="5dp"
-                        android:paddingVertical="10dp"
-                        android:fontFamily="monospace"
-                        android:gravity="left"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
+                        android:orientation="horizontal"
+                        android:layout_marginLeft="1dp"
+                        android:paddingLeft="10dp"
+                        android:background="@color/white"
                         app:layout_constraintLeft_toRightOf="@+id/guidelineSupplierName"
-                        app:layout_constraintRight_toLeftOf="@id/icSupplierName"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <ImageView
-                        android:id="@+id/icSupplierName"
-                        android:layout_width="40dp"
-                        android:layout_height="0dp"
-                        android:src="@drawable/ic_direction_right"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="7dp"
-                    app:layout_constraintTop_toBottomOf="@id/constraintLayoutSupplierName"
-                    app:layout_constraintBottom_toBottomOf="parent">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/constraintLayoutMoreSuppliersProducts"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        app:layout_constraintBottom_toBottomOf="parent">
 
                         <TextView
-                            android:id="@+id/lblMoreProduct"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:paddingLeft="15dp"
-                            android:fontFamily="monospace"
-                            android:gravity="left"
-                            android:text="More From"
-                            android:textColor="@color/gray"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/txtMoreSuppliersProductsName"/>
-
-                        <TextView
-                            android:id="@+id/txtMoreSuppliersProductsName"
+                            android:id="@+id/txtSupplierName"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:paddingRight="15dp"
-                            android:paddingLeft="8dp"
+                            android:layout_height="wrap_content"
+                            android:paddingRight="5dp"
+                            android:paddingVertical="10dp"
                             android:fontFamily="monospace"
                             android:gravity="left"
-                            android:text="More Info"
                             android:textColor="@color/gray_dark"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
+                            android:textSize="14sp"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            app:layout_constraintLeft_toRightOf="@id/lblMoreProduct"
-                            app:layout_constraintRight_toRightOf="parent"/>
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/icSupplierName"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <ImageView
+                            android:id="@+id/icSupplierName"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:src="@drawable/ic_direction_right"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="7dp"
+                app:layout_constraintTop_toBottomOf="@id/constraintLayoutSupplierName"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayoutMoreSuppliersProducts"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/lblMoreProduct"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="15dp"
+                        android:fontFamily="monospace"
+                        android:gravity="left"
+                        android:text="More From"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/txtMoreSuppliersProductsName"/>
+
+                    <TextView
+                        android:id="@+id/txtMoreSuppliersProductsName"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:paddingRight="15dp"
+                        android:paddingLeft="8dp"
+                        android:fontFamily="monospace"
+                        android:gravity="left"
+                        android:textColor="@color/gray_dark"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        app:layout_constraintLeft_toRightOf="@id/lblMoreProduct"
+                        app:layout_constraintRight_toRightOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recViewMoreSuppliersProducts"
