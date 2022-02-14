@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -26,10 +25,7 @@ import android.widget.ViewFlipper;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import dev.wsgroup.main.R;
@@ -37,20 +33,14 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APICategoryCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
-import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Product;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewDiscountSimpleAdapter;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
-import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
-import dev.wsgroup.main.views.activities.ProductDetailActivity;
-import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.activities.SupplierActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxCampaign;
-import dev.wsgroup.main.views.dialogbox.DialogBoxOrderDetail;
 
 public class DetailTab extends Fragment {
 
@@ -63,9 +53,11 @@ public class DetailTab extends Fragment {
             txtRatingProduct, txtRetailPriceORG, txtRetailPrice, txtCampaignDescription,
             txtCampaignPrice, txtCampaignQuantity, txtDiscountEndDate,
             txtCampaignOrderCount, txtCampaignQuantityCount, txtCampaignQuantityBar,
-            lblCampaignOrderCount, lblCampaignQuantitySeparator;
+            lblCampaignOrderCount, lblCampaignQuantitySeparator, txtCampaignNote;
     private RatingBar ratingProduct;
-    private ConstraintLayout constraintLayoutCampaign, layoutRetailQuantity, layoutCampaignQuantity;
+    private LinearLayout linearLayoutCampaign;
+    private ConstraintLayout layoutRetailQuantity,
+            layoutCampaignQuantity, constraintLayoutSupplierName;
     private ProgressBar progressBarQuantityCount;
     private LinearLayout layoutProductQuantityWithCampaign;
 
@@ -111,10 +103,12 @@ public class DetailTab extends Fragment {
         txtCampaignQuantityBar = view.findViewById(R.id.txtCampaignQuantityBar);
         lblCampaignOrderCount = view.findViewById(R.id.lblCampaignOrderCount);
         lblCampaignQuantitySeparator = view.findViewById(R.id.lblCampaignQuantitySeparator);
+        txtCampaignNote = view.findViewById(R.id.txtCampaignNote);
         ratingProduct = view.findViewById(R.id.ratingProduct);
-        constraintLayoutCampaign = view.findViewById(R.id.constraintLayoutCampaign);
+        linearLayoutCampaign = view.findViewById(R.id.linearLayoutCampaign);
         layoutRetailQuantity = view.findViewById(R.id.layoutRetailQuantity);
         layoutCampaignQuantity = view.findViewById(R.id.layoutCampaignQuantity);
+        constraintLayoutSupplierName = view.findViewById(R.id.constraintLayoutSupplierName);
         progressBarQuantityCount = view.findViewById(R.id.progressBarQuantityCount);
         layoutProductQuantityWithCampaign = view.findViewById(R.id.layoutProductQuantityWithCampaign);
 
@@ -123,11 +117,27 @@ public class DetailTab extends Fragment {
         intent = getActivity().getIntent();
         product = (Product)intent.getSerializableExtra("PRODUCT");
 
+
         if(product != null) {
             campaign = product.getCampaign();
             setProduct();
         }
-
+        constraintLayoutSupplierName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent supplierIntent = new Intent(getContext(), SupplierActivity.class);
+                supplierIntent.putExtra("SUPPLIER_ID", product.getSupplier().getId());
+                startActivity(supplierIntent);
+            }
+        });
+        txtMoreSuppliersProductsName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent supplierIntent = new Intent(getContext(), SupplierActivity.class);
+                supplierIntent.putExtra("SUPPLIER_ID", product.getSupplier().getId());
+                startActivity(supplierIntent);
+            }
+        });
     }
 
     private void setProduct() {
@@ -158,28 +168,15 @@ public class DetailTab extends Fragment {
             viewFlipperProduct.startFlipping();
         }
         if(campaign != null) {
+            linearLayoutCampaign.setVisibility(View.VISIBLE);
             if(!campaign.getStatus().equals("active")) {
                 txtCampaignDescription.setText("Upcoming Campaign");
+                txtProductQuantity.setVisibility(View.VISIBLE);
+                layoutRetailQuantity.setVisibility(View.VISIBLE);
+                layoutProductQuantityWithCampaign.setVisibility(View.GONE);
+                txtProductQuantity.setText(product.getQuantity() + "");
             } else {
                 txtCampaignDescription.setText("Ongoing Campaign");
-            }
-            constraintLayoutCampaign.setVisibility(View.VISIBLE);
-            txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
-            txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate()));
-            txtCampaignQuantity.setText(campaign.getQuantity() + "");
-            txtCampaignQuantityBar.setText(campaign.getQuantity() + "");
-            txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
-            txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
-            progressBarQuantityCount.setMax(campaign.getQuantity());
-            progressBarQuantityCount.setProgress(campaign.getQuantityCount());
-            if(campaign.getOrderCount() > 1) {
-                lblCampaignOrderCount.setText("waiting orders");
-            } else {
-                lblCampaignOrderCount.setText("waiting order");
-            }
-            lblCampaignQuantitySeparator.setText("/");
-
-            if (campaign.getStatus().equals("active")) {
                 txtProductQuantity.setVisibility(View.GONE);
                 layoutRetailQuantity.setVisibility(View.GONE);
                 layoutProductQuantityWithCampaign.setVisibility(View.VISIBLE);
@@ -197,14 +194,24 @@ public class DetailTab extends Fragment {
                         dialogBoxCampaign.show();
                     }
                 });
-            } else {
-                txtProductQuantity.setVisibility(View.VISIBLE);
-                layoutRetailQuantity.setVisibility(View.VISIBLE);
-                layoutProductQuantityWithCampaign.setVisibility(View.GONE);
-                txtProductQuantity.setText(product.getQuantity() + "");
             }
+            txtCampaignNote.setText(campaign.getDescription());
+            txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getSavingPrice()));
+            txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate()));
+            txtCampaignQuantity.setText(campaign.getQuantity() + "");
+            txtCampaignQuantityBar.setText(campaign.getQuantity() + "");
+            txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
+            txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
+            progressBarQuantityCount.setMax(campaign.getQuantity());
+            progressBarQuantityCount.setProgress(campaign.getQuantityCount());
+            if(campaign.getOrderCount() > 1) {
+                lblCampaignOrderCount.setText("waiting orders");
+            } else {
+                lblCampaignOrderCount.setText("waiting order");
+            }
+            lblCampaignQuantitySeparator.setText("/");
         } else {
-            constraintLayoutCampaign.setVisibility(View.GONE);
+            linearLayoutCampaign.setVisibility(View.GONE);
             txtProductQuantity.setVisibility(View.VISIBLE);
             layoutProductQuantityWithCampaign.setVisibility(View.GONE);
             txtProductQuantity.setText(product.getQuantity() + "");
@@ -230,11 +237,17 @@ public class DetailTab extends Fragment {
     }
 
     private void getProductList() {
-        APIProductCaller.getAllProduct(null, getActivity().getApplication(), new APIListener() {
+        APIProductCaller.getProductListBySupplierId(product.getSupplier().getId(),null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onProductListFound(List<Product> productList) {
                 super.onProductListFound(productList);
                 if(!productList.isEmpty()) {
+                    for (int i = (productList.size() - 1); i >= 0; i--) {
+                        if (productList.get(i).getProductId().equals(product.getProductId())) {
+                            productList.remove(i);
+                            i = 0;
+                        }
+                    }
                     setupMoreProductView(productList);
                 } else {
                     setupNoProductView();

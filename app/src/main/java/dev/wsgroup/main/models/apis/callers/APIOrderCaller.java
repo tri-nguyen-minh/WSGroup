@@ -9,10 +9,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.util.JsonUtils;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
@@ -52,15 +49,15 @@ public class APIOrderCaller {
                 jsonObjectProduct.put("productId", product.getProductId());
                 jsonObjectProduct.put("productName", product.getName());
                 jsonObjectProduct.put("quantity", cartProduct.getQuantity());
-                double totalPrice = cartProduct.getQuantity();
-                if(order.getCampaignId().isEmpty()) {
-                    jsonObjectProduct.put("price", product.getRetailPrice());
-                    totalPrice *= product.getRetailPrice();
-                } else {
-                    jsonObjectProduct.put("price", product.getCampaign().getPrice());
-                    totalPrice *= product.getCampaign().getPrice();
-                }
-                jsonObjectProduct.put("totalPrice", totalPrice);
+//                double totalPrice = cartProduct.getQuantity();
+//                if(order.getCampaignId().isEmpty()) {
+//                    jsonObjectProduct.put("price", product.getRetailPrice());
+//                    totalPrice *= product.getRetailPrice();
+//                } else {
+//                    jsonObjectProduct.put("price", product.getCampaign().getSavingPrice());
+//                    totalPrice *= product.getCampaign().getSavingPrice();
+//                }
+                jsonObjectProduct.put("totalPrice", orderProduct.getTotalPrice());
                 jsonObjectProduct.put("typeofproduct", cartProduct.getProductType());
                 jsonObjectProduct.put("image", product.getImageLink());
                 jsonObjectProduct.put("notes", orderProduct.getNote());
@@ -125,14 +122,11 @@ public class APIOrderCaller {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
-        System.out.println("test " + status);
-        System.out.println("test1 " + (list == null));
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        System.out.println(response);
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
                             orderList = (list == null) ? new ArrayList<>() : list;

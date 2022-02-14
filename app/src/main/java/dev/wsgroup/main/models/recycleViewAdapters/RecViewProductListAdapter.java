@@ -57,18 +57,34 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
 
     @Override
     public void onBindViewHolder(RecViewProductListAdapter.ViewHolder holder, int position) {
+        holder.txtCampaign.setVisibility(View.GONE);
+//        if (productsList.get(position).getCampaign() != null) {
+//            if (productsList.get(position).getCampaign().getStatus().equals("active")) {
+//                holder.txtCampaign.setVisibility(View.VISIBLE);
+//                holder.txtCampaign.setText("Campaign Ongoing");
+//            }
+//        }
+        if (!productsList.get(position).getStatus().equals("active")) {
+            holder.txtCampaign.setVisibility(View.VISIBLE);
+            holder.txtCampaign.setText("Ongoing Campaign");
+//            if (productsList.get(position).getCampaign().getStatus().equals("active")) {
+//                holder.txtCampaign.setVisibility(View.VISIBLE);
+//                holder.txtCampaign.setText("Campaign Ongoing");
+//            }
+        }
         holder.txtProductName.setText(productsList.get(position).getName());
 
 //        API get order Count
+        holder.lblProductOrderCount.setText(" order(s)");
+
         String productId = productsList.get(position).getProductId();
         int productOrderCount = 12400;
         if(productsList.get(position).getImageList() != null) {
             Glide.with(context).load(productsList.get(position).getImageList().get(0)).into(holder.imgProduct);
         }
+        holder.txtCampaign.bringToFront();
         holder.txtProductOrderCount.setText(MethodUtils.formatOrderOrReviewCount(productOrderCount));
         holder.txtRetailPrice.setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
-        holder.lblProductOrderCount.setText(" order(s)");
-//        holder.lblRetailPrice.setText("Retail:");
         holder.ratingProduct.setRating((float)productsList.get(position).getRating());
         holder.productCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +105,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
                     @Override
                     public void onFailedAPICall(int errorCode) {
                         super.onFailedAPICall(errorCode);
+                        dialogBoxLoading.dismiss();
                         DialogBoxAlert dialogBox =
                                 new DialogBoxAlert(activity,
                                         IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
@@ -107,7 +124,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
     public class ViewHolder extends RecyclerView.ViewHolder {
         private CardView productCard;
         private ImageView imgProduct;
-        private TextView txtProductName, txtProductOrderCount, txtRetailPrice;
+        private TextView txtCampaign, txtProductName, txtProductOrderCount, txtRetailPrice;
         private TextView lblProductOrderCount, lblRetailPrice;
         private RatingBar ratingProduct;
 
@@ -115,6 +132,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
             super(view);
             productCard = view.findViewById(R.id.cardRecViewHoneProduct);
             imgProduct = view.findViewById(R.id.imgRecViewHomeProduct);
+            txtCampaign = view.findViewById(R.id.txtCampaign);
             txtProductName = view.findViewById(R.id.txtHomeRecViewProductName);
             txtProductOrderCount = view.findViewById(R.id.txtHomeRecViewProductOrderCount);
             txtRetailPrice = view.findViewById(R.id.txtRecViewHomeRetailPrice);

@@ -22,8 +22,8 @@ public class DialogBoxCampaign extends Dialog {
 
     private ConstraintLayout layoutCampaign;
     private ImageView imgCloseDialogBox;
-    private TextView txtCampaignPrice, txtDiscountEndDate, txtCampaignOrderCount,
-                    txtCampaignQuantityCount, txtCampaignQuantityBar,
+    private TextView txtCampaignPrice, txtDiscountEndDate, txtCampaignNote, txtCampaignOrderCount,
+                    txtCampaignQuantityCount, txtCampaignQuantityBar, txtCampaignQuantity,
                     lblProductOrderCount, lblCampaignQuantitySeparator;
     private ProgressBar progressBarQuantityCount;
 
@@ -50,20 +50,23 @@ public class DialogBoxCampaign extends Dialog {
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
         txtCampaignPrice = findViewById(R.id.txtCampaignPrice);
         txtDiscountEndDate = findViewById(R.id.txtDiscountEndDate);
+        txtCampaignNote = findViewById(R.id.txtCampaignNote);
         txtCampaignOrderCount = findViewById(R.id.txtCampaignOrderCount);
         txtCampaignQuantityCount = findViewById(R.id.txtCampaignQuantityCount);
         txtCampaignQuantityBar = findViewById(R.id.txtCampaignQuantityBar);
+        txtCampaignQuantity = findViewById(R.id.txtCampaignQuantity);
         lblProductOrderCount = findViewById(R.id.lblProductOrderCount);
         lblCampaignQuantitySeparator = findViewById(R.id.lblCampaignQuantitySeparator);
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
 
         campaign = product.getCampaign();
-
-        txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
+        txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getSavingPrice()));
         txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate()));
+        txtCampaignNote.setText(campaign.getDescription());
         txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
         txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
         txtCampaignQuantityBar.setText(campaign.getQuantity() + "");
+        txtCampaignQuantity.setText(campaign.getQuantity() + "");
         if (campaign.getOrderCount() > 1) {
             lblProductOrderCount.setText("waiting orders");
         } else {

@@ -40,7 +40,6 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.account.SignInActivity;
 import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 
 public class DialogBoxOrderDetail extends Dialog{
@@ -261,7 +260,8 @@ public class DialogBoxOrderDetail extends Dialog{
                 setBasePriceSelected(true);
             }
             layoutCampaign.setVisibility(View.VISIBLE);
-            txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
+            double price = product.getRetailPrice() - campaign.getSavingPrice();
+            txtCampaignPrice.setText(MethodUtils.formatPriceString(price));
             layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -362,7 +362,8 @@ public class DialogBoxOrderDetail extends Dialog{
         if(campaignId.isEmpty()) {
             totalPrice *= product.getRetailPrice();
         } else {
-            totalPrice *= product.getCampaign().getPrice();
+            double price = product.getRetailPrice() - campaign.getSavingPrice();
+            totalPrice *= price;
         }
         txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
     }
@@ -380,13 +381,17 @@ public class DialogBoxOrderDetail extends Dialog{
     }
 
     private double getTotalPrice() {
-        double price = Double.parseDouble(editProductQuantity.getText().toString());
-        if(campaignId.isEmpty()) {
-            price *= product.getRetailPrice();
-        } else {
-            price *= product.getCampaign().getPrice();
-        }
-        return price;
+        double totalPrice = Double.parseDouble(editProductQuantity.getText().toString());
+        totalPrice *= product.getRetailPrice();
+
+//        double totalPrice = Double.parseDouble(editProductQuantity.getText().toString());
+//        if(campaignId.isEmpty()) {
+//            totalPrice *= product.getRetailPrice();
+//        } else {
+//            double price = product.getRetailPrice() - campaign.getSavingPrice();
+//            totalPrice *= price;
+//        }
+        return totalPrice;
     }
 
     private void updateCartProduct(CartProduct cartProduct) {
@@ -439,7 +444,13 @@ public class DialogBoxOrderDetail extends Dialog{
         cartProduct.setProductType(product.getTypeOfProduct());
         orderProduct.setProductId(product.getProductId());
         orderProduct.setQuantity(cartProduct.getQuantity());
-        orderProduct.setPrice(getTotalPrice());
+        orderProduct.setPrice(product.getRetailPrice());
+//        if (campaignId.isEmpty()) {
+//            orderProduct.setPrice(product.getRetailPrice());
+//        } else {
+//            orderProduct.setPrice(campaign.getSavingPrice());
+//        }
+        orderProduct.setTotalPrice(getTotalPrice());
         orderProduct.setCampaignId(campaignId);
         orderProduct.setProductType(cartProduct.getProductType());
         orderProduct.setProduct(product);

@@ -58,7 +58,7 @@ public class RecViewCampaignListAdapter extends RecyclerView.Adapter<RecViewCamp
                 }
             });
             holder.constraintLayoutCampaign.setVisibility(View.VISIBLE);
-            holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaignList.get(position).getPrice()));
+            holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaignList.get(position).getSavingPrice()));
             holder.txtCampaignQuantity.setText(campaignList.get(position).getQuantity() + "");
             holder.txtDiscountEndDate.setText(MethodUtils.formatDate(campaignList.get(position).getEndDate()));
             holder.txtCampaignOrderCount.setText(campaignList.get(position).getOrderCount() + "");

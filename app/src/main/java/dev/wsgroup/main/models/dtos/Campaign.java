@@ -5,9 +5,9 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class Campaign implements Serializable {
-    private String id, supplierId, productId, startDate, endDate, code, status;
+    private String id, supplierId, productId, startDate, endDate, code, status, description;
     private int quantity, orderCount, quantityCount;
-    private double price;
+    private double savingPrice;
 
     public Campaign() {
     }
@@ -72,12 +72,12 @@ public class Campaign implements Serializable {
         return orderCount;
     }
 
-    public double getPrice() {
-        return price;
+    public double getSavingPrice() {
+        return savingPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setSavingPrice(double savingPrice) {
+        this.savingPrice = savingPrice;
     }
 
     public void setOrderCount(int orderCount) {
@@ -100,6 +100,14 @@ public class Campaign implements Serializable {
         this.status = status;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public static Campaign getCampaignFromJSON(JSONObject data) throws Exception {
         Campaign campaign = new Campaign();
         campaign.setId(data.getString("id"));
@@ -109,8 +117,9 @@ public class Campaign implements Serializable {
         campaign.setStartDate(data.getString("fromdate"));
         campaign.setEndDate(data.getString("todate"));
         campaign.setQuantity(data.getInt("quantity"));
-        campaign.setPrice(data.getDouble("price"));
+        campaign.setSavingPrice(data.getDouble("price"));
         campaign.setStatus(data.getString("status"));
+        campaign.setDescription(data.getString("description"));
 //        campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
 //        campaign.setOrderCount(data.getInt("numorderwaiting"));
         campaign.setQuantityCount(0);

@@ -67,7 +67,6 @@ public class AccountDetailActivity extends AppCompatActivity {
         passwordDisplayed = false;
         passwordConfirmedDisplayed = false;
         String phoneNumber = getIntent().getStringExtra("PHONE");
-        System.out.println(phoneNumber);
         if(phoneNumber != null) {
             String phoneDisplay = MethodUtils.formatPhoneNumber(phoneNumber);
             editPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(phoneDisplay));

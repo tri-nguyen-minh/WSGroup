@@ -83,7 +83,6 @@ public class DialogBoxOrderNote extends Dialog {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     hideKeyboard(v);
-                    System.out.println("testing");
                 }
             }
         });

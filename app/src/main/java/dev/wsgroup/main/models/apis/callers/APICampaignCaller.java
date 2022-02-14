@@ -142,7 +142,6 @@ public class APICampaignCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        System.out.println("get camapign: " + response);
                         JSONObject data = response.getJSONObject("data");
                         if(data!= null) {
                             Campaign campaign = Campaign.getCampaignFromJSON(data);

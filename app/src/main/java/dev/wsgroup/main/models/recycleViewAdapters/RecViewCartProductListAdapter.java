@@ -100,6 +100,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         } else {
             setCheckboxSelectable(holder.checkboxCartProduct, false);
         }
+        setEditableQuantity(holder, true);
 
         holder.imgProductQuantityMinus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,7 +149,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                     quantity = Integer.parseInt(holder.editProductQuantity.getText().toString());
                 }
                 shoppingCart.get(position).setQuantity(quantity);
-                updateCartItem(shoppingCart.get(position));
+                setEditableQuantity(holder, false);
+                updateCartItem(shoppingCart.get(position), holder);
                 editTotalPrice(holder, shoppingCart.get(position));
             }
             @Override
@@ -185,13 +187,6 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         });
 
         setupCampaign(position, holder);
-//        String campaignId = "";
-//        if (campaign != null) {
-//            if (campaign.getStatus().equals("active") &&
-//                    shoppingCart.get(position).getProduct().getQuantity() <= campaign.getQuantity()) {
-//                shoppingCart.get(position).setCampaignId(shoppingCart.get(position).getProduct().getCampaign().getId());
-//            }
-//        }
     }
 
     private void setupCampaign(int position, ViewHolder holder) {
@@ -212,7 +207,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
             holder.editProductQuantity.setText(cartProduct.getQuantity() + "");
         } else {
             holder.layoutCampaign.setVisibility(View.VISIBLE);
-            holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
+            double price = product.getRetailPrice() - campaign.getSavingPrice();
+            holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(price));
             holder.layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -322,12 +318,13 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         }
     }
 
-    private void updateCartItem(CartProduct cartProduct) {
+    private void updateCartItem(CartProduct cartProduct, ViewHolder holder) {
         APICartCaller.updateCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
                 activity.getApplication(), new APIListener() {
                     @Override
                     public void onUpdateCartItemSuccessful() {
                         super.onUpdateCartItemSuccessful();
+                        setEditableQuantity(holder, true);
                     }
 
                     @Override
@@ -354,18 +351,33 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         }
     }
 
+    private void setEditableQuantity(ViewHolder holder, boolean editable) {
+        holder.editProductQuantity.setEnabled(editable);
+        holder.imgProductQuantityMinus.setEnabled(editable);
+        holder.imgProductQuantityPlus.setEnabled(editable);
+        if (!editable) {
+            holder.editProductQuantity.setTextColor(context.getResources().getColor(R.color.gray_light));
+            holder.imgProductQuantityMinus.setColorFilter(context.getResources().getColor(R.color.gray_light));
+            holder.imgProductQuantityPlus.setColorFilter(context.getResources().getColor(R.color.gray_light));
+        } else {
+            holder.editProductQuantity.setTextColor(context.getResources().getColor(R.color.gray_dark));
+            holder.imgProductQuantityMinus.setColorFilter(context.getResources().getColor(R.color.gray_dark));
+            holder.imgProductQuantityPlus.setColorFilter(context.getResources().getColor(R.color.gray_dark));
+        }
+    }
+
     private void editTotalPrice(ViewHolder holder, CartProduct cartProduct) {
         double totalPrice = cartProduct.getQuantity();
         if(cartProduct.getCampaignId().isEmpty()) {
             totalPrice *= cartProduct.getProduct().getRetailPrice();
         } else {
-            totalPrice *= cartProduct.getProduct().getCampaign().getPrice();
+            double price = cartProduct.getProduct().getRetailPrice() - cartProduct.getProduct().getCampaign().getSavingPrice();
+            totalPrice *= price;
         }
         holder.txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
     }
 
     private void setBasePriceSelected(ViewHolder viewHolder, boolean selected) {
-        System.out.println(selected);
         if(selected) {
             viewHolder.checkboxBasePrice.setImageResource(R.drawable.ic_checkbox_checked);
             viewHolder.checkboxBasePrice.setColorFilter(context.getResources().getColor(R.color.blue_main));

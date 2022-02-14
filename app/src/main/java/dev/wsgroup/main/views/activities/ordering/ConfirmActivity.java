@@ -26,6 +26,7 @@ import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Order;
+import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderProductListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
@@ -37,7 +38,7 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 public class ConfirmActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
-    private TextView txtSupplierName, txtSupplierAddress, lblOrderingProduct,
+    private TextView txtSupplierName, txtSupplierAddress, lblOrderingProduct, txtCampaignDescription,
             txtPrice, txtCampaignOrderCount, txtCampaignOrderQuantityCount,
             txtCampaignQuantityCount, txtDiscountPrice, txtDiscountDescription;
     private ProgressBar progressBarQuantityCount;
@@ -46,11 +47,12 @@ public class ConfirmActivity extends AppCompatActivity {
     private LinearLayout layoutCampaign, layoutScreen;
     private EditText editDiscount;
     private ConstraintLayout layoutDiscountSelect;
-    private LinearLayout layoutDiscountDescription;
+    private LinearLayout layoutDiscount, layoutDiscountDescription;
     private ProgressBar progressBarLoading;
 
     private Supplier supplier;
     private Order order;
+    private OrderProduct orderProduct;
     private Campaign campaign;
     private RecViewOrderProductListAdapter adapter;
     private String discountCode;
@@ -69,6 +71,7 @@ public class ConfirmActivity extends AppCompatActivity {
         txtSupplierName = findViewById(R.id.txtSupplierName);
         txtSupplierAddress = findViewById(R.id.txtSupplierAddress);
         lblOrderingProduct = findViewById(R.id.lblOrderingProduct);
+        txtCampaignDescription = findViewById(R.id.txtCampaignDescription);
         txtPrice = findViewById(R.id.txtPrice);
         txtCampaignOrderCount = findViewById(R.id.txtCampaignOrderCount);
         txtCampaignOrderQuantityCount = findViewById(R.id.txtCampaignOrderQuantityCount);
@@ -82,6 +85,7 @@ public class ConfirmActivity extends AppCompatActivity {
         layoutScreen = findViewById(R.id.layoutScreen);
         editDiscount = findViewById(R.id.editDiscount);
         layoutDiscountSelect = findViewById(R.id.layoutDiscountSelect);
+        layoutDiscount = findViewById(R.id.layoutDiscount);
         layoutDiscountDescription = findViewById(R.id.layoutDiscountDescription);
         progressBarLoading = findViewById(R.id.progressBarLoading);
 
@@ -92,25 +96,29 @@ public class ConfirmActivity extends AppCompatActivity {
         if(supplier != null) {
             txtSupplierName.setText(supplier.getName());
             txtSupplierAddress.setText(supplier.getAddress());
-            if(order.getOrderProductList().size() > 1) {
-                lblOrderingProduct.setText("Ordering Products");
-            } else {
-                lblOrderingProduct.setText("Ordering Product");
-            }
-            if (order.getCampaignId().isEmpty()) {
-                layoutCampaign.setVisibility(View.GONE);
-            } else {
-                campaign = order.getOrderProductList().get(0).getProduct().getCampaign();;
-                layoutCampaign.setVisibility(View.VISIBLE);
-                txtPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
-                txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
-                txtCampaignOrderQuantityCount.setText(campaign.getQuantityCount() + "");
-                txtCampaignQuantityCount.setText(campaign.getQuantity() + "");
-                progressBarQuantityCount.setMax(campaign.getQuantity());
-                progressBarQuantityCount.setProgress(campaign.getQuantityCount());
-            }
-            setupRecViewOrderList();
         }
+        if(order.getOrderProductList().size() > 1) {
+            lblOrderingProduct.setText("Ordering Products");
+        } else {
+            lblOrderingProduct.setText("Ordering Product");
+        }
+        if (order.getCampaignId().isEmpty()) {
+            layoutDiscount.setVisibility(View.VISIBLE);
+            layoutCampaign.setVisibility(View.GONE);
+        } else {
+            orderProduct = order.getOrderProductList().get(0);
+            campaign = orderProduct.getProduct().getCampaign();
+            layoutDiscount.setVisibility(View.GONE);
+            layoutCampaign.setVisibility(View.VISIBLE);
+            txtCampaignDescription.setText(campaign.getDescription());
+            txtPrice.setText(MethodUtils.formatPriceString(campaign.getSavingPrice()));
+            txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
+            txtCampaignOrderQuantityCount.setText(campaign.getQuantityCount() + "");
+            txtCampaignQuantityCount.setText(campaign.getQuantity() + "");
+            progressBarQuantityCount.setMax(campaign.getQuantity());
+            progressBarQuantityCount.setProgress(campaign.getQuantityCount());
+        }
+        setupRecViewOrderList();
 
 //        discount
         discountPrice = 0;
@@ -118,8 +126,6 @@ public class ConfirmActivity extends AppCompatActivity {
         List<CustomerDiscount> customerDiscountList = getDiscountList();
         progressBarLoading.setVisibility(View.INVISIBLE);
         layoutDiscountDescription.setVisibility(View.INVISIBLE);
-
-
 
         editDiscount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -187,8 +193,15 @@ public class ConfirmActivity extends AppCompatActivity {
                     @Override
                     public void onYesClicked() {
                         super.onYesClicked();
-                        if (customerDiscount != null) {
+                        if (campaign != null) {
+                            System.out.println("quantity " + orderProduct.getQuantity());
+                            System.out.println("price " + campaign.getSavingPrice());
+                            order.setDiscountPrice(orderProduct.getQuantity() * campaign.getSavingPrice());
+                        } else if (customerDiscount != null) {
                             order.setCustomerDiscount(customerDiscount);
+                            order.setDiscountPrice(customerDiscount.getDiscount().getDiscountPrice());
+                        } else {
+                            order.setDiscountPrice(0);
                         }
                         Intent orderInfoIntent = new Intent(getApplicationContext(), InfoActivity.class);
                         orderInfoIntent.putExtra("ORDER", order);

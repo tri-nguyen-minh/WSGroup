@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
 public class ProfileTab extends Fragment {
 
+    private ImageView imgAccountAvatar;
     private TextView txtProfileTabUsername;
     private LinearLayout layoutAccountInfo, layoutDeliveryAddress, layoutLogout;
 
@@ -45,6 +47,7 @@ public class ProfileTab extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        imgAccountAvatar = view.findViewById(R.id.imgAccountAvatar);
         txtProfileTabUsername = view.findViewById(R.id.txtProfileTabUsername);
         layoutAccountInfo = view.findViewById(R.id.layoutAccountInfo);
         layoutDeliveryAddress = view.findViewById(R.id.layoutDeliveryAddress);

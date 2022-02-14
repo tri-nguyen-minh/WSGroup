@@ -98,27 +98,6 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
             holder.checkboxCartSupplier.setColorFilter(context.getResources().getColor(R.color.gray));
         }
 
-//            holder.checkboxCartSupplier.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if(supplierList.get(position).getStatus()) {
-//                        supplierList.get(position).setStatus(false);
-//                        holder.checkboxCartSupplier.setImageResource(R.drawable.ic_checkbox_unchecked);
-//                        holder.checkboxCartSupplier.setColorFilter(context.getResources().getColor(R.color.gray));
-//                    } else {
-//                        supplierList.get(position).setStatus(true);
-//                        holder.checkboxCartSupplier.setImageResource(R.drawable.ic_checkbox_checked);
-//                        holder.checkboxCartSupplier.setColorFilter(context.getResources().getColor(R.color.blue_main));
-//                    }
-//                    cartProductList = shoppingCart.get(supplierList.get(position).getId());
-//                    for (int i = 0; i < cartProductList.size(); i++) {
-//                        cartProductList.get(i).setStatus(supplierList.get(position).getStatus());
-//                    }
-//                    setupCartProductList(holder.recViewCartProducts, supplierList.get(position).getId(), cartProductList);
-//                    onCheckboxSupplierChange();
-//                }
-//            });
-
         holder.lblDeleteCartSuppliers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,7 +149,9 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
                 if(cartProduct.getCampaignId().isEmpty()) {
                     tempPrice *= cartProduct.getProduct().getRetailPrice();
                 } else {
-                    tempPrice *= cartProduct.getProduct().getCampaign().getPrice();
+                    double price = cartProduct.getProduct().getRetailPrice()
+                            - cartProduct.getProduct().getCampaign().getSavingPrice();
+                    tempPrice *= price;
                 }
                 totalPrice += tempPrice;
             }
@@ -179,13 +160,18 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
     }
 
     private double getProductTotalPrice(CartProduct cartProduct) {
-        double price = cartProduct.getQuantity();
-        if(cartProduct.getCampaignId().isEmpty()) {
-            price *= cartProduct.getProduct().getRetailPrice();
-        } else {
-            price *= cartProduct.getProduct().getCampaign().getPrice();
-        }
-        return price;
+        double totalPrice = cartProduct.getQuantity();
+        totalPrice *= cartProduct.getProduct().getRetailPrice();
+
+//        double totalPrice = cartProduct.getQuantity();
+//        if(cartProduct.getCampaignId().isEmpty()) {
+//            totalPrice *= cartProduct.getProduct().getRetailPrice();
+//        } else {
+//            double price = cartProduct.getProduct().getRetailPrice()
+//                    - cartProduct.getProduct().getCampaign().getSavingPrice();
+//            totalPrice *= price;
+//        }
+        return totalPrice;
     }
 
     private Order getSelectedCartProduct(String supplierId) {
@@ -198,11 +184,14 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
                 orderProduct = new OrderProduct();
                 orderProduct.setProductId(cartProduct.getProduct().getProductId());
                 orderProduct.setQuantity(cartProduct.getQuantity());
-                if (cartProduct.getCampaignId().isEmpty()) {
-                    orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
-                } else {
-                    orderProduct.setPrice(cartProduct.getProduct().getCampaign().getPrice());
-                }
+//                if (cartProduct.getCampaignId().isEmpty()) {
+//                    orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
+//                } else {
+//                    double price = cartProduct.getProduct().getRetailPrice()
+//                            - cartProduct.getProduct().getCampaign().getSavingPrice();
+//                    orderProduct.setPrice(price);
+//                }
+                orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
                 orderProduct.setTotalPrice(getProductTotalPrice(cartProduct));
                 orderProduct.setCampaignId(cartProduct.getCampaignId());
                 orderProduct.setProductType(cartProduct.getProductType());
@@ -213,7 +202,6 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
                 list.add(orderProduct);
             }
         }
-        order.setCustomerDiscount(null);
         order.setOrderProductList(list);
         order.setCampaignId(list.get(0).getCampaignId());
         return order;

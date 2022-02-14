@@ -160,6 +160,7 @@
                                 android:fontFamily="monospace"
                                 android:inputType="number"
                                 android:hint="0"
+                                android:text="2"
                                 android:maxLines="1"
                                 android:textColor="@color/black"
                                 android:textColorHint="@color/gray"

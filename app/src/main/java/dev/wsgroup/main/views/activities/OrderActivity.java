@@ -22,7 +22,7 @@ import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 public class OrderActivity extends AppCompatActivity {
 
     private ImageView imgBackFromOrderDetail, imgOrderDetailMessage, imgOrderDetailHome, imgSupplierAvatar;
-    private TextView txtPhoneNumber, txtDeliveryAddress, txtPayment, txtStatus,
+    private TextView txtOrderCode, txtPhoneNumber, txtDeliveryAddress, txtPayment, txtStatus,
             txtSupplierName, txtSupplierAddress, txtTotalPrice;
     private RecyclerView recViewOrderProduct;
 
@@ -42,6 +42,7 @@ public class OrderActivity extends AppCompatActivity {
         imgOrderDetailMessage = findViewById(R.id.imgOrderDetailMessage);
         imgOrderDetailHome = findViewById(R.id.imgOrderDetailHome);
         imgSupplierAvatar = findViewById(R.id.imgSupplierAvatar);
+        txtOrderCode = findViewById(R.id.txtOrderCode);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
         txtDeliveryAddress = findViewById(R.id.txtDeliveryAddress);
         txtPayment = findViewById(R.id.txtPayment);
@@ -58,6 +59,7 @@ public class OrderActivity extends AppCompatActivity {
         phone = sharedPreferences.getString("PHONE", "");
         token = sharedPreferences.getString("TOKEN", "");
 
+        txtOrderCode.setText(order.getCode());
         txtPhoneNumber.setText(MethodUtils
                 .formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phone)));
         txtDeliveryAddress.setText(order.getAddress().getAddressString());

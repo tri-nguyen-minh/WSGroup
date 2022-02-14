@@ -97,14 +97,16 @@
         android:scrollbars="none">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragment_test"
+            <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="200dp"
+                android:src="@drawable/img_unavailable"
+                android:scaleX="2"
+                android:scaleY="2"/>
 
         </LinearLayout>
 

@@ -27,10 +27,12 @@ import dev.wsgroup.main.models.apis.callers.APIAddressCaller;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
 import dev.wsgroup.main.models.dtos.Address;
+import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Payment;
+import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderProductPriceAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
@@ -47,8 +49,8 @@ public class InfoActivity extends AppCompatActivity {
     private ImageView imgBackFromCheckout, imgCheckoutMessage, imgCheckoutHome;
     private ConstraintLayout layoutDeliveryInfo, layoutPayment, layoutAddress;
     private EditText editPhoneNumber;
-    private TextView txtDeliveryAddress, txtPaymentDescription,
-                txtTotalPrice, txtDiscountPrice, txtFinalPrice, txtDeliveryPrice;
+    private TextView txtDeliveryAddress, txtPaymentDescription, txtTotalPrice,
+            txtDiscountPrice, txtFinalPrice, txtDeliveryPrice, lblDiscountPrice;
     private RecyclerView recViewOrderProductPrice;
     private Button btnConfirmOrder;
 
@@ -84,6 +86,7 @@ public class InfoActivity extends AppCompatActivity {
         txtDiscountPrice = findViewById(R.id.txtDiscountPrice);
         txtFinalPrice = findViewById(R.id.txtFinalPrice);
         txtDeliveryPrice = findViewById(R.id.txtDeliveryPrice);
+        lblDiscountPrice = findViewById(R.id.lblDiscountPrice);
         recViewOrderProductPrice = findViewById(R.id.recViewOrderProductPrice);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
 
@@ -97,18 +100,24 @@ public class InfoActivity extends AppCompatActivity {
             totalPrice = 0; discountPrice = 0; finalPrice = 0; deliveryPrice = 0;
             orderProductList = order.getOrderProductList();
             for (OrderProduct orderProduct : orderProductList) {
-                totalPrice += orderProduct.getPrice();
+                totalPrice += orderProduct.getProduct().getRetailPrice() * orderProduct.getQuantity();
             }
-            totalPrice -= deliveryPrice;
+            txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
             txtDeliveryPrice.setText(MethodUtils.formatPriceString(deliveryPrice));
+
 
             txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
             customerDiscount = order.getCustomerDiscount();
-            if (customerDiscount != null) {
-                discountPrice = customerDiscount.getDiscount().getDiscountPrice();
+
+            if (order.getCampaignId().isEmpty()) {
+                lblDiscountPrice.setText("Discount");
+            } else {
+                lblDiscountPrice.setText("Campaign Saving");
             }
+            discountPrice = order.getDiscountPrice();
             txtDiscountPrice.setText(MethodUtils.formatPriceString(discountPrice));
-            finalPrice = totalPrice - discountPrice;
+            finalPrice = totalPrice - discountPrice - deliveryPrice;
+            order.setTotalPrice(finalPrice);
             txtFinalPrice.setText(MethodUtils.formatPriceString(finalPrice));
 
             RecViewOrderProductPriceAdapter adapter = new RecViewOrderProductPriceAdapter();
@@ -195,7 +204,6 @@ public class InfoActivity extends AppCompatActivity {
             dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxLoading.show();
             order.setAddress(currentAddress);
-
 //            set Payment
             currentPayment = new Payment();
             currentPayment.setId("");

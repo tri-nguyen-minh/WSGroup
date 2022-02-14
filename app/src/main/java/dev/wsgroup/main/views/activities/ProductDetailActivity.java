@@ -238,14 +238,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         return new DetailTab();
-//                        Fragment fragment = new DetailTab() {
-//                            @Override
-//                            public void editShoppingCart() {
-//                                super.editShoppingCart();
-//                                editShoppingCart();
-//                            }
-//                        };
-//                        return fragment;
                     case 1:
                         return new ReviewTab();
                     default:

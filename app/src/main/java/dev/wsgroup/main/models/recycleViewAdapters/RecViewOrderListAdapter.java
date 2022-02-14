@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -57,6 +58,7 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
         holder.constraintLayoutReturnDate.setVisibility(View.GONE);
         holder.constraintLayoutCancelDate.setVisibility(View.GONE);
         holder.txtOrderPrice.setText(MethodUtils.formatPriceString(orderList.get(position).getTotalPrice()));
+        holder.txtSupplier.setText(orderList.get(position).getSupplier().getName());
         int productCount = orderList.get(position).getOrderProductList().size();
         holder.txtProductCount.setText(productCount + "");
         holder.lblProduct.setText((productCount == 1) ? "product" : "products");
@@ -83,6 +85,12 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
             holder.constraintLayoutCancelDate.setVisibility(View.VISIBLE);
             holder.txtCancelDate.setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
         }
+        RecViewOrderProductPriceAdapter adapter = new RecViewOrderProductPriceAdapter();
+        adapter.setOrderProductList(orderList.get(position).getOrderProductList());
+        holder.recViewOrderProduct.setAdapter(adapter);
+        holder.recViewOrderProduct.setLayoutManager(new LinearLayoutManager(context,
+                LinearLayoutManager.VERTICAL, false));
+
         holder.layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,16 +131,18 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private RelativeLayout layoutParent;
-        private TextView txtOrderPrice, txtProductCount, lblProduct, txtDiscountCode, txtDiscountPrice,
+        private TextView txtOrderPrice, txtSupplier, txtProductCount, lblProduct, txtDiscountCode, txtDiscountPrice,
                 txtPayment, txtAddress, txtOrderDate, txtDeliverDate, txtReturnDate, txtCancelDate;
         private ConstraintLayout constraintLayoutDiscount, constraintLayoutDeliverDate,
                 constraintLayoutReturnDate, constraintLayoutCancelDate;
+        private RecyclerView recViewOrderProduct;
 
 
         public ViewHolder(View view) {
             super(view);
             layoutParent = view.findViewById(R.id.layoutParent);
             txtOrderPrice = view.findViewById(R.id.txtOrderPrice);
+            txtSupplier = view.findViewById(R.id.txtSupplier);
             txtProductCount = view.findViewById(R.id.txtProductCount);
             lblProduct = view.findViewById(R.id.lblProduct);
             txtDiscountCode = view.findViewById(R.id.txtDiscountCode);
@@ -147,6 +157,7 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
             constraintLayoutDeliverDate = view.findViewById(R.id.constraintLayoutDeliverDate);
             constraintLayoutReturnDate = view.findViewById(R.id.constraintLayoutReturnDate);
             constraintLayoutCancelDate = view.findViewById(R.id.constraintLayoutCancelDate);
+            recViewOrderProduct = view.findViewById(R.id.recViewOrderProduct);
         }
     }
 }

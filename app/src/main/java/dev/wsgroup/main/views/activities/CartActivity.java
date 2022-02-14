@@ -80,35 +80,6 @@ public class CartActivity extends AppCompatActivity {
             setupEmptyShoppingCart();
         }
 
-//        btnCheckout.setEnabled(false);
-//        btnCheckout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_CHECKOUT) {
-//                    @Override
-//                    public void onYesClicked() {
-//                        super.onYesClicked();
-//                        List<Supplier> orderSupplierList = new ArrayList<>();
-//                        HashMap<String, List<OrderProduct>> checkoutList = new HashMap<>();
-//                        List<OrderProduct> orderProductList = new ArrayList<>();
-//                        for (Supplier supplier : supplierList) {
-//                            orderProductList = getSelectedCartProduct(supplier.getId());
-//                            if(productList.size() > 0) {
-//                                orderSupplierList.add(supplier);
-//                                checkoutList.put(supplier.getId(), orderProductList);
-//                            }
-//                        }
-//                        Intent checkoutActivity = new Intent(getApplicationContext(), ConfirmActivity.class);
-//                        checkoutActivity.putExtra("SUPPLIER_LIST", (Serializable) orderSupplierList);
-//                        checkoutActivity.putExtra("CHECKOUT_LIST", (Serializable) checkoutList);
-//                        startActivityForResult(checkoutActivity, IntegerUtils.REQUEST_COMMON);
-//                    }
-//                };
-//                dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//                dialogBoxConfirm.show();
-//            }
-//        });
-
         imgBackFromCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

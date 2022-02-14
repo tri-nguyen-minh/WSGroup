@@ -39,7 +39,7 @@ public class DialogBoxOTP extends Dialog {
 
     private Context context;
     private Activity activity;
-    private String phoneNumber, otp;
+    private String phoneNumber;
     private int requestCode;
     private FirebasePhoneAuthService service;
 

@@ -7,6 +7,9 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -62,7 +65,7 @@ public class MethodUtils {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm MMM dd, yyyy");
         SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
-            returnedDate = format.format(dateParse.parse(dateString));
+            returnedDate = format.format(convertStringToDate(dateString));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -70,8 +73,21 @@ public class MethodUtils {
         return returnedDate;
     }
 
+    public static Date convertStringToDate(String dateString) throws Exception {
+        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        return dateParse.parse(dateString);
+    }
+
     public static boolean checkDeliveredOrder(String status) {
         return (status.equals("delivered") || status.equals("completed"));
+    }
+
+    public static boolean checkReturnedOrder(String status) {
+        return status.equals("returned");
+    }
+
+    public static boolean checkCancelledOrder(String status) {
+        return status.equals("cancelled");
     }
 
     public static String displayStatus(String status) {
@@ -88,22 +104,35 @@ public class MethodUtils {
         }
     }
 
-    public static boolean checkReturnedOrder(String status) {
-        return status.equals("returned");
-    }
-
-    public static boolean checkCancelledOrder(String status) {
-        return status.equals("cancelled");
-    }
-
     public static void main(String[] args) {
-        System.out.println(revertPhoneNumber("+8496 0029 29312"));
-//        try {
-//            String fullDate = "2022-10-01T12:42:10.000Z";
-//            String date = "2021-08-01";
-//            System.out.println(formatDateWithTime(fullDate));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            List<String> sortData = new ArrayList<>();
+            sortData.add("2022-02-12T14:36:49.958Z");
+            sortData.add("2022-02-11T22:33:43.396Z");
+            sortData.add("2022-01-27T17:25:59.996Z");
+            sortData.add("2022-02-12T12:05:33.288Z");
+            Collections.sort(sortData, new Comparator<String>() {
+                @Override
+                public int compare(String s1, String s2) {
+                    Date date1 = null, date2 = null;
+                    try {
+                        date1 = convertStringToDate(s1);
+                        date2 = convertStringToDate(s2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (false) {
+                        return date1.compareTo(date2);
+                    } else {
+                        return date2.compareTo(date1);
+                    }
+                }
+            });
+            for (String s : sortData) {
+                System.out.println(s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

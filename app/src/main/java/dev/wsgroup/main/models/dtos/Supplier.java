@@ -1,5 +1,7 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class Supplier implements Serializable {
@@ -64,5 +66,16 @@ public class Supplier implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public static Supplier getSupplierFromJSON(JSONObject data) throws Exception{
+        Supplier supplier = new Supplier();
+        supplier.setId(data.getString("id"));
+        supplier.setName(data.getString("name"));
+        supplier.setMail(data.getString("email"));
+        supplier.setAddress(data.getString("address"));
+        supplier.setAvatarLink(data.getString("avt"));
+        supplier.setStatus(data.getBoolean("isdeleted"));
+        return supplier;
     }
 }

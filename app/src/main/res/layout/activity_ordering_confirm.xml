@@ -121,6 +121,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/layoutDiscount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -158,7 +159,6 @@
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutDiscount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -302,7 +302,7 @@
                 android:paddingHorizontal="15dp"
                 android:fontFamily="monospace"
                 android:gravity="left"
-                android:text="Campaign"
+                android:text="Joined Campaign"
                 android:textColor="@color/gray"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -322,7 +322,7 @@
                     android:background="@color/white">
 
                     <TextView
-                        android:id="@+id/txtPriceDescription"
+                        android:id="@+id/txtCampaignDescription"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
@@ -337,38 +337,45 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintRight_toLeftOf="@id/txtPrice"/>
-
-                    <TextView
-                        android:id="@+id/txtPrice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:text="0.000d"
-                        android:textColor="@color/red"
-                        android:textSize="17dp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintRight_toLeftOf="@id/layoutCampaignPrice"/>
 
                     <LinearLayout
+                        android:id="@+id/layoutCampaignPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent">
 
-                        <ImageView
-                            android:id="@+id/imgCampaign"
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:src="@drawable/ic_direction_right"
-                            android:layout_marginLeft="5dp"
-                            android:visibility="gone"/>
+                        <TextView
+                            android:id="@+id/txtPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:text="0.000d"
+                            android:textColor="@color/red"
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="7dp"
+                            android:fontFamily="monospace"
+                            android:text="OFF"
+                            android:textColor="@color/red"
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
                     </LinearLayout>
 

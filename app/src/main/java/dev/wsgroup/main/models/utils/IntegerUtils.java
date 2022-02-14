@@ -18,6 +18,8 @@ public class IntegerUtils {
 
     public static final int REQUEST_REGISTER = 1;
     public static final int REQUEST_CHANGE_PASSWORD = 2;
+    public static final int REQUEST_SELECT_IMAGE = 1;
+    public static final int REQUEST_TAKE_IMAGE = 2;
 
     public static final int ADDRESS_ACTION_UPDATE = 1;
     public static final int ADDRESS_ACTION_DELETE = 2;

@@ -4,13 +4,14 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Review implements Serializable {
-    private String reviewId, userid, productId, description;
+    private String reviewId, userId, productId, description;
+    private double rating;
     private List<String> imageList;
     private boolean deletedStatus;
 
-    public Review(String reviewId, String userid, String productId, String description, List<String> imageList, boolean deletedStatus) {
+    public Review(String reviewId, String userId, String productId, String description, List<String> imageList, boolean deletedStatus) {
         this.reviewId = reviewId;
-        this.userid = userid;
+        this.userId = userId;
         this.productId = productId;
         this.description = description;
         this.imageList = imageList;
@@ -28,12 +29,12 @@ public class Review implements Serializable {
         this.reviewId = reviewId;
     }
 
-    public String getUserid() {
-        return userid;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getProductId() {
@@ -46,6 +47,14 @@ public class Review implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    public double getRating()    {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public void setDescription(String description) {

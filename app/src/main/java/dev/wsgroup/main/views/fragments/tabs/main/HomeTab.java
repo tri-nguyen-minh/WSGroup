@@ -53,7 +53,6 @@ public class HomeTab extends Fragment {
     private ImageView imgProductDetailMessage;
 
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
     private List<Supplier> supplierList;
     private HashMap<String, List<CartProduct>> shoppingCart;
     private List<CartProduct> productList;

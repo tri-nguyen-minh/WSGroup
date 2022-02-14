@@ -50,4 +50,6 @@ public class APIListener {
 
     public void onUpdateAddressSuccessful(Address address) {}
 
+    public void onSupplierFound(Supplier supplier) {}
+
 }

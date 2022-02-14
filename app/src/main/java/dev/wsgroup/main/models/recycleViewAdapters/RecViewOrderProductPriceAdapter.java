@@ -34,7 +34,9 @@ public class RecViewOrderProductPriceAdapter extends RecyclerView.Adapter<RecVie
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtProductName.setText(orderProductList.get(position).getProduct().getName());
-        holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
+        double price = orderProductList.get(position).getQuantity();
+        price *= orderProductList.get(position).getPrice();
+        holder.txtProductPrice.setText(MethodUtils.formatPriceString(price));
         holder.txtQuantityCount.setText(orderProductList.get(position).getQuantity() + "");
     }
 

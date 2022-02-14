@@ -20,7 +20,7 @@ public class DialogBoxDiscountSingle extends Dialog {
     private ImageView imgCloseDialogBox;
     private TextView txtDiscountDescription, txtDiscountCode, txtDiscountPrice, txtDiscountQuantity,
             txtDiscountStartDate, txtDiscountEndDate, txtDiscountMinQuantity, txtDiscountMinPrice;
-    private LinearLayout linearLayoutNoCondition, linearLayoutQuantityCondition, linearLayoutPriceCondition;
+    private LinearLayout linearLayoutQuantityCondition, linearLayoutPriceCondition;
     private Button btnSaveDiscount;
 
     private Discount discount;
@@ -47,7 +47,7 @@ public class DialogBoxDiscountSingle extends Dialog {
         txtDiscountEndDate = findViewById(R.id.txtDiscountEndDate);
         txtDiscountMinQuantity = findViewById(R.id.txtDiscountMinQuantity);
         txtDiscountMinPrice = findViewById(R.id.txtDiscountMinPrice);
-        linearLayoutNoCondition = findViewById(R.id.linearLayoutNoCondition);
+//        linearLayoutNoCondition = findViewById(R.id.linearLayoutNoCondition);
         linearLayoutQuantityCondition = findViewById(R.id.linearLayoutQuantityCondition);
         linearLayoutPriceCondition = findViewById(R.id.linearLayoutPriceCondition);
         btnSaveDiscount = findViewById(R.id.btnSaveDiscount);
@@ -65,11 +65,11 @@ public class DialogBoxDiscountSingle extends Dialog {
         });
         txtDiscountEndDate.setText(discount.getEndDate());
         if(discount.getMinPrice() == 0 && discount.getMinQuantity() == 0) {
-            linearLayoutNoCondition.setVisibility(View.VISIBLE);
+//            linearLayoutNoCondition.setVisibility(View.VISIBLE);
             linearLayoutQuantityCondition.setVisibility(View.GONE);
             linearLayoutPriceCondition.setVisibility(View.GONE);
         } else {
-            linearLayoutNoCondition.setVisibility(View.GONE);
+//            linearLayoutNoCondition.setVisibility(View.GONE);
             if(discount.getMinQuantity() > 0) {
                 txtDiscountMinQuantity.setText(discount.getMinQuantity() + "");
                 linearLayoutQuantityCondition.setVisibility(View.VISIBLE);
