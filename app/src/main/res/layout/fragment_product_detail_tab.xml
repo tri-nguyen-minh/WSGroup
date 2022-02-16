@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:padding="15dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left"
                         android:textColor="@color/black"
                         android:textSize="18sp"
@@ -105,7 +105,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="15dp"
                             android:gravity="center"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:text="0.0"
                             android:textColor="@color/gray_dark"
                             android:textSize="22sp"
@@ -129,7 +129,7 @@
                                 android:id="@+id/lblProductOrderCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="left"
                                 android:text="Orders:"
                                 android:textColor="@color/gray_dark"
@@ -143,7 +143,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:paddingLeft="7dp"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="right|center"
                                 android:text="0K"
                                 android:textColor="@color/gray_dark"
@@ -158,7 +158,7 @@
                                 android:id="@+id/lblProductReviewCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="left"
                                 android:text="Reviews:"
                                 android:textColor="@color/gray_dark"
@@ -172,7 +172,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:paddingLeft="7dp"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="right|center"
                                 android:text="0K"
                                 android:textColor="@color/gray_dark"
@@ -203,7 +203,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:text=" Discount"
                             android:textColor="@color/gray_dark"
@@ -236,7 +236,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:text="Retail Price: "
                             android:textColor="@color/gray_dark"
@@ -250,7 +250,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dp"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:text="0.000d"
                             android:textColor="@color/black"
@@ -262,7 +262,7 @@
                             android:id="@+id/txtProductRetailPrice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:text="0.000d"
                             android:textColor="@color/red"
@@ -286,7 +286,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_marginBottom="7dp"
                             android:paddingHorizontal="15dp"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:text="Ongoing Campaign"
                             android:textColor="@color/gray"
@@ -322,7 +322,7 @@
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:paddingRight="10dp"
-                                        android:fontFamily="monospace"
+                                        android:fontFamily="@font/segoeui"
                                         android:gravity="left"
                                         android:text="Ongoing Campaign"
                                         android:textColor="@color/gray_dark"
@@ -350,7 +350,7 @@
                                             android:id="@+id/txtCampaignPrice"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:fontFamily="monospace"
+                                            android:fontFamily="@font/segoeui"
                                             android:text="0.000d"
                                             android:textColor="@color/red"
                                             android:textSize="16dp"
@@ -364,7 +364,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_gravity="center"
                                             android:layout_marginLeft="7dp"
-                                            android:fontFamily="monospace"
+                                            android:fontFamily="@font/segoeui"
                                             android:text="OFF"
                                             android:textColor="@color/red"
                                             android:textSize="16dp"
@@ -398,7 +398,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:fontFamily="monospace"
+                                            android:fontFamily="@font/segoeui"
                                             android:gravity="left"
                                             android:text="Quantity:"
                                             android:textColor="@color/gray_dark"
@@ -409,7 +409,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_marginLeft="5dp"
-                                            android:fontFamily="monospace"
+                                            android:fontFamily="@font/segoeui"
                                             android:gravity="left"
                                             android:text="00"
                                             android:textColor="@color/gray_dark"
@@ -429,7 +429,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:fontFamily="monospace"
+                                            android:fontFamily="@font/segoeui"
                                             android:gravity="left"
                                             android:text="End on"
                                             android:textColor="@color/gray_dark"
@@ -440,7 +440,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_marginLeft="5dp"
-                                            android:fontFamily="monospace"
+                                            android:fontFamily="@font/segoeui"
                                             android:gravity="right"
                                             android:text=""
                                             android:textColor="@color/gray_dark"
@@ -487,7 +487,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:gravity="center|top"
                                                 android:textStyle="bold"
-                                                android:fontFamily="monospace"
+                                                android:fontFamily="@font/segoeui"
                                                 tools:text="0"
                                                 android:textSize="14sp"
                                                 android:textColor="@color/gray_dark"/>
@@ -498,7 +498,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:gravity="center|top"
                                                 android:textStyle="bold"
-                                                android:fontFamily="monospace"
+                                                android:fontFamily="@font/segoeui"
                                                 android:paddingLeft="7dp"
                                                 tools:text="orders"
                                                 android:textSize="14sp"
@@ -521,7 +521,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:gravity="center|top"
                                                 android:textStyle="bold"
-                                                android:fontFamily="monospace"
+                                                android:fontFamily="@font/segoeui"
                                                 tools:text="0"
                                                 android:textSize="14sp"
                                                 android:textColor="@color/gray_dark"/>
@@ -533,7 +533,7 @@
                                                 android:layout_marginHorizontal="7dp"
                                                 android:gravity="center|top"
                                                 android:textStyle="bold"
-                                                android:fontFamily="monospace"
+                                                android:fontFamily="@font/segoeui"
                                                 tools:text="/"
                                                 android:textSize="14sp"
                                                 android:textColor="@color/gray_dark"/>
@@ -544,7 +544,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:gravity="center|top"
                                                 android:textStyle="bold"
-                                                android:fontFamily="monospace"
+                                                android:fontFamily="@font/segoeui"
                                                 tools:text="0"
                                                 android:textSize="14sp"
                                                 android:textColor="@color/gray_dark"/>
@@ -571,7 +571,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="7dp"
                 android:paddingHorizontal="15dp"
-                android:fontFamily="monospace"
+                android:fontFamily="@font/segoeui"
                 android:gravity="left"
                 android:text="More Info"
                 android:textColor="@color/gray"
@@ -608,7 +608,7 @@
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
                         android:paddingHorizontal="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left|center"
                         android:text="Quantity"
                         android:textColor="@color/black"
@@ -645,7 +645,7 @@
                             android:id="@+id/txtProductQuantity"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:textColor="@color/gray_darker"
                             android:textSize="14sp"
@@ -658,7 +658,7 @@
 <!--                            android:layout_width="0dp"-->
 <!--                            android:layout_height="match_parent"-->
 <!--                            android:layout_marginHorizontal="7dp"-->
-<!--                            android:fontFamily="monospace"-->
+<!--                            android:fontFamily="@font/segoeui"-->
 <!--                            android:gravity="left"-->
 <!--                            android:textColor="@color/gray_dark"-->
 <!--                            android:textSize="14sp"-->
@@ -679,7 +679,7 @@
 <!--                            android:layout_width="0dp"-->
 <!--                            android:layout_height="wrap_content"-->
 <!--                            android:paddingLeft="10dp"-->
-<!--                            android:fontFamily="monospace"-->
+<!--                            android:fontFamily="@font/segoeui"-->
 <!--                            android:gravity="right"-->
 <!--                            android:textColor="@color/gray_darker"-->
 <!--                            android:textSize="14sp"-->
@@ -694,7 +694,7 @@
 <!--                            android:layout_width="0dp"-->
 <!--                            android:layout_height="wrap_content"-->
 <!--                            android:layout_marginHorizontal="7dp"-->
-<!--                            android:fontFamily="monospace"-->
+<!--                            android:fontFamily="@font/segoeui"-->
 <!--                            android:gravity="left"-->
 <!--                            android:textColor="@color/gray_dark"-->
 <!--                            android:textSize="14sp"-->
@@ -742,7 +742,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginHorizontal="7dp"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="left"
                                 android:textColor="@color/gray_dark"
                                 android:textSize="14sp"
@@ -754,7 +754,7 @@
                                 android:id="@+id/txtProductQuantityWithCampaign"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="left"
                                 android:textColor="@color/gray_darker"
                                 android:textSize="14sp"
@@ -789,7 +789,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="7dp"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="left|center"
                                 android:textColor="@color/gray_dark"
                                 android:textSize="14sp"
@@ -803,7 +803,7 @@
                                 android:id="@+id/txtProductQuantityTotalWithCampaign"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
+                                android:fontFamily="@font/segoeui"
                                 android:gravity="left|center"
                                 android:textColor="@color/gray_darker"
                                 android:textSize="14sp"
@@ -850,7 +850,7 @@
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
                         android:paddingHorizontal="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left|center"
                         android:text="Category"
                         android:textColor="@color/black"
@@ -880,7 +880,7 @@
                             android:layout_height="wrap_content"
                             android:paddingRight="5dp"
                             android:paddingVertical="10dp"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:textColor="@color/gray_dark"
                             android:textSize="14sp"
@@ -926,7 +926,7 @@
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
                         android:paddingHorizontal="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left|center"
                         android:text="Description"
                         android:textColor="@color/black"
@@ -945,7 +945,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="5dp"
                         android:paddingVertical="10dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left"
                         android:textColor="@color/gray_dark"
                         android:textSize="14sp"
@@ -981,7 +981,7 @@
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
                         android:paddingHorizontal="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left|center"
                         android:text="Suppliers"
                         android:textColor="@color/black"
@@ -1011,7 +1011,7 @@
                             android:layout_height="wrap_content"
                             android:paddingRight="5dp"
                             android:paddingVertical="10dp"
-                            android:fontFamily="monospace"
+                            android:fontFamily="@font/segoeui"
                             android:gravity="left"
                             android:textColor="@color/gray_dark"
                             android:textSize="14sp"
@@ -1056,7 +1056,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:paddingLeft="15dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left"
                         android:text="More From"
                         android:textColor="@color/gray"
@@ -1071,7 +1071,7 @@
                         android:layout_height="match_parent"
                         android:paddingRight="15dp"
                         android:paddingLeft="8dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="left"
                         android:textColor="@color/gray_dark"
                         android:textSize="16sp"

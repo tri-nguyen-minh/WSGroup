@@ -88,8 +88,12 @@ public class SignInActivity extends AppCompatActivity {
         layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editUsername.clearFocus();
-                editPassword.clearFocus();
+                if (editUsername.hasFocus()) {
+                    editUsername.clearFocus();
+                }
+                if (editPassword.hasFocus()) {
+                    editPassword.clearFocus();
+                }
             }
         });
 

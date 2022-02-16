@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="monospace"
+                android:fontFamily="@font/segoeui"
                 android:gravity="left"
                 android:text="ADDRESS INFORMATION"
                 android:textColor="@color/white"

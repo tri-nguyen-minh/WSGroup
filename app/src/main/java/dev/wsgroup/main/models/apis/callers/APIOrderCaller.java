@@ -57,6 +57,7 @@ public class APIOrderCaller {
 //                    jsonObjectProduct.put("price", product.getCampaign().getSavingPrice());
 //                    totalPrice *= product.getCampaign().getSavingPrice();
 //                }
+                jsonObjectProduct.put("price", product.getRetailPrice());
                 jsonObjectProduct.put("totalPrice", orderProduct.getTotalPrice());
                 jsonObjectProduct.put("typeofproduct", cartProduct.getProductType());
                 jsonObjectProduct.put("image", product.getImageLink());
@@ -117,11 +118,12 @@ public class APIOrderCaller {
     }
 
 
-    public static void getAllOrder(String token, String status, List<Order> list, Application application, APIListener APIListener) {
+    public static void getOrderByStatus(String token, String status, List<Order> list, Application application, APIListener APIListener) {
         String url = StringUtils.ORDER_API_URL + "customer?status=" + status;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
+        System.out.println(url);
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override

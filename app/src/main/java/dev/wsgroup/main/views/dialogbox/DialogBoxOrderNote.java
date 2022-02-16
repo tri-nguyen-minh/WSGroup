@@ -74,7 +74,9 @@ public class DialogBoxOrderNote extends Dialog {
         cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editNote.clearFocus();
+                if (editNote.hasFocus()) {
+                    editNote.clearFocus();
+                }
             }
         });
 

@@ -1,8 +1,22 @@
 package dev.wsgroup.main.models.utils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Base64;
+
+import com.android.volley.VolleyError;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -104,33 +118,66 @@ public class MethodUtils {
         }
     }
 
+    public static Uri getImageUri(Context context, Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "image", null);
+        return Uri.parse(path);
+    }
+
+    public static String getVolleyErrorMessage(VolleyError error) {
+        if (error == null || error.networkResponse == null) {
+            return "No error";
+        }
+
+        String body = "No message";
+        //get status code here
+        final String statusCode = String.valueOf(error.networkResponse.statusCode);
+        //get response body and parse with appropriate encoding
+        try {
+            body = statusCode + " - " + new String(error.networkResponse.data,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            System.out.println("error");
+            System.out.println(e.getMessage());
+        }
+        return body;
+    }
+
     public static void main(String[] args) {
         try {
-            List<String> sortData = new ArrayList<>();
-            sortData.add("2022-02-12T14:36:49.958Z");
-            sortData.add("2022-02-11T22:33:43.396Z");
-            sortData.add("2022-01-27T17:25:59.996Z");
-            sortData.add("2022-02-12T12:05:33.288Z");
-            Collections.sort(sortData, new Comparator<String>() {
-                @Override
-                public int compare(String s1, String s2) {
-                    Date date1 = null, date2 = null;
-                    try {
-                        date1 = convertStringToDate(s1);
-                        date2 = convertStringToDate(s2);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (false) {
-                        return date1.compareTo(date2);
-                    } else {
-                        return date2.compareTo(date1);
-                    }
-                }
-            });
-            for (String s : sortData) {
-                System.out.println(s);
-            }
+
+            String url = "https://firebasestorage.googleapis.com/v0/b/wsg-authen-144ba.appspot.com/o/images%2FCustomer1_avatar?alt=media&token=2c305695-eab8-4d10-8693-a9d04ed15998";
+            System.out.println(url.substring(1, url.length() - 1));
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference();
+            StorageReference ref = storageReference.child("images/2FCustomer1_avatar");
+
+
+//            List<String> sortData = new ArrayList<>();
+//            sortData.add("2022-02-12T14:36:49.958Z");
+//            sortData.add("2022-02-11T22:33:43.396Z");
+//            sortData.add("2022-01-27T17:25:59.996Z");
+//            sortData.add("2022-02-12T12:05:33.288Z");
+//            Collections.sort(sortData, new Comparator<String>() {
+//                @Override
+//                public int compare(String s1, String s2) {
+//                    Date date1 = null, date2 = null;
+//                    try {
+//                        date1 = convertStringToDate(s1);
+//                        date2 = convertStringToDate(s2);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (false) {
+//                        return date1.compareTo(date2);
+//                    } else {
+//                        return date2.compareTo(date1);
+//                    }
+//                }
+//            });
+//            for (String s : sortData) {
+//                System.out.println(s);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

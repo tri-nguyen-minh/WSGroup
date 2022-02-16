@@ -68,7 +68,9 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         holder.layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.editProductQuantity.clearFocus();
+                if (holder.editProductQuantity.hasFocus()) {
+                    holder.editProductQuantity.clearFocus();
+                }
             }
         });
         holder.editProductQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -263,7 +265,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
             holder.layoutCampaign.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(activity, context, cartProduct.getProduct()) {
+                    DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(activity, cartProduct.getProduct()) {
                         @Override
                         public void executeOnCampaignSelectedOnDialog(Campaign campaign) {
                             super.executeOnCampaignSelectedOnDialog(campaign);

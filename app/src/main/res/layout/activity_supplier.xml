@@ -58,7 +58,7 @@
                     android:id="@+id/txtProductDetailCartCount"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fontFamily="monospace"
+                    android:fontFamily="@font/segoeui"
                     android:gravity="center"
                     android:text="0"
                     android:textColor="@color/white"

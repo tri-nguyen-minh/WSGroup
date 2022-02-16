@@ -27,15 +27,11 @@ public class DialogBoxCampaign extends Dialog {
                     lblProductOrderCount, lblCampaignQuantitySeparator;
     private ProgressBar progressBarQuantityCount;
 
-    private Activity activity;
-    private Context context;
     private Product product;
     private Campaign campaign;
 
-    public DialogBoxCampaign(Activity activity, Context context, Product product) {
+    public DialogBoxCampaign(Activity activity, Product product) {
         super(activity);
-        this.activity = activity;
-        this.context = context;
         this.product = product;
     }
 

@@ -66,7 +66,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
+            android:fontFamily="@font/segoeui"
             android:gravity="center"
             android:text="YOUR SHOPPING CART\nIS CURRENTLY EMPTY"
             android:textColor="@color/gray"
@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:fontFamily="monospace"
+            android:fontFamily="@font/segoeui"
             android:gravity="center"
             android:text="CLICK TO TRY AGAIN"
             android:textColor="@color/blue_main"

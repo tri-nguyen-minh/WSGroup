@@ -86,13 +86,27 @@ public class AccountDetailActivity extends AppCompatActivity {
         layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editUsername.clearFocus();
-                editPassword.clearFocus();
-                editPasswordConfirm.clearFocus();
-                editPhoneNumber.clearFocus();
-                editFirstName.clearFocus();
-                editLastName.clearFocus();
-                editMail.clearFocus();
+                if (editUsername.hasFocus()) {
+                    editUsername.clearFocus();
+                }
+                if (editPassword.hasFocus()) {
+                    editPassword.clearFocus();
+                }
+                if (editPasswordConfirm.hasFocus()) {
+                    editPasswordConfirm.clearFocus();
+                }
+                if (editPhoneNumber.hasFocus()) {
+                    editPhoneNumber.clearFocus();
+                }
+                if (editFirstName.hasFocus()) {
+                    editFirstName.clearFocus();
+                }
+                if (editLastName.hasFocus()) {
+                    editLastName.clearFocus();
+                }
+                if (editMail.hasFocus()) {
+                    editMail.clearFocus();
+                }
             }
         });
         editUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {

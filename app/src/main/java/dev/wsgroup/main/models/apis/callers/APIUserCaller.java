@@ -21,6 +21,7 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIUserCaller {
@@ -209,18 +210,28 @@ public class APIUserCaller {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
-        String url = StringUtils.USER_API_URL + user.getUserId();
+        String url = StringUtils.USER_API_URL + "customer";
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("password", user.getPassword());
             jsonObject.put("firstName", user.getFirstName());
             jsonObject.put("lastName", user.getLastName());
             jsonObject.put("email", user.getMail());
-            Response.Listener<String> listener = new Response.Listener<String>() {
+            jsonObject.put("avt", user.getAvatarLink());
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 
                 @Override
-                public void onResponse(String response) {
-                    APIListener.onUpdateProfileSuccessful();
+                public void onResponse(JSONObject response) {
+                    try {
+                        String result = response.getString("message");
+                        if (result.equals("successful")) {
+                            APIListener.onUpdateProfileSuccessful();
+                        } else {
+                            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
                 }
             };
 
@@ -232,24 +243,20 @@ public class APIUserCaller {
                 }
             };
 
-            StringRequest request = new StringRequest(Request.Method.PUT, url,
-                    listener, errorListener) {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url,
+                    jsonObject, listener, errorListener) {
 
                 @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("password", user.getPassword());
-                    params.put("firstName", user.getFirstName());
-                    params.put("lastName", user.getLastName());
-                    params.put("email", user.getMail());
-                    return params;
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", user.getToken());
+                    return header;
                 }
 
                 @Override
                 public String getBodyContentType() {
                     return StringUtils.APPLICATION_JSON;
                 }
-
             };
             requestQueue.add(request);
         } catch (Exception e) {

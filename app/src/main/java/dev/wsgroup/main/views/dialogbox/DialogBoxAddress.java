@@ -78,8 +78,12 @@ public class DialogBoxAddress extends Dialog {
         cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editStreet.clearFocus();
-                editProvince.clearFocus();
+                if (editStreet.hasFocus()) {
+                    editStreet.clearFocus();
+                }
+                if (editProvince.hasFocus()) {
+                    editProvince.clearFocus();
+                }
             }
         });
         editStreet.setOnFocusChangeListener(new View.OnFocusChangeListener() {

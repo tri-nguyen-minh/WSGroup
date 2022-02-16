@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:fontFamily="monospace"
+            android:fontFamily="@font/segoeui"
             android:gravity="center"
             android:text=""
             android:textColor="@color/black"
@@ -122,11 +122,11 @@
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="center"
                         android:text="Notifications"
                         android:textColor="@color/black"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textStyle="bold"/>
 
                 </LinearLayout>
@@ -170,11 +170,11 @@
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="center"
                         android:text="Messages"
                         android:textColor="@color/black"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -218,11 +218,11 @@
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginVertical="5dp"
-                        android:fontFamily="monospace"
+                        android:fontFamily="@font/segoeui"
                         android:gravity="center"
                         android:text="Shopping Cart"
                         android:textColor="@color/black"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -243,7 +243,7 @@
 
             <TextView
                 android:id="@+id/txtUserInfo"
-                android:text="Account Information"
+                android:text="Change Password"
                 style="@style/style_profile_text" />
 
         </LinearLayout>
@@ -261,7 +261,8 @@
 
             <TextView
                 android:text="Change Password"
-                style="@style/style_profile_text"/>
+                style="@style/style_profile_text"
+                android:fontFamily="@font/calibri"/>
 
         </LinearLayout>
 
@@ -278,8 +279,9 @@
                 android:src="@drawable/ic_location" />
 
             <TextView
-                android:text="Delivery Addresses"
-                style="@style/style_profile_text"/>
+                android:text="Change Password"
+                style="@style/style_profile_text"
+                android:fontFamily="sans-serif"/>
 
         </LinearLayout>
 
@@ -295,8 +297,9 @@
                 android:src="@drawable/ic_dollar" />
 
             <TextView
-                android:text="E-Wallet"
-                style="@style/style_profile_text"/>
+                android:text="Change Password"
+                style="@style/style_profile_text"
+                android:fontFamily="monospace"/>
 
         </LinearLayout>
 
@@ -341,8 +344,9 @@
                 android:src="@drawable/ic_return" />
 
             <TextView
-                android:text="Sign out"
-                style="@style/style_profile_text"/>
+                android:text="Change Password"
+                style="@style/style_profile_text"
+                android:fontFamily="@font/sfran"/>
 
         </LinearLayout>
 

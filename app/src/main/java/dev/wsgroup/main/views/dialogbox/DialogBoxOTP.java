@@ -162,7 +162,9 @@ public class DialogBoxOTP extends Dialog {
         cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editOTP.clearFocus();
+                if (editOTP.hasFocus()) {
+                    editOTP.clearFocus();
+                }
             }
         });
 

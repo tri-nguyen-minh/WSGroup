@@ -71,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
         if(userId.isEmpty()) {
             setupTabLayout(0);
         } else {
-            String username = sharedPreferences.getString("USERNAME", "");
-            String password = sharedPreferences.getString("PASSWORD", "");
-            APIUserCaller.findUserByUsernameAndPassword(username, password, getApplication(), new APIListener() {
+//            String username = sharedPreferences.getString("USERNAME", "");
+//            String password = sharedPreferences.getString("PASSWORD", "");
+            token = sharedPreferences.getString("TOKEN", "");
+            APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
                 @Override
                 public void onUserFound(User user) {
+                    user.setToken(token);
                     sharedPreferences.edit().putString("TOKEN", user.getToken()).commit();
                     setUpShoppingCart(tabPosition);
                 }

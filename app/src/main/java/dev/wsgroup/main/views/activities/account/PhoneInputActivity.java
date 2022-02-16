@@ -40,7 +40,6 @@ public class PhoneInputActivity extends AppCompatActivity {
     private int requestCode;
     private String errorMessage;
     private DialogBoxLoading dialogBoxLoading;
-    private FirebasePhoneAuthService firebaseService;
 
 
 
@@ -99,7 +98,9 @@ public class PhoneInputActivity extends AppCompatActivity {
         layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editPhone.clearFocus();
+                if (editPhone.hasFocus()) {
+                    editPhone.clearFocus();
+                }
             }
         });
 

@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
+            android:fontFamily="@font/segoeui"
             android:gravity="center"
             android:text="YOU DO NOT HAVE ANY ORDER\nIN THIS CATEGORY"
             android:textColor="@color/gray"
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="7dp"
-                android:fontFamily="monospace"
+                android:fontFamily="@font/segoeui"
                 android:gravity="center|left"
                 android:text="Sort by"
                 android:textColor="@color/gray_dark"

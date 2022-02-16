@@ -108,7 +108,9 @@ public class DialogBoxOrderDetail extends Dialog{
         cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editProductQuantity.clearFocus();
+                if (editProductQuantity.hasFocus()) {
+                    editProductQuantity.clearFocus();
+                }
             }
         });
 
@@ -303,7 +305,7 @@ public class DialogBoxOrderDetail extends Dialog{
             layoutCampaign.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(activity, context, product) {
+                    DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(activity, product) {
                         @Override
                         public void executeOnCampaignSelectedOnDialog(Campaign campaign) {
                             super.executeOnCampaignSelectedOnDialog(campaign);

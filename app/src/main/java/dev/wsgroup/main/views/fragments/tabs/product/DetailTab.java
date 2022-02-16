@@ -189,7 +189,7 @@ public class DetailTab extends Fragment {
                 layoutCampaignQuantity.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(getActivity(), getContext(), product);
+                        DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(getActivity(), product);
                         dialogBoxCampaign.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         dialogBoxCampaign.show();
                     }

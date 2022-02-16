@@ -77,7 +77,7 @@ public class OrderFragment extends Fragment {
         
         setupSpinner();
 
-        APIOrderCaller.getAllOrder(token, orderStatus,null, getActivity().getApplication(), new APIListener() {
+        APIOrderCaller.getOrderByStatus(token, orderStatus,null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onOrderFound(List<Order> orderList) {
                 super.onOrderFound(orderList);
@@ -98,6 +98,7 @@ public class OrderFragment extends Fragment {
             @Override
             public void onFailedAPICall(int code) {
                 super.onFailedAPICall(code);
+                System.out.println("failed");
                 layoutLoading.setVisibility(View.INVISIBLE);
                 layoutNoOrder.setVisibility(View.VISIBLE);
                 layoutOrderView.setVisibility(View.INVISIBLE);
