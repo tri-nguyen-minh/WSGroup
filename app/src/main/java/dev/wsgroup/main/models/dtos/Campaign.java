@@ -120,10 +120,8 @@ public class Campaign implements Serializable {
         campaign.setSavingPrice(data.getDouble("price"));
         campaign.setStatus(data.getString("status"));
         campaign.setDescription(data.getString("description"));
-//        campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
-//        campaign.setOrderCount(data.getInt("numorderwaiting"));
-        campaign.setQuantityCount(0);
-        campaign.setOrderCount(0);
+        campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
+        campaign.setOrderCount(data.getInt("numorderwaiting"));
         return campaign;
     }
 

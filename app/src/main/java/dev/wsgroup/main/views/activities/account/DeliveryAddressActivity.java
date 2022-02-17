@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -24,11 +25,12 @@ import dev.wsgroup.main.models.apis.callers.APIAddressCaller;
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewAddressListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAddress;
 
 public class DeliveryAddressActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromDeliveryAddress;
+    private ImageView imgBackFromDeliveryAddress, imgDeliveryAddressHome;
     private RelativeLayout layoutLoading;
     private ConstraintLayout layoutNoDefaultAddress, layoutDefaultAddress, layoutAddAddress;
     private LinearLayout LayoutOtherAddress, layoutScreen;
@@ -49,6 +51,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         this.getSupportActionBar().hide();
 
         imgBackFromDeliveryAddress = findViewById(R.id.imgBackFromDeliveryAddress);
+        imgDeliveryAddressHome = findViewById(R.id.imgDeliveryAddressHome);
         layoutLoading = findViewById(R.id.layoutLoading);
         layoutNoDefaultAddress = findViewById(R.id.layoutNoDefaultAddress);
         layoutDefaultAddress = findViewById(R.id.layoutDefaultAddress);
@@ -81,9 +84,6 @@ public class DeliveryAddressActivity extends AppCompatActivity {
                             setupDefaultAddress(address);
                         }
                     }
-//                defaultAddress.setSelectedFlag(true);
-//                setupCheckBox(checkboxDefaultAddress, true);
-//                currentAddress = defaultAddress;
                     customerAddressList.remove(defaultAddress);
                     setupAddressList();
                 }
@@ -97,6 +97,14 @@ public class DeliveryAddressActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        imgDeliveryAddressHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }
+        });
+
         layoutNoDefaultAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

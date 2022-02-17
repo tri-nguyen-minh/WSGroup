@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:fontFamily="@font/segoeui"
+                android:fontFamily="@font/montserratr"
                 android:textStyle="bold"
                 tools:text="w"
                 android:textSize="13sp"

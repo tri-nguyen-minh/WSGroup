@@ -1,6 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -14,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +24,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,11 +35,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.net.URI;
-import java.util.UUID;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -53,12 +56,13 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
 
 public class AccountInformationActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromAccountInformation, imgAccountInfoHome, imgAccountAvatar;
+    private ImageView imgBackFromAccountInformation, imgAccountInfoHome, imgAccountInfoAvatar;
     private CardView cardViewEditProfileAvatar;
     private EditText editAccountInfoUsername, editAccountInfoFirstName, editAccountInfoLastName,
                      editAccountInfoPhone, editAccountInfoMail;
     private Button btnSaveEdit;
-    private ConstraintLayout layoutParent;
+    private ConstraintLayout layoutParent, layoutProfileAvatar;
+    private ProgressBar progressBarLoading;
 
     private SharedPreferences sharedPreferences;
     private String token, username, phone, avatarLink;
@@ -75,7 +79,7 @@ public class AccountInformationActivity extends AppCompatActivity {
 
         imgBackFromAccountInformation = findViewById(R.id.imgBackFromAccountInformation);
         imgAccountInfoHome = findViewById(R.id.imgAccountInfoHome);
-        imgAccountAvatar = findViewById(R.id.imgAccountAvatar);
+        imgAccountInfoAvatar = findViewById(R.id.imgAccountInfoAvatar);
         cardViewEditProfileAvatar = findViewById(R.id.cardViewEditProfileAvatar);
         editAccountInfoUsername = findViewById(R.id.editAccountInfoUsername);
         editAccountInfoFirstName = findViewById(R.id.editAccountInfoFirstName);
@@ -84,12 +88,17 @@ public class AccountInformationActivity extends AppCompatActivity {
         editAccountInfoMail = findViewById(R.id.editAccountInfoMail);
         btnSaveEdit = findViewById(R.id.btnSaveEdit);
         layoutParent = findViewById(R.id.layoutParent);
+        layoutProfileAvatar = findViewById(R.id.layoutProfileAvatar);
+        progressBarLoading = findViewById(R.id.progressBarLoading);
 
         dataLoaded = false;
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
         username = sharedPreferences.getString("USERNAME", "");
         phone = sharedPreferences.getString("PHONE", "");
+
+        layoutProfileAvatar.setVisibility(View.INVISIBLE);
+        progressBarLoading.setVisibility(View.VISIBLE);
 
         APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
             @Override
@@ -104,9 +113,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                 editAccountInfoLastName.setText(user.getLastName());
                 editAccountInfoPhone.setText(user.getPhoneNumber());
                 editAccountInfoMail.setText(user.getMail());
-                Uri uri = Uri.parse(user.getAvatarLink());
-                imgAccountAvatar.setImageURI(uri);
                 avatarLink = user.getAvatarLink();
+                loadAvatarFromFirebase();
                 dataLoaded = true;
                 enablingSaveButton();
             }
@@ -117,6 +125,31 @@ public class AccountInformationActivity extends AppCompatActivity {
         editAccountInfoUsername.setTextColor(getResources().getColor(R.color.gray));
         editAccountInfoPhone.setTextColor(getResources().getColor(R.color.gray));
 
+        View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(view);
+                }
+            }
+        };
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                enablingSaveButton();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        };
+
         imgBackFromAccountInformation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,12 +157,14 @@ public class AccountInformationActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         imgAccountInfoHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         });
+
         cardViewEditProfileAvatar.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
@@ -157,46 +192,9 @@ public class AccountInformationActivity extends AppCompatActivity {
             }
         });
 
-        editAccountInfoFirstName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(view);
-                }
-            }
-        });
-        editAccountInfoLastName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(view);
-                }
-            }
-        });
-        editAccountInfoMail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(view);
-                }
-            }
-        });
-        TextWatcher textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                enablingSaveButton();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        };
+        editAccountInfoFirstName.setOnFocusChangeListener(listener);
+        editAccountInfoLastName.setOnFocusChangeListener(listener);
+        editAccountInfoMail.setOnFocusChangeListener(listener);
         editAccountInfoFirstName.addTextChangedListener(textWatcher);
         editAccountInfoLastName.addTextChangedListener(textWatcher);
         editAccountInfoMail.addTextChangedListener(textWatcher);
@@ -222,36 +220,7 @@ public class AccountInformationActivity extends AppCompatActivity {
                 dialogBoxLoading = new DialogBoxLoading(AccountInformationActivity.this);
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                User updatedUser = new User();
-                updatedUser.setToken(token);
-                updatedUser.setFirstName(editAccountInfoFirstName.getText().toString());
-                updatedUser.setLastName(editAccountInfoLastName.getText().toString());
-                updatedUser.setMail(editAccountInfoMail.getText().toString());
-                updatedUser.setAvatarLink(user.getAvatarLink());
-                APIUserCaller.updateUserProfile(updatedUser, getApplication(), new APIListener() {
-                    @Override
-                    public void onUpdateProfileSuccessful() {
-                        super.onUpdateProfileSuccessful();
-                        dialogBoxLoading.dismiss();
-                        user.setFirstName(updatedUser.getFirstName());
-                        user.setLastName(updatedUser.getLastName());
-                        user.setMail(updatedUser.getMail());
-                        DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                                IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"");
-                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        dialogBox.show();
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        super.onFailedAPICall(code);
-                        dialogBoxLoading.dismiss();
-                        DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        dialogBox.show();
-                    }
-                });
+                uploadImageToFirebase();
             }
         });
     }
@@ -339,6 +308,153 @@ public class AccountInformationActivity extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    private void uploadImageToFirebase() {
+        avatarLink = username + "_avatar";
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageReference = storage.getReference();
+                StorageReference ref = storageReference.child("images/" + avatarLink);
+                StorageMetadata metadata = new StorageMetadata.Builder()
+                        .setContentType("image/jpeg")
+                        .build();
+                UploadTask uploadTask = ref.putFile(uri, metadata);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                            @Override
+                            public Task<Uri> then(Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                if (!task.isSuccessful()) {
+                                    displayUploadFailed();
+                                    throw task.getException();
+                                }
+                                return ref.getDownloadUrl();
+                            }
+                        });
+                        urlTask.addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    updateUser();
+                                } else {
+                                    displayUploadFailed();
+                                }
+                            }
+                        });
+                    }
+                });
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        e.printStackTrace();
+                        displayUploadFailed();
+                    }
+                });
+
+            }
+        }).addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                displayUploadFailed();
+            }
+        });
+    }
+
+    private void updateUser() {
+        User updatedUser = new User();
+        updatedUser.setToken(token);
+        updatedUser.setFirstName(editAccountInfoFirstName.getText().toString());
+        updatedUser.setLastName(editAccountInfoLastName.getText().toString());
+        updatedUser.setMail(editAccountInfoMail.getText().toString());
+        updatedUser.setAvatarLink(avatarLink);
+        APIUserCaller.updateUserProfile(updatedUser, getApplication(), new APIListener() {
+            @Override
+            public void onUpdateProfileSuccessful() {
+                super.onUpdateProfileSuccessful();
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                user.setFirstName(updatedUser.getFirstName());
+                user.setLastName(updatedUser.getLastName());
+                user.setMail(updatedUser.getMail());
+                DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
+                        IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"");
+                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.show();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                super.onFailedAPICall(code);
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
+                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"") {};
+                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.show();
+            }
+        });
+    }
+
+    private void displayUploadFailed() {
+        DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
+                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"") {
+            @Override
+            public void onClickAction() {
+                super.onClickAction();
+                avatarLink = "";
+                updateUser();
+            }
+        };
+        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBox.show();
+    }
+
+    private void loadAvatarFromFirebase() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageReference = storage.getReference();
+                StorageReference ref = storageReference.child("images/" + avatarLink);
+                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(getApplicationContext()).load(uri).into(imgAccountInfoAvatar);
+                        layoutProfileAvatar.setVisibility(View.VISIBLE);
+                        progressBarLoading.setVisibility(View.INVISIBLE);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        imgAccountInfoAvatar.setImageResource(R.drawable.ic_profile_circle);
+                        layoutProfileAvatar.setVisibility(View.VISIBLE);
+                        progressBarLoading.setVisibility(View.INVISIBLE);
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
+                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
+                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.show();
+                imgAccountInfoAvatar.setImageResource(R.drawable.ic_profile_circle);
+                layoutProfileAvatar.setVisibility(View.VISIBLE);
+                progressBarLoading.setVisibility(View.INVISIBLE);
+                e.printStackTrace();
+            }
+        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -350,78 +466,9 @@ public class AccountInformationActivity extends AppCompatActivity {
             } else if (requestCode == IntegerUtils.REQUEST_SELECT_IMAGE) {
                 uri = data.getData();
             }
-            dialogBoxLoading = new DialogBoxLoading(AccountInformationActivity.this);
-            dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialogBoxLoading.show();
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
-                @Override
-                public void onSuccess(AuthResult authResult) {
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference();
-                    StorageReference ref = storageReference.child("images/" + username + "_avatar");
-                    UploadTask uploadTask = ref.putFile(uri);
-                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                                @Override
-                                public Task<Uri> then(Task<UploadTask.TaskSnapshot> task) throws Exception {
-                                    dialogBoxLoading.dismiss();
-                                    if (!task.isSuccessful()) {
-                                        DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                        dialogBox.show();
-                                        throw task.getException();
-                                    }
-                                    return ref.getDownloadUrl();
-                                }
-                            });
-                            urlTask.addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                @Override
-                                public void onComplete(Task<Uri> task) {
-                                    dialogBoxLoading.dismiss();
-                                    if (task.isSuccessful()) {
-                                        Uri downloadUri = task.getResult();
-                                        user.setAvatarLink(downloadUri.toString());
-                                        System.out.println(user.getAvatarLink());
-                                        imgAccountAvatar.setImageURI(downloadUri);
-                                        enablingSaveButton();
-                                    } else {
-                                        DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                        dialogBox.show();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            dialogBoxLoading.dismiss();
-                            DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                                    IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                            dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                            dialogBox.show();
-                            e.printStackTrace();
-                        }
-                    });
-
-                }
-            }).addOnFailureListener(this, new OnFailureListener() {
-                @Override
-                public void onFailure(Exception e) {
-                    dialogBoxLoading.dismiss();
-                    DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                    dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialogBox.show();
-                    e.printStackTrace();
-                }
-            });
+            avatarLink = "temp";
+            imgAccountInfoAvatar.setImageURI(uri);
+            enablingSaveButton();
         }
     }
 }

@@ -4,7 +4,7 @@
     android:id="@+id/spinner_selected_item"
     style="?attr/spinnerDropDownItemStyle"
     android:textColor="@color/gray_darker"
-    android:fontFamily="@font/segoeui"
+    android:fontFamily="@font/montserratr"
     android:textSize="14sp"
     android:background="@drawable/abc_spinner_mtrl_am_alpha"
     android:backgroundTint="@color/gray_dark"

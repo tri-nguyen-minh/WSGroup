@@ -83,8 +83,13 @@ public class HomeTab extends Fragment {
         imgProductDetailMessage = view.findViewById(R.id.imgProductDetailMessage);
 
         cartCount = 0;
-        userId = sharedPreferences.getString("USER_ID", "");
-        token = sharedPreferences.getString("TOKEN", "");
+        try {
+            userId = sharedPreferences.getString("USER_ID", "");
+            token = sharedPreferences.getString("TOKEN", "");
+            editCartCountByUser();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         layoutNoProductFound.setVisibility(View.INVISIBLE);
         layoutLoading.setVisibility(View.VISIBLE);
@@ -95,8 +100,6 @@ public class HomeTab extends Fragment {
 //                APICampaignCaller.getCampaignById(token,"ce179be8-c93a-4627-b3d1-0f7be42fcc22", getActivity().getApplication(), new APIListener());
             }
         });
-
-        editCartCountByUser();
 
 //        List<Product> productList = getProductListByFilter("POPULAR");
         getProductList();

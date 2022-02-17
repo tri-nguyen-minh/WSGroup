@@ -2,26 +2,34 @@ package dev.wsgroup.main.views.activities.account;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.utils.StringUtils;
+import dev.wsgroup.main.views.activities.MainActivity;
 
 public class PasswordChangeActivity extends AppCompatActivity {
 
-    private TextView btnSignIn, txtPasswordError;
-    private EditText editPassword, editPasswordConfirm;
+    private ImageView imgBackFromChangePassword, imgChangePasswordHome;
+    private EditText editOldPassword, editNewPassword, editConfirmPassword;
+    private Button btnSaveEdit;
+    private ConstraintLayout layoutParent;
 
-    private String errorMessage, phoneNumber;
-    private boolean passwordDisplayed, passwordConfirmedDisplayed;
-    private Activity activity;
+    private SharedPreferences sharedPreferences;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,94 +37,100 @@ public class PasswordChangeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_password_change);
         this.getSupportActionBar().hide();
 
-        btnSignIn = findViewById(R.id.btnConfirm);
-        editPassword = findViewById(R.id.editLoginPassword);
-        editPasswordConfirm = findViewById(R.id.editPasswordConfirm);
-        ImageView imgDisplayPassword = findViewById(R.id.imgDisplayPassword);
-        ImageView imgDisplayPasswordConfirm = findViewById(R.id.imgDisplayPasswordConfirm);
-        CardView cardViewBackFromPassword = findViewById(R.id.cardViewBackFromPassword);
+        imgBackFromChangePassword = findViewById(R.id.imgBackFromChangePassword);
+        imgChangePasswordHome = findViewById(R.id.imgChangePasswordHome);
+        editOldPassword = findViewById(R.id.editOldPassword);
+        editNewPassword = findViewById(R.id.editNewPassword);
+        editConfirmPassword = findViewById(R.id.editConfirmPassword);
+        btnSaveEdit = findViewById(R.id.btnSaveEdit);
+        layoutParent = findViewById(R.id.layoutParent);
 
-        activity = this;
-        passwordDisplayed = false;
-        passwordConfirmedDisplayed = false;
-        phoneNumber = getIntent().getStringExtra("PHONE");
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        username = sharedPreferences.getString("USERNAME", "");
 
-        txtPasswordError.setVisibility(View.INVISIBLE);
-        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        enableButtonUpdate();
+        View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(view);
+                }
+            }
+        };
 
-        cardViewBackFromPassword.setOnClickListener(new View.OnClickListener() {
+        imgBackFromChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(Activity.RESULT_CANCELED, getIntent());
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
 
-        imgDisplayPassword.setOnClickListener(new View.OnClickListener() {
+        imgChangePasswordHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!editPassword.getText().toString().isEmpty()) {
-                    if (passwordDisplayed) {
-                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        imgDisplayPassword.setImageResource(R.drawable.ic_visibility_off);
-                        passwordDisplayed = false;
-                    } else {
-                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
-                        imgDisplayPassword.setImageResource(R.drawable.ic_visibility_on);
-                        passwordDisplayed = true;
-                    }
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }
+        });
+
+        layoutParent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editOldPassword.hasFocus()) {
+                    editOldPassword.clearFocus();
+                }
+                if (editNewPassword.hasFocus()) {
+                    editNewPassword.clearFocus();
+                }
+                if (editConfirmPassword.hasFocus()) {
+                    editConfirmPassword.clearFocus();
                 }
             }
         });
 
-        imgDisplayPasswordConfirm.setOnClickListener(new View.OnClickListener() {
+        editOldPassword.setOnFocusChangeListener(listener);
+        editNewPassword.setOnFocusChangeListener(listener);
+        editConfirmPassword.setOnFocusChangeListener(listener);
+
+        btnSaveEdit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(!editPasswordConfirm.getText().toString().isEmpty()) {
-                    if (passwordConfirmedDisplayed) {
-                        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        imgDisplayPasswordConfirm.setImageResource(R.drawable.ic_visibility_off);
-                        passwordConfirmedDisplayed = false;
-                    } else {
-                        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
-                        imgDisplayPasswordConfirm.setImageResource(R.drawable.ic_visibility_on);
-                        passwordConfirmedDisplayed = true;
-                    }
-                }
-            }
-        });
+            public void onClick(View view) {
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                txtPasswordError.setVisibility(View.INVISIBLE);
-                errorMessage = checkValidInput();
-                if(errorMessage.isEmpty()) {
-
-//                    API change password
-
-                } else {
-                    txtPasswordError.setText(errorMessage);
-                    txtPasswordError.setVisibility(View.VISIBLE);
-                }
             }
         });
     }
 
-    private String checkValidInput() {
-        if (editPassword.getText().toString().isEmpty()) {
-            return "Please fill the required fields";
+    private boolean checkEmptyFields() {
+        if(editOldPassword.getText().toString().isEmpty()) {
+            return true;
         }
-        if (!editPassword.getText().toString().matches(StringUtils.PASSWORD_REGEX)) {
-            return "This password is invalid";
+        if (editNewPassword.getText().toString().isEmpty()) {
+            return true;
         }
-        if (editPasswordConfirm.getText().toString().isEmpty()) {
-            return "Please fill the required fields";
+        if (editConfirmPassword.getText().toString().isEmpty()) {
+            return true;
         }
-        if (!editPassword.getText().toString().equals(editPasswordConfirm.getText().toString())) {
-            return "Please re-enter your password correctly";
+        return false;
+    }
+
+    private boolean checkMatchingPassword() {
+        String password = editNewPassword.getText().toString();
+        String confirmPassword = editConfirmPassword.getText().toString();
+        return password.equals(confirmPassword);
+    }
+
+    private void enableButtonUpdate() {
+        if(checkEmptyFields() || !checkMatchingPassword()) {
+            btnSaveEdit.setEnabled(false);
+            btnSaveEdit.setBackground(getResources().getDrawable(R.color.gray_light));
+        } else {
+            btnSaveEdit.setEnabled(true);
+            btnSaveEdit.setBackground(getResources().getDrawable(R.color.blue_main));
         }
-        return "";
+    }
+
+    private void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

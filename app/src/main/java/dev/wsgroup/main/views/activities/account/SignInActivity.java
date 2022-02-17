@@ -67,23 +67,38 @@ public class SignInActivity extends AppCompatActivity {
         btnSignIn.setEnabled(false);
         btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
 
-        editUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        TextWatcher textWatcher = new TextWatcher() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        editPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            }
+
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(!checkEmptyField()) {
+                    btnSignIn.setEnabled(true);
+                    btnSignIn.setBackground(getResources().getDrawable(R.color.blue_main));
+                } else {
+                    btnSignIn.setEnabled(false);
+                    btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
                 }
             }
-        });
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
+
+        View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(view);
+                }
+            }
+        };
+
 
         layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,54 +127,10 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        editUsername.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() > 0) {
-                    if (!editPassword.getText().toString().isEmpty()) {
-                        btnSignIn.setEnabled(true);
-                        btnSignIn.setBackground(getResources().getDrawable(R.color.blue_main));
-                    }
-                } else {
-                    btnSignIn.setEnabled(false);
-                    btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        editPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() > 0) {
-                    if (!editUsername.getText().toString().isEmpty()) {
-                        btnSignIn.setEnabled(true);
-                        btnSignIn.setBackground(getResources().getDrawable(R.color.blue_main));
-                    }
-                } else {
-                    btnSignIn.setEnabled(false);
-                    btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        editUsername.addTextChangedListener(textWatcher);
+        editPassword.addTextChangedListener(textWatcher);
+        editUsername.setOnFocusChangeListener(listener);
+        editPassword.setOnFocusChangeListener(listener);
 
         imgDisplayPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,6 +223,13 @@ public class SignInActivity extends AppCompatActivity {
     private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private boolean checkEmptyField() {
+        if (editUsername.getText().toString().isEmpty() || editPassword.getText().toString().isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     @Override

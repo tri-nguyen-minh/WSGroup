@@ -215,7 +215,7 @@ public class AccountDetailActivity extends AppCompatActivity {
             }
         });
 
-        editUsername.addTextChangedListener(new TextWatcher() {
+        TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -226,67 +226,14 @@ public class AccountDetailActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {}
-        });
-        editFirstName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        };
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                enableButtonConfirm();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-        editLastName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                enableButtonConfirm();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-        editPhoneNumber.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                enableButtonConfirm();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-        editPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                enableButtonConfirm();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-        editPasswordConfirm.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                enableButtonConfirm();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
+        editUsername.addTextChangedListener(textWatcher);
+        editFirstName.addTextChangedListener(textWatcher);
+        editLastName.addTextChangedListener(textWatcher);
+        editPhoneNumber.addTextChangedListener(textWatcher);
+        editPassword.addTextChangedListener(textWatcher);
+        editPasswordConfirm.addTextChangedListener(textWatcher);
 
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
