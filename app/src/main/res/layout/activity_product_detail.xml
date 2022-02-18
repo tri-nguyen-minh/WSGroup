@@ -31,8 +31,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutShoppingCart"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            style="@style/style_icon"
             android:layout_marginHorizontal="15dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toLeftOf="@id/imgProductDetailHome"
@@ -44,11 +43,10 @@
                 android:src="@drawable/ic_shopping_cart"
                 app:tint="@color/white"/>
 
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewProductDetailCartCount"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:backgroundTint="@color/red"
                 app:cardCornerRadius="180dp"
                 android:layout_gravity="center"
@@ -64,7 +62,7 @@
                     android:gravity="center"
                     android:text="0"
                     android:textColor="@color/white"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"/>
 
             </androidx.cardview.widget.CardView>
@@ -72,8 +70,7 @@
 
         <ImageView
             android:id="@+id/imgProductDetailHome"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            style="@style/style_icon"
             android:src="@drawable/ic_home"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -82,8 +79,7 @@
 
         <ImageView
             android:id="@+id/imgProductDetailMessage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            style="@style/style_icon"
             android:src="@drawable/ic_message"
             android:layout_marginHorizontal="15dp"
             app:layout_constraintTop_toTopOf="parent"
@@ -138,6 +134,7 @@
             android:id="@+id/btnPurchaseProduct"
             android:text="PURCHASE PRODUCT"
             style="@style/style_button_account"
+            android:textSize="18sp"
             android:layout_marginTop="10dp"
             android:layout_marginHorizontal="30dp"/>
 

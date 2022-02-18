@@ -17,7 +17,7 @@
     <FrameLayout
         android:id="@+id/frameLayoutMainTabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:paddingTop="2dp"
         android:background="@color/gray_dark"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -27,7 +27,7 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/mainTabLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:tabIndicatorColor="@color/blue_main"
             app:tabBackground="@drawable/background_nav_tab"
             app:tabIndicatorGravity="top"

@@ -12,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FrameLayout frameLayoutMainTabLayout;
-    private TabLayout.Tab tabCommon;
+    private View viewCommon;
 
     private SharedPreferences sharedPreferences;
     private List<Supplier> supplierList;
@@ -166,24 +167,38 @@ public class MainActivity extends AppCompatActivity {
         frameLayoutMainTabLayout.setVisibility(View.VISIBLE);
         tabLayout.removeAllTabs();
         viewPager.setAdapter(null);
-        tabCommon = tabLayout.newTab();
 
-        tabCommon.setText("Home");
-        tabCommon.setIcon(R.drawable.ic_home);
-        tabCommon.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
-        tabLayout.addTab(tabCommon);
+//        tabCommon.setText("Home");
+//        tabCommon.setIcon(R.drawable.ic_home);
+//        tabCommon.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+//        tabLayout.addTab(tabCommon);
 
-        tabCommon = tabLayout.newTab();
-        tabCommon.setText("History");
-        tabCommon.setIcon(R.drawable.ic_history);
-        tabCommon.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
-        tabLayout.addTab(tabCommon);
+//        tabCommon = tabLayout.newTab();
+//        tabCommon.setText("History");
+//        tabCommon.setIcon(R.drawable.ic_history);
+//        tabCommon.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+//        tabLayout.addTab(tabCommon);
 
-        tabCommon = tabLayout.newTab();
-        tabCommon.setText("Profile");
-        tabCommon.setIcon(R.drawable.ic_profile);
-        tabCommon.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
-        tabLayout.addTab(tabCommon);
+//        tabCommon = tabLayout.newTab();
+//        tabCommon.setText("Profile");
+//        tabCommon.setIcon(R.drawable.ic_profile);
+//        tabCommon.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+//        tabLayout.addTab(tabCommon);
+
+        viewCommon = getLayoutInflater().inflate(R.layout.custom_tab, null);
+        viewCommon.findViewById(R.id.icon).setBackgroundResource(R.drawable.ic_home);
+//        ((TextView)viewCommon.findViewById(R.id.text)).setText("Home");
+        tabLayout.addTab(tabLayout.newTab().setCustomView(viewCommon));
+
+        viewCommon = getLayoutInflater().inflate(R.layout.custom_tab, null);
+        viewCommon.findViewById(R.id.icon).setBackgroundResource(R.drawable.ic_history);
+//        ((TextView)viewCommon.findViewById(R.id.text)).setText("History");
+        tabLayout.addTab(tabLayout.newTab().setCustomView(viewCommon));
+
+        viewCommon = getLayoutInflater().inflate(R.layout.custom_tab, null);
+        viewCommon.findViewById(R.id.icon).setBackgroundResource(R.drawable.ic_profile);
+//        ((TextView)viewCommon.findViewById(R.id.text)).setText("Profile");
+        tabLayout.addTab(tabLayout.newTab().setCustomView(viewCommon));
 
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
@@ -223,8 +238,9 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 if(!userId.isEmpty()) {
                     viewPager.setCurrentItem(tab.getPosition());
-                    if (tab.getIcon() != null)
-                        tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+
+//                    if (tab.getIcon() != null)
+//                        tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
                 } else {
                     int selectedTab = tab.getPosition();
                     if (selectedTab > 0) {
