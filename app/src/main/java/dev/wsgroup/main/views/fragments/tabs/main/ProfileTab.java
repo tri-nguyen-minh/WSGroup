@@ -158,8 +158,7 @@ public class ProfileTab extends Fragment {
                 public void onSuccess(AuthResult authResult) {
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference storageReference = storage.getReference();
-                    System.out.println(user.getUsername() + "_avatar");
-                    StorageReference ref = storageReference.child("images/" + user.getUsername() + "_avatar");
+                    StorageReference ref = storageReference.child(user.getAvatarLink());
                     ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {

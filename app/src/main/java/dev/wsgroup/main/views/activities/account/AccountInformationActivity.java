@@ -309,14 +309,14 @@ public class AccountInformationActivity extends AppCompatActivity {
     }
 
     private void uploadImageToFirebase() {
-        avatarLink = username + "_avatar";
+        avatarLink = "images/" + username + "_avatar";
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageReference = storage.getReference();
-                StorageReference ref = storageReference.child("images/" + avatarLink);
+                StorageReference ref = storageReference.child(avatarLink);
                 StorageMetadata metadata = new StorageMetadata.Builder()
                         .setContentType("image/jpeg")
                         .build();
@@ -422,7 +422,7 @@ public class AccountInformationActivity extends AppCompatActivity {
             public void onSuccess(AuthResult authResult) {
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageReference = storage.getReference();
-                StorageReference ref = storageReference.child("images/" + avatarLink);
+                StorageReference ref = storageReference.child(avatarLink);
                 ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
