@@ -46,6 +46,7 @@ public class APIUserCaller {
                         user.setToken(data.getString("token"));
                         APIListener.onUserFound(user);
                     } catch (Exception e) {
+                        System.out.println("test parse");
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
                     }
@@ -250,6 +251,65 @@ public class APIUserCaller {
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String, String> header = new HashMap<>();
                     header.put("cookie", user.getToken());
+                    return header;
+                }
+
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void updatePassword(String token, String password, Application application, APIListener APIListener) {
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        String url = StringUtils.USER_API_URL + "user/resetPassword";
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("password", password);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        int data = response.getInt("data");
+                        if (data == 1) {
+                            APIListener.onUpdateProfileSuccessful();
+                        } else {
+                            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                        }
+                    } catch (Exception e) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(error.toString().contains("NoConnectionError")) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
+                }
+            };
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
                     return header;
                 }
 
