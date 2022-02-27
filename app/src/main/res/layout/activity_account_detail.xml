@@ -11,14 +11,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutAccountDetailRegisterHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="10dp"
-        android:paddingHorizontal="15dp"
-        android:background="@color/blue_main"
-        app:layout_constraintTop_toTopOf="parent">
+        style="@style/style_header_layout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
 
         <ImageView
             android:id="@+id/imgBackFromAccountDetailRegister"

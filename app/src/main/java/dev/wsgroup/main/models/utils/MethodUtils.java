@@ -126,18 +126,20 @@ public class MethodUtils {
     }
 
     public static String getVolleyErrorMessage(VolleyError error) {
-        if (error == null || error.networkResponse == null) {
-            return "No error";
+        String body = "";
+        if (error == null) {
+            return   "No error ";
+        }
+        if (error.networkResponse == null) {
+            return  "no response ";
         }
 
-        String body = "No message";
         //get status code here
         final String statusCode = String.valueOf(error.networkResponse.statusCode);
         //get response body and parse with appropriate encoding
         try {
-            body = statusCode + " - " + new String(error.networkResponse.data,"UTF-8");
+            body += statusCode + " - " + new String(error.networkResponse.data,"UTF-8");
         } catch (UnsupportedEncodingException e) {
-            System.out.println("error");
             System.out.println(e.getMessage());
         }
         return body;

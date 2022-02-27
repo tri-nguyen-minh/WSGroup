@@ -61,7 +61,7 @@ public class PhoneInputActivity extends AppCompatActivity {
 
         editPhone.setText("091392173");
         btnSendOTP.setEnabled(false);
-        btnSendOTP.setBackground(getResources().getDrawable(R.color.gray_light));
+        btnSendOTP.getBackground().setTint(getResources().getColor(R.color.gray_light));
 
         editPhone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -82,10 +82,10 @@ public class PhoneInputActivity extends AppCompatActivity {
                 String stringPhone = "0" + editPhone.getText().toString();
                 if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
                     btnSendOTP.setEnabled(false);
-                    btnSendOTP.setBackground(getResources().getDrawable(R.color.gray_light));
+                    btnSendOTP.getBackground().setTint(getResources().getColor(R.color.gray_light));
                 } else {
                     btnSendOTP.setEnabled(true);
-                    btnSendOTP.setBackground(getResources().getDrawable(R.color.blue_main));
+                    btnSendOTP.getBackground().setTint(getResources().getColor(R.color.blue_main));
                 }
             }
 

@@ -227,8 +227,6 @@ public class AccountInformationActivity extends AppCompatActivity {
 
     private void enablingSaveButton() {
         if (dataLoaded) {
-            System.out.println("check: " + checkEmptyFields());
-            System.out.println("check2: " + !checkInfoChanged());
             if (checkEmptyFields() || !checkInfoChanged()) {
                 btnSaveEdit.setEnabled(false);
                 btnSaveEdit.getBackground().setTint(getApplicationContext().getResources().getColor(R.color.gray_light));
@@ -263,22 +261,18 @@ public class AccountInformationActivity extends AppCompatActivity {
         String lastname = editAccountInfoLastName.getText().toString();
         String mail = editAccountInfoMail.getText().toString();
         if (!firstName.equals(user.getFirstName())) {
-            System.out.println("first");
             return true;
         }
         if (!lastname.equals(user.getLastName())) {
-            System.out.println("last");
             return true;
         }
         if (!mail.equals(user.getMail())) {
-            System.out.println("mail");
             return true;
         }
         return checkAvatarChanged();
     }
 
     private boolean checkAvatarChanged() {
-        System.out.println(!avatarLink.equals(user.getAvatarLink()));
         return !avatarLink.equals(user.getAvatarLink());
     }
 

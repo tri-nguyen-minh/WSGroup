@@ -88,7 +88,7 @@ public class DialogBoxOrderDetail extends Dialog{
         checkboxCampaign = findViewById(R.id.checkboxCampaign);
         txtNumberInStorage = findViewById(R.id.txtNumberInStorage);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
-        lblBasePrice = findViewById(R.id.lblBasePrice);
+        lblBasePrice = findViewById(R.id.txtPricingDescription);
         lblCampaignPrice = findViewById(R.id.lblCampaignPrice);
         txtCampaignPrice = findViewById(R.id.txtCampaignPrice);
         txtProductPrice = findViewById(R.id.txtProductPrice);
@@ -253,7 +253,7 @@ public class DialogBoxOrderDetail extends Dialog{
             layoutCampaign.setVisibility(View.GONE);
             setBasePriceSelected(true);
         } else {
-            retailPurchaseOutOfStock = (product.getQuantity() <= campaign.getQuantity());
+            retailPurchaseOutOfStock = (product.getQuantity() <= campaign.getMinQuantity());
             if (retailPurchaseOutOfStock) {
                 campaignId = campaign.getId();
                 setBasePriceSelected(false);
@@ -375,7 +375,7 @@ public class DialogBoxOrderDetail extends Dialog{
         if (campaignId.isEmpty()) {
             if (product.getCampaign() != null) {
                 if (product.getCampaign().getStatus().equals("active")) {
-                    quantity -= product.getCampaign().getQuantity();
+                    quantity -= product.getCampaign().getMinQuantity();
                 }
             }
         }
@@ -421,7 +421,6 @@ public class DialogBoxOrderDetail extends Dialog{
                     public void onAddCartItemSuccessful(CartProduct cartProduct) {
                         super.onAddCartItemSuccessful(cartProduct);
                         dialogBoxLoading.dismiss();
-                        cartProduct.setCampaignId("");
                         onCartProductAdded(cartProduct);
                         dismiss();
                     }
@@ -437,32 +436,33 @@ public class DialogBoxOrderDetail extends Dialog{
 
     private Order getOrder() {
         Order order = new Order();
-        List<OrderProduct> list = new ArrayList<>();
-        OrderProduct orderProduct = new OrderProduct();
-        CartProduct cartProduct = new CartProduct();
-        cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
-        cartProduct.setProduct(product);
-        cartProduct.setCampaignId(campaignId);
-        cartProduct.setProductType(product.getTypeOfProduct());
-        orderProduct.setProductId(product.getProductId());
-        orderProduct.setQuantity(cartProduct.getQuantity());
-        orderProduct.setPrice(product.getRetailPrice());
-//        if (campaignId.isEmpty()) {
-//            orderProduct.setPrice(product.getRetailPrice());
-//        } else {
-//            orderProduct.setPrice(campaign.getSavingPrice());
-//        }
-        orderProduct.setTotalPrice(getTotalPrice());
-        orderProduct.setCampaignId(campaignId);
-        orderProduct.setProductType(cartProduct.getProductType());
-        orderProduct.setProduct(product);
-        orderProduct.setCartProduct(cartProduct);
-        orderProduct.setNote("");
-        orderProduct.setTypeList(cartProduct.getTypeList());
-        list.add(orderProduct);
-        order.setOrderProductList(list);
-        order.setSupplier(product.getSupplier());
-        order.setCampaignId(campaignId);
+//        List<OrderProduct> list = new ArrayList<>();
+//        OrderProduct orderProduct = new OrderProduct();
+//        CartProduct cartProduct = new CartProduct();
+//        cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
+//        cartProduct.setProduct(product);
+////        cartProduct.setCampaignId(campaignId);
+//        cartProduct.setProductType(product.getTypeOfProduct());
+//        orderProduct.setProductId(product.getProductId());
+//        orderProduct.setQuantity(cartProduct.getQuantity());
+//        orderProduct.setPrice(product.getRetailPrice());
+////        if (campaignId.isEmpty()) {
+////            orderProduct.setPrice(product.getRetailPrice());
+////        } else {
+////            orderProduct.setPrice(campaign.getSavingPrice());
+////        }
+//        orderProduct.setTotalPrice(getTotalPrice());
+//        orderProduct.setCampaignId(campaignId);
+//        orderProduct.setProductType(cartProduct.getProductType());
+//        orderProduct.setProduct(product);
+//        orderProduct.setCartProduct(cartProduct);
+//        orderProduct.setNote("");
+//        orderProduct.setTypeList(cartProduct.getTypeList());
+//        list.add(orderProduct);
+//        order.setOrderProductList(list);
+//        order.setSupplier(product.getSupplier());
+//        order.setCampaignId(campaignId);
+//        order.setInCart(false);
         return order;
     }
 

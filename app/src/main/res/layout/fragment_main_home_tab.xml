@@ -172,14 +172,8 @@
             android:gravity="center">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:gravity="center"
                 android:text="CANNOT RETRIEVE\nLIST OF PRODUCTS"
-                android:textColor="@color/gray"
-                android:textSize="22sp"
-                android:textStyle="bold"/>
+                style="@style/style_empty_note" />
 
             <TextView
                 android:id="@+id/lblRetryGetProduct"
@@ -188,7 +182,7 @@
                 android:layout_marginTop="15dp"
                 android:fontFamily="@font/montserratr"
                 android:gravity="center"
-                android:text="CLICK TO TRY AGAIN"
+                android:text="CLICK HERE TO TRY AGAIN"
                 android:textColor="@color/blue_main"
                 android:textSize="17sp"
                 android:textStyle="bold"/>

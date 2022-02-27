@@ -38,7 +38,7 @@ public class RecViewDiscountSimpleAdapter extends RecyclerView.Adapter<RecViewDi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_discount_simple_card, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_discount_simple_card, parent, false);
         RecViewDiscountSimpleAdapter.ViewHolder holder = new RecViewDiscountSimpleAdapter.ViewHolder(view);
         return holder;
     }

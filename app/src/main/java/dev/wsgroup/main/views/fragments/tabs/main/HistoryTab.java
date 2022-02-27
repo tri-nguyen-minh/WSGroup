@@ -23,8 +23,8 @@ public class HistoryTab extends Fragment {
 
     private ViewPager historyViewPager;
     private TabLayout historyTabLayout;
-
     private TabLayout.Tab tabCommon;
+
     private SharedPreferences sharedPreferences;
     private String username, userId;
 

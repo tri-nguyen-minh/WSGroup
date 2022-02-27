@@ -2,6 +2,7 @@ package dev.wsgroup.main.models.apis;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.Campaign;
@@ -28,7 +29,8 @@ public class APIListener {
 
     public void onProductListFound(List<Product> productList) {}
 
-    public void onCartListFound(HashMap<String, List<CartProduct>> shoppingCart, List<Supplier> supplierList) {}
+    public void onCartListFound(HashMap<String, List<CartProduct>> retailCart, List<Supplier> supplierRetailList,
+                                HashMap<String, List<CartProduct>> campaignCart, List<Supplier> supplierCampaignList) {}
 
     public void onProductFound(Product product) {}
 
@@ -37,6 +39,8 @@ public class APIListener {
     public void onCampaignFound(Campaign campaign) {}
 
     public void onCampaignListFound(List<Campaign> campaignList) {}
+
+    public void onCampaignMapFound(Map<String, List<Campaign>> campaignMap) {}
 
     public void onNoCampaignFound() {}
 

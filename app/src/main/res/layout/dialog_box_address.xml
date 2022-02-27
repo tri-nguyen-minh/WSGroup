@@ -5,7 +5,6 @@
     android:id="@+id/cardViewParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="15dp"
     app:cardElevation="10dp"
     app:cardCornerRadius="5dp">
 
@@ -17,15 +16,13 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutDialogCampaign"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
+            style="@style/style_header_layout"
             android:background="@color/blue_main">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
+                android:fontFamily="@font/montserratm"
                 android:gravity="left"
                 android:text="ADDRESS INFORMATION"
                 android:textColor="@color/white"

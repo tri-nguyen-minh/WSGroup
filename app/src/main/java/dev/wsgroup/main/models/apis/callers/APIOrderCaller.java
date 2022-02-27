@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
@@ -42,14 +43,20 @@ public class APIOrderCaller {
             JSONArray productArray = new JSONArray();
             CartProduct cartProduct;
             Product product;
+            Campaign campaign = order.getCampaign();
             for (OrderProduct orderProduct : order.getOrderProductList()) {
                 cartProduct = orderProduct.getCartProduct();
                 product = cartProduct.getProduct();
                 jsonObjectProduct = new JSONObject();
+                if (order.isInCart()) {
+                    jsonObjectProduct.put("cartId", cartProduct.getId());
+                } else {
+                    jsonObjectProduct.put("cartId", JSONObject.NULL);
+                }
                 jsonObjectProduct.put("productId", product.getProductId());
                 jsonObjectProduct.put("productName", product.getName());
+                jsonObjectProduct.put("image", product.getImageLink());
                 jsonObjectProduct.put("quantity", cartProduct.getQuantity());
-//                double totalPrice = cartProduct.getQuantity();
 //                if(order.getCampaignId().isEmpty()) {
 //                    jsonObjectProduct.put("price", product.getRetailPrice());
 //                    totalPrice *= product.getRetailPrice();
@@ -60,24 +67,23 @@ public class APIOrderCaller {
                 jsonObjectProduct.put("price", product.getRetailPrice());
                 jsonObjectProduct.put("totalPrice", orderProduct.getTotalPrice());
                 jsonObjectProduct.put("typeofproduct", cartProduct.getProductType());
-                jsonObjectProduct.put("image", product.getImageLink());
                 jsonObjectProduct.put("notes", orderProduct.getNote());
                 productArray.put(jsonObjectProduct);
             }
-            jsonObjectOrder.put("campaignId", order.getCampaignId().isEmpty() ? null : order.getCampaignId());
+            jsonObjectOrder.put("campaignId", (campaign == null) ? JSONObject.NULL : campaign.getId());
+            jsonObjectOrder.put("isWholesale", (campaign == null) ? false : true);
             jsonObjectOrder.put("addressId", order.getAddress().getId());
             jsonObjectOrder.put("paymentId", order.getPayment().getId());
             jsonObjectOrder.put("discountPrice", order.getDiscountPrice());
             jsonObjectOrder.put("shippingFee", order.getShippingFee());
             jsonObjectOrder.put("supplierId", order.getSupplier().getId());
+            jsonObjectOrder.put("inCart", order.isInCart());
+            if (order.getCustomerDiscount() != null) {
+                jsonObjectOrder.put("customerDiscountCodeId", order.getCustomerDiscount().getId());
+            } else {
+                jsonObjectOrder.put("customerDiscountCodeId", JSONObject.NULL);
+            }
 
-//            if (order.getCustomerDiscount() != null) {
-//                jsonObjectOrder.put("customerDiscountCodeId", order.getCustomerDiscount().getId());
-//            } else {
-                jsonObjectOrder.put("customerDiscountCodeId", null);
-//            }
-
-            jsonObjectOrder.put("isWholesale", order.getCampaignId().isEmpty() ? false : true);
             jsonObjectOrder.put("products", productArray);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
@@ -123,7 +129,6 @@ public class APIOrderCaller {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
-        System.out.println(url);
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
@@ -138,7 +143,7 @@ public class APIOrderCaller {
                                 order = Order.getOrderFromJSON(jsonArray.getJSONObject(i));
                                 if (order.getStatus().equals(status)) {
                                     orderList.add(order);
-                                    if (!order.getCampaignId().isEmpty()) {
+                                    if (order.getCampaign() != null) {
                                         orderWithCampaignIndexList.add(orderList.indexOf(order));
                                     }
                                 }

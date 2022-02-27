@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="none"
-        android:layout_marginBottom="5dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -83,18 +82,18 @@
                             android:orientation="vertical"
                             app:layout_constraintGuide_percent="0.37"/>
 
-                        <RatingBar
+                        <me.zhanghai.android.materialratingbar.MaterialRatingBar
                             android:id="@+id/ratingProduct"
-                            style="?android:attr/ratingBarStyleIndicator"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_marginRight="10dp"
                             android:progressTint="@color/gold"
                             android:secondaryProgressTint="@color/gold"
                             android:numStars="5"
                             android:rating="0"
                             android:stepSize="0.5"
-                            android:scaleX="0.8"
-                            android:scaleY="0.8"
+                            android:theme="@style/ratingBar"
+                            android:isIndicator="true"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -103,7 +102,7 @@
                             android:id="@+id/txtRatingProduct"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="15dp"
+                            android:layout_marginRight="10dp"
                             android:gravity="center"
                             android:fontFamily="@font/montserratr"
                             android:text="0.0"
@@ -111,15 +110,14 @@
                             android:textSize="22sp"
                             android:textStyle="bold"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintLeft_toRightOf="@id/guidelineProductUserFeedback"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/ratingProduct"/>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:gravity="left|center"
                             android:paddingRight="15dp"
-                            android:background="@drawable/background_separator_right"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -191,7 +189,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
-                        android:background="@color/white">
+                        android:background="@color/white"
+                        android:visibility="gone">
 
                         <androidx.constraintlayout.widget.Guideline
                             android:id="@+id/guidelineDiscount"
@@ -246,30 +245,16 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
-                            android:id="@+id/txtProductRetailPriceORG"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            android:fontFamily="@font/montserratr"
-                            android:gravity="left"
-                            android:text="0.000d"
-                            android:textColor="@color/black"
-                            android:textSize="14sp"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintBottom_toTopOf="@id/txtProductRetailPrice" />
-
-                        <TextView
                             android:id="@+id/txtProductRetailPrice"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
                             android:text="0.000d"
                             android:textColor="@color/red"
-                            android:textSize="16sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/txtProductRetailPriceORG" />
+                            app:layout_constraintRight_toRightOf="parent"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -280,34 +265,82 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/txtCampaignDescription"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:text="Ongoing Campaign"
                             android:layout_marginTop="10dp"
                             android:layout_marginBottom="7dp"
-                            android:paddingHorizontal="15dp"
-                            android:fontFamily="@font/montserratr"
-                            android:gravity="left"
-                            android:text="Ongoing Campaign"
-                            android:textColor="@color/gray"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"/>
+                            style="@style/style_background_header"/>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutSelectCampaign"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingVertical="10dp"
                             android:layout_marginBottom="2dp"
+                            android:padding="10dp"
                             android:background="@color/white">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintRight_toLeftOf="@id/imgAddAddress">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text=" View"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/txtCampaignCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="7dp"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="00"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/lblCampaignCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="Ongoing Campaign"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"/>
+
+
+                            </LinearLayout>
+
+                            <ImageView
+                                android:id="@+id/imgAddAddress"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:scaleY="1.2"
+                                android:scaleX="1.2"
+                                android:src="@drawable/ic_direction_right"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:background="@color/white"
-                                android:visibility="visible"
+                                android:visibility="gone"
+                                android:paddingVertical="10dp"
                                 app:layout_constraintTop_toTopOf="parent">
 
                                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -583,19 +616,10 @@
             </LinearLayout>
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:text="More Info"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="7dp"
-                android:paddingHorizontal="15dp"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left"
-                android:text="More Info"
-                android:textColor="@color/gray"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                style="@style/style_background_header"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -604,13 +628,85 @@
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayoutSupplierName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineSupplierName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
+
+                    <TextView
+                        android:id="@+id/lblSupplierName"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:paddingVertical="10dp"
+                        android:paddingHorizontal="10dp"
+                        android:fontFamily="@font/montserratr"
+                        android:gravity="left"
+                        android:text="Suppliers"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/guidelineSupplierName"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginLeft="1dp"
+                        android:paddingLeft="10dp"
+                        android:background="@color/white"
+                        app:layout_constraintLeft_toRightOf="@+id/guidelineSupplierName"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/txtSupplierName"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingRight="5dp"
+                            android:paddingVertical="10dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="14sp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/icSupplierName"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <ImageView
+                            android:id="@+id/icSupplierName"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:scaleY="1.2"
+                            android:scaleX="1.2"
+                            android:src="@drawable/ic_direction_right"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayoutProductQuantity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:layout_marginBottom="2dp">
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guidelineProductQuantity"
@@ -624,9 +720,9 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
-                        android:paddingHorizontal="5dp"
+                        android:paddingHorizontal="10dp"
                         android:fontFamily="@font/montserratr"
-                        android:gravity="left|center"
+                        android:gravity="left"
                         android:text="Quantity"
                         android:textColor="@color/black"
                         android:textSize="15sp"
@@ -834,6 +930,8 @@
                                 android:id="@+id/imgSelectCampaign"
                                 android:layout_width="35dp"
                                 android:layout_height="35dp"
+                                android:scaleY="1.2"
+                                android:scaleX="1.2"
                                 android:src="@drawable/ic_direction_right"
                                 app:layout_constraintRight_toRightOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -849,10 +947,7 @@
                     android:id="@+id/constraintLayoutProductCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/constraintLayoutProductQuantity">
+                    android:layout_marginBottom="2dp">
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guidelineProductCategory"
@@ -866,9 +961,9 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
-                        android:paddingHorizontal="5dp"
+                        android:paddingHorizontal="10dp"
                         android:fontFamily="@font/montserratr"
-                        android:gravity="left|center"
+                        android:gravity="left"
                         android:text="Category"
                         android:textColor="@color/black"
                         android:textSize="15sp"
@@ -912,6 +1007,8 @@
                             android:id="@+id/icProductCategory"
                             android:layout_width="35dp"
                             android:layout_height="35dp"
+                            android:scaleY="1.2"
+                            android:scaleX="1.2"
                             android:src="@drawable/ic_direction_right"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
@@ -925,10 +1022,7 @@
                     android:id="@+id/constraintLayoutProductDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/constraintLayoutProductCategory">
+                    android:layout_marginBottom="2dp">
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guidelineProductDescription"
@@ -942,9 +1036,9 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:paddingVertical="10dp"
-                        android:paddingHorizontal="5dp"
+                        android:paddingHorizontal="10dp"
                         android:fontFamily="@font/montserratr"
-                        android:gravity="left|center"
+                        android:gravity="left"
                         android:text="Description"
                         android:textColor="@color/black"
                         android:textSize="15sp"
@@ -955,161 +1049,117 @@
                         app:layout_constraintRight_toLeftOf="@id/guidelineProductDescription"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <TextView
-                        android:id="@+id/txtProductDescription"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="5dp"
-                        android:paddingVertical="10dp"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="left"
-                        android:textColor="@color/gray_dark"
-                        android:textSize="14sp"
-                        android:text="test"
-                        android:layout_marginLeft="1dp"
-                        android:background="@color/white"
+                        android:orientation="vertical"
                         app:layout_constraintLeft_toRightOf="@+id/guidelineProductDescription"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintLayoutSupplierName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/constraintLayoutProductDescription">
-
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/guidelineSupplierName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.3"/>
-
-                    <TextView
-                        android:id="@+id/lblSupplierName"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:paddingVertical="10dp"
-                        android:paddingHorizontal="5dp"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="left|center"
-                        android:text="Suppliers"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:layout_marginLeft="1dp"
-                        android:background="@color/white"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toLeftOf="@id/guidelineSupplierName"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginLeft="1dp"
-                        android:paddingLeft="10dp"
-                        android:background="@color/white"
-                        app:layout_constraintLeft_toRightOf="@+id/guidelineSupplierName"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent">
 
                         <TextView
-                            android:id="@+id/txtSupplierName"
-                            android:layout_width="0dp"
+                            android:id="@+id/txtProductDescription"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:paddingLeft="10dp"
                             android:paddingRight="5dp"
                             android:paddingVertical="10dp"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
                             android:textColor="@color/gray_dark"
                             android:textSize="14sp"
-                            android:maxLines="1"
                             android:ellipsize="end"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/icSupplierName"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
+                            android:text="test"
+                            android:layout_marginLeft="1dp"
+                            android:background="@color/white"/>
 
-                        <ImageView
-                            android:id="@+id/icSupplierName"
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:src="@drawable/ic_direction_right"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
+                        <TextView
+                            android:id="@+id/lblDescriptionLength"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="10dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="right"
+                            android:textColor="@color/red"
+                            android:textSize="14sp"
+                            android:text="View more"
+                            android:layout_marginLeft="1dp"
+                            android:background="@color/white"/>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
+
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
+                android:id="@+id/layoutMoreSuppliersProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="7dp"
-                app:layout_constraintTop_toBottomOf="@id/constraintLayoutSupplierName"
-                app:layout_constraintBottom_toBottomOf="parent">
+                android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintLayoutMoreSuppliersProducts"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="7dp"
+                    app:layout_constraintTop_toBottomOf="@id/constraintLayoutSupplierName"
+                    app:layout_constraintBottom_toBottomOf="parent">
 
-                    <TextView
-                        android:id="@+id/lblMoreProduct"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingLeft="15dp"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="left"
-                        android:text="More From"
-                        android:textColor="@color/gray"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toLeftOf="@id/txtMoreSuppliersProductsName"/>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/constraintLayoutMoreSuppliersProducts"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/txtMoreSuppliersProductsName"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:paddingRight="15dp"
-                        android:paddingLeft="8dp"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="left"
-                        android:textColor="@color/gray_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        app:layout_constraintLeft_toRightOf="@id/lblMoreProduct"
-                        app:layout_constraintRight_toRightOf="parent"/>
+                        <TextView
+                            android:id="@+id/lblMoreProduct"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingLeft="15dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:text="More From"
+                            android:textColor="@color/gray"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/txtMoreSuppliersProductsName"/>
+
+                        <TextView
+                            android:id="@+id/txtMoreSuppliersProductsName"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:paddingRight="15dp"
+                            android:paddingLeft="8dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            app:layout_constraintLeft_toRightOf="@id/lblMoreProduct"
+                            app:layout_constraintRight_toRightOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recViewMoreSuppliersProducts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:paddingVertical="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/constraintLayoutMoreSuppliersProducts"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recViewMoreSuppliersProducts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:paddingVertical="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/constraintLayoutMoreSuppliersProducts"/>
+            </LinearLayout>
 
         </LinearLayout>
 

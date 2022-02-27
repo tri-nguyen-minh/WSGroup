@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICartCaller {
@@ -40,25 +42,37 @@ public class APICartCaller {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    CartProduct cartProduct = null;
-                    Supplier supplier = null;
+                    CartProduct cartProduct;
+                    Supplier supplier;
                     cartProductList = new ArrayList<>();
-                    HashMap<String, List<CartProduct>> shoppingCart = new HashMap<>();
-                    List<Supplier> supplierList = new ArrayList<>();
+                    HashMap<String, List<CartProduct>> retailCart = new HashMap<>();
+                    HashMap<String, List<CartProduct>> campaignCart = new HashMap<>();
+                    List<Supplier> supplierRetailList = new ArrayList<>();
+                    List<Supplier> supplierCampaignList = new ArrayList<>();
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length();i++) {
                             cartProduct = CartProduct.getCartProductFromJSON(jsonArray.getJSONObject(i));
                             supplier = cartProduct.getProduct().getSupplier();
-                            cartProductList = shoppingCart.get(supplier.getId());
-                            if(cartProductList == null) {
-                                supplierList.add(supplier);
-                                cartProductList = new ArrayList<>();
+                            if (!cartProduct.getCampaignFlag()) {
+                                cartProductList = retailCart.get(supplier.getId());
+                                if(cartProductList == null) {
+                                    supplierRetailList.add(supplier);
+                                    cartProductList = new ArrayList<>();
+                                }
+                                cartProductList.add(cartProduct);
+                                retailCart.put(supplier.getId(), cartProductList);
+                            } else {
+                                cartProductList = campaignCart.get(supplier.getId());
+                                if(cartProductList == null) {
+                                    supplierCampaignList.add(supplier);
+                                    cartProductList = new ArrayList<>();
+                                }
+                                cartProductList.add(cartProduct);
+                                campaignCart.put(supplier.getId(), cartProductList);
                             }
-                            cartProductList.add(cartProduct);
-                            shoppingCart.put(supplier.getId(), cartProductList);
                         }
-                        APIListener.onCartListFound(shoppingCart, supplierList);
+                        APIListener.onCartListFound(retailCart, supplierRetailList, campaignCart, supplierCampaignList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -97,6 +111,13 @@ public class APICartCaller {
             jsonObject.put("productId", cartProduct.getProduct().getProductId());
             jsonObject.put("quantity", cartProduct.getQuantity());
             jsonObject.put("typeofproduct", cartProduct.getProductType());
+            Campaign campaign = cartProduct.getCampaign();
+            jsonObject.put("inCampaign", (campaign != null));
+            if (campaign != null) {
+                jsonObject.put("campaignId", campaign.getId());
+            } else {
+                jsonObject.put("campaignId", JSONObject.NULL);
+            }
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

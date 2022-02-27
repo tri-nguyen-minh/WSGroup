@@ -90,21 +90,7 @@ public class APIProductCaller {
                         JSONObject jsonObject = response.getJSONObject("data");
                         if(jsonObject != null) {
                             product = Product.getProductFromJSON(jsonObject);
-                            APICampaignCaller.getCampaignByProductId(productId, application, new APIListener() {
-                                @Override
-                                public void onCampaignFound(Campaign campaign) {
-                                    super.onCampaignFound(campaign);
-                                    product.setCampaign(campaign);
-                                    APIListener.onProductFound(product);
-                                }
-
-                                @Override
-                                public void onNoCampaignFound() {
-                                    super.onNoCampaignFound();
-                                    product.setCampaign(null);
-                                    APIListener.onProductFound(product);
-                                }
-                            });
+                            APIListener.onProductFound(product);
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         }

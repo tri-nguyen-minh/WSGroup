@@ -71,7 +71,7 @@ public class DialogBoxOTP extends Dialog {
 
         txtPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phoneNumber)));
         btnConfirmOTP.setEnabled(false);
-        btnConfirmOTP.setBackground(context.getResources().getDrawable(R.color.gray_light));
+        btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.gray_light));
 
         setLabel(false);
         layoutOTPCountdown.setVisibility(View.INVISIBLE);
@@ -187,10 +187,10 @@ public class DialogBoxOTP extends Dialog {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (getOTPString().length() == 6) {
                     btnConfirmOTP.setEnabled(true);
-                    btnConfirmOTP.setBackground(context.getResources().getDrawable(R.color.blue_main));
+                    btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
                 } else {
                     btnConfirmOTP.setEnabled(false);
-                    btnConfirmOTP.setBackground(context.getResources().getDrawable(R.color.gray_light));
+                    btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.gray_light));
                 }
             }
 

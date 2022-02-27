@@ -10,13 +10,14 @@ import java.util.List;
 public class Order implements Serializable {
 
     private List<OrderProduct> orderProductList;
-    private String id, campaignId, customerId, code, status;
+    private String id, code, status, dateCreated, dateUpdated, updateReason;
     private double discountPrice, shippingFee, totalPrice;
     private Supplier supplier;
     private Address address;
+    private Campaign campaign;
     private CustomerDiscount customerDiscount;
     private Payment payment;
-    private String dateCreated, dateUpdated;
+    private boolean inCart;
 
     public Order() {
     }
@@ -37,22 +38,6 @@ public class Order implements Serializable {
         this.id = id;
     }
 
-    public String getCampaignId() {
-        return campaignId;
-    }
-
-    public void setCampaignId(String campaignId) {
-        this.campaignId = campaignId;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
     public String getCode() {
         return code;
     }
@@ -67,6 +52,14 @@ public class Order implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getUpdateReason() {
+        return updateReason;
+    }
+
+    public void setUpdateReason(String updateReason) {
+        this.updateReason = updateReason;
     }
 
     public double getDiscountPrice() {
@@ -109,6 +102,14 @@ public class Order implements Serializable {
         this.address = address;
     }
 
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
+    }
+
     public CustomerDiscount getCustomerDiscount() {
         return customerDiscount;
     }
@@ -141,43 +142,56 @@ public class Order implements Serializable {
         this.dateUpdated = dateUpdated;
     }
 
+    public boolean isInCart() {
+        return inCart;
+    }
+
+    public void setInCart(boolean inCart) {
+        this.inCart = inCart;
+    }
+
     public static Order getOrderFromJSON(JSONObject jsonObject) throws Exception {
         Order order = new Order();
         order.setId(jsonObject.getString("id"));
 
         String stringObject = jsonObject.getString("customerdiscountcodeid");
-        CustomerDiscount customerDiscount = new CustomerDiscount();
-        customerDiscount.setId((!stringObject.equals("null")) ? stringObject : "");
-        order.setCustomerDiscount(customerDiscount);
-
+        if (!stringObject.equals("null")) {
+            CustomerDiscount customerDiscount = new CustomerDiscount();
+            customerDiscount.setId(stringObject);
+            order.setCustomerDiscount(customerDiscount);
+        }
         order.setStatus(jsonObject.getString("status"));
         stringObject = jsonObject.getString("campaignid");
-        order.setCampaignId((!stringObject.equals("null")) ? stringObject : "");
-        stringObject = jsonObject.getString("addressid");
+        if (!stringObject.equals("null")) {
+            Campaign campaign = new Campaign();
+            campaign.setId(stringObject);
+            order.setCampaign(campaign);
+        }
         Address address = new Address();
-        address.setId((!stringObject.equals("null")) ? stringObject : "");
+        address.setId(jsonObject.getString("addressid"));
         address.setAddressString(jsonObject.getString("address"));
         order.setAddress(address);
 
         stringObject = jsonObject.getString("paymentid");
-        Payment payment = new Payment();
-        payment.setId((!stringObject.equals("null")) ? stringObject : "");
-        order.setPayment(payment);
-        order.setDiscountPrice(jsonObject.getDouble("discountprice"));
-        order.setShippingFee(jsonObject.getDouble("shippingfee"));
-        order.setTotalPrice(jsonObject.getDouble("totalprice"));
+        if (!stringObject.equals("null")) {
+            Payment payment = new Payment();
+            payment.setId(stringObject);
+            order.setPayment(payment);
+        }
         order.setDateCreated(jsonObject.getString("createdat"));
         order.setDateUpdated(jsonObject.getString("updatedat"));
-
+        order.setDiscountPrice(jsonObject.getDouble("discountprice"));
+        order.setShippingFee(jsonObject.getDouble("shippingfee"));
         order.setCode(jsonObject.getString("ordercode"));
+        order.setTotalPrice(jsonObject.getDouble("totalprice"));
         Supplier supplier = new Supplier();
         supplier.setId(jsonObject.getString("supplierid"));
         supplier.setName(jsonObject.getString("suppliername"));
         order.setSupplier(supplier);
-
+        order.setUpdateReason(jsonObject.getString("reasonforupdatestatus"));
+        JSONArray jsonArray = jsonObject.getJSONArray("details");
         List<OrderProduct> orderProductList = new ArrayList<>();
         OrderProduct orderProduct;
-        JSONArray jsonArray = jsonObject.getJSONArray("details");
         for (int i = 0; i < jsonArray.length(); i++) {
             orderProduct = OrderProduct.getOrderProductFromJSON(jsonArray.getJSONObject(i));
             orderProductList.add(orderProduct);

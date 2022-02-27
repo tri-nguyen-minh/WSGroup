@@ -36,13 +36,13 @@ public class DialogBoxConfirm extends Dialog {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onYesClicked();
                 dismiss();
+                onYesClicked();
             }
         });
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 dismiss();
             }
         });

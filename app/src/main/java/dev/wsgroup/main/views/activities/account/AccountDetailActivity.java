@@ -315,10 +315,10 @@ public class AccountDetailActivity extends AppCompatActivity {
     private void enableButtonConfirm() {
         if(checkEmptyFields()) {
             btnConfirm.setEnabled(false);
-            btnConfirm.setBackground(getResources().getDrawable(R.color.gray_light));
+            btnConfirm.getBackground().setTint(getResources().getColor(R.color.gray_light));
         } else {
             btnConfirm.setEnabled(true);
-            btnConfirm.setBackground(getResources().getDrawable(R.color.blue_main));
+            btnConfirm.getBackground().setTint(getResources().getColor(R.color.blue_main));
         }
     }
 

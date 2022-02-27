@@ -16,7 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WSGroup"
         android:usesCleartextTraffic="true">
-        <activity android:name=".views.activities.account.DeliveryAddressActivity"></activity>
+        <activity android:name=".views.activities.DiscountActivity"></activity>
+        <activity android:name=".views.activities.productviews.CampaignListActivity" />
+        <activity android:name=".views.activities.productviews.PrepareProductActivity" />
+        <activity android:name=".views.activities.account.DeliveryAddressActivity" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -50,7 +53,7 @@
             android:name=".views.activities.account.AccountInformationActivity"
             android:exported="true" />
         <activity
-            android:name=".views.activities.ProductDetailActivity"
+            android:name=".views.activities.productviews.ProductDetailActivity"
             android:exported="true" />
         <activity
             android:name=".views.activities.account.AccountDetailActivity"

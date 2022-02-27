@@ -15,18 +15,14 @@
         android:background="@color/white">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/blue_main"
-            android:padding="10dp"
-            android:layout_marginBottom="10dp">
+            style="@style/style_header_layout"
+            android:background="@color/blue_main">
 
             <TextView
                 android:id="@+id/lblDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:fontFamily="@font/montserratr"
+                android:fontFamily="@font/montserratm"
                 android:gravity="left"
                 android:text="ADD PHOTOS"
                 android:textColor="@color/white"
@@ -55,7 +51,8 @@
             android:layout_width="match_parent"
             android:textSize="14dp"
             android:paddingVertical="10dp"
-            android:layout_marginVertical="15dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="15dp"
             android:layout_marginHorizontal="15dp"
             android:text="TAKE NEW PHOTO" />
 

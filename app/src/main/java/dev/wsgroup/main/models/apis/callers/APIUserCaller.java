@@ -46,7 +46,6 @@ public class APIUserCaller {
                         user.setToken(data.getString("token"));
                         APIListener.onUserFound(user);
                     } catch (Exception e) {
-                        System.out.println("test parse");
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
                     }

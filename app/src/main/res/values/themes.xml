@@ -13,4 +13,9 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="ratingBar" parent="@android:style/Widget.RatingBar">
+        <item name="colorControlNormal">@color/gray_light</item>
+        <item name="colorControlActivated">@color/gold</item>
+    </style>
 </resources>

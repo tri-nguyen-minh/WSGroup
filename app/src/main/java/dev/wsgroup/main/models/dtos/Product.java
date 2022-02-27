@@ -20,6 +20,7 @@ public class Product implements Serializable {
     private List<String> imageList;
     private List<String> typeList;
     private Campaign campaign;
+    private List<Campaign> campaignList;
 
     public Product() {
     }
@@ -108,6 +109,14 @@ public class Product implements Serializable {
         this.typeList = productTypeList;
     }
 
+    public List<Campaign> getCampaignList() {
+        return campaignList;
+    }
+
+    public void setCampaignList(List<Campaign> campaignList) {
+        this.campaignList = campaignList;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -130,18 +139,18 @@ public class Product implements Serializable {
 
     public void setImageLink(String imageLink) {
         this.imageLink = imageLink;
-        if(!imageLink.isEmpty()) {
-            try {
-                List<String> imageList = new ArrayList<>();
-                JSONArray jsonArray = new JSONArray(imageLink);
+        List<String> imageList = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(imageLink);
+            if(jsonArray.length() > 0) {
                 JSONArray imageArray = jsonArray.getJSONObject(0).getJSONArray("response");
                 for (int i = 0; i < imageArray.length(); i++) {
                     imageList.add(imageArray.getJSONObject(i).getString("url"));
                 }
-                setImageList(imageList);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+            setImageList(imageList);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

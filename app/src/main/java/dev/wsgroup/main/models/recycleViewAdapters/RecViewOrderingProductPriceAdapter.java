@@ -1,5 +1,6 @@
 package dev.wsgroup.main.models.recycleViewAdapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,13 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
-public class RecViewOrderProductPriceAdapter extends RecyclerView.Adapter<RecViewOrderProductPriceAdapter.ViewHolder> {
+public class RecViewOrderingProductPriceAdapter extends RecyclerView.Adapter<RecViewOrderingProductPriceAdapter.ViewHolder> {
 
+    private Context context;
     private List<OrderProduct> orderProductList;
 
-    public RecViewOrderProductPriceAdapter() {
+    public RecViewOrderingProductPriceAdapter(Context context) {
+        this.context = context;
     }
 
     public void setOrderProductList(List<OrderProduct> orderProductList) {
@@ -26,7 +29,7 @@ public class RecViewOrderProductPriceAdapter extends RecyclerView.Adapter<RecVie
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_ordering_product_price, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_ordering_product_price, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }

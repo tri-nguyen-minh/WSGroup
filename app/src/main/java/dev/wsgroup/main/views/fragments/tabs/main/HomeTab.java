@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -53,11 +54,10 @@ public class HomeTab extends Fragment {
     private ImageView imgProductDetailMessage;
 
     private SharedPreferences sharedPreferences;
-    private List<Supplier> supplierList;
-    private HashMap<String, List<CartProduct>> shoppingCart;
+    private List<Supplier> supplierRetailList, supplierCampaignList;
+    private HashMap<String, List<CartProduct>> retailCart, campaignCart;
     private List<CartProduct> productList;
-
-    private String userId, token;
+    private String userId;
     private int cartCount;
 
     @Override
@@ -85,7 +85,6 @@ public class HomeTab extends Fragment {
         cartCount = 0;
         try {
             userId = sharedPreferences.getString("USER_ID", "");
-            token = sharedPreferences.getString("TOKEN", "");
             editCartCountByUser();
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,97 +167,53 @@ public class HomeTab extends Fragment {
         scrollViewHomeFragment.setVisibility(View.INVISIBLE);
     }
 
-    private int getShoppingCartCount() {
-        cartCount = 0;
-        for (Supplier supplier : supplierList) {
-            productList = shoppingCart.get(supplier.getId());
-            cartCount += productList.size();
+    private int getRetailCartCount() {
+        int count = 0;
+        for (Supplier supplier : supplierRetailList) {
+            productList = retailCart.get(supplier.getId());
+            count += productList.size();
         }
-        return cartCount;
+        return count;
     }
 
-    private void setUpShoppingCart(String token) {
-        APICartCaller.getCartList(token, getActivity().getApplication(), new APIListener() {
-            @Override
-            public void onCartListFound(HashMap<String, List<CartProduct>> shoppingCart, List<Supplier> supplierList) {
-                super.onCartListFound(shoppingCart, supplierList);
-                List<String> productIdList = new ArrayList<>();
-                for (Supplier supplier : supplierList) {
-                    productList = shoppingCart.get(supplier.getId());
-                    for (CartProduct product : productList) {
-                        productIdList.add(product.getProduct().getProductId());
-                    }
-                }
-                APICampaignCaller.getCampaignListByProductId(productIdList,null, getActivity().getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        super.onCampaignListFound(campaignList);
-                        for (Campaign campaign : campaignList) {
-                            for (Supplier supplier : supplierList) {
-                                productList = shoppingCart.get(supplier.getId());
-                                for (CartProduct product : productList) {
-                                    if(product.getProduct().getProductId().equals(campaign.getProductId())) {
-                                        product.getProduct().setCampaign(campaign);
-                                    }
-                                }
-                            }
-                        }
-                        putShoppingCartToSession(shoppingCart, supplierList);
-                    }
-
-                    @Override
-                    public void onNoCampaignFound() {
-                        super.onNoCampaignFound();
-                        putShoppingCartToSession(shoppingCart, supplierList);
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        super.onFailedAPICall(code);
-                        putShoppingCartToSession(shoppingCart, supplierList);
-                    }
-                });
-            }
-            @Override
-            public void onFailedAPICall(int code) {
-                super.onFailedAPICall(code);
-                shoppingCart = new HashMap<>();
-                supplierList = new ArrayList<>();
-                putShoppingCartToSession(shoppingCart, supplierList);
-            }
-        });
-    }
-
-    private void putShoppingCartToSession(HashMap<String, List<CartProduct>> shoppingCart, List<Supplier> supplierList) {
-        try {
-            sharedPreferences.edit()
-                    .putString("SHOPPING_CART", ObjectSerializer.serialize((Serializable) shoppingCart))
-                    .commit();
-            sharedPreferences.edit()
-                    .putString("SUPPLIER_LIST", ObjectSerializer.serialize((Serializable) supplierList))
-                    .commit();
-        } catch (IOException e) {
-            e.printStackTrace();
+    private int getCampaignCartCount() {
+        int count = 0;
+        for (Supplier supplier : supplierCampaignList) {
+            productList = campaignCart.get(supplier.getId());
+            count += productList.size();
         }
-        editCartCountByUser();
+        return count;
     }
 
     private void editCartCountByUser() {
         try {
-            supplierList = (ArrayList<Supplier>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("SUPPLIER_LIST", ""));
-            shoppingCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("SHOPPING_CART", ""));
+            retailCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+                    .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
+            campaignCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+                    .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
+            supplierRetailList = (ArrayList<Supplier>) ObjectSerializer
+                    .deserialize(sharedPreferences.getString("SUPPLIER_RETAIL_LIST", ""));
+            supplierCampaignList = (ArrayList<Supplier>) ObjectSerializer
+                    .deserialize(sharedPreferences.getString("SUPPLIER_CAMPAIGN_LIST", ""));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(supplierList == null) {
+        if(supplierRetailList == null && supplierCampaignList == null) {
             cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
-        } else if (supplierList.size() != 0) {
-            cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
-            txtProductDetailCartCount.setText(getShoppingCartCount() + "");
         } else {
-            cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
+            if (supplierRetailList.size() > 0 || supplierCampaignList.size() > 0) {
+                cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
+                cartCount = 0;
+                if (supplierRetailList.size() > 0) {
+                    cartCount += getRetailCartCount();
+                }
+                if (supplierCampaignList.size() > 0) {
+                    cartCount += getCampaignCartCount();
+                }
+                txtProductDetailCartCount.setText(cartCount + "");
+            } else {
+                cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }

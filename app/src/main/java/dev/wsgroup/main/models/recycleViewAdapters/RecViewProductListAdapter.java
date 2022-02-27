@@ -26,8 +26,7 @@ import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.ProductDetailActivity;
-import dev.wsgroup.main.views.activities.account.AccountDetailActivity;
+import dev.wsgroup.main.views.activities.productviews.ProductDetailActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -50,7 +49,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_product_list, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_product_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -79,7 +78,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
 
         String productId = productsList.get(position).getProductId();
         int productOrderCount = 12400;
-        if(productsList.get(position).getImageList() != null) {
+        if(productsList.get(position).getImageList().size() > 0) {
             Glide.with(context).load(productsList.get(position).getImageList().get(0)).into(holder.imgProduct);
         }
         holder.txtCampaign.bringToFront();
@@ -98,7 +97,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
                         super.onProductFound(product);
                         dialogBoxLoading.dismiss();
                         Intent intent = new Intent(activity.getApplicationContext(), ProductDetailActivity.class);
-                        intent.putExtra("PRODUCT", product);
+                        intent.putExtra("PRODUCT_ID", product.getProductId());
                         activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
                     }
 

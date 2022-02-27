@@ -25,6 +25,8 @@
                 android:id="@+id/imgDiscount"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:scaleY="1.2"
+                android:scaleX="1.2"
                 android:src="@drawable/ic_direction_right"
                 android:tint="@color/white"
                 app:layout_constraintRight_toRightOf="parent"
@@ -609,6 +611,8 @@
                             android:id="@+id/imgCampaign"
                             android:layout_width="35dp"
                             android:layout_height="35dp"
+                            android:scaleY="1.2"
+                            android:scaleX="1.2"
                             android:src="@drawable/ic_direction_right"
                             android:layout_marginLeft="5dp"
                             android:visibility="gone"/>

@@ -98,7 +98,6 @@ public class OrderFragment extends Fragment {
             @Override
             public void onFailedAPICall(int code) {
                 super.onFailedAPICall(code);
-                System.out.println("failed");
                 layoutLoading.setVisibility(View.INVISIBLE);
                 layoutNoOrder.setVisibility(View.VISIBLE);
                 layoutOrderView.setVisibility(View.INVISIBLE);

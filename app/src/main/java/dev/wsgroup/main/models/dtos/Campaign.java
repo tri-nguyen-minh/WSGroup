@@ -6,8 +6,9 @@ import java.io.Serializable;
 
 public class Campaign implements Serializable {
     private String id, supplierId, productId, startDate, endDate, code, status, description;
-    private int quantity, orderCount, quantityCount;
+    private int minQuantity, maxQuantity, orderCount, quantityCount;
     private double savingPrice;
+    private boolean shareFlag;
 
     public Campaign() {
     }
@@ -60,12 +61,20 @@ public class Campaign implements Serializable {
         this.code = code;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getMinQuantity() {
+        return minQuantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setMinQuantity(int minQuantity) {
+        this.minQuantity = minQuantity;
+    }
+
+    public int getMaxQuantity() {
+        return maxQuantity;
+    }
+
+    public void setMaxQuantity(int maxQuantity) {
+        this.maxQuantity = maxQuantity;
     }
 
     public int getOrderCount() {
@@ -108,6 +117,14 @@ public class Campaign implements Serializable {
         this.description = description;
     }
 
+    public boolean getShareFlag() {
+        return shareFlag;
+    }
+
+    public void setShareFlag(boolean shareFlag) {
+        this.shareFlag = shareFlag;
+    }
+
     public static Campaign getCampaignFromJSON(JSONObject data) throws Exception {
         Campaign campaign = new Campaign();
         campaign.setId(data.getString("id"));
@@ -116,12 +133,14 @@ public class Campaign implements Serializable {
         campaign.setCode(data.getString("code"));
         campaign.setStartDate(data.getString("fromdate"));
         campaign.setEndDate(data.getString("todate"));
-        campaign.setQuantity(data.getInt("quantity"));
+        campaign.setMinQuantity(data.getInt("quantity"));
+        campaign.setMaxQuantity(data.getInt("maxquantity"));
         campaign.setSavingPrice(data.getDouble("price"));
         campaign.setStatus(data.getString("status"));
         campaign.setDescription(data.getString("description"));
         campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
         campaign.setOrderCount(data.getInt("numorderwaiting"));
+        campaign.setShareFlag(data.getBoolean("isshare"));
         return campaign;
     }
 

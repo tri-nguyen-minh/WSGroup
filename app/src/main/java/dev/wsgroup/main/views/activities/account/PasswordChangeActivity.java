@@ -216,10 +216,10 @@ public class PasswordChangeActivity extends AppCompatActivity {
     private void enableButtonUpdate() {
         if(checkEmptyFields() || !checkMatchingPassword()) {
             btnSaveEdit.setEnabled(false);
-            btnSaveEdit.setBackground(getResources().getDrawable(R.color.gray_light));
+            btnSaveEdit.getBackground().setTint(getResources().getColor(R.color.gray_light));
         } else {
             btnSaveEdit.setEnabled(true);
-            btnSaveEdit.setBackground(getResources().getDrawable(R.color.blue_main));
+            btnSaveEdit.getBackground().setTint(getResources().getColor(R.color.blue_main));
         }
     }
 

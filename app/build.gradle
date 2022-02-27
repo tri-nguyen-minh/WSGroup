@@ -58,7 +58,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage'
     implementation 'androidx.browser:browser:1.3.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
-//    implementation 'com.github.PayME-Tech:PayME-SDK-Android:0.9.37'
+    implementation 'me.zhanghai.android.materialratingbar:library:1.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     testImplementation 'junit:junit:4.+'

@@ -50,7 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="7dp">
 
             <TextView
                 android:id="@+id/lblSorting"
@@ -61,7 +62,7 @@
                 android:gravity="center|left"
                 android:text="Sort by"
                 android:textColor="@color/gray_dark"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -70,10 +71,10 @@
                 android:id="@+id/spinnerSorting"
                 style="@style/Widget.AppCompat.Spinner"
                 android:layout_width="160dp"
-                android:layout_height="?attr/dropdownListPreferredItemHeight"
+                android:layout_height="40dp"
                 android:background="@drawable/spinner_background"
                 android:dropDownWidth="match_parent"
-                android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
+                android:dropDownVerticalOffset="40dp"
                 android:popupBackground="@android:color/white"
                 android:popupElevation="10dp"
                 android:stateListAnimator="@drawable/spinner_anim"

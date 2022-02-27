@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderProduct implements Serializable {
-    private String id, productId, productType, note,
-            campaignId, addressId, paymentId, status;
+    private String id, productType, note, orderCode;
     private int quantity;
     private double price, totalPrice;
     private Product product;
+    private Campaign campaign;
     private CartProduct cartProduct;
     private List<String> typeList;
+    private boolean inCampaign;
 
     public OrderProduct() {
     }
@@ -24,14 +25,6 @@ public class OrderProduct implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
     }
 
     public String getProductType() {
@@ -56,36 +49,12 @@ public class OrderProduct implements Serializable {
         this.note = note;
     }
 
-    public String getCampaignId() {
-        return campaignId;
+    public String getOrderCode() {
+        return orderCode;
     }
 
-    public void setCampaignId(String campaignId) {
-        this.campaignId = campaignId;
-    }
-
-    public String getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(String addressId) {
-        this.addressId = addressId;
-    }
-
-    public String getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(String paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
     }
 
     public int getQuantity() {
@@ -120,6 +89,14 @@ public class OrderProduct implements Serializable {
         this.product = product;
     }
 
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
+    }
+
     public CartProduct getCartProduct() {
         return cartProduct;
     }
@@ -136,6 +113,14 @@ public class OrderProduct implements Serializable {
         this.typeList = typeList;
     }
 
+    public boolean getInCampaign() {
+        return inCampaign;
+    }
+
+    public void setInCampaign(boolean inCampaign) {
+        this.inCampaign = inCampaign;
+    }
+
     public static OrderProduct getOrderProductFromJSON(JSONObject jsonObject) throws Exception {
         OrderProduct orderProduct = new OrderProduct();
         orderProduct.setId(jsonObject.getString("id"));
@@ -143,13 +128,19 @@ public class OrderProduct implements Serializable {
         orderProduct.setPrice(jsonObject.getDouble("price"));
         orderProduct.setTotalPrice(jsonObject.getDouble("totalprice"));
         orderProduct.setQuantity(jsonObject.getInt("quantity"));
+        orderProduct.setOrderCode(jsonObject.getString("ordercode"));
         Product product = new Product();
-        product.setImageLink(jsonObject.getString("image"));
         product.setProductId(jsonObject.getString("productid"));
+        product.setImageLink(jsonObject.getString("image"));
         product.setName(jsonObject.getString("productname"));
         orderProduct.setProduct(product);
-        String jsonString = jsonObject.getString("typeofproduct");
-        orderProduct.setProductType((jsonString != null) ? jsonString : "");
+        orderProduct.setInCampaign(jsonObject.getBoolean("incampaign"));
+        String stringObject = jsonObject.getString("campaignid");
+        if (!stringObject.equals("null")) {
+            Campaign campaign = new Campaign();
+            campaign.setId(stringObject);
+            orderProduct.setCampaign(campaign);
+        }
         return orderProduct;
     }
 }

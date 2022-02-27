@@ -1,6 +1,7 @@
 package dev.wsgroup.main.views.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -8,11 +9,8 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -21,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
@@ -43,13 +42,12 @@ public class MainActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private FrameLayout frameLayoutMainTabLayout;
     private View viewCommon;
+    private ConstraintLayout layoutMainPage, layoutLoading;
 
     private SharedPreferences sharedPreferences;
-    private List<Supplier> supplierList;
-    private HashMap<String, List<CartProduct>> shoppingCart;
-    private List<CartProduct> productList;
+    private List<Supplier> supplierRetailList, supplierCampaignList;
+    private HashMap<String, List<CartProduct>> retailCart, campaignCart;
 
     private String userId, token;
     private int tabPosition;
@@ -62,18 +60,19 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = findViewById(R.id.mainTabLayout);
         viewPager = findViewById(R.id.mainViewPager);
-        frameLayoutMainTabLayout = findViewById(R.id.frameLayoutMainTabLayout);
+        layoutMainPage = findViewById(R.id.layoutMainPage);
+        layoutLoading = findViewById(R.id.layoutLoading);
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
         tabPosition = getIntent().getIntExtra("MAIN_TAB_POSITION", 0);
-        frameLayoutMainTabLayout.setVisibility(View.GONE);
+
+        layoutMainPage.setVisibility(View.INVISIBLE);
+        layoutLoading.setVisibility(View.VISIBLE);
 
         if(userId.isEmpty()) {
             setupTabLayout(0);
         } else {
-//            String username = sharedPreferences.getString("USERNAME", "");
-//            String password = sharedPreferences.getString("PASSWORD", "");
             token = sharedPreferences.getString("TOKEN", "");
             APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
                 @Override
@@ -98,62 +97,33 @@ public class MainActivity extends AppCompatActivity {
         token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
-            public void onCartListFound(HashMap<String, List<CartProduct>> shoppingCart, List<Supplier> supplierList) {
-                super.onCartListFound(shoppingCart, supplierList);
-                List<String> productIdList = new ArrayList<>();
-                for (Supplier supplier : supplierList) {
-                    productList = shoppingCart.get(supplier.getId());
-                    for (CartProduct product : productList) {
-                        productIdList.add(product.getProduct().getProductId());
-                    }
-                }
-                APICampaignCaller.getCampaignListByProductId(productIdList,null, getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        super.onCampaignListFound(campaignList);
-                        for (Campaign campaign : campaignList) {
-                            for (Supplier supplier : supplierList) {
-                                productList = shoppingCart.get(supplier.getId());
-                                for (CartProduct product : productList) {
-                                    if(product.getProduct().getProductId().equals(campaign.getProductId())) {
-                                        product.getProduct().setCampaign(campaign);
-                                    }
-                                }
-                            }
-                        }
-                        putSessionCart(shoppingCart, supplierList, tabPosition);
-                    }
-
-                    @Override
-                    public void onNoCampaignFound() {
-                        super.onNoCampaignFound();
-                        putSessionCart(shoppingCart, supplierList, tabPosition);
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        super.onFailedAPICall(code);
-                        putSessionCart(shoppingCart, supplierList, tabPosition);
-                    }
-                });
+            public void onCartListFound(HashMap<String, List<CartProduct>> rCart, List<Supplier> rList,
+                                        HashMap<String, List<CartProduct>> cCart, List<Supplier> cList) {
+                retailCart = rCart;
+                campaignCart = cCart;
+                supplierRetailList = rList;
+                supplierCampaignList = cList;
+                putSessionCart(tabPosition);
             }
             @Override
             public void onFailedAPICall(int code) {
                 super.onFailedAPICall(code);
-                shoppingCart = new HashMap<>();
-                supplierList = new ArrayList<>();
-                putSessionCart(shoppingCart, supplierList, tabPosition);
+                retailCart = new HashMap<>();
+                campaignCart = new HashMap<>();
+                supplierRetailList = new ArrayList<>();
+                supplierCampaignList = new ArrayList<>();
+                putSessionCart(tabPosition);
             }
         });
     }
 
-    private void putSessionCart(HashMap<String, List<CartProduct>> shoppingCart, List<Supplier> supplierList, int tabPosition) {
+    private void putSessionCart(int tabPosition) {
         try {
             sharedPreferences.edit()
-                    .putString("SHOPPING_CART", ObjectSerializer.serialize((Serializable) shoppingCart))
-                    .commit();
-            sharedPreferences.edit()
-                    .putString("SUPPLIER_LIST", ObjectSerializer.serialize((Serializable) supplierList))
+                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCart))
+                    .putString("SUPPLIER_RETAIL_LIST", ObjectSerializer.serialize((Serializable) supplierRetailList))
+                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCart))
+                    .putString("SUPPLIER_CAMPAIGN_LIST", ObjectSerializer.serialize((Serializable) supplierCampaignList))
                     .commit();
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,9 +132,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupTabLayout(int tabPosition) {
-        viewPager.setVisibility(View.VISIBLE);
-        tabLayout.setVisibility(View.VISIBLE);
-        frameLayoutMainTabLayout.setVisibility(View.VISIBLE);
+        layoutMainPage.setVisibility(View.VISIBLE);
+        layoutLoading.setVisibility(View.INVISIBLE);
         tabLayout.removeAllTabs();
         viewPager.setAdapter(null);
 
@@ -187,17 +156,14 @@ public class MainActivity extends AppCompatActivity {
 
         viewCommon = getLayoutInflater().inflate(R.layout.custom_tab, null);
         viewCommon.findViewById(R.id.icon).setBackgroundResource(R.drawable.ic_home);
-//        ((TextView)viewCommon.findViewById(R.id.text)).setText("Home");
         tabLayout.addTab(tabLayout.newTab().setCustomView(viewCommon));
 
         viewCommon = getLayoutInflater().inflate(R.layout.custom_tab, null);
         viewCommon.findViewById(R.id.icon).setBackgroundResource(R.drawable.ic_history);
-//        ((TextView)viewCommon.findViewById(R.id.text)).setText("History");
         tabLayout.addTab(tabLayout.newTab().setCustomView(viewCommon));
 
         viewCommon = getLayoutInflater().inflate(R.layout.custom_tab, null);
         viewCommon.findViewById(R.id.icon).setBackgroundResource(R.drawable.ic_profile);
-//        ((TextView)viewCommon.findViewById(R.id.text)).setText("Profile");
         tabLayout.addTab(tabLayout.newTab().setCustomView(viewCommon));
 
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
@@ -231,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.clearOnTabSelectedListeners();
         viewPager.clearOnPageChangeListeners();
         viewPager.setEnabled(false);
-        viewPager.setOffscreenPageLimit(0);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -252,8 +217,8 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getIcon() != null)
-                    tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+//                if (tab.getIcon() != null)
+//                    tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
@@ -269,9 +234,8 @@ public class MainActivity extends AppCompatActivity {
         if(resultCode == RESULT_CANCELED) {
             tabLayout.selectTab(tabLayout.getTabAt(0));
         } else if (resultCode == RESULT_OK) {
-            viewPager.setVisibility(View.GONE);
-            tabLayout.setVisibility(View.GONE);
-            frameLayoutMainTabLayout.setVisibility(View.GONE);
+            layoutMainPage.setVisibility(View.INVISIBLE);
+            layoutLoading.setVisibility(View.VISIBLE);
             sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
             userId = sharedPreferences.getString("USER_ID", "");
             tabPosition = 0;

@@ -20,7 +20,7 @@
         <item name="android:backgroundTint">@color/blue_main</item>
         <item name="android:gravity">center</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">@font/montserratr</item>
+        <item name="android:fontFamily">@font/montserratm</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
@@ -32,7 +32,7 @@
         <item name="android:backgroundTint">@color/blue_main</item>
         <item name="android:gravity">center</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">@font/montserratr</item>
+        <item name="android:fontFamily">@font/montserratm</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
@@ -60,15 +60,11 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/background_otp</item>
-        <item name="android:layout_marginHorizontal">5dp</item>
-        <item name="android:paddingVertical">10dp</item>
-        <item name="android:paddingHorizontal">15dp</item>
-        <item name="android:fontFamily">@font/montserratr</item>
+        <item name="android:fontFamily">@font/montserrat</item>
         <item name="android:gravity">center</item>
-        <item name="android:inputType">number</item>
-        <item name="android:textColor">@color/gray_dark</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:textColorHint">@color/gray</item>
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="style_label_account_info">
@@ -99,8 +95,39 @@
     </style>
 
     <style name="style_icon">
-        <item name="android:layout_width">35dp</item>
-        <item name="android:layout_height">35dp</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+    </style>
+
+    <style name="style_header_layout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingVertical">7dp</item>
+        <item name="android:paddingHorizontal">15dp</item>
+        <item name="android:background">@color/blue_main</item>
+    </style>
+
+    <style name="style_background_header">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingHorizontal">15dp</item>
+        <item name="android:fontFamily">@font/montserratr</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="style_empty_note">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/montserratr</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

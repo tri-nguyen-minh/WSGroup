@@ -1,6 +1,5 @@
 package dev.wsgroup.main.models.dtos;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -8,11 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CartProduct implements Serializable {
-    private String id, productType, campaignId;
+    private String id, productType;
     private List<String> typeList;
     private int quantity;
     private Product product;
-    private boolean selected, selectableFlag;
+    private Campaign campaign;
+    private boolean selectedFlag, selectableFlag, campaignFlag;
 
     public CartProduct() {
 
@@ -48,12 +48,12 @@ public class CartProduct implements Serializable {
         this.typeList = productTypeList;
     }
 
-    public boolean getSelected() {
-        return selected;
+    public boolean getSelectedFlag() {
+        return selectedFlag;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void setSelectedFlag(boolean selectedFlag) {
+        this.selectedFlag = selectedFlag;
     }
 
     public boolean getSelectableFlag() {
@@ -64,6 +64,14 @@ public class CartProduct implements Serializable {
         this.selectableFlag = selectableFlag;
     }
 
+    public boolean getCampaignFlag() {
+        return campaignFlag;
+    }
+
+    public void setCampaignFlag(boolean campaignFlag) {
+        this.campaignFlag = campaignFlag;
+    }
+
     public Product getProduct() {
         return product;
     }
@@ -72,12 +80,12 @@ public class CartProduct implements Serializable {
         this.product = product;
     }
 
-    public String getCampaignId() {
-        return campaignId;
+    public Campaign getCampaign() {
+        return campaign;
     }
 
-    public void setCampaignId(String campaignId) {
-        this.campaignId = campaignId;
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
     }
 
     public List<String> getTypeList() {
@@ -90,21 +98,23 @@ public class CartProduct implements Serializable {
 
     public static CartProduct getCartProductFromJSON(JSONObject jsonObject) throws Exception {
         CartProduct cartProduct = new CartProduct();
-        Product product = new Product();
-        Supplier supplier = new Supplier();
         cartProduct.setId(jsonObject.getString("id"));
         cartProduct.setQuantity(jsonObject.getInt("quantity"));
         cartProduct.setProductType(jsonObject.getString("typeofproduct"));
-        cartProduct.setCampaignId("");
+        cartProduct.setCampaignFlag(jsonObject.getBoolean("incampaign"));
+        if (cartProduct.getCampaignFlag()) {
+            Campaign campaign = new Campaign();
+            campaign.setId(jsonObject.getString("campaignid"));
+            cartProduct.setCampaign(campaign);
+        }
         cartProduct.setSelectableFlag(true);
+        Product product = new Product();
         product.setProductId(jsonObject.getString("productid"));
         product.setName(jsonObject.getString("productname"));
         product.setRetailPrice(jsonObject.getDouble("productretailprice"));
         product.setQuantity(jsonObject.getInt("productquantity"));
-        if (product.getQuantity() < cartProduct.getQuantity()) {
-            cartProduct.setQuantity(product.getQuantity());
-        }
         product.setImageLink(jsonObject.getString("productimage"));
+        Supplier supplier = new Supplier();
         supplier.setId(jsonObject.getString("supplierid"));
         supplier.setName(jsonObject.getString("suppliername"));
         supplier.setAddress(jsonObject.getString("supplieraddress"));

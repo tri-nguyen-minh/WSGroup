@@ -3,7 +3,6 @@ package dev.wsgroup.main.models.recycleViewAdapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -46,7 +45,7 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_view_order_list, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_order_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -62,12 +61,12 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
         int productCount = orderList.get(position).getOrderProductList().size();
         holder.txtProductCount.setText(productCount + "");
         holder.lblProduct.setText((productCount == 1) ? "product" : "products");
-        if (!orderList.get(position).getCustomerDiscount().getId().isEmpty()) {
+        if (orderList.get(position).getCustomerDiscount() != null) {
             holder.constraintLayoutDiscount.setVisibility(View.VISIBLE);
             holder.txtDiscountPrice.setText(MethodUtils.formatPriceString(orderList.get(position).getDiscountPrice()));
 
         }
-        if (orderList.get(position).getPayment().getId().isEmpty()) {
+        if (orderList.get(position).getPayment() == null) {
             holder.txtPayment.setText("Payment on Delivery");
         } else {
 
@@ -85,7 +84,7 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
             holder.constraintLayoutCancelDate.setVisibility(View.VISIBLE);
             holder.txtCancelDate.setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
         }
-        RecViewOrderProductPriceAdapter adapter = new RecViewOrderProductPriceAdapter();
+        RecViewOrderingProductPriceAdapter adapter = new RecViewOrderingProductPriceAdapter(context);
         adapter.setOrderProductList(orderList.get(position).getOrderProductList());
         holder.recViewOrderProduct.setAdapter(adapter);
         holder.recViewOrderProduct.setLayoutManager(new LinearLayoutManager(context,
@@ -98,8 +97,9 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 Order order = orderList.get(position);
-                if (!order.getCampaignId().isEmpty()) {
-                    APICampaignCaller.getCampaignById(order.getCampaignId(), activity.getApplication(), new APIListener() {
+                if (order.getCampaign() != null) {
+                    APICampaignCaller.getCampaignById(order.getCampaign().getId(), activity.getApplication(),
+                                                new APIListener() {
                         @Override
                         public void onCampaignFound(Campaign campaign) {
                             super.onCampaignFound(campaign);

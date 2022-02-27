@@ -2,7 +2,6 @@ package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,15 +60,15 @@ public class DialogBoxCampaign extends Dialog {
         txtCampaignNote.setText(campaign.getDescription());
         txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
         txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
-        txtCampaignQuantityBar.setText(campaign.getQuantity() + "");
-        txtCampaignQuantity.setText(campaign.getQuantity() + "");
+        txtCampaignQuantityBar.setText(campaign.getMinQuantity() + "");
+        txtCampaignQuantity.setText(campaign.getMinQuantity() + "");
         if (campaign.getOrderCount() > 1) {
             lblProductOrderCount.setText("waiting orders");
         } else {
             lblProductOrderCount.setText("waiting order");
         }
         lblCampaignQuantitySeparator.setText("/");
-        progressBarQuantityCount.setMax(campaign.getQuantity());
+        progressBarQuantityCount.setMax(campaign.getMinQuantity());
         progressBarQuantityCount.setProgress(campaign.getQuantityCount());
         layoutCampaign.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -4,37 +4,28 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Review implements Serializable {
-    private String reviewId, userId, productId, description;
+    private String id, orderId, productId, description;
     private double rating;
-    private List<String> imageList;
-    private boolean deletedStatus;
-
-    public Review(String reviewId, String userId, String productId, String description, List<String> imageList, boolean deletedStatus) {
-        this.reviewId = reviewId;
-        this.userId = userId;
-        this.productId = productId;
-        this.description = description;
-        this.imageList = imageList;
-        this.deletedStatus = deletedStatus;
-    }
+    private User user;
+    private String createDate, updateDate;
 
     public Review() {
     }
 
-    public String getReviewId() {
-        return reviewId;
+    public String getId() {
+        return id;
     }
 
-    public void setReviewId(String reviewId) {
-        this.reviewId = reviewId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public String getProductId() {
@@ -49,7 +40,11 @@ public class Review implements Serializable {
         return description;
     }
 
-    public double getRating()    {
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getRating() {
         return rating;
     }
 
@@ -57,23 +52,27 @@ public class Review implements Serializable {
         this.rating = rating;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public User getUser() {
+        return user;
     }
 
-    public List<String> getImageList() {
-        return imageList;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public void setImageList(List<String> imageList) {
-        this.imageList = imageList;
+    public String getCreateDate() {
+        return createDate;
     }
 
-    public boolean isDeletedStatus() {
-        return deletedStatus;
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
     }
 
-    public void setDeletedStatus(boolean deletedStatus) {
-        this.deletedStatus = deletedStatus;
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

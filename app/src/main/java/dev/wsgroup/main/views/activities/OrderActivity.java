@@ -17,7 +17,6 @@ import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderProductListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
 
 public class OrderActivity extends AppCompatActivity {
 

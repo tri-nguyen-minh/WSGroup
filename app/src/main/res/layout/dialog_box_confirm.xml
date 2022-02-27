@@ -22,10 +22,9 @@
             android:gravity="center"
             android:layout_marginBottom="15dp"
             android:fontFamily="@font/montserratr"
-            android:text=""
+            android:text="This product is already\nin your shopping cart.\nReplace it?"
             android:textColor="@color/black"
-            android:textSize="18dp"
-            android:textStyle="bold"/>
+            android:textSize="18dp"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

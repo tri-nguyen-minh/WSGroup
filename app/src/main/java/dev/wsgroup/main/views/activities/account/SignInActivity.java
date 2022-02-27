@@ -65,7 +65,7 @@ public class SignInActivity extends AppCompatActivity {
 
         editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         btnSignIn.setEnabled(false);
-        btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
+        btnSignIn.getBackground().setTint(getResources().getColor(R.color.gray_light));
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -77,10 +77,10 @@ public class SignInActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!checkEmptyField()) {
                     btnSignIn.setEnabled(true);
-                    btnSignIn.setBackground(getResources().getDrawable(R.color.blue_main));
+                    btnSignIn.getBackground().setTint(getResources().getColor(R.color.blue_main));
                 } else {
                     btnSignIn.setEnabled(false);
-                    btnSignIn.setBackground(getResources().getDrawable(R.color.gray_light));
+                    btnSignIn.getBackground().setTint(getResources().getColor(R.color.gray_light));
                 }
             }
 

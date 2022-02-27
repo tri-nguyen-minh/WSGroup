@@ -30,8 +30,10 @@ public class APICampaignCaller {
 
     private static RequestQueue requestQueue;
     private static List<Campaign> campaignList;
+    private static Map<String, List<Campaign>> campaignMap;
 
-    public static void getCampaignByProductId(String productId, Application application, APIListener APIListener) {
+    public static void getCampaignListByProductId(String productId, String status, List<Campaign> list,
+                                                  Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -41,19 +43,26 @@ public class APICampaignCaller {
             JSONArray jsonArray = new JSONArray();
             jsonArray.put(productId);
             jsonObject.put("productIds", jsonArray);
+            jsonObject.put("status", status);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
                         JSONArray data = response.getJSONArray("data");
                         if(data.length() > 0) {
-                            Campaign campaign = Campaign.getCampaignFromJSON(data.getJSONObject(0));
-                            APIListener.onCampaignFound(campaign);
+                            campaignList = (list == null) ? new ArrayList<>() : list;
+                            Campaign campaign;
+                            for (int i = 0; i < data.length(); i++) {
+                                campaign = Campaign.getCampaignFromJSON(data.getJSONObject(i));
+                                campaignList.add(campaign);
+                            }
+                            APIListener.onCampaignListFound(campaignList);
                         } else {
                             APIListener.onNoCampaignFound();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        APIListener.onNoCampaignFound();
                     }
                 }
             };
@@ -78,7 +87,8 @@ public class APICampaignCaller {
         }
     }
 
-    public static void getCampaignListByProductId(List<String> productIdList, List<Campaign> list, Application application, APIListener APIListener) {
+    public static void getCampaignListByProductIdList(List<String> productIdList, Map<String, List<Campaign>> map,
+                                                      Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -95,19 +105,27 @@ public class APICampaignCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONArray data = response.getJSONArray("data");
+                        campaignMap = (map == null) ? new HashMap<>() : map;
                         if(data.length() > 0) {
-                            campaignList = (list == null) ? new ArrayList<>() : list;
+                            campaignMap = new HashMap<>();
                             Campaign campaign;
+                            String productId;
                             for (int i = 0; i < data.length(); i++) {
                                 campaign = Campaign.getCampaignFromJSON(data.getJSONObject(i));
+                                campaignList = campaignMap.get(campaign.getProductId());
+                                if (campaignList == null) {
+                                    campaignList = new ArrayList<>();
+                                }
                                 campaignList.add(campaign);
+                                campaignMap.put(campaign.getProductId(), campaignList);
                             }
-                            APIListener.onCampaignListFound(campaignList);
+                            APIListener.onCampaignMapFound(campaignMap);
                         } else {
                             APIListener.onNoCampaignFound();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        APIListener.onNoCampaignFound();
                     }
                 }
             };
@@ -142,15 +160,16 @@ public class APICampaignCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        JSONObject data = response.getJSONObject("data");
-                        if(data!= null) {
-                            Campaign campaign = Campaign.getCampaignFromJSON(data);
+                        JSONArray data = response.getJSONArray("data");
+                        if(data.length() > 0) {
+                            Campaign campaign = Campaign.getCampaignFromJSON(data.getJSONObject(0));
                             APIListener.onCampaignFound(campaign);
                         } else {
                             APIListener.onNoCampaignFound();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                     }
                 }
             };
