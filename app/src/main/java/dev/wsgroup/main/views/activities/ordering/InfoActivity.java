@@ -14,9 +14,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIAddressCaller;
 import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
+import dev.wsgroup.main.models.apis.callers.APIPaymentCaller;
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
@@ -40,6 +44,7 @@ import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.DeliveryAddressSelectActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
+import dev.wsgroup.main.views.dialogbox.DialogBoxPayment;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class InfoActivity extends AppCompatActivity {
@@ -51,6 +56,7 @@ public class InfoActivity extends AppCompatActivity {
             txtDiscountPrice, txtFinalPrice, txtDeliveryPrice, lblDiscountPrice;
     private RecyclerView recViewOrderProductPrice;
     private Button btnConfirmOrder;
+    private Spinner spinnerPayment;
 
     private DialogBoxLoading dialogBoxLoading;
     private DialogBoxConfirm dialogBoxConfirm;
@@ -67,6 +73,7 @@ public class InfoActivity extends AppCompatActivity {
     private ArrayList<Order> orderList;
     private int requestCode;
     private Campaign campaign;
+    private final String[] paymentData = {"Payment on Delivery", "Payment via VNPay"};
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -91,6 +98,7 @@ public class InfoActivity extends AppCompatActivity {
         lblDiscountPrice = findViewById(R.id.lblDiscountPrice);
         recViewOrderProductPrice = findViewById(R.id.recViewOrderProductPrice);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
+        spinnerPayment = findViewById(R.id.spinnerPayment);
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         phone = sharedPreferences.getString("PHONE", "");
@@ -98,6 +106,8 @@ public class InfoActivity extends AppCompatActivity {
 
         orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
         requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
+
+        setupSpinner();
 
         APIAddressCaller.getDefaultAddress(token, getApplication(), new APIListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -195,10 +205,8 @@ public class InfoActivity extends AppCompatActivity {
                 dialogBoxConfirm.show();
             }
         });
-
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setupConfirmAddress() {
         if (currentAddress != null) {
             txtDeliveryAddress.setText(currentAddress.getAddressString());
@@ -210,6 +218,34 @@ public class InfoActivity extends AppCompatActivity {
             txtDeliveryAddress.setTextColor(getResources().getColor(R.color.gray));
             btnConfirmOrder.setEnabled(false);
             btnConfirmOrder.getBackground().setTint(getResources().getColor(R.color.gray_light));
+        }
+    }
+    private void setupSpinner() {
+
+        ArrayAdapter adapter =
+                new ArrayAdapter<String>(InfoActivity.this, R.layout.spinner_selected_item, paymentData);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+
+        spinnerPayment.setAdapter(adapter);
+        spinnerPayment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int positionInt, long positionLong) {
+                paymentMethodSelected(positionInt);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        spinnerPayment.setSelection(0);
+    }
+
+    private void paymentMethodSelected(int position) {
+        if (position == 0) {
+            btnConfirmOrder.setText("PLACE ORDER");
+        } else {
+            btnConfirmOrder.setText("CHECKOUT WITH VNPAY");
         }
     }
 
@@ -248,7 +284,7 @@ public class InfoActivity extends AppCompatActivity {
                         @Override
                         public void onOrderSuccessful(Order result) {
                             super.onOrderSuccessful(result);
-                            System.out.println(orderCount);
+                            order = result;
                             onSuccessfulOrder();
                         }
                     });
@@ -261,8 +297,31 @@ public class InfoActivity extends AppCompatActivity {
             System.out.println("checking");
             orderCount--;
             if (orderCount == 0) {
-                displaySuccessfulMessage();
+                processPayment();
             }
+        } else {
+            processPayment();
+        }
+    }
+
+    private void processPayment() {
+        if (spinnerPayment.getSelectedItemPosition() == 1) {
+            APIPaymentCaller.getPaymentURL(order, getApplication(), new APIListener() {
+                @Override
+                public void onGettingPaymentURL(String url) {
+                    super.onGettingPaymentURL(url);
+                    DialogBoxPayment dialogBox
+                            = new DialogBoxPayment(InfoActivity.this, url, order) {
+                        @Override
+                        public void onCompletedPayment() {
+                            super.onCompletedPayment();
+                            displaySuccessfulMessage();
+                        }
+                    };
+                    dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialogBox.show();
+                }
+            });
         } else {
             displaySuccessfulMessage();
         }

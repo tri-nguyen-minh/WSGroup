@@ -148,10 +148,11 @@ public class Product implements Serializable {
                     imageList.add(imageArray.getJSONObject(i).getString("url"));
                 }
             }
-            setImageList(imageList);
         } catch (Exception e) {
             e.printStackTrace();
+            imageList = new ArrayList<>();
         }
+        setImageList(imageList);
     }
 
     public List<String> getTypeList() {

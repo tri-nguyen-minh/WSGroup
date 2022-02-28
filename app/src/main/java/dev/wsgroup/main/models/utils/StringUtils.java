@@ -9,6 +9,8 @@ public class StringUtils {
     public static final String CAMPAIGN_API_URL = BASE_URL + "api/campaigns/";
     public static final String ORDER_API_URL = BASE_URL + "api/order/";
     public static final String ADDRESS_API_URL = BASE_URL + "api/address/";
+    public static final String REVIEW_API_URL = BASE_URL + "api/comment/";
+    public static final String PAYMENT_API_URL = BASE_URL + "api/payment/";
 
     public static final String LOGIN_URL = USER_API_URL + "login";
     public static final String REGISTER_URL = USER_API_URL + "register";

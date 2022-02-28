@@ -77,7 +77,8 @@ public class OrderFragment extends Fragment {
         
         setupSpinner();
 
-        APIOrderCaller.getOrderByStatus(token, orderStatus,null, getActivity().getApplication(), new APIListener() {
+        APIOrderCaller.getOrderByStatus(token, orderStatus, currentOrderList,
+                    getActivity().getApplication(), new APIListener() {
             @Override
             public void onOrderFound(List<Order> orderList) {
                 super.onOrderFound(orderList);
@@ -86,8 +87,8 @@ public class OrderFragment extends Fragment {
                     layoutLoading.setVisibility(View.INVISIBLE);
                     layoutNoOrder.setVisibility(View.INVISIBLE);
                     layoutOrderView.setVisibility(View.VISIBLE);
-                    sortByCreate(currentOrderList, false);
-                    setupOrderList(currentOrderList);
+                    sortByCreate(false);
+                    setupOrderList();
                 } else {
                     layoutLoading.setVisibility(View.INVISIBLE);
                     layoutNoOrder.setVisibility(View.VISIBLE);
@@ -121,15 +122,15 @@ public class OrderFragment extends Fragment {
                     case 1: {
 //                        sortByUpdate(currentOrderList, false);
                         if (currentOrderList != null) {
-                            sortByCreate(currentOrderList, true);
-                            setupOrderList(currentOrderList);
+                            sortByCreate(true);
+                            setupOrderList();
                         }
                         break;
                     }
                     default: {
                         if (currentOrderList != null) {
-                            sortByCreate(currentOrderList, false);
-                            setupOrderList(currentOrderList);
+                            sortByCreate(false);
+                            setupOrderList();
                         }
                         break;
                     }
@@ -143,7 +144,7 @@ public class OrderFragment extends Fragment {
         });
     }
 
-    private void sortByCreate(List<Order> currentOrderList, boolean sortAscending) {
+    private void sortByCreate(boolean sortAscending) {
         Collections.sort(currentOrderList, new Comparator<Order>() {
             @Override
             public int compare(Order order1, Order order2) {
@@ -187,9 +188,9 @@ public class OrderFragment extends Fragment {
         });
     }
 
-    private void setupOrderList(List<Order> orderList) {
+    private void setupOrderList() {
         adapter = new RecViewOrderListAdapter(getContext(), getActivity());
-        adapter.setOrderList(orderList);
+        adapter.setOrderList(currentOrderList);
         recViewOrderView.setAdapter(adapter);
         recViewOrderView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recViewOrderView.setVisibility(View.VISIBLE);

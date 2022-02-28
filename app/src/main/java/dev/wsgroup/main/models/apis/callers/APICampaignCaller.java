@@ -58,11 +58,11 @@ public class APICampaignCaller {
                             }
                             APIListener.onCampaignListFound(campaignList);
                         } else {
-                            APIListener.onNoCampaignFound();
+                            APIListener.onNoJSONFound();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        APIListener.onNoCampaignFound();
+                        APIListener.onNoJSONFound();
                     }
                 }
             };
@@ -121,11 +121,11 @@ public class APICampaignCaller {
                             }
                             APIListener.onCampaignMapFound(campaignMap);
                         } else {
-                            APIListener.onNoCampaignFound();
+                            APIListener.onNoJSONFound();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        APIListener.onNoCampaignFound();
+                        APIListener.onNoJSONFound();
                     }
                 }
             };
@@ -165,7 +165,7 @@ public class APICampaignCaller {
                             Campaign campaign = Campaign.getCampaignFromJSON(data.getJSONObject(0));
                             APIListener.onCampaignFound(campaign);
                         } else {
-                            APIListener.onNoCampaignFound();
+                            APIListener.onNoJSONFound();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

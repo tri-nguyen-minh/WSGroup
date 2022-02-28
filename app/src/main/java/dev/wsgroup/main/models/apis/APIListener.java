@@ -10,12 +10,15 @@ import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.Product;
+import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.dtos.User;
 
 public class APIListener {
 
     public void onFailedAPICall(int code) {}
+
+    public void onNoJSONFound() {}
 
     public void onUserFound(User user) { }
 
@@ -42,8 +45,6 @@ public class APIListener {
 
     public void onCampaignMapFound(Map<String, List<Campaign>> campaignMap) {}
 
-    public void onNoCampaignFound() {}
-
     public void onOrderSuccessful(Order order) {}
 
     public void onOrderFound(List<Order> orderList) {}
@@ -55,5 +56,9 @@ public class APIListener {
     public void onUpdateAddressSuccessful(Address address) {}
 
     public void onSupplierFound(Supplier supplier) {}
+
+    public void onReviewFound(Review review) {}
+
+    public void onGettingPaymentURL(String url) {}
 
 }

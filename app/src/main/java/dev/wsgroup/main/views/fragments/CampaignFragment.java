@@ -66,7 +66,7 @@ public class CampaignFragment extends Fragment {
         product = (Product) getActivity().getIntent().getSerializableExtra("PRODUCT");
         productId = product.getProductId();
         APICampaignCaller.getCampaignListByProductId(productId, campaignStatus,
-                        null, getActivity().getApplication(), new APIListener() {
+                    campaignList, getActivity().getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> foundCampaignList) {
                         campaignList = foundCampaignList;
@@ -77,7 +77,7 @@ public class CampaignFragment extends Fragment {
                     }
 
                     @Override
-                    public void onNoCampaignFound() {
+                    public void onNoJSONFound() {
                         layoutLoading.setVisibility(View.INVISIBLE);
                         layoutNoCampaign.setVisibility(View.VISIBLE);
                         recViewCampaignView.setVisibility(View.INVISIBLE);

@@ -168,8 +168,8 @@ public class CartActivity extends AppCompatActivity {
                                     }
                                 }
                                 @Override
-                                public void onNoCampaignFound() {
-                                    super.onNoCampaignFound();
+                                public void onNoJSONFound() {
+                                    super.onNoJSONFound();
                                     retailCount--;
                                     Product product = cartProduct.getProduct();
                                     product.setCampaignList(new ArrayList<Campaign>());
@@ -209,7 +209,7 @@ public class CartActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onNoCampaignFound() {
+                                public void onNoJSONFound() {
                                     campaignCount--;
                                     if (campaignCount == 0) {
                                         putCartToSession();

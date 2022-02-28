@@ -144,8 +144,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                         setupTabLayout();
                     }
                     @Override
-                    public void onNoCampaignFound() {
-                        super.onNoCampaignFound();
+                    public void onNoJSONFound() {
+                        super.onNoJSONFound();
                         product.setCampaign(null);
                         product.setCampaignList(new ArrayList<Campaign>());
                         getIntent().putExtra("PRODUCT", foundProduct);

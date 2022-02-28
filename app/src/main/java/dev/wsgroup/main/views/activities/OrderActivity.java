@@ -49,7 +49,6 @@ public class OrderActivity extends AppCompatActivity {
         txtSupplierName = findViewById(R.id.txtSupplierName);
         txtSupplierAddress = findViewById(R.id.txtSupplierAddress);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
-//        txtNote = findViewById(R.id.txtNote);
         recViewOrderProduct = findViewById(R.id.recViewOrderProduct);
 
         order = (Order) getIntent().getSerializableExtra("ORDER");
@@ -95,7 +94,7 @@ public class OrderActivity extends AppCompatActivity {
 
     private void setupRecViewOrderList() {
         adapter = new RecViewOrderProductListAdapter(getApplicationContext(),
-                OrderActivity.this, IntegerUtils.REQUEST_NOTE_READ_ONLY);
+                OrderActivity.this, IntegerUtils.REQUEST_NOTE_READ_ONLY, IntegerUtils.REQUEST_ORDER_REVIEW);
         adapter.setOrder(order);
         recViewOrderProduct.setAdapter(adapter);
         recViewOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),

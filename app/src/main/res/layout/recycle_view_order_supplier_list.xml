@@ -176,42 +176,9 @@
                         android:text="No Discount"
                         android:textColor="@color/gray_dark"
                         android:textSize="15sp"
-                        android:visibility="invisible"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <LinearLayout
-                        android:id="@+id/layoutDiscountPrice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center|right"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
-
-                        <TextView
-                            android:id="@+id/txtDiscountPrice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserratr"
-                            android:text="00.000.000d"
-                            android:textColor="@color/red"
-                            android:textSize="15dp"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="7dp"
-                            android:fontFamily="@font/montserratr"
-                            android:text="OFF"
-                            android:textColor="@color/red"
-                            android:textSize="15dp"
-                            android:textStyle="bold"/>
-
-                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -229,16 +196,38 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/guidelineOrderPrice">
 
-                <TextView
-                    android:id="@+id/txtOrderPriceDiscount"
+                <LinearLayout
+                    android:id="@+id/layoutDiscountPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center|right"
                     android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/montserratr"
-                    android:gravity="right"
-                    android:text="0.000d"
-                    android:textColor="@color/gray_dark"
-                    android:textSize="14sp" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/txtDiscountPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserratr"
+                        android:text="00.000.000d"
+                        android:textColor="@color/gray_darker"
+                        android:textSize="14dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="7dp"
+                        android:fontFamily="@font/montserratr"
+                        android:text="OFF"
+                        android:textColor="@color/gray_darker"
+                        android:textSize="14dp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/txtTotalPrice"

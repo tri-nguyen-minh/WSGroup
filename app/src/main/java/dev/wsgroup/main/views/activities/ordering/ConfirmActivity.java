@@ -117,7 +117,7 @@ public class ConfirmActivity extends AppCompatActivity {
 
     private void setupRecViewOrderList() {
         adapter = new RecViewOrderSupplierListAdapter(getApplicationContext(),
-                ConfirmActivity.this, requestCode) {
+                ConfirmActivity.this, requestCode, IntegerUtils.REQUEST_ORDER_NOTE) {
 
         };
         adapter.setList(orderList);

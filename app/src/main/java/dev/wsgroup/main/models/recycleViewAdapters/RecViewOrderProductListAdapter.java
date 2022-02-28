@@ -32,11 +32,12 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
     private List<OrderProduct> orderProductList;
     private Context context;
     private Activity activity;
-    private int requestCode;
+    private int requestCode, requestState;
 
-    public RecViewOrderProductListAdapter(Context context, Activity activity, int requestCode) {
+    public RecViewOrderProductListAdapter(Context context, Activity activity, int requestState, int requestCode) {
         this.context = context;
         this.activity = activity;
+        this.requestState = requestState;
         this.requestCode = requestCode;
     }
 
@@ -61,12 +62,14 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
         holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
         holder.txtOrderQuantity.setText(orderProductList.get(position).getQuantity() + "");
         holder.txtTotalPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getTotalPrice()));
-
+        holder.btnNote.setText("Note");
+        holder.btnNote.setEnabled(true);
+        holder.btnNote.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
         holder.btnNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DialogBoxOrderNote dialogBox = new DialogBoxOrderNote(activity, context,
-                        orderProductList.get(position), requestCode) {
+                        orderProductList.get(position), requestState) {
                     @Override
                     public void onConfirmNote(String note) {
                         super.onConfirmNote(note);
@@ -75,9 +78,24 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
                 };
                 dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBox.show();
-
             }
         });
+        if (order.getStatus() != null) {
+            holder.layoutReview.setVisibility(View.VISIBLE);
+            if (order.getStatus().equals("completed")) {
+                if (orderProductList.get(position).getReview() != null) {
+                    holder.txtReviewStatus.setText("Reviewed");
+                    holder.btnReview.setText("View Review");
+                } else {
+                    holder.txtReviewStatus.setText("Not Reviewed");
+                    holder.btnReview.setText("Write Review");
+                }
+            } else {
+                holder.layoutReview.setVisibility(View.GONE);
+            }
+        } else {
+            holder.layoutReview.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -87,8 +105,10 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgRecViewProduct;
-        private TextView txtRecViewProductOrderName, txtOrderQuantity, txtProductPrice, txtTotalPrice;
-        private Button btnNote;
+        private TextView txtRecViewProductOrderName, txtOrderQuantity, txtProductPrice,
+                txtTotalPrice, txtReviewStatus;
+        private Button btnNote, btnReview;
+        private ConstraintLayout layoutReview;
 
         public ViewHolder(View view) {
             super(view);
@@ -97,7 +117,10 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
             txtOrderQuantity = view.findViewById(R.id.txtOrderQuantity);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
             txtTotalPrice = view.findViewById(R.id.txtTotalPrice);
+            txtReviewStatus = view.findViewById(R.id.txtReviewStatus);
             btnNote = view.findViewById(R.id.btnNote);
+            btnReview = view.findViewById(R.id.btnReview);
+            layoutReview = view.findViewById(R.id.layoutReview);
         }
     }
 }

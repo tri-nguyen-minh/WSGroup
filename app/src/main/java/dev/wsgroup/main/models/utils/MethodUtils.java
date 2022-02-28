@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import dev.wsgroup.main.models.dtos.CartProduct;
+import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.dtos.Supplier;
 
 public class MethodUtils {
@@ -147,14 +148,51 @@ public class MethodUtils {
 
     public static void main(String[] args) {
         try {
-
-            String url = "https://firebasestorage.googleapis.com/v0/b/wsg-authen-144ba.appspot.com/o/images%2FCustomer1_avatar?alt=media&token=2c305695-eab8-4d10-8693-a9d04ed15998";
-            System.out.println(url.substring(1, url.length() - 1));
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageReference = storage.getReference();
-            StorageReference ref = storageReference.child("images/2FCustomer1_avatar");
-
-
+            List<Review> reviews = new ArrayList<>();
+            Review review = new Review();
+            review.setCreateDate("2022-02-12T14:36:49.958Z");
+            review.setRating(1);
+            reviews.add(review);
+            review = new Review();
+            review.setCreateDate("2022-01-27T17:25:59.996Z");
+            review.setRating(4);
+            reviews.add(review);
+            review = new Review();
+            review.setCreateDate("2022-02-12T07:05:33.288Z");
+            review.setRating(2.5);
+            reviews.add(review);
+            Collections.sort(reviews, new Comparator<Review>() {
+                @Override
+                public int compare(Review review1, Review review2) {
+                    Date date1 = null, date2 = null;
+                    int result = 0;
+                    if (review1.getCreateDate() != null && review2.getCreateDate() != null) {
+                        try {
+                            date1 = MethodUtils.convertStringToDate(review1.getCreateDate());
+                            date2 = MethodUtils.convertStringToDate(review2.getCreateDate());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        result = date1.compareTo(date2);
+                    }
+                    return result;
+                }
+            });
+            System.out.println("By Date");
+            for (Review r : reviews) {
+                System.out.println(r.getRating() + " - " + formatDateWithTime(r.getCreateDate()));
+            }
+            Collections.sort(reviews, new Comparator<Review>() {
+                @Override
+                public int compare(Review review1, Review review2) {
+                    return review1.getRating() > review2.getRating() ? -1 :
+                            (review1.getRating() < review2.getRating() ? 1 : 0);
+                }
+            });
+            System.out.println("By Rating");
+            for (Review r : reviews) {
+                System.out.println(r.getRating() + " - " + formatDateWithTime(r.getCreateDate()));
+            }
 //            List<String> sortData = new ArrayList<>();
 //            sortData.add("2022-02-12T14:36:49.958Z");
 //            sortData.add("2022-02-11T22:33:43.396Z");

@@ -15,6 +15,7 @@ public class OrderProduct implements Serializable {
     private CartProduct cartProduct;
     private List<String> typeList;
     private boolean inCampaign;
+    private Review review;
 
     public OrderProduct() {
     }
@@ -119,6 +120,14 @@ public class OrderProduct implements Serializable {
 
     public void setInCampaign(boolean inCampaign) {
         this.inCampaign = inCampaign;
+    }
+
+    public Review getReview() {
+        return review;
+    }
+
+    public void setReview(Review review) {
+        this.review = review;
     }
 
     public static OrderProduct getOrderProductFromJSON(JSONObject jsonObject) throws Exception {

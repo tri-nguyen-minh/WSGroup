@@ -1,5 +1,7 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -74,5 +76,11 @@ public class Review implements Serializable {
 
     public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public static Review getReviewFromJSON(JSONObject jsonObject) throws Exception {
+        Review review = new Review();
+
+        return review;
     }
 }

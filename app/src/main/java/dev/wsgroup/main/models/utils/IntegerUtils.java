@@ -16,6 +16,8 @@ public class IntegerUtils {
     public static final int REQUEST_TAKE_IMAGE = 13;
     public static final int REQUEST_ORDER_RETAIL = 14;
     public static final int REQUEST_ORDER_CAMPAIGN = 15;
+    public static final int REQUEST_ORDER_NOTE = 16;
+    public static final int REQUEST_ORDER_REVIEW = 17;
 
     public static final int ERROR_API = 1;
     public static final int ERROR_PARSING_JSON = 2;

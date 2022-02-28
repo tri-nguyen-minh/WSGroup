@@ -25,6 +25,7 @@ import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIOrderCaller {
@@ -90,7 +91,9 @@ public class APIOrderCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONObject data = response.getJSONObject("data");
+                        order.setId(data.getString("id"));
                         order.setStatus(data.getString("status"));
+                        order.setTotalPrice(data.getDouble("totalprice"));
                         APIListener.onOrderSuccessful(order);
                     } catch (Exception e) {
                         e.printStackTrace();

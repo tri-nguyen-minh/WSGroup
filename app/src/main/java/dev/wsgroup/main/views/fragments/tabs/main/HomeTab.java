@@ -20,19 +20,13 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
-import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
-import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Supplier;
@@ -96,7 +90,7 @@ public class HomeTab extends Fragment {
         imgProductDetailMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                APICampaignCaller.getCampaignById(token,"ce179be8-c93a-4627-b3d1-0f7be42fcc22", getActivity().getApplication(), new APIListener());
+
             }
         });
 

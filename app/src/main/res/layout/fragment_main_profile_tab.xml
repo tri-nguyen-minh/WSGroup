@@ -409,6 +409,7 @@
             <LinearLayout
                 android:background="@color/white"
                 style="@style/style_profile_tab"
+                android:visibility="gone"
                 android:layout_marginBottom="2dp">
 
                 <ImageView

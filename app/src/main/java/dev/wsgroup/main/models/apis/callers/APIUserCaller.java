@@ -28,7 +28,8 @@ public class APIUserCaller {
 
     private static RequestQueue requestQueue;
 
-    public static void findUserByUsernameAndPassword(String username, String password, Application application, APIListener APIListener) {
+    public static void findUserByUsernameAndPassword(String username, String password,
+                                                     Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
