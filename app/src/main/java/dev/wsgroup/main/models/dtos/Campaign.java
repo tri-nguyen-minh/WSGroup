@@ -125,7 +125,7 @@ public class Campaign implements Serializable {
         this.shareFlag = shareFlag;
     }
 
-    public static Campaign getCampaignFromJSON(JSONObject data) throws Exception {
+    public static Campaign getObjectFromJSON(JSONObject data) throws Exception {
         Campaign campaign = new Campaign();
         campaign.setId(data.getString("id"));
         campaign.setProductId(data.getString("productid"));

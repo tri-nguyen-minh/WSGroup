@@ -196,7 +196,7 @@ public class Product implements Serializable {
         this.reviewList = reviewList;
     }
 
-    public static Product getProductFromJSON(JSONObject jsonObject) throws Exception {
+    public static Product getObjectFromJSON(JSONObject jsonObject) throws Exception {
         Product product = new Product();
         product.setProductId(jsonObject.getString("id"));
         product.setName(jsonObject.getString("name"));

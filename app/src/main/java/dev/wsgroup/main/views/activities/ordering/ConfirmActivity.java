@@ -1,36 +1,28 @@
 package dev.wsgroup.main.views.activities.ordering;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Campaign;
-import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
-import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Order;
-import dev.wsgroup.main.models.dtos.OrderProduct;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderSupplierListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
@@ -46,9 +38,11 @@ public class ConfirmActivity extends AppCompatActivity {
     private ProgressBar progressBarQuantityCount;
     private RecyclerView recViewCheckoutOrderProduct;
     private Button btnConfirmOrder;
-    private LinearLayout layoutCampaign;
+    private LinearLayout layoutCampaign, layoutOrderList;
+    private RelativeLayout layoutLoading;
 
     private ArrayList<Order> orderList;
+    private List<List<CustomerDiscount>> discountList;
     private int requestCode;
     private Campaign campaign;
     private RecViewOrderSupplierListAdapter adapter;
@@ -71,12 +65,18 @@ public class ConfirmActivity extends AppCompatActivity {
         recViewCheckoutOrderProduct = findViewById(R.id.recViewCheckoutOrderProduct);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
         layoutCampaign = findViewById(R.id.layoutCampaign);
+        layoutOrderList = findViewById(R.id.layoutOrderList);
+        layoutLoading = findViewById(R.id.layoutLoading);
 
         orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
         requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
+        layoutOrderList.setVisibility(View.INVISIBLE);
+        layoutLoading.setVisibility(View.VISIBLE);
 
         if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
             layoutCampaign.setVisibility(View.GONE);
+
+            setupRecViewOrderList();
         } else {
             campaign = orderList.get(0).getCampaign();
             txtCampaignTag.setText(campaign.getShareFlag() ? "Sharing Campaign" : "Single Campaign");
@@ -88,8 +88,8 @@ public class ConfirmActivity extends AppCompatActivity {
             txtCampaignQuantityCount.setText(campaign.getMinQuantity() + "");
             progressBarQuantityCount.setMax(campaign.getMinQuantity());
             progressBarQuantityCount.setProgress(campaign.getQuantityCount());
+            setupRecViewOrderList();
         }
-        setupRecViewOrderList();
 
         imgBackFromCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +135,8 @@ public class ConfirmActivity extends AppCompatActivity {
         recViewCheckoutOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                                             LinearLayoutManager.VERTICAL, false));
         recViewCheckoutOrderProduct.setNestedScrollingEnabled(false);
-
+        layoutLoading.setVisibility(View.GONE);
+        layoutOrderList.setVisibility(View.VISIBLE);
     }
 
     @Override

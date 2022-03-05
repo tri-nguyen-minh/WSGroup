@@ -77,7 +77,7 @@ public class Supplier implements Serializable {
         this.loyaltyStatus = loyaltyStatus;
     }
 
-    public static Supplier getSupplierFromJSON(JSONObject data) throws Exception{
+    public static Supplier getObjectFromJSON(JSONObject data) throws Exception{
         Supplier supplier = new Supplier();
         supplier.setId(data.getString("id"));
         supplier.setName(data.getString("name"));

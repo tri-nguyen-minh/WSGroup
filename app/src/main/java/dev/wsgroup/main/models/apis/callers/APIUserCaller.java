@@ -8,7 +8,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -21,7 +20,6 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIUserCaller {
@@ -44,7 +42,7 @@ public class APIUserCaller {
                     try {
                         String message = response.getString("status");
                         JSONObject data = response.getJSONObject("data");
-                        User user = User.getUserAccountFromJSON(data.getJSONObject("user"), data.getJSONObject("info"));
+                        User user = User.getAccountFromJSON(data.getJSONObject("user"), data.getJSONObject("info"));
                         user.setToken(data.getString("token"));
                         APIListener.onUserFound(user, message);
                     } catch (Exception e) {
@@ -91,7 +89,7 @@ public class APIUserCaller {
                     try {
                         String message = response.getString("status");
                         JSONObject data = response.getJSONObject("data");
-                        User user = User.getUserAccountFromJSON(data.getJSONObject("user"), data.getJSONObject("info"));
+                        User user = User.getAccountFromJSON(data.getJSONObject("user"), data.getJSONObject("info"));
                         user.setToken(data.getString("token"));
                         APIListener.onUserFound(user, message);
                     } catch (Exception e) {
@@ -226,7 +224,7 @@ public class APIUserCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         String message = response.getString("message");
-                        User user = User.getUserFromJSON(response.getJSONObject("data"));
+                        User user = User.getObjectFromJSON(response.getJSONObject("data"));
                         APIListener.onUserFound(user, message);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);

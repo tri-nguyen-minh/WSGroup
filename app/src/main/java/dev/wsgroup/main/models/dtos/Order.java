@@ -183,7 +183,7 @@ public class Order implements Serializable {
         this.advanceFee = advanceFee;
     }
 
-    public static Order getOrderFromJSON(JSONObject jsonObject) throws Exception {
+    public static Order getObjectFromJSON(JSONObject jsonObject) throws Exception {
         Order order = new Order();
         order.setId(jsonObject.getString("id"));
 
@@ -226,7 +226,7 @@ public class Order implements Serializable {
         List<OrderProduct> orderProductList = new ArrayList<>();
         OrderProduct orderProduct;
         for (int i = 0; i < jsonArray.length(); i++) {
-            orderProduct = OrderProduct.getOrderProductFromJSON(jsonArray.getJSONObject(i));
+            orderProduct = OrderProduct.getObjectFromJSON(jsonArray.getJSONObject(i));
             orderProductList.add(orderProduct);
         }
         order.setOrderProductList(orderProductList);

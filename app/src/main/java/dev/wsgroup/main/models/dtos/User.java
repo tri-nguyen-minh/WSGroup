@@ -125,7 +125,7 @@ public class User implements Serializable {
         this.status = status;
     }
 
-    public static User getUserAccountFromJSON(JSONObject account, JSONObject profile) throws Exception {
+    public static User getAccountFromJSON(JSONObject account, JSONObject profile) throws Exception {
         User user = new User();
         user.setUserId(profile.getString("id"));
         user.setAccountId(account.getString("id"));
@@ -140,7 +140,7 @@ public class User implements Serializable {
         return user;
     }
 
-    public static User getUserFromJSON(JSONObject jsonObject) throws Exception {
+    public static User getObjectFromJSON(JSONObject jsonObject) throws Exception {
         User user = new User();
         user.setUserId(jsonObject.getString("id"));
         user.setAccountId(jsonObject.getString("accountid"));

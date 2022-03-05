@@ -2,12 +2,10 @@ package dev.wsgroup.main.models.apis.callers;
 
 import android.app.Application;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -21,10 +19,7 @@ import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Campaign;
-import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICampaignCaller {
@@ -54,7 +49,7 @@ public class APICampaignCaller {
                         if(data.length() > 0) {
                             Campaign campaign;
                             for (int i = 0; i < data.length(); i++) {
-                                campaign = Campaign.getCampaignFromJSON(data.getJSONObject(i));
+                                campaign = Campaign.getObjectFromJSON(data.getJSONObject(i));
                                 campaignList.add(campaign);
                             }
                         }
@@ -110,7 +105,7 @@ public class APICampaignCaller {
                             Campaign campaign;
                             String productId;
                             for (int i = 0; i < data.length(); i++) {
-                                campaign = Campaign.getCampaignFromJSON(data.getJSONObject(i));
+                                campaign = Campaign.getObjectFromJSON(data.getJSONObject(i));
                                 campaignList = campaignMap.get(campaign.getProductId());
                                 if (campaignList == null) {
                                     campaignList = new ArrayList<>();
@@ -161,7 +156,7 @@ public class APICampaignCaller {
                     try {
                         JSONArray data = response.getJSONArray("data");
                         if(data.length() > 0) {
-                            Campaign campaign = Campaign.getCampaignFromJSON(data.getJSONObject(0));
+                            Campaign campaign = Campaign.getObjectFromJSON(data.getJSONObject(0));
                             APIListener.onCampaignFound(campaign);
                         } else {
                             APIListener.onNoJSONFound();

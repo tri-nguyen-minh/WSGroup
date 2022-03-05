@@ -8,7 +8,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -23,10 +22,8 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICartCaller {
@@ -54,7 +51,7 @@ public class APICartCaller {
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length();i++) {
-                            cartProduct = CartProduct.getCartProductFromJSON(jsonArray.getJSONObject(i));
+                            cartProduct = CartProduct.getObjectFromJSON(jsonArray.getJSONObject(i));
                             supplier = cartProduct.getProduct().getSupplier();
                             if (!cartProduct.getCampaignFlag()) {
                                 retailList.add(cartProduct);

@@ -20,10 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIProductCaller {
@@ -49,7 +47,7 @@ public class APIProductCaller {
                             productList = (list == null) ? new ArrayList<>() : list;
                             for (int i = 0; i < jsonArray.length();i++) {
                                 jsonObject = jsonArray.getJSONObject(i);
-                                product = Product.getProductFromJSON(jsonObject);
+                                product = Product.getObjectFromJSON(jsonObject);
                                 productList.add(product);
                             }
                             APIListener.onProductListFound(productList);
@@ -96,7 +94,7 @@ public class APIProductCaller {
                     try {
                         JSONObject jsonObject = response.getJSONObject("data");
                         if(jsonObject != null) {
-                            product = Product.getProductFromJSON(jsonObject);
+                            product = Product.getObjectFromJSON(jsonObject);
                             APIListener.onProductFound(product);
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -142,7 +140,7 @@ public class APIProductCaller {
                             productList = (list == null) ? new ArrayList<>() : list;
                             for (int i = 0; i < jsonArray.length();i++) {
                                 jsonObject = jsonArray.getJSONObject(i);
-                                product = Product.getProductFromJSON(jsonObject);
+                                product = Product.getObjectFromJSON(jsonObject);
                                 productList.add(product);
                             }
                             APIListener.onProductListFound(productList);

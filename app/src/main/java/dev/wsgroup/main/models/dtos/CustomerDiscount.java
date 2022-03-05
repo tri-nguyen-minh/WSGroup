@@ -1,5 +1,7 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class CustomerDiscount implements Serializable {
@@ -40,5 +42,14 @@ public class CustomerDiscount implements Serializable {
 
     public void setDiscount(Discount discount) {
         this.discount = discount;
+    }
+
+    public static CustomerDiscount getObjectFromJSON(JSONObject data) throws Exception {
+        CustomerDiscount customerDiscount = new CustomerDiscount();
+        customerDiscount.setId(data.getString("id"));
+        customerDiscount.setStatus(data.getString("customerDiscountCodeStatus"));
+        Discount discount = Discount.getObjectFromJSON(data);
+        customerDiscount.setDiscount(discount);
+        return customerDiscount;
     }
 }

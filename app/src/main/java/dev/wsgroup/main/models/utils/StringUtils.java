@@ -3,6 +3,10 @@ package dev.wsgroup.main.models.utils;
 public class StringUtils {
     public static final String BASE_URL = "https://server-wsg.herokuapp.com/";
     public static final String USER_API_URL = BASE_URL + "api/users/";
+    public static final String LOGIN_URL = USER_API_URL + "login";
+    public static final String REGISTER_URL = USER_API_URL + "register";
+    public static final String GET_PROFILE_URL = USER_API_URL + "profile/me";
+    public static final String LOGIN_GOOGLE_URL = USER_API_URL + "login/google";
     public static final String PRODUCT_API_URL = BASE_URL + "api/products/";
     public static final String CATEGORY_API_URL = BASE_URL + "api/categories/";
     public static final String CART_API_URL = BASE_URL + "api/cart/";
@@ -11,11 +15,8 @@ public class StringUtils {
     public static final String ADDRESS_API_URL = BASE_URL + "api/address/";
     public static final String REVIEW_API_URL = BASE_URL + "api/comment/";
     public static final String PAYMENT_API_URL = BASE_URL + "api/payment/";
+    public static final String DISCOUNT_API_URL = BASE_URL + "api/customerdiscountcode/";
 
-    public static final String LOGIN_URL = USER_API_URL + "login";
-    public static final String REGISTER_URL = USER_API_URL + "register";
-    public static final String GET_PROFILE_URL = USER_API_URL + "profile/me";
-    public static final String LOGIN_GOOGLE_URL = USER_API_URL + "login/google";
 //    public static final String GET_CATEGORY_BY_SUPPLIER_URL = CATEGORY_API_URL + "?userId=";
     public static final String APPLICATION_JSON = "application/json";
 

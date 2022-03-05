@@ -19,13 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.dtos.Address;
-import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Order;
-import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIReviewCaller {
@@ -98,7 +93,7 @@ public class APIReviewCaller {
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray != null) {
                             if (jsonArray.length() > 0) {
-                                review = Review.getReviewFromJSON(jsonArray.getJSONObject(0));
+                                review = Review.getObjectFromJSON(jsonArray.getJSONObject(0));
                             }
                         }
                         APIListener.onReviewFound(review);
@@ -137,7 +132,7 @@ public class APIReviewCaller {
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray != null) {
                             if (jsonArray.length() > 0) {
-                                review = Review.getReviewFromJSON(jsonArray.getJSONObject(0));
+                                review = Review.getObjectFromJSON(jsonArray.getJSONObject(0));
                             }
                         }
                         APIListener.onReviewFound(review);
@@ -179,7 +174,7 @@ public class APIReviewCaller {
                         if (jsonArray != null) {
                             if (jsonArray.length() > 0) {
                                 for (int i = 0; i < jsonArray.length(); i++) {
-                                    review = Review.getReviewFromJSON(jsonArray.getJSONObject(i));
+                                    review = Review.getObjectFromJSON(jsonArray.getJSONObject(i));
                                     reviewList.add(review);
                                 }
                             }

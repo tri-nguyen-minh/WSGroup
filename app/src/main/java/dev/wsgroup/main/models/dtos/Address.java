@@ -71,7 +71,7 @@ public class Address implements Serializable {
         addressString = street + " " + province;
     }
 
-    public static Address getAddressFromJSON(JSONObject jsonObject) throws Exception {
+    public static Address getObjectFromJSON(JSONObject jsonObject) throws Exception {
         Address address = new Address();
         address.setId(jsonObject.getString("id"));
         address.setCustomerId(jsonObject.getString("customerid"));

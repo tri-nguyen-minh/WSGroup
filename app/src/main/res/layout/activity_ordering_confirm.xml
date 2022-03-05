@@ -309,15 +309,46 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/lblOrderingProduct"
-                android:text="Ordering Products"
-                style="@style/style_background_header"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recViewCheckoutOrderProduct"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/layoutOrderList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/lblOrderingProduct"
+                        android:text="Ordering Products"
+                        style="@style/style_background_header"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recViewCheckoutOrderProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/layoutLoading"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingVertical="50dp">
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/blue_main"/>
+
+                </RelativeLayout>
+
+            </FrameLayout>
 
         </LinearLayout>
 

@@ -96,7 +96,7 @@ public class CartProduct implements Serializable {
         this.typeList = typeList;
     }
 
-    public static CartProduct getCartProductFromJSON(JSONObject jsonObject) throws Exception {
+    public static CartProduct getObjectFromJSON(JSONObject jsonObject) throws Exception {
         CartProduct cartProduct = new CartProduct();
         cartProduct.setId(jsonObject.getString("id"));
         cartProduct.setQuantity(jsonObject.getInt("quantity"));

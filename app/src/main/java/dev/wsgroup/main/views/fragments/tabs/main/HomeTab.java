@@ -26,8 +26,10 @@ import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APIDiscountCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.dtos.CartProduct;
+import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
@@ -85,7 +87,7 @@ public class HomeTab extends Fragment {
         layoutLoading.setVisibility(View.VISIBLE);
 
         List<String> list = new ArrayList<>();
-        list.add("3c2623eb-f4ba-4fe9-8f33-c3e604250ab5");
+//        list.add("3c2623eb-f4ba-4fe9-8f33-c3e604250ab5");
         list.add("1bd7c4d0-80dd-4a33-a229-df536a621aed");
         list.add("b53602fc-fc91-483b-a528-799338cbe13f");
         list.add("84bb4393-be10-406c-93ec-cc92be9a6da0");
@@ -93,6 +95,18 @@ public class HomeTab extends Fragment {
         imgProductDetailMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String id = "99ba5ad1-612c-493f-8cdb-2c2af92ae95a";
+                APIDiscountCaller.getCustomerDiscountByCondition(sharedPreferences.getString("TOKEN", ""), list, 1000000, id,
+                        null, getActivity().getApplication(), new APIListener() {
+                            @Override
+                            public void onDiscountListFound(List<CustomerDiscount> discountList) {
+                                System.out.println("size " + discountList.size());
+                            }
+                        });
+//                APIDiscountCaller.getCustomerDiscountByCondition(sharedPreferences.getString("TOKEN", ""), null, 100000, id,
+//                        null, getActivity().getApplication(), new APIListener());
+//                APIDiscountCaller.getCustomerDiscountByStatus(sharedPreferences.getString("TOKEN", ""), "ready", null,
+//                        getActivity().getApplication(), new APIListener());
             }
         });
 

@@ -25,7 +25,6 @@ import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIOrderCaller {
@@ -143,7 +142,7 @@ public class APIOrderCaller {
                             List<Integer> orderWithCampaignIndexList = new ArrayList<>();
                             Order order;
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                order = Order.getOrderFromJSON(jsonArray.getJSONObject(i));
+                                order = Order.getObjectFromJSON(jsonArray.getJSONObject(i));
                                 if (order.getStatus().equals(status)) {
                                     orderList.add(order);
                                     if (order.getCampaign() != null) {

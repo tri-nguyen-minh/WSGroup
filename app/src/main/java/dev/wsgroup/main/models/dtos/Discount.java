@@ -1,13 +1,15 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class Discount implements Serializable {
 
-    private String id, supplierId, code, description, starDate, endDate;
+    private String id, supplierId, code, description, starDate, endDate, productId;
     private boolean status;
     private double discountPrice, minPrice;
-    private int quantity, minQuantity;
+    private int quantity;
 
     public Discount() {
     }
@@ -60,6 +62,14 @@ public class Discount implements Serializable {
         this.endDate = endDate;
     }
 
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
     public double getDiscountPrice() {
         return discountPrice;
     }
@@ -74,14 +84,6 @@ public class Discount implements Serializable {
 
     public void setMinPrice(double minPrice) {
         this.minPrice = minPrice;
-    }
-
-    public int getMinQuantity() {
-        return minQuantity;
-    }
-
-    public void setMinQuantity(int minQuantity) {
-        this.minQuantity = minQuantity;
     }
 
     public int getQuantity() {
@@ -106,5 +108,21 @@ public class Discount implements Serializable {
         } else {
             this.status = false;
         }
+    }
+
+    public static Discount getObjectFromJSON(JSONObject data) throws Exception {
+        Discount discount = new Discount();
+        discount.setId(data.getString("discountCodeId"));
+        discount.setSupplierId(data.getString("supplierid"));
+        discount.setCode(data.getString("code"));
+        discount.setDescription(data.getString("description"));
+        discount.setStarDate(data.getString("startdate"));
+        discount.setEndDate(data.getString("enddate"));
+        discount.setProductId(data.getString("productid"));
+        discount.setStatusByString(data.getString("status"));
+        discount.setDiscountPrice(data.getDouble("discountprice"));
+        discount.setMinPrice(data.getDouble("minimunpricecondition"));
+        discount.setQuantity(data.getInt("quantity"));
+        return discount;
     }
 }

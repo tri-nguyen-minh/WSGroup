@@ -130,7 +130,7 @@ public class OrderProduct implements Serializable {
         this.review = review;
     }
 
-    public static OrderProduct getOrderProductFromJSON(JSONObject jsonObject) throws Exception {
+    public static OrderProduct getObjectFromJSON(JSONObject jsonObject) throws Exception {
         OrderProduct orderProduct = new OrderProduct();
         orderProduct.setId(jsonObject.getString("id"));
         orderProduct.setNote(jsonObject.getString("notes"));

@@ -64,25 +64,25 @@ public class DialogBoxDiscountSingle extends Dialog {
             }
         });
         txtDiscountEndDate.setText(discount.getEndDate());
-        if(discount.getMinPrice() == 0 && discount.getMinQuantity() == 0) {
-//            linearLayoutNoCondition.setVisibility(View.VISIBLE);
-            linearLayoutQuantityCondition.setVisibility(View.GONE);
-            linearLayoutPriceCondition.setVisibility(View.GONE);
-        } else {
-//            linearLayoutNoCondition.setVisibility(View.GONE);
-            if(discount.getMinQuantity() > 0) {
-                txtDiscountMinQuantity.setText(discount.getMinQuantity() + "");
-                linearLayoutQuantityCondition.setVisibility(View.VISIBLE);
-            } else {
-                linearLayoutQuantityCondition.setVisibility(View.GONE);
-            }
-            if(discount.getMinPrice() > 0) {
-                txtDiscountMinPrice.setText(MethodUtils.formatPriceString(discount.getMinPrice()));
-                linearLayoutPriceCondition.setVisibility(View.VISIBLE);
-            } else {
-                linearLayoutPriceCondition.setVisibility(View.GONE);
-            }
-        }
+//        if(discount.getMinPrice() == 0 && discount.getMinQuantity() == 0) {
+////            linearLayoutNoCondition.setVisibility(View.VISIBLE);
+//            linearLayoutQuantityCondition.setVisibility(View.GONE);
+//            linearLayoutPriceCondition.setVisibility(View.GONE);
+//        } else {
+////            linearLayoutNoCondition.setVisibility(View.GONE);
+//            if(discount.getMinQuantity() > 0) {
+//                txtDiscountMinQuantity.setText(discount.getMinQuantity() + "");
+//                linearLayoutQuantityCondition.setVisibility(View.VISIBLE);
+//            } else {
+//                linearLayoutQuantityCondition.setVisibility(View.GONE);
+//            }
+//            if(discount.getMinPrice() > 0) {
+//                txtDiscountMinPrice.setText(MethodUtils.formatPriceString(discount.getMinPrice()));
+//                linearLayoutPriceCondition.setVisibility(View.VISIBLE);
+//            } else {
+//                linearLayoutPriceCondition.setVisibility(View.GONE);
+//            }
+//        }
         if(discount.getStatus()) {
             btnSaveDiscount.setEnabled(true);
             btnSaveDiscount.setText("SAVE DISCOUNT");

@@ -8,6 +8,7 @@ import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Category;
+import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.LoyaltyStatus;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.Product;
@@ -68,5 +69,7 @@ public class APIListener {
     public void onGettingPaymentURL(String url) {}
 
     public void onLoyaltyStatusFound(LoyaltyStatus status) {}
+
+    public void onDiscountListFound(List<CustomerDiscount> discountList) {}
 
 }

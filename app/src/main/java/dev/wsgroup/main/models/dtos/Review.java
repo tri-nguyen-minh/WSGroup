@@ -78,7 +78,7 @@ public class Review implements Serializable {
         this.updateDate = updateDate;
     }
 
-    public static Review getReviewFromJSON(JSONObject jsonObject) throws Exception {
+    public static Review getObjectFromJSON(JSONObject jsonObject) throws Exception {
         Review review = new Review();
         review.setId(jsonObject.getString("id"));
         review.setProductId(jsonObject.getString("productid"));

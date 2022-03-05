@@ -18,7 +18,6 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.LoyaltyStatus;
 import dev.wsgroup.main.models.dtos.Supplier;
-import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
@@ -41,7 +40,7 @@ public class APISupplierCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONObject data = response.getJSONObject("data");
-                        Supplier supplier = Supplier.getSupplierFromJSON(data);
+                        Supplier supplier = Supplier.getObjectFromJSON(data);
                         APIListener.onSupplierFound(supplier);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
