@@ -81,7 +81,6 @@ public class OrderFragment extends Fragment {
                     getActivity().getApplication(), new APIListener() {
             @Override
             public void onOrderFound(List<Order> orderList) {
-                super.onOrderFound(orderList);
                 if (orderList.size() > 0) {
                     currentOrderList = orderList;
                     layoutLoading.setVisibility(View.INVISIBLE);
@@ -98,7 +97,6 @@ public class OrderFragment extends Fragment {
 
             @Override
             public void onFailedAPICall(int code) {
-                super.onFailedAPICall(code);
                 layoutLoading.setVisibility(View.INVISIBLE);
                 layoutNoOrder.setVisibility(View.VISIBLE);
                 layoutOrderView.setVisibility(View.INVISIBLE);

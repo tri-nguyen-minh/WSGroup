@@ -46,7 +46,8 @@ public class RecViewOrderSupplierListAdapter extends RecyclerView.Adapter<RecVie
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_order_supplier_list, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_order_supplier_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }

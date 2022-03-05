@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private String userId, accountId, username, phoneNumber, password,
+    private String userId, googleId, accountId, username, phoneNumber, password,
             firstName, lastName, mail, avatarLink, token;
 
     private boolean status;
@@ -24,6 +24,14 @@ public class User implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
     }
 
     public String getAccountId() {
@@ -74,6 +82,17 @@ public class User implements Serializable {
         this.lastName = lastName;
     }
 
+    public String getDisplayName() {
+        String name = "";
+        if (firstName != null) {
+            name += firstName + " ";
+        }
+        if (lastName != null) {
+            name += lastName;
+        }
+        return name;
+    }
+
     public String getMail() {
         return mail;
     }
@@ -110,6 +129,7 @@ public class User implements Serializable {
         User user = new User();
         user.setUserId(profile.getString("id"));
         user.setAccountId(account.getString("id"));
+        user.setGoogleId(account.getString("googleid"));
         user.setUsername(account.getString("username"));
         user.setFirstName(profile.getString("firstname"));
         user.setLastName(profile.getString("lastname"));

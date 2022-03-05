@@ -25,18 +25,13 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
 
     private List<Supplier> supplierList;
     private HashMap<String, List<CartProduct>> shoppingCart;
-    private HashMap<String, List<OrderProduct>> shoppingOrder;
-    private List<CartProduct> cartProductList;
 
     private Activity activity;
     private Context context;
     private int identifier;
     private RecViewCartProductListAdapter cartAdapter;
-    private SharedPreferences sharedPreferences;
-    private DialogBoxLoading dialogBoxLoading;
 
     public RecViewCartSupplierListAdapter(Context context, Activity activity, int identifier) {
-        sharedPreferences = activity.getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         this.activity = activity;
         this.context = context;
         this.identifier = identifier;
@@ -73,14 +68,13 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         cartAdapter = new RecViewCartProductListAdapter(context, activity, identifier) {
 
             @Override
-            public void onRemoveProduct(int productPosition) {
-                onRemove(productPosition, position);
+            public void onRemoveProduct(String cartProductId) {
+                onRemove(cartProductId);
             }
 
             @Override
-            public void onCheckboxProductChanged(int productPosition, boolean status) {
-                super.onCheckboxProductChanged(productPosition, status);
-                onCheckboxChanged(productPosition, position, status);
+            public void onCheckboxProductChanged(String cartProductId, boolean status) {
+                onCheckboxChanged(cartProductId, status);
             }
 
             @Override
@@ -103,9 +97,9 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         recyclerView.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL,false));
     }
 
-    public void onCheckboxChanged(int productPosition, int supplierPosition, boolean newStatus) { }
+    public void onCheckboxChanged(String cartProductId, boolean newStatus) { }
 
-    public void onRemove(int productPosition, int supplierPosition) {}
+    public void onRemove(String cartProductId) {}
 
     public void onPriceChanging() {}
 

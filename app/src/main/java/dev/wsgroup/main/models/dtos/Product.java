@@ -14,13 +14,14 @@ public class Product implements Serializable {
     private String productId, name, description, categoryId, typeOfProduct, status;
     private Supplier supplier;
     private double retailPrice;
-    private int quantity;
+    private int quantity, orderCount, reviewCount;
     private double rating;
     private String imageLink;
     private List<String> imageList;
     private List<String> typeList;
     private Campaign campaign;
     private List<Campaign> campaignList;
+    private List<Review> reviewList;
 
     public Product() {
     }
@@ -63,6 +64,22 @@ public class Product implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public int getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(int orderCount) {
+        this.orderCount = orderCount;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
     }
 
     public String getCategoryId() {
@@ -171,6 +188,14 @@ public class Product implements Serializable {
         this.campaign = campaign;
     }
 
+    public List<Review> getReviewList() {
+        return reviewList;
+    }
+
+    public void setReviewList(List<Review> reviewList) {
+        this.reviewList = reviewList;
+    }
+
     public static Product getProductFromJSON(JSONObject jsonObject) throws Exception {
         Product product = new Product();
         product.setProductId(jsonObject.getString("id"));
@@ -187,15 +212,13 @@ public class Product implements Serializable {
         supplier.setAddress(jsonObject.getString("supplieraddress"));
         product.setSupplier(supplier);
         product.setImageLink(jsonObject.getString("image"));
-
-//        work with type of product
-
         List<String> typeList = new ArrayList<>();
         if (!product.getTypeOfProduct().isEmpty()) {
             typeList.add(product.getTypeOfProduct());
         }
         typeList.add("type");
-
+        product.setOrderCount(0);
+        product.setReviewCount(0);
         return product;
     }
 }

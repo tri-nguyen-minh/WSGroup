@@ -132,8 +132,7 @@ public class PhoneInputActivity extends AppCompatActivity {
 
                 APIUserCaller.findUserByPhoneNumber(stringPhone, getApplication(), new APIListener() {
                     @Override
-                    public void onUserFound(User user) {
-                        super.onUserFound(user);
+                    public void onUserFound(User user, String message) {
                         if(requestCode != IntegerUtils.REQUEST_REGISTER) {
                             sendOTP(stringPhone);
                         } else {

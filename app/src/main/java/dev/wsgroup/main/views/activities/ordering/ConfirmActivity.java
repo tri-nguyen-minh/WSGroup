@@ -42,7 +42,7 @@ public class ConfirmActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
     private TextView txtCampaignDescription, txtCampaignPrice, txtCampaignOrderCount,
-                    txtCampaignOrderQuantityCount, txtCampaignQuantityCount;
+                    txtCampaignOrderQuantityCount, txtCampaignQuantityCount, txtCampaignTag;
     private ProgressBar progressBarQuantityCount;
     private RecyclerView recViewCheckoutOrderProduct;
     private Button btnConfirmOrder;
@@ -66,6 +66,7 @@ public class ConfirmActivity extends AppCompatActivity {
         txtCampaignOrderCount = findViewById(R.id.txtCampaignOrderCount);
         txtCampaignOrderQuantityCount = findViewById(R.id.txtCampaignOrderQuantityCount);
         txtCampaignQuantityCount = findViewById(R.id.txtCampaignQuantityCount);
+        txtCampaignTag = findViewById(R.id.txtCampaignTag);
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
         recViewCheckoutOrderProduct = findViewById(R.id.recViewCheckoutOrderProduct);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
@@ -78,6 +79,7 @@ public class ConfirmActivity extends AppCompatActivity {
             layoutCampaign.setVisibility(View.GONE);
         } else {
             campaign = orderList.get(0).getCampaign();
+            txtCampaignTag.setText(campaign.getShareFlag() ? "Sharing Campaign" : "Single Campaign");
             layoutCampaign.setVisibility(View.VISIBLE);
             txtCampaignDescription.setText(campaign.getDescription());
             txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getSavingPrice()));
@@ -107,10 +109,18 @@ public class ConfirmActivity extends AppCompatActivity {
         btnConfirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent orderInfoIntent = new Intent(getApplicationContext(), InfoActivity.class);
-                orderInfoIntent.putExtra("ORDER_LIST", orderList);
-                orderInfoIntent.putExtra("REQUEST_CODE", requestCode);
-                startActivityForResult(orderInfoIntent, requestCode);
+                DialogBoxConfirm dialogBoxConfirm
+                        = new DialogBoxConfirm(ConfirmActivity.this, StringUtils.MES_CONFIRM_ORDER) {
+                    @Override
+                    public void onYesClicked() {
+                        Intent orderInfoIntent = new Intent(getApplicationContext(), InfoActivity.class);
+                        orderInfoIntent.putExtra("ORDER_LIST", orderList);
+                        orderInfoIntent.putExtra("REQUEST_CODE", requestCode);
+                        startActivityForResult(orderInfoIntent, requestCode);
+                    }
+                };
+                dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxConfirm.show();
             }
         });
     }

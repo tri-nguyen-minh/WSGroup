@@ -24,6 +24,7 @@ import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICampaignCaller {
@@ -49,17 +50,15 @@ public class APICampaignCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONArray data = response.getJSONArray("data");
+                        campaignList = (list == null) ? new ArrayList<>() : list;
                         if(data.length() > 0) {
-                            campaignList = (list == null) ? new ArrayList<>() : list;
                             Campaign campaign;
                             for (int i = 0; i < data.length(); i++) {
                                 campaign = Campaign.getCampaignFromJSON(data.getJSONObject(i));
                                 campaignList.add(campaign);
                             }
-                            APIListener.onCampaignListFound(campaignList);
-                        } else {
-                            APIListener.onNoJSONFound();
                         }
+                        APIListener.onCampaignListFound(campaignList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onNoJSONFound();

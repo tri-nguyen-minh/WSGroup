@@ -49,7 +49,8 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_product_list, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_product_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -57,32 +58,23 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
     @Override
     public void onBindViewHolder(RecViewProductListAdapter.ViewHolder holder, int position) {
         holder.txtCampaign.setVisibility(View.GONE);
-//        if (productsList.get(position).getCampaign() != null) {
-//            if (productsList.get(position).getCampaign().getStatus().equals("active")) {
-//                holder.txtCampaign.setVisibility(View.VISIBLE);
-//                holder.txtCampaign.setText("Campaign Ongoing");
-//            }
-//        }
-        if (!productsList.get(position).getStatus().equals("active")) {
+        if (productsList.get(position).getStatus().equals("incampaign")) {
             holder.txtCampaign.setVisibility(View.VISIBLE);
             holder.txtCampaign.setText("Ongoing Campaign");
-//            if (productsList.get(position).getCampaign().getStatus().equals("active")) {
-//                holder.txtCampaign.setVisibility(View.VISIBLE);
-//                holder.txtCampaign.setText("Campaign Ongoing");
-//            }
         }
         holder.txtProductName.setText(productsList.get(position).getName());
 
 //        API get order Count
-        holder.lblProductOrderCount.setText(" order(s)");
+        holder.txtProductOrderCount
+                .setText(MethodUtils.formatOrderOrReviewCount(productsList.get(position).getOrderCount()));
+        holder.lblProductOrderCount
+                .setText((productsList.get(position).getOrderCount() > 0) ? "orders" : "order");
 
         String productId = productsList.get(position).getProductId();
-        int productOrderCount = 12400;
         if(productsList.get(position).getImageList().size() > 0) {
             Glide.with(context).load(productsList.get(position).getImageList().get(0)).into(holder.imgProduct);
         }
         holder.txtCampaign.bringToFront();
-        holder.txtProductOrderCount.setText(MethodUtils.formatOrderOrReviewCount(productOrderCount));
         holder.txtRetailPrice.setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
         holder.ratingProduct.setRating((float)productsList.get(position).getRating());
         holder.productCard.setOnClickListener(new View.OnClickListener() {

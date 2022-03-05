@@ -34,8 +34,6 @@ public class APIPaymentCaller {
         }
         try {
             JSONObject jsonObject = new JSONObject();
-            System.out.println(order.getTotalPrice());
-            System.out.println(order.getId());
             jsonObject.put("amount", (int) order.getTotalPrice());
             jsonObject.put("bankCode", "NCB");
             jsonObject.put("orderDescription", "topup tesst");
@@ -46,11 +44,8 @@ public class APIPaymentCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         String url = response.getString("data");
-                        System.out.println(url);
                         APIListener.onGettingPaymentURL(url);
                     } catch (Exception e) {
-                        System.out.println("fail parse");
-                        System.out.println(e);
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
                     }
@@ -59,8 +54,6 @@ public class APIPaymentCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
-                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };

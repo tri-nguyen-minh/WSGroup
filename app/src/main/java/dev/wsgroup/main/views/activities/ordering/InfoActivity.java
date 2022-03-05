@@ -194,13 +194,21 @@ public class InfoActivity extends AppCompatActivity {
         btnConfirmOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogBoxConfirm = new DialogBoxConfirm(InfoActivity.this, StringUtils.MES_CONFIRM_ORDER) {
+                String confirmMessage = "";
+                String confirmDescription = "";
+                if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
+                    confirmMessage = StringUtils.MES_CONFIRM_ORDER;
+                } else {
+                    confirmDescription = StringUtils.MES_CONFIRM_CHECKOUT;
+                }
+                dialogBoxConfirm = new DialogBoxConfirm(InfoActivity.this, confirmMessage) {
                     @Override
                     public void onYesClicked() {
                         super.onYesClicked();
                         processOrder();
                     }
                 };
+                dialogBoxConfirm.setDescription(confirmDescription);
                 dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxConfirm.show();
             }
@@ -294,7 +302,6 @@ public class InfoActivity extends AppCompatActivity {
 
     private void onSuccessfulOrder() {
         if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
-            System.out.println("checking");
             orderCount--;
             if (orderCount == 0) {
                 processPayment();
@@ -336,8 +343,14 @@ public class InfoActivity extends AppCompatActivity {
             @Override
             public void onClickAction() {
                 super.onClickAction();
-                setResult(RESULT_OK);
-                finish();
+                Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+                mainIntent.putExtra("MAIN_TAB_POSITION", 1);
+                if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
+                    mainIntent.putExtra("HISTORY_TAB_POSITION", 1);
+                } else {
+                    mainIntent.putExtra("HISTORY_TAB_POSITION", 0);
+                }
+                startActivity(mainIntent);
             }
         };
         dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

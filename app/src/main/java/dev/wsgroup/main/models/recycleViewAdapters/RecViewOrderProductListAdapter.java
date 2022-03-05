@@ -22,9 +22,11 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
+import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxOrderNote;
+import dev.wsgroup.main.views.dialogbox.DialogBoxReview;
 
 public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecViewOrderProductListAdapter.ViewHolder> {
 
@@ -48,7 +50,8 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_order_product_list, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_order_product_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -72,7 +75,6 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
                         orderProductList.get(position), requestState) {
                     @Override
                     public void onConfirmNote(String note) {
-                        super.onConfirmNote(note);
                         orderProductList.get(position).setNote(note);
                     }
                 };
@@ -81,15 +83,26 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
             }
         });
         if (order.getStatus() != null) {
-            holder.layoutReview.setVisibility(View.VISIBLE);
             if (order.getStatus().equals("completed")) {
+                holder.layoutReview.setVisibility(View.VISIBLE);
+                holder.txtReviewStatus.setText("Write Review");
                 if (orderProductList.get(position).getReview() != null) {
-                    holder.txtReviewStatus.setText("Reviewed");
-                    holder.btnReview.setText("View Review");
-                } else {
-                    holder.txtReviewStatus.setText("Not Reviewed");
-                    holder.btnReview.setText("Write Review");
+                    holder.txtReviewStatus.setText("View Review");
                 }
+                holder.layoutReview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DialogBoxReview dialogBox = new DialogBoxReview(activity, context,
+                                orderProductList.get(position)) {
+                            @Override
+                            public void onConfirmReview(Review review) {
+                                addingReview(review);
+                            }
+                        };
+                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialogBox.show();
+                    }
+                });
             } else {
                 holder.layoutReview.setVisibility(View.GONE);
             }
@@ -97,6 +110,8 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
             holder.layoutReview.setVisibility(View.GONE);
         }
     }
+
+    public void addingReview(Review review) {}
 
     @Override
     public int getItemCount() {
@@ -119,7 +134,6 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
             txtTotalPrice = view.findViewById(R.id.txtTotalPrice);
             txtReviewStatus = view.findViewById(R.id.txtReviewStatus);
             btnNote = view.findViewById(R.id.btnNote);
-            btnReview = view.findViewById(R.id.btnReview);
             layoutReview = view.findViewById(R.id.layoutReview);
         }
     }

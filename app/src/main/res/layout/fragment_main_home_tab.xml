@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="top|center"
+    android:background="@color/white"
     tools:context=".views.fragments.tabs.main.HomeTab">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -71,7 +72,7 @@
             android:textSize="15sp"
             android:textColor="@color/black"
             android:maxLines="1"
-            android:background="@drawable/background_otp"
+            android:background="@drawable/background_search_bar"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/constraintLayoutNotification"
             app:layout_constraintRight_toLeftOf="@id/imgProductDetailMessage"

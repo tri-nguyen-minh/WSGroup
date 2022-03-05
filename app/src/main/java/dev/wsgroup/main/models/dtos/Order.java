@@ -10,8 +10,9 @@ import java.util.List;
 public class Order implements Serializable {
 
     private List<OrderProduct> orderProductList;
-    private String id, code, status, dateCreated, dateUpdated, updateReason;
-    private double discountPrice, shippingFee, totalPrice;
+    private String id, code, status, dateCreated, dateUpdated,
+            updateReason, paymentId, advanceId, paymentMethod;
+    private double discountPrice, shippingFee, totalPrice, advanceFee;
     private Supplier supplier;
     private Address address;
     private Campaign campaign;
@@ -148,6 +149,38 @@ public class Order implements Serializable {
 
     public void setInCart(boolean inCart) {
         this.inCart = inCart;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String getAdvanceId() {
+        return advanceId;
+    }
+
+    public void setAdvanceId(String advanceId) {
+        this.advanceId = advanceId;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public double getAdvanceFee() {
+        return advanceFee;
+    }
+
+    public void setAdvanceFee(double advanceFee) {
+        this.advanceFee = advanceFee;
     }
 
     public static Order getOrderFromJSON(JSONObject jsonObject) throws Exception {

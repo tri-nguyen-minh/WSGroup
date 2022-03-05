@@ -24,7 +24,6 @@ import com.bumptech.glide.Glide;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import dev.wsgroup.main.R;
@@ -35,7 +34,6 @@ import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
@@ -63,9 +61,10 @@ public class PrepareProductActivity extends AppCompatActivity {
     private int quantity, minQuantity, maxQuantity;
     private double price, totalPrice;
     private DialogBoxLoading dialogBoxLoading;
-    private List<Supplier> supplierList;
-    private HashMap<String, List<CartProduct>> cart;
-    private List<CartProduct> cartProductList;
+//    private List<Supplier> supplierList;
+//    private HashMap<String, List<CartProduct>> cart;
+    private List<CartProduct> cartList;
+//    private List<CartProduct> cartProductList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +102,7 @@ public class PrepareProductActivity extends AppCompatActivity {
             }
             txtProductPriceORG.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             setupPurchasePriceAndQuantity();
-
+            calculateTotalPrice();
         }
 
         imgBackFromPrepareProduct.setOnClickListener(new View.OnClickListener() {
@@ -200,51 +199,72 @@ public class PrepareProductActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 cartTag = (campaign != null) ? "CAMPAIGN_CART" : "RETAIL_CART";
-                supplierListTag = (campaign != null) ? "SUPPLIER_CAMPAIGN_LIST" : "SUPPLIER_RETAIL_LIST";
+//                supplierListTag = (campaign != null) ? "SUPPLIER_CAMPAIGN_LIST" : "SUPPLIER_RETAIL_LIST";
                 try {
-                    cart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+                    cartList = (List<CartProduct>) ObjectSerializer
                             .deserialize(sharedPreferences.getString(cartTag, ""));
-                    supplierList = (ArrayList<Supplier>) ObjectSerializer
-                            .deserialize(sharedPreferences.getString(supplierListTag, ""));
+//                    cart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+//                            .deserialize(sharedPreferences.getString(cartTag, ""));
+//                    supplierList = (ArrayList<Supplier>) ObjectSerializer
+//                            .deserialize(sharedPreferences.getString(supplierListTag, ""));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 CartProduct cartProduct = getCartProduct();
-                if (supplierList == null) {
-                    addCartProduct(cartProduct);
-                } else if (supplierList.size() == 0) {
+                String cartId = checkDuplicateCartProduct();
+                if (cartId == null) {
                     addCartProduct(cartProduct);
                 } else {
-                    boolean duplicateProduct = false;
-                    cartProductList = cart.get(product.getSupplier().getId());
-                    if (cartProductList != null) {
-                        for (CartProduct cProduct : cartProductList) {
-                            if (cProduct.getProduct().getProductId().equals(product.getProductId())) {
-                                cartProduct.setId(cProduct.getId());
-                                duplicateProduct = true;
-                            }
-                        }
-                        if (duplicateProduct) {
-                            if (dialogBoxLoading.isShowing()) {
-                                dialogBoxLoading.dismiss();
-                            }
-                            DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(PrepareProductActivity.this,
-                                    StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
-                                @Override
-                                public void onYesClicked() {
-                                    dialogBoxLoading.show();
-                                    updateCartProduct(cartProduct);
-                                }
-                            };
-                            confirmLogoutBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                            confirmLogoutBox.show();
-                        } else {
-                            addCartProduct(cartProduct);
-                        }
-                    } else {
-                        addCartProduct(cartProduct);
+                    cartProduct.setId(cartId);
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
                     }
+                    DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(PrepareProductActivity.this,
+                            StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
+                        @Override
+                        public void onYesClicked() {
+                            dialogBoxLoading.show();
+                            updateCartProduct(cartProduct);
+                        }
+                    };
+                    confirmLogoutBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    confirmLogoutBox.show();
                 }
+//                if (supplierList == null) {
+//                    addCartProduct(cartProduct);
+//                } else if (supplierList.size() == 0) {
+//                    addCartProduct(cartProduct);
+//                } else {
+//                    boolean duplicateProduct = false;
+//                    cartProductList = cart.get(product.getSupplier().getId());
+//                    if (cartProductList != null) {
+//                        for (CartProduct cProduct : cartProductList) {
+//                            if (cProduct.getProduct().getProductId().equals(product.getProductId())) {
+//                                cartProduct.setId(cProduct.getId());
+//                                duplicateProduct = true;
+//                            }
+//                        }
+//                        if (duplicateProduct) {
+//                            if (dialogBoxLoading.isShowing()) {
+//                                dialogBoxLoading.dismiss();
+//                            }
+//                            DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(PrepareProductActivity.this,
+//                                    StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
+//                                @Override
+//                                public void onYesClicked() {
+//                                    dialogBoxLoading.show();
+//                                    updateCartProduct(cartProduct);
+//                                }
+//                            };
+//                            confirmLogoutBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                            confirmLogoutBox.show();
+//                        } else {
+//                            addCartProduct(cartProduct);
+//                        }
+//                    } else {
+//                        addCartProduct(cartProduct);
+//                    }
+//                }
             }
         });
 
@@ -255,7 +275,6 @@ public class PrepareProductActivity extends AppCompatActivity {
                         StringUtils.MES_CONFIRM_IMMEDIATE_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
-                        super.onYesClicked();
                         dismiss();
                         startInstantOrder();
                     }
@@ -311,23 +330,15 @@ public class PrepareProductActivity extends AppCompatActivity {
                 cartProduct, getApplication(), new APIListener() {
                     @Override
                     public void onAddCartItemSuccessful(CartProduct cartProduct) {
-                        super.onAddCartItemSuccessful(cartProduct);
-                        cartProductList = cart.get(product.getSupplier().getId());
-                        if (cartProductList == null) {
-                            supplierList.add(product.getSupplier());
-                            cartProductList = new ArrayList<>();
-                        }
-                        cartProductList.add(cartProduct);
-                        cart.put(product.getSupplier().getId(), cartProductList);
+                        cartList.add(cartProduct);
                         try {
                             sharedPreferences.edit()
-                                    .putString(cartTag, ObjectSerializer.serialize((Serializable) cart))
-                                    .putString(supplierListTag, ObjectSerializer.serialize((Serializable) supplierList))
+                                    .putString(cartTag, ObjectSerializer.serialize((Serializable) cartList))
                                     .commit();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        addCartSuccessful();
+                        displaySuccessMessage();
                     }
 
                     @Override
@@ -342,7 +353,7 @@ public class PrepareProductActivity extends AppCompatActivity {
                 getApplication(), new APIListener() {
                     @Override
                     public void onUpdateCartItemSuccessful() {
-                        addCartSuccessful();
+                        displaySuccessMessage();
                     }
 
                     @Override
@@ -352,7 +363,7 @@ public class PrepareProductActivity extends AppCompatActivity {
                 });
     }
 
-    private void addCartSuccessful() {
+    private void displaySuccessMessage() {
         if (dialogBoxLoading.isShowing()) {
             dialogBoxLoading.dismiss();
         }
@@ -362,7 +373,6 @@ public class PrepareProductActivity extends AppCompatActivity {
                         StringUtils.MES_SUCCESSFUL_ADD_CART,"") {
                     @Override
                     public void onClickAction() {
-                        super.onClickAction();
                         setResult(RESULT_OK);
                         finish();
                     }
@@ -465,6 +475,15 @@ public class PrepareProductActivity extends AppCompatActivity {
             setClickableQuantityButton(imgProductQuantityMinus, true);
             setClickableQuantityButton(imgProductQuantityPlus, true);
         }
+    }
+
+    private String checkDuplicateCartProduct() {
+        for (CartProduct cartProduct : cartList) {
+            if (cartProduct.getProduct().getProductId().equals(product.getProductId())) {
+                return cartProduct.getId();
+            }
+        }
+        return null;
     }
 
     @Override

@@ -259,10 +259,10 @@ public class AccountDetailActivity extends AppCompatActivity {
                     APIUserCaller.registerNewUser(user, getApplication(), new APIListener() {
                         @Override
                         public void onCompletingRegistrationRequest() {
-                            APIUserCaller.findUserByUsernameAndPassword(user.getUsername(), user.getPassword(),
+                            APIUserCaller.logInWithUsernameAndPassword(user.getUsername(), user.getPassword(),
                                     getApplication(), new APIListener() {
                                 @Override
-                                public void onUserFound(User user) {
+                                public void onUserFound(User user, String message) {
                                     dialogBoxLoading.dismiss();
                                     activity.getIntent().putExtra("USER", user);
                                     try {

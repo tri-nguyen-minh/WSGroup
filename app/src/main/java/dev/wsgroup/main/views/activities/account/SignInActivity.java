@@ -1,8 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,26 +17,40 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.Task;
+
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class SignInActivity extends AppCompatActivity {
 
     private Button btnSignIn, btnSignUp;
     private TextView txtForgetPassword;
     private EditText editUsername, editPassword;
-    private ImageView imgDisplayPassword, imgBackFromSignIn, imgSignInfoHome;
+    private ImageView imgDisplayPassword, imgBackFromSignIn, imgSignInfoHome, imgGoogle;
     private ConstraintLayout layoutParent;
 
     private boolean passwordDisplayedFlag;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private DialogBoxLoading dialogBoxLoading;
+    private GoogleSignInOptions options;
+    private GoogleSignInClient client;
+    private final int REQUEST_GOOGLE_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +66,15 @@ public class SignInActivity extends AppCompatActivity {
         imgDisplayPassword = findViewById(R.id.imgDisplayPassword);
         imgBackFromSignIn = findViewById(R.id.imgBackFromSignIn);
         imgSignInfoHome = findViewById(R.id.imgSignInfoHome);
+        imgGoogle = findViewById(R.id.imgGoogle);
         layoutParent = findViewById(R.id.layoutParent);
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        passwordDisplayedFlag = false;
-
+        options = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        client = GoogleSignIn.getClient(getApplicationContext(), options);
         editUsername.setText("Customer");
         editPassword.setText("Password1!");
 
@@ -183,17 +198,32 @@ public class SignInActivity extends AppCompatActivity {
                 startActivityForResult(signUpIntent, IntegerUtils.REQUEST_CHANGE_PASSWORD);
             }
         });
+
+        imgGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                passwordDisplayedFlag = false;
+                Intent signInIntent = client.getSignInIntent();
+                startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+            }
+        });
     }
 
     private void loginWithUsernameAndPassword(String stringUsername, String stringPassword) {
-        APIUserCaller.findUserByUsernameAndPassword(stringUsername, stringPassword, getApplication(), new APIListener() {
+        dialogBoxLoading = new DialogBoxLoading(SignInActivity.this);
+        dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBoxLoading.show();
+        APIUserCaller.logInWithUsernameAndPassword(stringUsername, stringPassword, getApplication(), new APIListener() {
             @Override
-            public void onUserFound(User user) {
+            public void onUserFound(User user, String message) {
                 signInAccount(user);
             }
 
             @Override
             public void onFailedAPICall(int errorCode) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
                 DialogBoxAlert dialogBox;
                 if(errorCode == IntegerUtils.ERROR_API) {
                     dialogBox = new DialogBoxAlert(SignInActivity.this,
@@ -211,11 +241,14 @@ public class SignInActivity extends AppCompatActivity {
     private void signInAccount(User user) {
         editor = sharedPreferences.edit();
         editor.putString("USER_ID", user.getUserId());
-        editor.putString("USERNAME", user.getUsername());
+//        editor.putString("USERNAME", user.getUsername());
         editor.putString("PHONE", user.getPhoneNumber());
         editor.putString("PASSWORD", editPassword.getText().toString());
         editor.putString("TOKEN", user.getToken());
         editor.commit();
+        if (dialogBoxLoading.isShowing()) {
+            dialogBoxLoading.dismiss();
+        }
         setResult(Activity.RESULT_OK, getIntent());
         finish();
     }
@@ -232,10 +265,47 @@ public class SignInActivity extends AppCompatActivity {
         return false;
     }
 
+    private void loginGoogle(User user) {
+        APIUserCaller.loginWithGoogle(user, getApplication(), new APIListener() {
+            @Override
+            public void onUserFound(User user, String message) {
+                System.out.println(message);
+                System.out.println(user.getGoogleId());
+                System.out.println(user.getFirstName());
+                System.out.println(user.getLastName());
+                System.out.println(user.getPhoneNumber());
+                signInAccount(user);
+            }
+        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_GOOGLE_SIGN_IN) {
+            dialogBoxLoading = new DialogBoxLoading(SignInActivity.this);
+            dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialogBoxLoading.show();
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount googleAccount = task.getResult();
+                User user = new User();
+                user.setGoogleId(googleAccount.getId());
+                user.setFirstName(googleAccount.getGivenName());
+                user.setLastName(googleAccount.getFamilyName());
+                user.setPhoneNumber("1");
+                user.setMail(googleAccount.getEmail());
+                loginGoogle(user);
+//                System.out.println(googleAccount.getIdToken());
+//                System.out.println(googleAccount.getDisplayName());
+//                System.out.println(googleAccount.getEmail());
+//                System.out.println(googleAccount.getFamilyName());
+//                System.out.println(googleAccount.getGivenName());
+//                System.out.println(googleAccount.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (resultCode == RESULT_OK) {
             User user = (User) data.getSerializableExtra("USER");
             signInAccount(user);
         }

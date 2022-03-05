@@ -29,7 +29,8 @@ public class RecViewOrderingProductPriceAdapter extends RecyclerView.Adapter<Rec
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_ordering_product_price, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_ordering_product_price, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }

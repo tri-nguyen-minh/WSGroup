@@ -45,7 +45,8 @@ public class RecViewProductTypeAdapter  extends RecyclerView.Adapter<RecViewProd
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_product_type, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_product_type, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }

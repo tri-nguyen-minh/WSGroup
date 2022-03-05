@@ -21,6 +21,8 @@ import com.google.android.material.tabs.TabLayout;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -110,33 +112,47 @@ public class CartActivity extends AppCompatActivity {
         String token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
-            public void onCartListFound(HashMap<String, List<CartProduct>> rCart, List<Supplier> rList,
-                                        HashMap<String, List<CartProduct>> cCart, List<Supplier> cList) {
-                retailCart = rCart;
-                campaignCart = cCart;
-                supplierRetailList = rList;
-                supplierCampaignList = cList;
-                if (supplierRetailList.size() > 0 || supplierCampaignList.size() > 0) {
-                    finishRetailCart();
-                } else {
-                    retailCart = new HashMap<>();
-                    campaignCart = new HashMap<>();
-                    supplierRetailList = new ArrayList<>();
-                    supplierCampaignList = new ArrayList<>();
-                    putCartToSession();
-                    setupEmptyCustomerCart();
-                }
+            public void onCartListFound(List<CartProduct> retailList,
+                                        List<CartProduct> campaignList) {
+                retailCartProductList = retailList;
+                campaignCartProductList = campaignList;
+                Comparator<CartProduct> comparator = new Comparator<CartProduct>() {
+                    @Override
+                    public int compare(CartProduct cart1, CartProduct cart2) {
+                        return cart1.getProduct().getName().compareTo(cart2.getProduct().getName());
+                    }
+                };
+                Collections.sort(retailCartProductList, comparator);
+                Collections.sort(campaignCartProductList, comparator);
+                putCartToSession();
+                setupCustomerCart();
+//                retailCart = rCart;
+//                campaignCart = cCart;
+//                supplierRetailList = rList;
+//                supplierCampaignList = cList;
+//                if (retailCartProductList.size() > 0 || campaignCartProductList.size() > 0) {
+//                    putCartToSession();
+//                    setupEmptyCustomerCart();
+//                } else {
+//                    retailCart = new HashMap<>();
+//                    campaignCart = new HashMap<>();
+//                    supplierRetailList = new ArrayList<>();
+//                    supplierCampaignList = new ArrayList<>();
+//                    putCartToSession();
+//                    setupEmptyCustomerCart();
+//                }
             }
             @Override
             public void onFailedAPICall(int code) {
-                super.onFailedAPICall(code);
                 if (code == IntegerUtils.ERROR_API) {
                     setupFailedCustomerCart();
                 } else {
-                    retailCart = new HashMap<>();
-                    campaignCart = new HashMap<>();
-                    supplierRetailList = new ArrayList<>();
-                    supplierCampaignList = new ArrayList<>();
+                    retailCartProductList = new ArrayList<>();
+                    campaignCartProductList = new ArrayList<>();
+//                    retailCart = new HashMap<>();
+//                    campaignCart = new HashMap<>();
+//                    supplierRetailList = new ArrayList<>();
+//                    supplierCampaignList = new ArrayList<>();
                     putCartToSession();
                     setupEmptyCustomerCart();
                 }
@@ -144,98 +160,107 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
-    private void finishRetailCart() {
-        if (supplierRetailList.size() > 0) {
-            retailCount = 0;
-            for (Supplier supplier : supplierRetailList) {
-                retailCartProductList = retailCart.get(supplier.getId());
-                retailCount += retailCartProductList.size();
-            }
-            for (Supplier supplier : supplierRetailList) {
-                retailCartProductList = retailCart.get(supplier.getId());
-                for (CartProduct cartProduct : retailCartProductList) {
-                    APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
-                            "active", null, getApplication(), new APIListener() {
-                                @Override
-                                public void onCampaignListFound(List<Campaign> campaignList) {
-                                    super.onCampaignListFound(campaignList);
-                                    retailCount--;
-                                    Product product = cartProduct.getProduct();
-                                    product.setCampaignList(campaignList);
-                                    cartProduct.setProduct(product);
-                                    if (retailCount == 0) {
-                                        finishCampaignCart();
-                                    }
-                                }
-                                @Override
-                                public void onNoJSONFound() {
-                                    super.onNoJSONFound();
-                                    retailCount--;
-                                    Product product = cartProduct.getProduct();
-                                    product.setCampaignList(new ArrayList<Campaign>());
-                                    cartProduct.setProduct(product);
-                                    if (retailCount == 0) {
-                                        finishCampaignCart();
-                                    }
-                                }
-                            });
-                }
-            }
-        } else {
-            finishCampaignCart();
-        }
-    }
-
-    private void finishCampaignCart() {
-        if (supplierCampaignList.size() > 0) {
-            campaignCount = 0;
-            for (Supplier supplier : supplierCampaignList) {
-                campaignCartProductList = campaignCart.get(supplier.getId());
-                campaignCount += campaignCartProductList.size();
-            }
-            for (Supplier supplier : supplierCampaignList) {
-                campaignCartProductList = campaignCart.get(supplier.getId());
-                for (CartProduct cartProduct : campaignCartProductList) {
-                    APICampaignCaller.getCampaignById(cartProduct.getCampaign().getId(),
-                            getApplication(), new APIListener() {
-                                @Override
-                                public void onCampaignFound(Campaign campaign) {
-                                    cartProduct.setCampaign(campaign);
-                                    campaignCount--;
-                                    if (campaignCount == 0) {
-                                        putCartToSession();
-                                        setupCustomerCart();
-                                    }
-                                }
-
-                                @Override
-                                public void onNoJSONFound() {
-                                    campaignCount--;
-                                    if (campaignCount == 0) {
-                                        putCartToSession();
-                                        setupCustomerCart();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailedAPICall(int code) {
-                                    super.onFailedAPICall(code);
-                                    setupFailedCustomerCart();
-                                }
-                            });
-                }
-            }
-        }
-    }
+//    private void finishRetailCart() {
+//        if (supplierRetailList.size() > 0) {
+//            retailCount = 0;
+//            for (Supplier supplier : supplierRetailList) {
+//                retailCartProductList = retailCart.get(supplier.getId());
+//                retailCount += retailCartProductList.size();
+//            }
+//            for (Supplier supplier : supplierRetailList) {
+//                retailCartProductList = retailCart.get(supplier.getId());
+//                for (for) {
+//                    CartProduct cartProduct = retailCartProductList.get(iterator);
+//                    APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
+//                            "active", null, getApplication(), new APIListener() {
+//                                @Override
+//                                public void onCampaignListFound(List<Campaign> campaignList) {
+//                                    super.onCampaignListFound(campaignList);
+//                                    retailCount--;
+//                                    Product product = cartProduct.getProduct();
+//                                    product.setCampaignList(campaignList);
+//                                    cartProduct.setProduct(product);
+//                                    retailCartProductList.set(iterator, cartProduct);
+//                                    if (retailCount == 0) {
+//                                        finishCampaignCart();
+//                                    }
+//                                }
+//                                @Override
+//                                public void onNoJSONFound() {
+//                                    super.onNoJSONFound();
+//                                    retailCount--;
+//                                    Product product = cartProduct.getProduct();
+//                                    product.setCampaignList(new ArrayList<Campaign>());
+//                                    cartProduct.setProduct(product);
+//                                    retailCartProductList.set(iterator, cartProduct);
+//                                    if (retailCount == 0) {
+//                                        finishCampaignCart();
+//                                    }
+//                                }
+//                            });
+//                }
+//            }
+//        } else {
+//            finishCampaignCart();
+//        }
+//    }
+//
+//    private void finishCampaignCart() {
+//        if (supplierCampaignList.size() > 0) {
+//            campaignCount = 0;
+//            for (Supplier supplier : supplierCampaignList) {
+//                campaignCartProductList = campaignCart.get(supplier.getId());
+//                campaignCount += campaignCartProductList.size();
+//            }
+//            for (Supplier supplier : supplierCampaignList) {
+//                campaignCartProductList = campaignCart.get(supplier.getId());
+//                for (CartProduct cartProduct : campaignCartProductList) {
+//                    APICampaignCaller.getCampaignById(cartProduct.getCampaign().getId(),
+//                            getApplication(), new APIListener() {
+//                                @Override
+//                                public void onCampaignFound(Campaign campaign) {
+//                                    cartProduct.setCampaign(campaign);
+//                                    campaignCount--;
+//                                    if (campaignCount == 0) {
+//                                        putCartToSession();
+//                                        setupCustomerCart();
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onNoJSONFound() {
+//                                    campaignCount--;
+//                                    if (campaignCount == 0) {
+//                                        putCartToSession();
+//                                        setupCustomerCart();
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onFailedAPICall(int code) {
+//                                    super.onFailedAPICall(code);
+//                                    setupFailedCustomerCart();
+//                                }
+//                            });
+//                }
+//            }
+//        } else {
+//            setupCustomerCart();
+//        }
+//    }
 
     private void putCartToSession() {
         try {
             sharedPreferences.edit()
-                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCart))
-                    .putString("SUPPLIER_RETAIL_LIST", ObjectSerializer.serialize((Serializable) supplierRetailList))
-                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCart))
-                    .putString("SUPPLIER_CAMPAIGN_LIST", ObjectSerializer.serialize((Serializable) supplierCampaignList))
+                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCartProductList))
+                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCartProductList))
                     .commit();
+//            sharedPreferences.edit()
+//                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCart))
+//                    .putString("SUPPLIER_RETAIL_LIST", ObjectSerializer.serialize((Serializable) supplierRetailList))
+//                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCart))
+//                    .putString("SUPPLIER_CAMPAIGN_LIST", ObjectSerializer.serialize((Serializable) supplierCampaignList))
+//                    .commit();
         } catch (IOException e) {
             e.printStackTrace();
         }

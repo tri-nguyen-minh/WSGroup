@@ -25,14 +25,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
+import dev.wsgroup.main.models.apis.callers.APIReviewCaller;
+import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
+import dev.wsgroup.main.models.dtos.LoyaltyStatus;
 import dev.wsgroup.main.models.dtos.Product;
+import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
@@ -53,15 +58,15 @@ public class ProductDetailActivity extends AppCompatActivity {
     private TextView  txtProductDetailCartCount;
     private CardView cardViewProductDetailCartCount;
     private ConstraintLayout constraintLayoutShoppingCart, layoutLoading,layoutMainLayout;
-    private Button btnPurchaseProduct;
 
     private SharedPreferences sharedPreferences;
-    private String userId, productId;
+    private String userId, productId, token;
     private int cartCount;
     private Product product;
-    private List<Supplier> supplierRetailList, supplierCampaignList;
-    private HashMap<String, List<CartProduct>> retailCart, campaignCart;
-    private List<CartProduct> cartProductList;
+    private Supplier supplier;
+    private List<CartProduct> retailList, campaignList;
+    private boolean campaignListStatus, reviewListStatus, orderCountStatus,
+            reviewCountStatus, loyaltyCheckStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +79,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             imgProductDetailMessage = findViewById(R.id.imgProductDetailMessage);
             imgBackFromProductDetail = findViewById(R.id.imgBackFromProductDetail);
             imgProductDetailHome = findViewById(R.id.imgProductDetailHome);
-            btnPurchaseProduct = findViewById(R.id.btnPurchaseProduct);
             txtProductDetailCartCount = findViewById(R.id.txtProductDetailCartCount);
             cardViewProductDetailCartCount = findViewById(R.id.cardViewProductDetailCartCount);
             constraintLayoutShoppingCart = findViewById(R.id.constraintLayoutShoppingCart);
@@ -84,6 +88,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
+        token = sharedPreferences.getString("TOKEN", "");
         productId = getIntent().getStringExtra("PRODUCT_ID");
 
         loadProduct();
@@ -107,7 +112,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         constraintLayoutShoppingCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(userId.isEmpty()) {
+                if (userId.isEmpty()) {
                     Intent signInIntent = new Intent(getApplicationContext(), SignInActivity.class);
                     startActivityForResult(signInIntent, IntegerUtils.REQUEST_LOGIN_FOR_CART);
                 } else {
@@ -116,99 +121,139 @@ public class ProductDetailActivity extends AppCompatActivity {
                 }
             }
         });
-
-        btnPurchaseProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                product.setCampaign(null);
-                startDialogBoxProductDetail();
-            }
-        });
+//        btnPurchaseProduct.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                product.setCampaign(null);
+//                startDialogBoxProductDetail();
+//            }
+//        });
     }
 
     private void loadProduct() {
         layoutLoading.setVisibility(View.VISIBLE);
         layoutMainLayout.setVisibility(View.INVISIBLE);
+        campaignListStatus = false;
+        reviewListStatus = false;
+        orderCountStatus = false;
+        reviewCountStatus = false;
+        loyaltyCheckStatus = false;
         APIProductCaller.getProductById(productId, getApplication(), new APIListener() {
             @Override
             public void onProductFound(Product foundProduct) {
                 product = foundProduct;
                 APICampaignCaller.getCampaignListByProductId(productId, "active", null,
-                                                    getApplication(), new APIListener() {
+                        getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> campaignList) {
-                        super.onCampaignListFound(campaignList);
                         product.setCampaign(null);
                         product.setCampaignList(campaignList);
-                        getIntent().putExtra("PRODUCT", foundProduct);
-                        setupTabLayout();
+                        campaignListStatus = true;
+                        finishSetup(product);
                     }
                     @Override
                     public void onNoJSONFound() {
-                        super.onNoJSONFound();
                         product.setCampaign(null);
                         product.setCampaignList(new ArrayList<Campaign>());
-                        getIntent().putExtra("PRODUCT", foundProduct);
-                        setupTabLayout();
+                        campaignListStatus = true;
+                        finishSetup(product);
+                    }
+                });
+                APIReviewCaller.getReviewListByProductId(productId, null,
+                        getApplication(), new APIListener() {
+                    @Override
+                    public void onReviewListFound(List<Review> reviewList) {
+                        product.setReviewList(reviewList);
+                        reviewListStatus = true;
+                        finishSetup(product);
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        product.setReviewList(new ArrayList<>());
+                        campaignListStatus = true;
+                        finishSetup(product);
+                    }
+                });
+                APIReviewCaller.getReviewCountByProductId(productId, getApplication(), new APIListener() {
+                    @Override
+                    public void onReviewCountFound(int count, double rating) {
+                        product.setReviewCount(count);
+                        product.setRating(rating);
+                        reviewCountStatus = true;
+                        finishSetup(product);
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        product.setReviewCount(0);
+                        product.setRating(0);
+                        reviewCountStatus = true;
+                        finishSetup(product);
+                    }
+                });
+                if (!token.isEmpty()) {
+                    APISupplierCaller.getCustomerLoyaltyStatus(token, product.getSupplier().getId(), getApplication(), new APIListener() {
+                        @Override
+                        public void onLoyaltyStatusFound(LoyaltyStatus status) {
+                            supplier = product.getSupplier();
+                            supplier.setLoyaltyStatus(status);
+                            product.setSupplier(supplier);
+                            loyaltyCheckStatus = true;
+                            finishSetup(product);
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            loyaltyCheckStatus = true;
+                            finishSetup(product);
+                        }
+                    });
+                } else {
+                    loyaltyCheckStatus = true;
+                    finishSetup(product);
+                }
+                List<String> list = new ArrayList<>();
+                list.add(productId);
+                APIProductCaller.getOrderCountByProductIdList(list,
+                        getApplication(), new APIListener() {
+                    @Override
+                    public void onProductOrderCountFound(Map<String, Integer> countList) {
+                        if (countList.size() > 0) {
+                            product.setOrderCount(countList.get(productId));
+                        }
+                        orderCountStatus = true;
+                        finishSetup(product);
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        product.setOrderCount(0);
+                        orderCountStatus = true;
+                        finishSetup(product);
                     }
                 });
             }
         });
     }
 
+    private void finishSetup(Product product) {
+        if (campaignListStatus && reviewListStatus && orderCountStatus
+                && reviewCountStatus && loyaltyCheckStatus) {
+            getIntent().putExtra("PRODUCT", product);
+            setupTabLayout();
+        }
+    }
+
     private void startDialogBoxProductDetail() {
-        if(userId.isEmpty()) {
+        if (userId.isEmpty()) {
             Intent SignInIntent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivityForResult(SignInIntent, IntegerUtils.REQUEST_LOGIN);
         } else {
             Intent campaignSelectIntent = new Intent(getApplicationContext(), PrepareProductActivity.class);
             campaignSelectIntent.putExtra("PRODUCT", product);
             startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_MAKE_PURCHASE);
-//            DialogBoxOrderDetail dialogBox = new DialogBoxOrderDetail(ProductDetailActivity.this, getApplicationContext(), userId, product) {
-//                @Override
-//                public void onCartProductAdded(CartProduct cartProduct) {
-//                    super.onCartProductAdded(cartProduct);
-//                    cartProduct.setSelectableFlag(true);
-//                    Supplier supplier = cartProduct.getProduct().getSupplier();
-//                    cartProductList = shoppingCart.get(supplier.getId());
-//                    if(cartProductList == null) {
-//                        supplierList.add(supplier);
-//                        cartProductList = new ArrayList<>();
-//                        cartProductList.add(cartProduct);
-//                    } else {
-//                        int cartProductPosition = checkDuplicateCartProduct(cartProduct.getId());
-//                        if(cartProductPosition >= 0) {
-//                            cartProductList.get(cartProductPosition).setQuantity(cartProduct.getQuantity());
-//                        } else {
-//                            cartProductList.add(cartProduct);
-//                        }
-//                    }
-//                    shoppingCart.put(supplier.getId(), cartProductList);
-//                    try {
-//                        sharedPreferences.edit()
-//                                .putString("SHOPPING_CART", ObjectSerializer.serialize((Serializable) shoppingCart))
-//                                .commit();
-//                        sharedPreferences.edit()
-//                                .putString("SUPPLIER_LIST", ObjectSerializer.serialize((Serializable) supplierList))
-//                                .commit();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    editShoppingCart();
-//                }
-//            };
-//            dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//            dialogBox.show();
         }
-    }
-
-    private int checkDuplicateCartProduct(String id) {
-        for (int i = 0; i < cartProductList.size(); i++) {
-            if(cartProductList.get(i).getId().equals(id)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private void setupTabLayout() {
@@ -267,14 +312,10 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void getShoppingCart() {
         try {
-            retailCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+            retailList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-            campaignCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+            campaignList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
-            supplierRetailList = (ArrayList<Supplier>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("SUPPLIER_RETAIL_LIST", ""));
-            supplierCampaignList = (ArrayList<Supplier>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("SUPPLIER_CAMPAIGN_LIST", ""));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -282,41 +323,17 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void editShoppingCart() {
         getShoppingCart();
-        if(supplierRetailList == null && supplierCampaignList == null) {
+        if(retailList == null && campaignList == null) {
             cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
         } else {
-            if (supplierRetailList.size() > 0 || supplierCampaignList.size() > 0) {
-                cartCount = 0;
+            if (retailList.size() > 0 || campaignList.size() > 0) {
                 cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
-                if (supplierRetailList.size() > 0) {
-                    cartCount += getRetailCartCount();
-                }
-                if (supplierCampaignList.size() > 0) {
-                    cartCount += getCampaignCartCount();
-                }
+                cartCount = retailList.size() + campaignList.size();
                 txtProductDetailCartCount.setText(cartCount + "");
             } else {
                 cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
             }
         }
-    }
-
-    private int getRetailCartCount() {
-        int count = 0;
-        for (Supplier supplier : supplierRetailList) {
-            cartProductList = retailCart.get(supplier.getId());
-            count += cartProductList.size();
-        }
-        return count;
-    }
-
-    private int getCampaignCartCount() {
-        int count = 0;
-        for (Supplier supplier : supplierCampaignList) {
-            cartProductList = campaignCart.get(supplier.getId());
-            count += cartProductList.size();
-        }
-        return count;
     }
 
     @Override

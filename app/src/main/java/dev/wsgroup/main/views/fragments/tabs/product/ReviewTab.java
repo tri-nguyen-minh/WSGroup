@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,10 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Review;
-import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderListAdapter;
+import dev.wsgroup.main.models.recycleViewAdapters.RecViewReviewAdapter;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
@@ -42,13 +39,13 @@ public class ReviewTab extends Fragment {
     private MaterialRatingBar ratingProduct;
     private RecyclerView recViewReview;
     private RelativeLayout layoutLoading, layoutNoReview;
-    private ConstraintLayout layoutMain;
     private LinearLayout layoutReview;
 
     private SharedPreferences sharedPreferences;
     private Intent intent;
     private Product product;
     private List<Review> reviewList;
+    private RecViewReviewAdapter adapter;
     private final String[] sortData = {"Latest", "Highest Rating"};
 
     @Override
@@ -68,24 +65,43 @@ public class ReviewTab extends Fragment {
         recViewReview = view.findViewById(R.id.recViewReview);
         layoutLoading = view.findViewById(R.id.layoutLoading);
         layoutNoReview = view.findViewById(R.id.layoutNoReview);
-        layoutMain = view.findViewById(R.id.layoutMain);
         layoutReview = view.findViewById(R.id.layoutReview);
 
+        setMainLoadingState();
         sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         intent = getActivity().getIntent();
         product = (Product)intent.getSerializableExtra("PRODUCT");
+        reviewList = product.getReviewList();
 
-//        setMainLoadingState();
-//
-//        setupSpinner();
-//        setupReviewList();
+        if (reviewList.size() > 0) {
+            setReviewCount();
+            setupReviewList();
+            setupSpinner();
+        } else {
+            setNoReviewState();
+        }
+    }
+
+    private void setReviewCount() {
+        txtProductReviewCount.setText(MethodUtils.formatOrderOrReviewCount(product.getReviewCount()));
+        txtRatingProduct.setText(product.getRating() + "");
+        ratingProduct.setRating((float) product.getRating());
+        ratingProduct.setIsIndicator(true);
+    }
+
+    private void setupReviewList() {
+        recViewReview.setAdapter(null);
+        adapter = new RecViewReviewAdapter(getContext());
+        adapter.setReviewList(reviewList);
+        recViewReview.setAdapter(adapter);
+        recViewReview.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        setReviewLoadedState();
     }
 
     private void setupSpinner() {
 
         ArrayAdapter adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, sortData);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-
         spinnerSorting.setAdapter(adapter);
         spinnerSorting.setSelection(0);
         spinnerSorting.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -97,11 +113,7 @@ public class ReviewTab extends Fragment {
                     public int compare(Review review1, Review review2) {
                         int result = 0;
                         switch (positionInt) {
-                            case 1: {
-                                result = review1.getRating() > review2.getRating() ? -1 :
-                                        (review1.getRating() < review2.getRating() ? 1 : 0);
-                            }
-                            default: {
+                            case 0: {
                                 Date date1 = null, date2 = null;
                                 if (review1.getCreateDate() != null && review2.getCreateDate() != null) {
                                     try {
@@ -112,11 +124,18 @@ public class ReviewTab extends Fragment {
                                     }
                                     result = date2.compareTo(date1);
                                 }
+                                break;
+                            }
+                            case 1: {
+                                result = review1.getRating() > review2.getRating() ? -1 :
+                                        (review1.getRating() < review2.getRating() ? 1 : 0);
+                                break;
                             }
                         }
                         return result;
                     }
                 });
+                setupReviewList();
             }
 
             @Override
@@ -126,19 +145,14 @@ public class ReviewTab extends Fragment {
         });
     }
 
-    private void setupReviewList() {
-    }
-
     private void setMainLoadingState() {
         layoutLoading.setVisibility(View.VISIBLE);
-        layoutMain.setVisibility(View.INVISIBLE);
         layoutNoReview.setVisibility(View.INVISIBLE);
         layoutReview.setVisibility(View.INVISIBLE);
     }
 
     private void setListLoadingState() {
         layoutLoading.setVisibility(View.VISIBLE);
-        layoutMain.setVisibility(View.VISIBLE);
         layoutNoReview.setVisibility(View.INVISIBLE);
         layoutReview.setVisibility(View.VISIBLE);
         recViewReview.setVisibility(View.INVISIBLE);
@@ -146,7 +160,6 @@ public class ReviewTab extends Fragment {
 
     private void setReviewLoadedState() {
         layoutLoading.setVisibility(View.INVISIBLE);
-        layoutMain.setVisibility(View.VISIBLE);
         layoutNoReview.setVisibility(View.INVISIBLE);
         layoutReview.setVisibility(View.VISIBLE);
         recViewReview.setVisibility(View.VISIBLE);
@@ -154,7 +167,6 @@ public class ReviewTab extends Fragment {
 
     private void setNoReviewState() {
         layoutLoading.setVisibility(View.INVISIBLE);
-        layoutMain.setVisibility(View.VISIBLE);
         layoutNoReview.setVisibility(View.VISIBLE);
         layoutReview.setVisibility(View.INVISIBLE);
     }

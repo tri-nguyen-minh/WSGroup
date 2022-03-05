@@ -80,7 +80,19 @@ public class Review implements Serializable {
 
     public static Review getReviewFromJSON(JSONObject jsonObject) throws Exception {
         Review review = new Review();
-
+        review.setId(jsonObject.getString("id"));
+        review.setProductId(jsonObject.getString("productid"));
+        review.setOrderId(jsonObject.getString("oderdetailid"));
+        review.setCreateDate(jsonObject.getString("createdat"));
+        review.setUpdateDate(jsonObject.getString("updatedat"));
+        review.setRating(jsonObject.getDouble("rating"));
+        review.setDescription(jsonObject.getString("comment"));
+        User user = new User();
+        user.setUserId(jsonObject.getString("customerid"));
+        user.setAvatarLink(jsonObject.getString("avt"));
+        user.setFirstName(jsonObject.getString("firstname"));
+        user.setLastName(jsonObject.getString("lastname"));
+        review.setUser(user);
         return review;
     }
 }

@@ -54,7 +54,6 @@ public class FirebasePhoneAuthService {
 
             @Override
             public void onCodeSent(String id, PhoneAuthProvider.ForceResendingToken token) {
-                super.onCodeSent(id, token);
                 verificationId = id;
                 resentToken = token;
                 onOTPSent();

@@ -8,6 +8,7 @@ public class Supplier implements Serializable {
 
     private String id, accountId, name, address, mail, avatarLink;
     private boolean status;
+    private LoyaltyStatus loyaltyStatus;
 
     public Supplier() {
     }
@@ -66,6 +67,14 @@ public class Supplier implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public LoyaltyStatus getLoyaltyStatus() {
+        return loyaltyStatus;
+    }
+
+    public void setLoyaltyStatus(LoyaltyStatus loyaltyStatus) {
+        this.loyaltyStatus = loyaltyStatus;
     }
 
     public static Supplier getSupplierFromJSON(JSONObject data) throws Exception{

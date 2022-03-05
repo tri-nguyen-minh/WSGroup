@@ -8,6 +8,7 @@ import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Category;
+import dev.wsgroup.main.models.dtos.LoyaltyStatus;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Review;
@@ -20,7 +21,7 @@ public class APIListener {
 
     public void onNoJSONFound() {}
 
-    public void onUserFound(User user) { }
+    public void onUserFound(User user, String message) { }
 
     public void onCompletingRegistrationRequest() {}
 
@@ -32,8 +33,7 @@ public class APIListener {
 
     public void onProductListFound(List<Product> productList) {}
 
-    public void onCartListFound(HashMap<String, List<CartProduct>> retailCart, List<Supplier> supplierRetailList,
-                                HashMap<String, List<CartProduct>> campaignCart, List<Supplier> supplierCampaignList) {}
+    public void onCartListFound(List<CartProduct> retailCartProductList, List<CartProduct> campaignCartProductList) {}
 
     public void onProductFound(Product product) {}
 
@@ -59,6 +59,14 @@ public class APIListener {
 
     public void onReviewFound(Review review) {}
 
+    public void onReviewListFound(List<Review> reviewList) {}
+
+    public void onReviewCountFound(int count, double rating) {}
+
+    public void onProductOrderCountFound(Map<String, Integer> countList) {}
+
     public void onGettingPaymentURL(String url) {}
+
+    public void onLoyaltyStatusFound(LoyaltyStatus status) {}
 
 }

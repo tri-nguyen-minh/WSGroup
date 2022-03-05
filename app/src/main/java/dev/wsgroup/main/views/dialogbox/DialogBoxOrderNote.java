@@ -41,7 +41,6 @@ public class DialogBoxOrderNote extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_order_note);
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         cardViewParent = findViewById(R.id.cardViewParent);
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);

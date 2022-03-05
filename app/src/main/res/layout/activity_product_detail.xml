@@ -109,14 +109,21 @@
         app:layout_constraintTop_toBottomOf="@id/layoutProductDetailHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/productViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/frameLayoutProductTabLayout"/>
+
         <FrameLayout
             android:id="@+id/frameLayoutProductTabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="2dp"
+            android:paddingTop="2dp"
             android:background="@color/gray_dark"
             app:layout_constraintTop_toBottomOf="@id/productViewPager"
-            app:layout_constraintBottom_toTopOf="@id/layoutButtonPurchase">
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/productTabLayout"
@@ -128,32 +135,6 @@
                 app:tabTextAppearance="@style/style_main_tab_text"/>
 
         </FrameLayout>
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/productViewPager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/frameLayoutProductTabLayout"/>
-
-        <RelativeLayout
-            android:id="@+id/layoutButtonPurchase"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:paddingBottom="10dp"
-            app:layout_constraintTop_toBottomOf="@id/frameLayoutProductTabLayout"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <Button
-                android:id="@+id/btnPurchaseProduct"
-                android:text="PURCHASE PRODUCT"
-                style="@style/style_button_account"
-                android:textSize="18sp"
-                android:layout_marginTop="10dp"
-                android:layout_marginHorizontal="30dp"/>
-
-        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

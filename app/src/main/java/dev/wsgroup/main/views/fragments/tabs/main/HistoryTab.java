@@ -25,13 +25,11 @@ public class HistoryTab extends Fragment {
     private TabLayout historyTabLayout;
     private TabLayout.Tab tabCommon;
 
-    private SharedPreferences sharedPreferences;
-    private String username, userId;
+    private int tabPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         return inflater.inflate(R.layout.fragment_main_history_tab, container, false);
     }
 
@@ -41,6 +39,9 @@ public class HistoryTab extends Fragment {
 
         historyViewPager = view.findViewById(R.id.historyViewPager);
         historyTabLayout = view.findViewById(R.id.historyTabLayout);
+
+        tabPosition = getActivity().getIntent().getIntExtra("HISTORY_TAB_POSITION", 0);
+
         historyTabLayout.removeAllTabs();
         historyViewPager.setAdapter(null);
 
@@ -108,6 +109,7 @@ public class HistoryTab extends Fragment {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+        historyTabLayout.selectTab(historyTabLayout.getTabAt(tabPosition));
         historyViewPager.setCurrentItem(historyTabLayout.getSelectedTabPosition());
     }
 }

@@ -133,10 +133,9 @@ public class PasswordChangeActivity extends AppCompatActivity {
                 } else {
                     String oldPassword = editOldPassword.getText().toString();
                     String newPassword = editNewPassword.getText().toString();
-                    APIUserCaller.findUserByUsernameAndPassword(username, oldPassword, getApplication(), new APIListener() {
+                    APIUserCaller.logInWithUsernameAndPassword(username, oldPassword, getApplication(), new APIListener() {
                         @Override
-                        public void onUserFound(User user) {
-                            super.onUserFound(user);
+                        public void onUserFound(User user, String message) {
                             if (oldPassword.equals(newPassword)) {
                                 errorMessage = StringUtils.MES_ERROR_DUPLICATE_OLD_PASSWORD;
                                 dialogBoxLoading.dismiss();
@@ -151,7 +150,6 @@ public class PasswordChangeActivity extends AppCompatActivity {
                                                 IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,StringUtils.MES_SUCCESSFUL_UPDATE_PASSWORD,"") {
                                             @Override
                                             public void onClickAction() {
-                                                super.onClickAction();
                                                 imgBackFromChangePassword.performClick();
                                             }
                                         };
@@ -161,7 +159,6 @@ public class PasswordChangeActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onFailedAPICall(int code) {
-                                        super.onFailedAPICall(code);
                                         errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
                                         dialogBoxLoading.dismiss();
                                         alertError(errorMessage);
@@ -172,7 +169,6 @@ public class PasswordChangeActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailedAPICall(int code) {
-                            super.onFailedAPICall(code);
                             if (code == IntegerUtils.ERROR_API) {
                                 errorMessage = StringUtils.MES_ERROR_WRONG_OLD_PASSWORD;
                             } else {

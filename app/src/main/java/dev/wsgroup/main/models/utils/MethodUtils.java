@@ -155,11 +155,11 @@ public class MethodUtils {
             reviews.add(review);
             review = new Review();
             review.setCreateDate("2022-01-27T17:25:59.996Z");
-            review.setRating(4);
+            review.setRating(3);
             reviews.add(review);
             review = new Review();
             review.setCreateDate("2022-02-12T07:05:33.288Z");
-            review.setRating(2.5);
+            review.setRating(4.5);
             reviews.add(review);
             Collections.sort(reviews, new Comparator<Review>() {
                 @Override

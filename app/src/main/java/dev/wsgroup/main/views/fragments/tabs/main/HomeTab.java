@@ -21,15 +21,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Product;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
@@ -48,9 +47,7 @@ public class HomeTab extends Fragment {
     private ImageView imgProductDetailMessage;
 
     private SharedPreferences sharedPreferences;
-    private List<Supplier> supplierRetailList, supplierCampaignList;
-    private HashMap<String, List<CartProduct>> retailCart, campaignCart;
-    private List<CartProduct> productList;
+    private List<CartProduct> retailList, campaignList;
     private String userId;
     private int cartCount;
 
@@ -87,10 +84,15 @@ public class HomeTab extends Fragment {
         layoutNoProductFound.setVisibility(View.INVISIBLE);
         layoutLoading.setVisibility(View.VISIBLE);
 
+        List<String> list = new ArrayList<>();
+        list.add("3c2623eb-f4ba-4fe9-8f33-c3e604250ab5");
+        list.add("1bd7c4d0-80dd-4a33-a229-df536a621aed");
+        list.add("b53602fc-fc91-483b-a528-799338cbe13f");
+        list.add("84bb4393-be10-406c-93ec-cc92be9a6da0");
+
         imgProductDetailMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
             }
         });
 
@@ -124,22 +126,32 @@ public class HomeTab extends Fragment {
         APIProductCaller.getAllProduct(null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onProductListFound(List<Product> productList) {
-                super.onProductListFound(productList);
                 if(!productList.isEmpty()) {
-                    setupView(productList);
+                    APIProductCaller.getOrderCountByProductList(productList, getActivity().getApplication(), new APIListener() {
+                        @Override
+                        public void onProductOrderCountFound(Map<String, Integer> countList) {
+                            for (Product product : productList) {
+                                if (countList.get(product.getProductId()) != null) {
+                                    product.setOrderCount(countList.get(product.getProductId()));
+                                }else {
+                                    product.setOrderCount(0);
+                                }
+                            }
+                            setupMostPopularView(productList);
+                        }
+                    });
                 } else {
                     setupNoProductView();
                 }
             }
             @Override
             public void onFailedAPICall(int errorCode) {
-                super.onFailedAPICall(errorCode);
                 setupNoProductView();
             }
         });
     }
 
-    private void setupView(List<Product> productList) {
+    private void setupMostPopularView(List<Product> productList) {
         layoutNoProductFound.setVisibility(View.INVISIBLE);
         layoutLoading.setVisibility(View.INVISIBLE);
         scrollViewHomeFragment.setVisibility(View.VISIBLE);
@@ -161,49 +173,21 @@ public class HomeTab extends Fragment {
         scrollViewHomeFragment.setVisibility(View.INVISIBLE);
     }
 
-    private int getRetailCartCount() {
-        int count = 0;
-        for (Supplier supplier : supplierRetailList) {
-            productList = retailCart.get(supplier.getId());
-            count += productList.size();
-        }
-        return count;
-    }
-
-    private int getCampaignCartCount() {
-        int count = 0;
-        for (Supplier supplier : supplierCampaignList) {
-            productList = campaignCart.get(supplier.getId());
-            count += productList.size();
-        }
-        return count;
-    }
-
     private void editCartCountByUser() {
         try {
-            retailCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+            retailList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-            campaignCart = (HashMap<String, List<CartProduct>>) ObjectSerializer
+            campaignList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
-            supplierRetailList = (ArrayList<Supplier>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("SUPPLIER_RETAIL_LIST", ""));
-            supplierCampaignList = (ArrayList<Supplier>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("SUPPLIER_CAMPAIGN_LIST", ""));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(supplierRetailList == null && supplierCampaignList == null) {
+        if(retailList == null && campaignList == null) {
             cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
         } else {
-            if (supplierRetailList.size() > 0 || supplierCampaignList.size() > 0) {
+            if (retailList.size() > 0 || campaignList.size() > 0) {
                 cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
-                cartCount = 0;
-                if (supplierRetailList.size() > 0) {
-                    cartCount += getRetailCartCount();
-                }
-                if (supplierCampaignList.size() > 0) {
-                    cartCount += getCampaignCartCount();
-                }
+                cartCount = retailList.size() + campaignList.size();
                 txtProductDetailCartCount.setText(cartCount + "");
             } else {
                 cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);

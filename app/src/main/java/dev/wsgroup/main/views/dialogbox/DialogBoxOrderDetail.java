@@ -172,7 +172,6 @@ public class DialogBoxOrderDetail extends Dialog{
                 DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_IMMEDIATE_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
-                        super.onYesClicked();
                         dismiss();
                         Intent checkoutActivity = new Intent(context, ConfirmActivity.class);
                         checkoutActivity.putExtra("ORDER", (Serializable) order);
@@ -308,7 +307,6 @@ public class DialogBoxOrderDetail extends Dialog{
                     DialogBoxCampaign dialogBoxCampaign = new DialogBoxCampaign(activity, product) {
                         @Override
                         public void executeOnCampaignSelectedOnDialog(Campaign campaign) {
-                            super.executeOnCampaignSelectedOnDialog(campaign);
                             if (campaignId.isEmpty()) {
                                 campaignId = campaign.getId();
                                 maxQuantity = getMaximumQuantity();
@@ -401,7 +399,6 @@ public class DialogBoxOrderDetail extends Dialog{
                 activity.getApplication(), new APIListener() {
                     @Override
                     public void onUpdateCartItemSuccessful() {
-                        super.onUpdateCartItemSuccessful();
                         dialogBoxLoading.dismiss();
                         onCartProductAdded(cartProduct);
                         dismiss();
@@ -409,7 +406,6 @@ public class DialogBoxOrderDetail extends Dialog{
 
                     @Override
                     public void onFailedAPICall(int code) {
-                        super.onFailedAPICall(code);
                     }
                 });
     }

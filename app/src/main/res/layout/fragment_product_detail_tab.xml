@@ -59,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
-                        android:padding="15dp"
+                        android:padding="10dp"
                         android:fontFamily="@font/montserratr"
                         android:gravity="left"
                         android:textColor="@color/black"
@@ -70,8 +70,7 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="15dp"
-                        android:paddingLeft="10dp"
+                        android:padding="10dp"
                         android:layout_marginVertical="2dp"
                         android:background="@color/white">
 
@@ -86,14 +85,10 @@
                             android:id="@+id/ratingProduct"
                             android:layout_width="wrap_content"
                             android:layout_height="30dp"
-                            android:layout_marginRight="10dp"
                             android:progressTint="@color/gold"
-                            android:secondaryProgressTint="@color/gold"
+                            android:progressBackgroundTint="@color/gray"
                             android:numStars="5"
-                            android:rating="0"
-                            android:stepSize="0.5"
                             android:theme="@style/ratingBar"
-                            android:isIndicator="true"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -107,7 +102,7 @@
                             android:fontFamily="@font/montserratr"
                             android:text="0.0"
                             android:textColor="@color/gray_dark"
-                            android:textSize="22sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -156,6 +151,7 @@
                                 android:id="@+id/lblProductReviewCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
                                 android:fontFamily="@font/montserratr"
                                 android:gravity="left"
                                 android:text="Reviews:"
@@ -170,6 +166,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:paddingLeft="7dp"
+                                android:layout_marginTop="3dp"
                                 android:fontFamily="@font/montserratr"
                                 android:gravity="right|center"
                                 android:text="0K"
@@ -225,36 +222,91 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutLoyalty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/red"
+                        android:paddingHorizontal="15dp"
+                        android:paddingVertical="5dp"
+                        app:layout_constraintBottom_toTopOf="@id/txtProductRetailPrice"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/txtLoyaltyTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserratm"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="Loyal Customer Discount"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/txtLoyaltyDiscount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="7dp"
+                            android:fontFamily="@font/montserratm"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            tools:text="50%"
+                            app:layout_constraintRight_toLeftOf="@id/lblLoyaltyDiscount"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/lblLoyaltyDiscount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserratm"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            tools:text="OFF"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/layoutBasePrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="10dp"
+                        android:paddingVertical="7dp"
+                        android:paddingHorizontal="10dp"
                         android:layout_marginBottom="2dp"
                         android:background="@color/white">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserratr"
-                            android:gravity="left"
-                            android:text="Retail Price: "
-                            android:textColor="@color/gray_dark"
-                            android:textSize="16sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/txtProductRetailPrice"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
                             android:text="0.000d"
                             android:textColor="@color/red"
                             android:textSize="18sp"
                             android:textStyle="bold"
-                            app:layout_constraintRight_toRightOf="parent"/>
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <Button
+                            android:id="@+id/btnPurchaseProduct"
+                            android:text="PURCHASE"
+                            style="@style/style_button_dialog_box"
+                            android:textSize="15sp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -275,7 +327,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="2dp"
-                            android:padding="10dp"
+                            android:padding="7dp"
                             android:background="@color/white">
 
                             <LinearLayout

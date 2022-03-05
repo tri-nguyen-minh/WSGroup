@@ -46,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout layoutMainPage, layoutLoading;
 
     private SharedPreferences sharedPreferences;
-    private List<Supplier> supplierRetailList, supplierCampaignList;
-    private HashMap<String, List<CartProduct>> retailCart, campaignCart;
+    private List<CartProduct> retailCartProductList, campaignCartProductList;
 
     private String userId, token;
     private int tabPosition;
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             token = sharedPreferences.getString("TOKEN", "");
             APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
                 @Override
-                public void onUserFound(User user) {
+                public void onUserFound(User user, String message) {
                     user.setToken(token);
                     sharedPreferences.edit().putString("TOKEN", user.getToken()).commit();
                     setUpShoppingCart(tabPosition);
@@ -84,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailedAPICall(int errorCode) {
-                    super.onFailedAPICall(errorCode);
                     sharedPreferences.edit().clear().commit();
                     userId = "";
                     setUpShoppingCart(tabPosition);
@@ -97,21 +95,16 @@ public class MainActivity extends AppCompatActivity {
         token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
-            public void onCartListFound(HashMap<String, List<CartProduct>> rCart, List<Supplier> rList,
-                                        HashMap<String, List<CartProduct>> cCart, List<Supplier> cList) {
-                retailCart = rCart;
-                campaignCart = cCart;
-                supplierRetailList = rList;
-                supplierCampaignList = cList;
+            public void onCartListFound(List<CartProduct> retailList,
+                                        List<CartProduct> campaignList) {
+                retailCartProductList = retailList;
+                campaignCartProductList = campaignList;
                 putSessionCart(tabPosition);
             }
             @Override
             public void onFailedAPICall(int code) {
-                super.onFailedAPICall(code);
-                retailCart = new HashMap<>();
-                campaignCart = new HashMap<>();
-                supplierRetailList = new ArrayList<>();
-                supplierCampaignList = new ArrayList<>();
+                retailCartProductList = new ArrayList<>();
+                campaignCartProductList = new ArrayList<>();
                 putSessionCart(tabPosition);
             }
         });
@@ -120,10 +113,8 @@ public class MainActivity extends AppCompatActivity {
     private void putSessionCart(int tabPosition) {
         try {
             sharedPreferences.edit()
-                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCart))
-                    .putString("SUPPLIER_RETAIL_LIST", ObjectSerializer.serialize((Serializable) supplierRetailList))
-                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCart))
-                    .putString("SUPPLIER_CAMPAIGN_LIST", ObjectSerializer.serialize((Serializable) supplierCampaignList))
+                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCartProductList))
+                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCartProductList))
                     .commit();
         } catch (IOException e) {
             e.printStackTrace();

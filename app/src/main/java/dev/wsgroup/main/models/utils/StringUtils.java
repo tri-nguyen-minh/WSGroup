@@ -15,7 +15,8 @@ public class StringUtils {
     public static final String LOGIN_URL = USER_API_URL + "login";
     public static final String REGISTER_URL = USER_API_URL + "register";
     public static final String GET_PROFILE_URL = USER_API_URL + "profile/me";
-    public static final String GET_CATEGORY_BY_SUPPLIER_URL = CATEGORY_API_URL + "?userId=";
+    public static final String LOGIN_GOOGLE_URL = USER_API_URL + "login/google";
+//    public static final String GET_CATEGORY_BY_SUPPLIER_URL = CATEGORY_API_URL + "?userId=";
     public static final String APPLICATION_JSON = "application/json";
 
     public static final String PHONE_REGEX = "0[1-9][0-9]{8,9}";
@@ -29,6 +30,9 @@ public class StringUtils {
     public static final String MES_CONFIRM_IMMEDIATE_CHECKOUT = "Checkout immediately?";
     public static final String MES_CONFIRM_ORDER = "Confirm order?";
     public static final String MES_CONFIRM_DUPLICATE_CART_PRODUCT = "This product is already\nin your shopping cart.\nReplace it?";
+    public static final String MES_CONFIRM_ADD_REVIEW = "Submit your Review?";
+    public static final String MES_CONFIRM_ADD_REVIEW_DESCRIPTION = "Your review cannot be changed or removed later.";
+    public static final String MES_CONFIRM_CAMPAIGN_ORDER_ADVANCE = "This order requires .";
 
     public static final String MES_ERROR_FAILED_API_CALL = "An error has occurred.\nPlease try again later.";
     public static final String MES_ERROR_FAILED_LOG_IN = "Your Username or Password is incorrect";
@@ -56,4 +60,5 @@ public class StringUtils {
     public static final String MES_SUCCESSFUL_ORDER = "Your order has been processed!";
     public static final String MES_SUCCESSFUL_OTP = "Your number has been successfully confirmed!";
     public static final String MES_SUCCESSFUL_ADD_CART = "The product has been add to your shopping cart!";
+    public static final String MES_SUCCESSFUL_ADD_REVIEW = "Your review has been submitted.";
 }

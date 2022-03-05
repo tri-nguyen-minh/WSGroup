@@ -58,7 +58,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_cart_product_list, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_cart_product_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -91,7 +92,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                     } else {
                         currentStatus = true;
                     }
-                    onCheckboxProductChanged(position, currentStatus);
+                    onCheckboxProductChanged(shoppingCart.get(position).getId(), currentStatus);
                 }
             });
         } else {
@@ -196,25 +197,11 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
 
         holder.btnDeleteCartProducts.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_DELETE_CART) {
-                    @Override
-                    public void onYesClicked() {
-                        onRemoveProduct(position);
-                    }
-                };
-                dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialogBoxConfirm.show();
-            }
-        });
-
-        holder.btnDeleteCartProducts.setOnClickListener(new View.OnClickListener() {
-            @Override
             public void onClick(View v) {
                 DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_DELETE_CART) {
                     @Override
                     public void onYesClicked() {
-                        onRemoveProduct(position);
+                        onRemoveProduct(shoppingCart.get(position).getId());
                     }
                 };
                 dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -224,7 +211,7 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
     }
 
     private void getPurchasePrice(int position) {
-        price = shoppingCart.get(0).getProduct().getRetailPrice();
+        price = shoppingCart.get(position).getProduct().getRetailPrice();
         if (identifier == IntegerUtils.IDENTIFIER_CAMPAIGN_CART) {
             price -= shoppingCart.get(position).getCampaign().getSavingPrice();
         }
@@ -310,7 +297,6 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                 activity.getApplication(), new APIListener() {
                     @Override
                     public void onUpdateCartItemSuccessful() {
-                        super.onUpdateCartItemSuccessful();
                         holder.btnCheckout.setEnabled(true);
                         holder.btnCheckout.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
                         if (!cartProduct.getSelectedFlag()) {
@@ -323,16 +309,15 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
 
                     @Override
                     public void onFailedAPICall(int code) {
-                        super.onFailedAPICall(code);
                         holder.btnCheckout.setEnabled(true);
                         holder.btnCheckout.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
                     }
                 });
     }
 
-    public void onRemoveProduct(int position) {}
+    public void onRemoveProduct(String cartProductId) {}
 
-    public void onCheckboxProductChanged(int position, boolean newStatus) {}
+    public void onCheckboxProductChanged(String cartProductId, boolean status) {}
 
     public void onPriceChanging() {}
 

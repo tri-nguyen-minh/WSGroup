@@ -32,8 +32,8 @@ import dev.wsgroup.main.views.fragments.tabs.cart.RetailTab;
 public class DiscountActivity extends AppCompatActivity {
 
     private ImageView imgBackFromDiscount, imgDiscountMessage, imgDiscountHome;
-    private LinearLayout layoutFailedGettingDiscount, layoutNoDiscount;
-    private ConstraintLayout layoutDiscount, layoutLoading;
+//    private LinearLayout layoutFailedGettingDiscount, layoutNoDiscount;
+    private ConstraintLayout layoutDiscount;
     private TabLayout discountTabLayout;
     private ViewPager discountViewPager;
     private TextView lblRetryGetDiscount;
@@ -41,7 +41,6 @@ public class DiscountActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private List<CustomerDiscount> discountList;
-    private int identifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +52,11 @@ public class DiscountActivity extends AppCompatActivity {
         imgBackFromDiscount = findViewById(R.id.imgBackFromDiscount);
         imgDiscountMessage = findViewById(R.id.imgDiscountMessage);
         imgDiscountHome = findViewById(R.id.imgDiscountHome);
-        layoutFailedGettingDiscount = findViewById(R.id.layoutFailedGettingDiscount);
-        layoutNoDiscount = findViewById(R.id.layoutNoDiscount);
-        layoutDiscount = findViewById(R.id.layoutDiscount);
-        layoutLoading = findViewById(R.id.layoutLoading);
         discountTabLayout = findViewById(R.id.discountTabLayout);
         discountViewPager = findViewById(R.id.discountViewPager);
         lblRetryGetDiscount = findViewById(R.id.lblRetryGetDiscount);
 
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutFailedGettingDiscount.setVisibility(View.INVISIBLE);
-        layoutNoDiscount.setVisibility(View.INVISIBLE);
         layoutDiscount.setVisibility(View.INVISIBLE);
-        identifier = getIntent().getIntExtra("IDENTIFIER", IntegerUtils.IDENTIFIER_DISCOUNT_VIEW);
         setupDiscountList();
 
         imgBackFromDiscount.setOnClickListener(new View.OnClickListener() {
@@ -80,17 +71,6 @@ public class DiscountActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            }
-        });
-
-        lblRetryGetDiscount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                layoutLoading.setVisibility(View.VISIBLE);
-                layoutFailedGettingDiscount.setVisibility(View.INVISIBLE);
-                layoutNoDiscount.setVisibility(View.INVISIBLE);
-                layoutDiscount.setVisibility(View.INVISIBLE);
-                setupDiscountList();
             }
         });
     }
@@ -116,7 +96,7 @@ public class DiscountActivity extends AppCompatActivity {
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override
             public Fragment getItem(int position) {
-                Fragment fragment = new DiscountFragment(identifier);
+                Fragment fragment = new DiscountFragment(discountTabLayout.getTabAt(position).getText().toString());
                 return fragment;
             }
 

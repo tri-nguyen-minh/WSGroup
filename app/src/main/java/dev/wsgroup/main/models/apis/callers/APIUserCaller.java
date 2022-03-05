@@ -28,8 +28,8 @@ public class APIUserCaller {
 
     private static RequestQueue requestQueue;
 
-    public static void findUserByUsernameAndPassword(String username, String password,
-                                                     Application application, APIListener APIListener) {
+    public static void logInWithUsernameAndPassword(String username, String password,
+                                                    Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -42,10 +42,11 @@ public class APIUserCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
+                        String message = response.getString("status");
                         JSONObject data = response.getJSONObject("data");
                         User user = User.getUserAccountFromJSON(data.getJSONObject("user"), data.getJSONObject("info"));
                         user.setToken(data.getString("token"));
-                        APIListener.onUserFound(user);
+                        APIListener.onUserFound(user, message);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
@@ -66,6 +67,54 @@ public class APIUserCaller {
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, StringUtils.LOGIN_URL,
                                                                 jsonObject, listener, errorListener);
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loginWithGoogle(User user, Application application, APIListener APIListener) {
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("googleId", user.getGoogleId());
+            jsonObject.put("firstName", user.getFirstName());
+            jsonObject.put("lastName", user.getLastName());
+            jsonObject.put("phone", user.getPhoneNumber());
+            jsonObject.put("email", user.getMail());
+            jsonObject.put("roleName", "Customer");
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String message = response.getString("status");
+                        JSONObject data = response.getJSONObject("data");
+                        User user = User.getUserAccountFromJSON(data.getJSONObject("user"), data.getJSONObject("info"));
+                        user.setToken(data.getString("token"));
+                        APIListener.onUserFound(user, message);
+                    } catch (Exception e) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, StringUtils.LOGIN_GOOGLE_URL,
+                    jsonObject, listener, errorListener) {
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,9 +184,10 @@ public class APIUserCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
+                        String message = response.getString("message");
                         JSONArray jsonArray = response.getJSONArray("data");
                         if(jsonArray.length() > 0) {
-                            APIListener.onUserFound(new User());
+                            APIListener.onUserFound(new User(), message);
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                         }
@@ -175,8 +225,9 @@ public class APIUserCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
+                        String message = response.getString("message");
                         User user = User.getUserFromJSON(response.getJSONObject("data"));
-                        APIListener.onUserFound(user);
+                        APIListener.onUserFound(user, message);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();

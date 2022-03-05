@@ -45,34 +45,38 @@ public class APICartCaller {
                     CartProduct cartProduct;
                     Supplier supplier;
                     cartProductList = new ArrayList<>();
-                    HashMap<String, List<CartProduct>> retailCart = new HashMap<>();
-                    HashMap<String, List<CartProduct>> campaignCart = new HashMap<>();
-                    List<Supplier> supplierRetailList = new ArrayList<>();
-                    List<Supplier> supplierCampaignList = new ArrayList<>();
+                    List<CartProduct> retailList = new ArrayList<>();
+                    List<CartProduct> campaignList = new ArrayList<>();
+//                    HashMap<String, List<CartProduct>> retailCart = new HashMap<>();
+//                    HashMap<String, List<CartProduct>> campaignCart = new HashMap<>();
+//                    List<Supplier> supplierRetailList = new ArrayList<>();
+//                    List<Supplier> supplierCampaignList = new ArrayList<>();
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length();i++) {
                             cartProduct = CartProduct.getCartProductFromJSON(jsonArray.getJSONObject(i));
                             supplier = cartProduct.getProduct().getSupplier();
                             if (!cartProduct.getCampaignFlag()) {
-                                cartProductList = retailCart.get(supplier.getId());
-                                if(cartProductList == null) {
-                                    supplierRetailList.add(supplier);
-                                    cartProductList = new ArrayList<>();
-                                }
-                                cartProductList.add(cartProduct);
-                                retailCart.put(supplier.getId(), cartProductList);
+                                retailList.add(cartProduct);
+//                                cartProductList = retailCart.get(supplier.getId());
+//                                if(cartProductList == null) {
+//                                    supplierRetailList.add(supplier);
+//                                    cartProductList = new ArrayList<>();
+//                                }
+//                                cartProductList.add(cartProduct);
+//                                retailCart.put(supplier.getId(), cartProductList);
                             } else {
-                                cartProductList = campaignCart.get(supplier.getId());
-                                if(cartProductList == null) {
-                                    supplierCampaignList.add(supplier);
-                                    cartProductList = new ArrayList<>();
-                                }
-                                cartProductList.add(cartProduct);
-                                campaignCart.put(supplier.getId(), cartProductList);
+                                campaignList.add(cartProduct);
+//                                cartProductList = campaignCart.get(supplier.getId());
+//                                if(cartProductList == null) {
+//                                    supplierCampaignList.add(supplier);
+//                                    cartProductList = new ArrayList<>();
+//                                }
+//                                cartProductList.add(cartProduct);
+//                                campaignCart.put(supplier.getId(), cartProductList);
                             }
                         }
-                        APIListener.onCartListFound(retailCart, supplierRetailList, campaignCart, supplierCampaignList);
+                        APIListener.onCartListFound(retailList, campaignList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);

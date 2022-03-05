@@ -94,7 +94,6 @@ public class DialogBoxOTP extends Dialog {
                                     IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS, StringUtils.MES_SUCCESSFUL_OTP,"") {
                                 @Override
                                 public void onClickAction() {
-                                    super.onClickAction();
                                     Intent nextIntent;
                                     if (requestCode == IntegerUtils.REQUEST_REGISTER) {
                                         nextIntent = new Intent(context, AccountDetailActivity.class);
@@ -112,45 +111,6 @@ public class DialogBoxOTP extends Dialog {
                 }
             }
         };
-
-//        dialogBoxLoading = new DialogBoxLoading(activity);
-//        dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        dialogBoxLoading.show();
-//        APIUserCaller.findUserByPhoneNumber(phoneNumber, activity.getApplication(), new APIListener() {
-//            @Override
-//            public void onUserFound(User user) {
-//                super.onUserFound(user);
-//                dialogBoxLoading.dismiss();
-//                if(requestCode != IntegerUtils.REQUEST_REGISTER) {
-//                    cardViewParent.setVisibility(View.VISIBLE);
-//                } else {
-//                    displayError(StringUtils.MES_ERROR_DUPLICATE_NUMBER);
-//                    dismiss();
-//                }
-//            }
-//            @Override
-//            public void onFailedAPICall(int errorCode) {
-//                super.onFailedAPICall(errorCode);
-//                dialogBoxLoading.dismiss();
-//                switch (errorCode) {
-//                    case IntegerUtils.ERROR_API:
-//                    case IntegerUtils.ERROR_PARSING_JSON: {
-//                        displayError(StringUtils.MES_ERROR_FAILED_API_CALL);
-//                        dismiss();
-//                        break;
-//                    }
-//                    case IntegerUtils.ERROR_NO_USER: {
-//                        if(requestCode != IntegerUtils.REQUEST_REGISTER) {
-//                            displayError(StringUtils.MES_ERROR_NO_NUMBER_FOUND);
-//                            dismiss();
-//                        } else {
-//                            cardViewParent.setVisibility(View.VISIBLE);
-//                        }
-//                        break;
-//                    }
-//                }
-//            }
-//        });
 
         txtResendOTP.setOnClickListener(new View.OnClickListener() {
             @Override

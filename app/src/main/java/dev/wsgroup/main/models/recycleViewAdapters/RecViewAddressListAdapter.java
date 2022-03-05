@@ -39,7 +39,8 @@ public class RecViewAddressListAdapter extends RecyclerView.Adapter<RecViewAddre
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recycle_view_address_list, parent, false);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.recycle_view_address_list, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -57,14 +58,12 @@ public class RecViewAddressListAdapter extends RecyclerView.Adapter<RecViewAddre
                             addressList.get(position), false) {
                         @Override
                         public void onAddressUpdate(Address address) {
-                            super.onAddressUpdate(address);
                             onAddressChange(address, position, IntegerUtils.ADDRESS_ACTION_UPDATE);
                             notifyDataSetChanged();
                         }
 
                         @Override
                         public void onAddressDelete() {
-                            super.onAddressDelete();
                             onAddressChange(addressList.get(position), position, IntegerUtils.ADDRESS_ACTION_DELETE);
                             notifyDataSetChanged();
                         }

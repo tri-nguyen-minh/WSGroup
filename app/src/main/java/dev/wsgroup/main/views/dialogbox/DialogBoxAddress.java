@@ -146,7 +146,6 @@ public class DialogBoxAddress extends Dialog {
                     APIAddressCaller.UpdateAddress(token, address, activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {
-                            super.onUpdateAddressSuccessful(address);
                             dismiss();
                             onAddressUpdate(address);
                         }
@@ -159,7 +158,6 @@ public class DialogBoxAddress extends Dialog {
                     APIAddressCaller.DeleteAddress(token, address, activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {
-                            super.onUpdateAddressSuccessful(address);
                             dismiss();
                             onAddressDelete();
                         }
@@ -177,7 +175,6 @@ public class DialogBoxAddress extends Dialog {
                     APIAddressCaller.AddAddress(token, address, activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {
-                            super.onUpdateAddressSuccessful(address);
                             dismiss();
                             onAddressAdd(address);
                         }

@@ -77,8 +77,8 @@
 
                     <ImageView
                         android:id="@+id/imgProduct"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
                         android:src="@drawable/img_unavailable"/>
 
                 </androidx.cardview.widget.CardView>
@@ -97,7 +97,7 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:text="test\ntest\ntest"
+                android:text=""
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/cardViewImage"
                 app:layout_constraintBottom_toBottomOf="parent"

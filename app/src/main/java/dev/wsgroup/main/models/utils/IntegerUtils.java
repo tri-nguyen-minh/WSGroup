@@ -38,7 +38,4 @@ public class IntegerUtils {
 
     public static final int IDENTIFIER_RETAIL_CART = 1;
     public static final int IDENTIFIER_CAMPAIGN_CART = 2;
-
-    public static final int IDENTIFIER_DISCOUNT_VIEW = 1;
-    public static final int IDENTIFIER_DISCOUNT_SELECT = 2;
 }

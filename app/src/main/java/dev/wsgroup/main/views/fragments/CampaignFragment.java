@@ -70,10 +70,16 @@ public class CampaignFragment extends Fragment {
                     @Override
                     public void onCampaignListFound(List<Campaign> foundCampaignList) {
                         campaignList = foundCampaignList;
-                        layoutLoading.setVisibility(View.INVISIBLE);
-                        layoutNoCampaign.setVisibility(View.INVISIBLE);
-                        recViewCampaignView.setVisibility(View.VISIBLE);
-                        setupCampaignList();
+                        if (campaignList.size() > 0) {
+                            layoutLoading.setVisibility(View.INVISIBLE);
+                            layoutNoCampaign.setVisibility(View.INVISIBLE);
+                            recViewCampaignView.setVisibility(View.VISIBLE);
+                            setupCampaignList();
+                        } else {
+                            layoutLoading.setVisibility(View.INVISIBLE);
+                            layoutNoCampaign.setVisibility(View.VISIBLE);
+                            recViewCampaignView.setVisibility(View.INVISIBLE);
+                        }
                     }
 
                     @Override
@@ -96,7 +102,6 @@ public class CampaignFragment extends Fragment {
         adapter = new RecViewCampaignListAdapter(getContext()) {
             @Override
             public void executeOnCampaignSelected(Campaign campaign) {
-                super.executeOnCampaignSelected(campaign);
                 getActivity().getIntent().putExtra("CAMPAIGN_SELECTED", campaign);
                 getActivity().getIntent().putExtra("REQUEST_CODE", IntegerUtils.REQUEST_SELECT_CAMPAIGN);
                 getActivity().setResult(Activity.RESULT_OK, getActivity().getIntent());

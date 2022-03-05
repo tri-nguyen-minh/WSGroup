@@ -102,8 +102,7 @@ public class AccountInformationActivity extends AppCompatActivity {
 
         APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
             @Override
-            public void onUserFound(User foundUser) {
-                super.onUserFound(foundUser);
+            public void onUserFound(User foundUser, String message) {
                 user = foundUser;
                 user.setToken(token);
                 user.setUsername(username);
@@ -169,11 +168,9 @@ public class AccountInformationActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-
                 DialogBoxSelectImage dialogBox = new DialogBoxSelectImage(AccountInformationActivity.this) {
                     @Override
                     public void executeTakePhoto() {
-                        super.executeTakePhoto();
                         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             requestPermissions(new String[]{Manifest.permission.CAMERA}, 100);
                         } else {
@@ -183,7 +180,6 @@ public class AccountInformationActivity extends AppCompatActivity {
 
                     @Override
                     public void executeSelectPhoto() {
-                        super.executeSelectPhoto();
                         selectImage();
                     }
                 };
@@ -332,6 +328,7 @@ public class AccountInformationActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(Task<Uri> task) {
                                 if (task.isSuccessful()) {
+                                    avatarLink = task.getResult().toString();
                                     updateUser();
                                 } else {
                                     displayUploadFailed();
@@ -368,7 +365,6 @@ public class AccountInformationActivity extends AppCompatActivity {
         APIUserCaller.updateUserProfile(updatedUser, getApplication(), new APIListener() {
             @Override
             public void onUpdateProfileSuccessful() {
-                super.onUpdateProfileSuccessful();
                 if (dialogBoxLoading.isShowing()) {
                     dialogBoxLoading.dismiss();
                 }
@@ -383,7 +379,6 @@ public class AccountInformationActivity extends AppCompatActivity {
 
             @Override
             public void onFailedAPICall(int code) {
-                super.onFailedAPICall(code);
                 if (dialogBoxLoading.isShowing()) {
                     dialogBoxLoading.dismiss();
                 }
@@ -410,43 +405,9 @@ public class AccountInformationActivity extends AppCompatActivity {
     }
 
     private void loadAvatarFromFirebase() {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                StorageReference storageReference = storage.getReference();
-                StorageReference ref = storageReference.child(avatarLink);
-                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Glide.with(getApplicationContext()).load(uri).into(imgAccountInfoAvatar);
-                        layoutProfileAvatar.setVisibility(View.VISIBLE);
-                        progressBarLoading.setVisibility(View.INVISIBLE);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        imgAccountInfoAvatar.setImageResource(R.drawable.ic_profile_circle);
-                        layoutProfileAvatar.setVisibility(View.VISIBLE);
-                        progressBarLoading.setVisibility(View.INVISIBLE);
-                        e.printStackTrace();
-                    }
-                });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialogBox.show();
-                imgAccountInfoAvatar.setImageResource(R.drawable.ic_profile_circle);
-                layoutProfileAvatar.setVisibility(View.VISIBLE);
-                progressBarLoading.setVisibility(View.INVISIBLE);
-                e.printStackTrace();
-            }
-        });
+        Glide.with(getApplicationContext()).load(avatarLink).into(imgAccountInfoAvatar);
+        layoutProfileAvatar.setVisibility(View.VISIBLE);
+        progressBarLoading.setVisibility(View.INVISIBLE);
     }
 
     @Override

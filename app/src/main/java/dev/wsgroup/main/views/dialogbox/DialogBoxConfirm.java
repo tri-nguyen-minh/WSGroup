@@ -14,13 +14,17 @@ import dev.wsgroup.main.R;
 public class DialogBoxConfirm extends Dialog {
 
     private Button btnConfirm, btnCancel;
-    private TextView txtConfirmContent;
+    private TextView txtConfirmContent, txtConfirmDescription;
 
-    private String message;
+    private String message, description;
 
     public DialogBoxConfirm(Activity activity, String message) {
         super(activity);
         this.message = message;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -29,10 +33,21 @@ public class DialogBoxConfirm extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_confirm);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         btnConfirm = findViewById(R.id.btnYes);
         btnCancel = findViewById(R.id.btnNo);
         txtConfirmContent = findViewById(R.id.txtConfirmContent);
+        txtConfirmDescription = findViewById(R.id.txtConfirmDescription);
+
+        txtConfirmDescription.setVisibility(View.GONE);
+
         txtConfirmContent.setText(message);
+        if (description != null) {
+            if (!description.isEmpty()) {
+                txtConfirmDescription.setVisibility(View.VISIBLE);
+                txtConfirmDescription.setText(description);
+            }
+        }
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
