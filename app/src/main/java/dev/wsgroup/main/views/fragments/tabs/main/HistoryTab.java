@@ -46,6 +46,10 @@ public class HistoryTab extends Fragment {
         historyViewPager.setAdapter(null);
 
         tabCommon = historyTabLayout.newTab();
+        tabCommon.setText("Unpaid");
+        historyTabLayout.addTab(tabCommon);
+
+        tabCommon = historyTabLayout.newTab();
         tabCommon.setText("Waiting");
         historyTabLayout.addTab(tabCommon);
 

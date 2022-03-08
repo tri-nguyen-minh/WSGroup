@@ -30,6 +30,7 @@ import java.util.Map;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
+import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.apis.callers.APIReviewCaller;
 import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
@@ -336,13 +337,46 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
+    private void setUpShoppingCart() {
+        System.out.println("setupcart");
+        token = sharedPreferences.getString("TOKEN", "");
+        APICartCaller.getCartList(token, getApplication(), new APIListener() {
+            @Override
+            public void onCartListFound(List<CartProduct> retailList,
+                                        List<CartProduct> campaignList) {
+                System.out.println(retailList.size());
+                System.out.println(campaignList.size());
+                putSessionCart(retailList, campaignList);
+                editShoppingCart();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                putSessionCart(new ArrayList<>(), new ArrayList<>());
+                editShoppingCart();
+            }
+        });
+    }
+
+    private void putSessionCart(List<CartProduct> retailList,
+                                List<CartProduct> campaignList) {
+        try {
+            sharedPreferences.edit()
+                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailList))
+                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignList))
+                    .commit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
         loadProduct();
-        editShoppingCart();
+        setUpShoppingCart();
         if (resultCode == RESULT_OK) {
             if (requestCode == IntegerUtils.REQUEST_LOGIN_FOR_CART) {
                 constraintLayoutShoppingCart.performClick();

@@ -32,8 +32,8 @@ public class DialogBoxConfirm extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_confirm);
+        setCancelable(false);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
         btnConfirm = findViewById(R.id.btnYes);
         btnCancel = findViewById(R.id.btnNo);
         txtConfirmContent = findViewById(R.id.txtConfirmContent);

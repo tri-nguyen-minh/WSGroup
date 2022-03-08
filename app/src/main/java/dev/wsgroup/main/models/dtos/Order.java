@@ -17,7 +17,6 @@ public class Order implements Serializable {
     private Address address;
     private Campaign campaign;
     private CustomerDiscount customerDiscount;
-    private Payment payment;
     private boolean inCart;
 
     public Order() {
@@ -119,14 +118,6 @@ public class Order implements Serializable {
         this.customerDiscount = customerDiscount;
     }
 
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
-    }
-
     public String getDateCreated() {
         return dateCreated;
     }
@@ -205,12 +196,7 @@ public class Order implements Serializable {
         address.setAddressString(jsonObject.getString("address"));
         order.setAddress(address);
 
-        stringObject = jsonObject.getString("paymentid");
-        if (!stringObject.equals("null")) {
-            Payment payment = new Payment();
-            payment.setId(stringObject);
-            order.setPayment(payment);
-        }
+        order.setPaymentId(jsonObject.getString("paymentid"));
         order.setDateCreated(jsonObject.getString("createdat"));
         order.setDateUpdated(jsonObject.getString("updatedat"));
         order.setDiscountPrice(jsonObject.getDouble("discountprice"));
@@ -222,6 +208,14 @@ public class Order implements Serializable {
         supplier.setName(jsonObject.getString("suppliername"));
         order.setSupplier(supplier);
         order.setUpdateReason(jsonObject.getString("reasonforupdatestatus"));
+        order.setPaymentMethod(jsonObject.getString("paymentmethod"));
+        order.setAdvanceId(jsonObject.getString("advancedid"));
+        stringObject = jsonObject.getString("advancefee");
+        if (!stringObject.equals("null")) {
+            order.setAdvanceFee(Double.parseDouble(stringObject));
+        } else {
+            order.setAdvanceFee(0);
+        }
         JSONArray jsonArray = jsonObject.getJSONArray("details");
         List<OrderProduct> orderProductList = new ArrayList<>();
         OrderProduct orderProduct;

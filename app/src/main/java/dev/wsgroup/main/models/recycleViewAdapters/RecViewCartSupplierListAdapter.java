@@ -2,7 +2,6 @@ package dev.wsgroup.main.models.recycleViewAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +16,7 @@ import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Supplier;
-import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecViewCartSupplierListAdapter.ViewHolder> {
 
@@ -55,7 +52,7 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         holder.txtRecViewCartSupplierName.setText(supplierList.get(position).getName());
         holder.checkboxCartSupplier.setVisibility(View.GONE);
         setupCartProductList(holder.recViewCartProducts, position,
-                shoppingCart.get(supplierList.get(position).getId()), holder);
+                shoppingCart.get(supplierList.get(position).getId()));
         holder.checkboxCartSupplier.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,7 +61,8 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         });
     }
 
-    private void setupCartProductList(RecyclerView recyclerView, int position, List<CartProduct> productList, ViewHolder holder) {
+    private void setupCartProductList(RecyclerView recyclerView,
+                                      int position, List<CartProduct> productList) {
         cartAdapter = new RecViewCartProductListAdapter(context, activity, identifier) {
 
             @Override
@@ -94,7 +92,8 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         };
         cartAdapter.setShoppingCart(productList);
         recyclerView.setAdapter(cartAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL,false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context,
+                LinearLayoutManager.VERTICAL,false));
     }
 
     public void onCheckboxChanged(String cartProductId, boolean newStatus) { }

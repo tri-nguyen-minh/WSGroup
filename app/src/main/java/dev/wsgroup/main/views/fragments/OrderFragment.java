@@ -190,7 +190,8 @@ public class OrderFragment extends Fragment {
         adapter = new RecViewOrderListAdapter(getContext(), getActivity());
         adapter.setOrderList(currentOrderList);
         recViewOrderView.setAdapter(adapter);
-        recViewOrderView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        recViewOrderView.setLayoutManager(new LinearLayoutManager(getContext(),
+                LinearLayoutManager.VERTICAL, false));
         recViewOrderView.setVisibility(View.VISIBLE);
     }
 }

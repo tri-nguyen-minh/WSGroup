@@ -335,7 +335,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="invisible">
+                    android:visibility="visible">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         style="@style/style_profile_tab"
@@ -355,8 +355,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             style="@style/style_label_account_info"
                             android:paddingHorizontal="10dp"
-                            android:textSize="15sp"
-                            android:gravity="left"/>
+                            android:textSize="17sp"
+                            android:gravity="left"
+                            android:textStyle="bold"/>
 
                         <TextView
                             android:id="@+id/txtTotalPrice"
@@ -376,6 +377,87 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        style="@style/style_profile_tab"
+                        android:paddingVertical="0dp"
+                        android:paddingHorizontal="10dp"
+                        android:background="@color/white"
+                        android:layout_marginTop="2dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/lblDiscount"
+                            android:text="Discount"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            style="@style/style_label_account_info"
+                            android:paddingHorizontal="10dp"
+                            android:textSize="15sp"
+                            android:gravity="left"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/txtTotalDiscount"
+                            android:gravity="center|right"
+                            android:textSize="15sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="@color/gray"
+                            android:text="00.000d"
+                            android:textStyle="bold"
+                            app:layout_constraintLeft_toRightOf="@+id/lblDiscount"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            style="@style/style_txt_account_info" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutAdvance"
+                        style="@style/style_profile_tab"
+                        android:paddingVertical="0dp"
+                        android:paddingHorizontal="10dp"
+                        android:background="@color/white"
+                        android:layout_marginTop="2dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/lblAdvanced"
+                            android:text="Advanced Fee"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            style="@style/style_label_account_info"
+                            android:paddingHorizontal="10dp"
+                            android:textSize="15sp"
+                            android:gravity="left"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/txtAdvanced"
+                            android:gravity="center|right"
+                            android:textSize="15sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="@color/gray"
+                            android:text="00.000d"
+                            android:textStyle="bold"
+                            app:layout_constraintLeft_toRightOf="@+id/lblAdvanced"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            style="@style/style_txt_account_info" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recViewOrderProduct"
                         android:layout_width="match_parent"
@@ -385,6 +467,17 @@
                 </LinearLayout>
 
             </FrameLayout>
+
+            <Button
+                android:id="@+id/btnAdditionalAction"
+                style="@style/style_button_dialog_box"
+                android:layout_width="match_parent"
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="30dp"
+                android:textSize="14dp"
+                android:paddingVertical="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="" />
 
         </LinearLayout>
 

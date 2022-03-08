@@ -1,10 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +19,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
@@ -38,9 +37,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -168,11 +164,13 @@ public class AccountInformationActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                DialogBoxSelectImage dialogBox = new DialogBoxSelectImage(AccountInformationActivity.this) {
+                DialogBoxSelectImage dialogBox
+                        = new DialogBoxSelectImage(AccountInformationActivity.this) {
                     @Override
                     public void executeTakePhoto() {
-                        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions(new String[]{Manifest.permission.CAMERA}, 100);
+                        if (checkSelfPermission(Manifest.permission.CAMERA)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(new String[] {Manifest.permission.CAMERA}, 100);
                         } else {
                             takeImage();
                         }
@@ -214,7 +212,8 @@ public class AccountInformationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 dialogBoxLoading = new DialogBoxLoading(AccountInformationActivity.this);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 uploadImageToFirebase();
             }
@@ -225,10 +224,14 @@ public class AccountInformationActivity extends AppCompatActivity {
         if (dataLoaded) {
             if (checkEmptyFields() || !checkInfoChanged()) {
                 btnSaveEdit.setEnabled(false);
-                btnSaveEdit.getBackground().setTint(getApplicationContext().getResources().getColor(R.color.gray_light));
+                btnSaveEdit.getBackground()
+                           .setTint(getApplicationContext().getResources()
+                                    .getColor(R.color.gray_light));
             } else {
                 btnSaveEdit.setEnabled(true);
-                btnSaveEdit.getBackground().setTint(getApplicationContext().getResources().getColor(R.color.blue_main));
+                btnSaveEdit.getBackground()
+                           .setTint(getApplicationContext().getResources()
+                                    .getColor(R.color.blue_main));
             }
         }
     }
@@ -294,7 +297,8 @@ public class AccountInformationActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -314,7 +318,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        Task<Uri> urlTask
+                                = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                             @Override
                             public Task<Uri> then(Task<UploadTask.TaskSnapshot> task) throws Exception {
                                 if (!task.isSuccessful()) {
@@ -372,7 +377,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                 user.setLastName(updatedUser.getLastName());
                 user.setMail(updatedUser.getMail());
                 DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                        IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"");
+                        IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
+                        StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"");
                 dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBox.show();
             }
@@ -383,7 +389,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                     dialogBoxLoading.dismiss();
                 }
                 DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"") {};
+                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                        StringUtils.MES_ERROR_FAILED_API_CALL,"") {};
                 dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBox.show();
             }
@@ -392,7 +399,8 @@ public class AccountInformationActivity extends AppCompatActivity {
 
     private void displayUploadFailed() {
         DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"") {
+                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                StringUtils.MES_ERROR_FAILED_API_CALL,"") {
             @Override
             public void onClickAction() {
                 super.onClickAction();

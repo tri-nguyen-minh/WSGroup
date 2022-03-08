@@ -53,8 +53,9 @@ public class DetailTab extends Fragment {
     private RecyclerView recViewMoreSuppliersProducts;
     private ViewFlipper viewFlipperProduct;
     private ImageView imgCommonFlipper;
-    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount, txtRatingProduct,
-            txtRetailPrice, txtCampaignCount, lblDescriptionLength, txtLoyaltyDiscount;
+    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount,
+            txtRatingProduct, txtRetailPrice, txtCampaignCount, lblDescriptionLength,
+            txtLoyaltyDiscount, lblLoyaltyDiscount, lblLoyaltyTag;
     private MaterialRatingBar ratingProduct;
 //    private RatingBar ratingProduct;
     private LinearLayout linearLayoutCampaign;
@@ -93,6 +94,8 @@ public class DetailTab extends Fragment {
         txtCampaignCount = view.findViewById(R.id.txtCampaignCount);
         lblDescriptionLength = view.findViewById(R.id.lblDescriptionLength);
         txtLoyaltyDiscount = view.findViewById(R.id.txtLoyaltyDiscount);
+        lblLoyaltyDiscount = view.findViewById(R.id.lblLoyaltyDiscount);
+        lblLoyaltyTag = view.findViewById(R.id.lblLoyaltyTag);
         ratingProduct = view.findViewById(R.id.ratingProduct);
         linearLayoutCampaign = view.findViewById(R.id.linearLayoutCampaign);
         constraintLayoutSupplierName = view.findViewById(R.id.constraintLayoutSupplierName);
@@ -198,7 +201,9 @@ public class DetailTab extends Fragment {
         txtMoreSuppliersProductsName.setText(supplier.getName());
         if (supplier.getLoyaltyStatus() != null) {
             layoutLoyalty.setVisibility(View.VISIBLE);
-            txtLoyaltyDiscount.setText(supplier.getLoyaltyStatus().getDiscountPercent());
+            txtLoyaltyDiscount.setText(supplier.getLoyaltyStatus().getDiscountPercent() + "%");
+            lblLoyaltyTag.setText("Loyal Customer Discount");
+            lblLoyaltyDiscount.setText("OFF");
         } else {
             layoutLoyalty.setVisibility(View.GONE);
         }
@@ -240,7 +245,8 @@ public class DetailTab extends Fragment {
         RecViewProductListAdapter adapter = new RecViewProductListAdapter(getContext(), getActivity());
         adapter.setProductsList(productList);
         recViewMoreSuppliersProducts.setAdapter(adapter);
-        recViewMoreSuppliersProducts.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        recViewMoreSuppliersProducts.setLayoutManager(new LinearLayoutManager(getContext(),
+                LinearLayoutManager.HORIZONTAL, false));
     }
 
     private void setupNoProductView() {

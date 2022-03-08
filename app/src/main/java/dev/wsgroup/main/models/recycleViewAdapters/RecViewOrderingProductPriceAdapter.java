@@ -14,7 +14,8 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
-public class RecViewOrderingProductPriceAdapter extends RecyclerView.Adapter<RecViewOrderingProductPriceAdapter.ViewHolder> {
+public class RecViewOrderingProductPriceAdapter
+        extends RecyclerView.Adapter<RecViewOrderingProductPriceAdapter.ViewHolder> {
 
     private Context context;
     private List<OrderProduct> orderProductList;

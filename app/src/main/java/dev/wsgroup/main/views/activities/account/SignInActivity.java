@@ -269,11 +269,6 @@ public class SignInActivity extends AppCompatActivity {
         APIUserCaller.loginWithGoogle(user, getApplication(), new APIListener() {
             @Override
             public void onUserFound(User user, String message) {
-                System.out.println(message);
-                System.out.println(user.getGoogleId());
-                System.out.println(user.getFirstName());
-                System.out.println(user.getLastName());
-                System.out.println(user.getPhoneNumber());
                 signInAccount(user);
             }
         });

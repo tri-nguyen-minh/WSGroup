@@ -20,7 +20,8 @@ public class APICategoryCaller {
 
     private static RequestQueue requestQueue;
 
-    public static void getCategoryById(String categoryId, Application application, APIListener APIListener) {
+    public static void getCategoryById(String categoryId,
+                                       Application application, APIListener APIListener) {
         String url = StringUtils.CATEGORY_API_URL + "/" + categoryId;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);

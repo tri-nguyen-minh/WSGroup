@@ -42,7 +42,6 @@ public class DialogBoxReview extends Dialog {
     private Review review;
     private Activity activity;
     private Context context;
-    private float rating;
 
     public DialogBoxReview(Activity activity, Context context, OrderProduct orderProduct) {
         super(activity);
@@ -59,6 +58,7 @@ public class DialogBoxReview extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_review);
+        setCancelable(false);
 
         editReviewRating = findViewById(R.id.editReviewRating);
         editReview = findViewById(R.id.editReview);

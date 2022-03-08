@@ -30,13 +30,13 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
-public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewCartProductListAdapter.ViewHolder> {
+public class RecViewCartProductListAdapter
+        extends RecyclerView.Adapter<RecViewCartProductListAdapter.ViewHolder> {
 
     private List<CartProduct> shoppingCart;
     private Context context;
@@ -68,13 +68,17 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtRecViewCartProductName.setText(shoppingCart.get(position).getProduct().getName());
         if(shoppingCart.get(position).getProduct().getImageList().size() > 0) {
-            Glide.with(context).load(shoppingCart.get(position).getProduct().getImageList().get(0)).into(holder.imgRecViewProduct);
+            Glide.with(context)
+                 .load(shoppingCart.get(position).getProduct().getImageList().get(0))
+                 .into(holder.imgRecViewProduct);
         }
 
-        RecViewProductTypeAdapter adapter = new RecViewProductTypeAdapter(context, activity, IntegerUtils.IDENTIFIER_PRODUCT_TYPE_SELECTED);
+        RecViewProductTypeAdapter adapter = new RecViewProductTypeAdapter(context, activity,
+                IntegerUtils.IDENTIFIER_PRODUCT_TYPE_SELECTED);
         adapter.setTypeList(shoppingCart.get(position).getTypeList());
         holder.recViewProductTypeTag.setAdapter(adapter);
-        holder.recViewProductTypeTag.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false));
+        holder.recViewProductTypeTag.setLayoutManager(new LinearLayoutManager(context,
+                RecyclerView.HORIZONTAL, false));
 
         if (identifier == IntegerUtils.IDENTIFIER_RETAIL_CART) {
             holder.checkboxCartProduct.setVisibility(View.VISIBLE);
@@ -97,7 +101,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
             });
         } else {
             holder.checkboxCartProduct.setVisibility(View.GONE);
-            holder.txtPricingDescription.setText(shoppingCart.get(position).getCampaign().getDescription());
+            holder.txtPricingDescription
+                  .setText(shoppingCart.get(position).getCampaign().getDescription());
             boolean sharing = shoppingCart.get(position).getCampaign().getShareFlag();
             holder.txtCampaignTag.setText(sharing ? "Sharing Campaign" : "Single Campaign");
             holder.txtProductPriceORG.setVisibility(View.VISIBLE);
@@ -139,7 +144,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         holder.imgProductQuantityMinus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int quantityCount = Integer.parseInt(holder.editProductQuantity.getText().toString()) - 1;
+                int quantityCount
+                        = Integer.parseInt(holder.editProductQuantity.getText().toString()) - 1;
                 holder.editProductQuantity.setText(quantityCount + "");
             }
         });
@@ -147,7 +153,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         holder.imgProductQuantityPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int quantityCount = Integer.parseInt(holder.editProductQuantity.getText().toString()) + 1;
+                int quantityCount
+                        = Integer.parseInt(holder.editProductQuantity.getText().toString()) + 1;
                 holder.editProductQuantity.setText(quantityCount + "");
             }
         });
@@ -198,13 +205,15 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
         holder.btnDeleteCartProducts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_DELETE_CART) {
+                DialogBoxConfirm dialogBoxConfirm
+                        = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_DELETE_CART) {
                     @Override
                     public void onYesClicked() {
                         onRemoveProduct(shoppingCart.get(position).getId());
                     }
                 };
-                dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxConfirm.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxConfirm.show();
             }
         });
@@ -298,10 +307,12 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                     @Override
                     public void onUpdateCartItemSuccessful() {
                         holder.btnCheckout.setEnabled(true);
-                        holder.btnCheckout.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
+                        holder.btnCheckout.getBackground()
+                              .setTint(context.getResources().getColor(R.color.blue_main));
                         if (!cartProduct.getSelectedFlag()) {
                             holder.checkboxCartProduct.setEnabled(true);
-                            holder.checkboxCartProduct.setColorFilter(context.getResources().getColor(R.color.gray));
+                            holder.checkboxCartProduct
+                                  .setColorFilter(context.getResources().getColor(R.color.gray));
                         } else {
                             onPriceChanged();
                         }
@@ -310,7 +321,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
                     @Override
                     public void onFailedAPICall(int code) {
                         holder.btnCheckout.setEnabled(true);
-                        holder.btnCheckout.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
+                        holder.btnCheckout.getBackground()
+                              .setTint(context.getResources().getColor(R.color.blue_main));
                     }
                 });
     }
@@ -327,7 +339,8 @@ public class RecViewCartProductListAdapter extends RecyclerView.Adapter<RecViewC
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 

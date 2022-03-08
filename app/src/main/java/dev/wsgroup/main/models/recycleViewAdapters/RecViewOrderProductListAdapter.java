@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -23,24 +22,23 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Review;
-import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxOrderNote;
 import dev.wsgroup.main.views.dialogbox.DialogBoxReview;
 
-public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecViewOrderProductListAdapter.ViewHolder> {
+public class RecViewOrderProductListAdapter
+        extends RecyclerView.Adapter<RecViewOrderProductListAdapter.ViewHolder> {
 
     private Order order;
     private List<OrderProduct> orderProductList;
     private Context context;
     private Activity activity;
-    private int requestCode, requestState;
+    private int requestState;
 
-    public RecViewOrderProductListAdapter(Context context, Activity activity, int requestState, int requestCode) {
+    public RecViewOrderProductListAdapter(Context context, Activity activity, int requestState) {
         this.context = context;
         this.activity = activity;
         this.requestState = requestState;
-        this.requestCode = requestCode;
     }
 
     public void setOrder(Order order) {
@@ -59,12 +57,16 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if(orderProductList.get(position).getProduct().getImageList().size() > 0) {
-            Glide.with(context).load(orderProductList.get(position).getProduct().getImageList().get(0)).into(holder.imgRecViewProduct);
+            Glide.with(context)
+                 .load(orderProductList.get(position).getProduct().getImageList().get(0))
+                 .into(holder.imgRecViewProduct);
         }
         holder.txtRecViewProductOrderName.setText(orderProductList.get(position).getProduct().getName());
-        holder.txtProductPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
+        holder.txtProductPrice
+                .setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
         holder.txtOrderQuantity.setText(orderProductList.get(position).getQuantity() + "");
-        holder.txtTotalPrice.setText(MethodUtils.formatPriceString(orderProductList.get(position).getTotalPrice()));
+        holder.txtTotalPrice
+                .setText(MethodUtils.formatPriceString(orderProductList.get(position).getTotalPrice()));
         holder.btnNote.setText("Note");
         holder.btnNote.setEnabled(true);
         holder.btnNote.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
@@ -99,7 +101,8 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
                                 addingReview(review);
                             }
                         };
-                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialogBox.getWindow()
+                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         dialogBox.show();
                     }
                 });
@@ -120,9 +123,9 @@ public class RecViewOrderProductListAdapter extends RecyclerView.Adapter<RecView
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgRecViewProduct;
-        private TextView txtRecViewProductOrderName, txtOrderQuantity, txtProductPrice,
-                txtTotalPrice, txtReviewStatus;
-        private Button btnNote, btnReview;
+        private TextView txtRecViewProductOrderName, txtOrderQuantity,
+                txtProductPrice, txtTotalPrice, txtReviewStatus;
+        private Button btnNote;
         private ConstraintLayout layoutReview;
 
         public ViewHolder(View view) {

@@ -1,7 +1,5 @@
 package dev.wsgroup.main.models.dtos;
 
-import android.util.JsonReader;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -104,12 +102,6 @@ public class Product implements Serializable {
 
     public void setRating(double rating) {
         this.rating = rating;
-    }
-
-    public void applyRating() {
-
-//        get API get average rating
-
     }
 
     public String getTypeOfProduct() {

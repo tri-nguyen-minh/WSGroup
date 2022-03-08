@@ -34,6 +34,7 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_alert);
+        setCancelable(false);
         btnConfirmRegister = findViewById(R.id.btnConfirmRegister);
         lblConfirmText = findViewById(R.id.lblConfirmText);
         lblDescription = findViewById(R.id.lblDescription);

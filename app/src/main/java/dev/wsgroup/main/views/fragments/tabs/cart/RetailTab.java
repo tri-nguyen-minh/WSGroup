@@ -54,7 +54,7 @@ public class RetailTab extends Fragment {
     private TextView txtTotalCartPrice;
     private Button btnCheckout;
 
-    private double totalPrice;
+    private double totalPrice, orderTotalPrice;
     private SharedPreferences sharedPreferences;
     private RecViewCartSupplierListAdapter adapter;
     private List<Supplier> supplierRetailList;
@@ -99,6 +99,7 @@ public class RetailTab extends Fragment {
                 Order order;
                 OrderProduct orderProduct;
                 for (Supplier supplier : supplierRetailList) {
+                    orderTotalPrice = 0;
                     List<OrderProduct> selectedProductList = new ArrayList<>();
                     cartProductList = retailCart.get(supplier.getId());
                     for (CartProduct cartProduct : cartProductList) {
@@ -108,13 +109,16 @@ public class RetailTab extends Fragment {
                             orderProduct.setQuantity(cartProduct.getQuantity());
                             orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
                             totalPrice = cartProduct.getQuantity() * cartProduct.getProduct().getRetailPrice();
+                            orderTotalPrice += totalPrice;
                             orderProduct.setTotalPrice(totalPrice);
                             orderProduct.setCartProduct(cartProduct);
+                            orderProduct.setCampaign(null);
                             selectedProductList.add(orderProduct);
                         }
                     }
                     if (selectedProductList.size() > 0) {
                         order = new Order();
+                        order.setTotalPrice(orderTotalPrice);
                         order.setCampaign(null);
                         order.setSupplier(supplier);
                         order.setInCart(true);

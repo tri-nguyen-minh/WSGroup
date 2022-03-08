@@ -1,8 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,9 +14,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
@@ -109,62 +109,21 @@ public class AccountDetailActivity extends AppCompatActivity {
                 }
             }
         });
-        editUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     hideKeyboard(v);
                 }
             }
-        });
-        editPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
-        editPasswordConfirm.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
-        editPhoneNumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
-        editFirstName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
-        editLastName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
-        editMail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
+        };
+        editUsername.setOnFocusChangeListener(focusChangeListener);
+        editPassword.setOnFocusChangeListener(focusChangeListener);
+        editPasswordConfirm.setOnFocusChangeListener(focusChangeListener);
+        editPhoneNumber.setOnFocusChangeListener(focusChangeListener);
+        editFirstName.setOnFocusChangeListener(focusChangeListener);
+        editLastName.setOnFocusChangeListener(focusChangeListener);
+        editMail.setOnFocusChangeListener(focusChangeListener);
 
         imgBackFromAccountDetailRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,11 +145,13 @@ public class AccountDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!editPassword.getText().toString().isEmpty()) {
                     if (passwordDisplayed) {
-                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT
+                                                | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                         imgDisplayPassword.setImageResource(R.drawable.ic_visibility_off);
                         passwordDisplayed = false;
                     } else {
-                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
+                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT
+                                                | InputType.TYPE_TEXT_VARIATION_NORMAL);
                         imgDisplayPassword.setImageResource(R.drawable.ic_visibility_on);
                         passwordDisplayed = true;
                     }
@@ -203,11 +164,13 @@ public class AccountDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!editPasswordConfirm.getText().toString().isEmpty()) {
                     if (passwordConfirmedDisplayed) {
-                        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT
+                                                        | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                         imgDisplayPasswordConfirm.setImageResource(R.drawable.ic_visibility_off);
                         passwordConfirmedDisplayed = false;
                     } else {
-                        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
+                        editPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT
+                                                        | InputType.TYPE_TEXT_VARIATION_NORMAL);
                         imgDisplayPasswordConfirm.setImageResource(R.drawable.ic_visibility_on);
                         passwordConfirmedDisplayed = true;
                     }
@@ -239,14 +202,16 @@ public class AccountDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dialogBoxLoading = new DialogBoxLoading(AccountDetailActivity.this);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 errorMessage = checkValidInput();
                 if(errorMessage != null) {
                     dialogBoxLoading.dismiss();
                     dialogBoxAlert = new DialogBoxAlert(activity,
-                                    IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
-                    dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
+                    dialogBoxAlert.getWindow()
+                                  .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBoxAlert.show();
                 } else {
                     User user = new User();
@@ -259,8 +224,8 @@ public class AccountDetailActivity extends AppCompatActivity {
                     APIUserCaller.registerNewUser(user, getApplication(), new APIListener() {
                         @Override
                         public void onCompletingRegistrationRequest() {
-                            APIUserCaller.logInWithUsernameAndPassword(user.getUsername(), user.getPassword(),
-                                    getApplication(), new APIListener() {
+                            APIUserCaller.logInWithUsernameAndPassword(user.getUsername(),
+                                    user.getPassword(), getApplication(), new APIListener() {
                                 @Override
                                 public void onUserFound(User user, String message) {
                                     dialogBoxLoading.dismiss();
@@ -272,11 +237,14 @@ public class AccountDetailActivity extends AppCompatActivity {
                                                     @Override
                                                     public void onClickAction() {
                                                         super.onClickAction();
-                                                        activity.setResult(Activity.RESULT_OK, activity.getIntent());
+                                                        activity.setResult(Activity.RESULT_OK,
+                                                                activity.getIntent());
                                                         activity.finish();
                                                     }
                                                 };
-                                        dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                        dialogBoxAlert.getWindow()
+                                                      .setBackgroundDrawable(
+                                                              new ColorDrawable(Color.TRANSPARENT));
                                         dialogBoxAlert.show();
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -286,12 +254,9 @@ public class AccountDetailActivity extends AppCompatActivity {
                                 @Override
                                 public void onFailedAPICall(int errorCode) {
                                     super.onFailedAPICall(errorCode);
-                                    dialogBoxLoading.dismiss();
                                     errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
-                                    dialogBoxAlert = new DialogBoxAlert(activity,
-                                                    IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
-                                    dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                    dialogBoxAlert.show();
+                                    dialogBoxLoading.dismiss();
+                                    displayErrorMessage();
                                 }
                             });
                         }
@@ -299,17 +264,23 @@ public class AccountDetailActivity extends AppCompatActivity {
                         @Override
                         public void onFailedAPICall(int errorCode) {
                             super.onFailedAPICall(errorCode);
-                            dialogBoxLoading.dismiss();
                             errorMessage = StringUtils.MES_ERROR_DUPLICATE_USERNAME;
-                            dialogBoxAlert = new DialogBoxAlert(activity,
-                                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
-                            dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                            dialogBoxAlert.show();
+                            dialogBoxLoading.dismiss();
+                            displayErrorMessage();
                         }
                     });
                 }
             }
         });
+    }
+
+    private void displayErrorMessage() {
+        dialogBoxAlert = new DialogBoxAlert(activity,
+                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
+        dialogBoxAlert.getWindow()
+                      .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBoxAlert.show();
+
     }
 
     private void enableButtonConfirm() {
@@ -348,7 +319,8 @@ public class AccountDetailActivity extends AppCompatActivity {
         if (!editUsername.getText().toString().matches(StringUtils.USERNAME_REGEX)) {
             return StringUtils.MES_ERROR_INVALID_USERNAME;
         }
-        if (!MethodUtils.revertPhoneNumber(editPhoneNumber.getText().toString()).matches(StringUtils.PHONE_REGEX)) {
+        if (!MethodUtils.revertPhoneNumber(editPhoneNumber.getText()
+                .toString()).matches(StringUtils.PHONE_REGEX)) {
             return StringUtils.MES_ERROR_INVALID_NUMBER;
         }
         if(!editMail.getText().toString().isEmpty()) {
@@ -366,7 +338,8 @@ public class AccountDetailActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

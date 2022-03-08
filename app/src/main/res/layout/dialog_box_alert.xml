@@ -37,7 +37,7 @@
             android:id="@+id/lblDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="center"
             android:lineSpacingExtra="5dp"
             android:fontFamily="@font/montserratr"
             android:text="Your ... should be:\n

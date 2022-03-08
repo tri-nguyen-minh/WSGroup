@@ -2,7 +2,6 @@ package dev.wsgroup.main.models.apis.callers;
 
 import android.app.Application;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -10,34 +9,29 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIPaymentCaller {
 
     private static RequestQueue requestQueue;
 
-    public static void getPaymentURL(Order order, Application application, APIListener APIListener) {
+    public static void getPaymentURL(Order order, double price, String bankString,
+                                     String orderDescription, String orderType,
+                                     Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("amount", (int) order.getTotalPrice());
-            jsonObject.put("bankCode", "NCB");
-            jsonObject.put("orderDescription", "topup tesst");
-            jsonObject.put("orderType", "topup");
+            jsonObject.put("amount", (int) price);
+            jsonObject.put("bankCode", bankString);
+            jsonObject.put("orderDescription", orderDescription);
+            jsonObject.put("orderType", orderType);
             jsonObject.put("orderId", order.getId());
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
@@ -57,8 +51,8 @@ public class APIPaymentCaller {
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, StringUtils.PAYMENT_API_URL,
-                    jsonObject, listener, errorListener) {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                    StringUtils.PAYMENT_API_URL, jsonObject, listener, errorListener) {
 
                 @Override
                 public String getBodyContentType() {

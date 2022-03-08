@@ -20,13 +20,13 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
-            android:id="@+id/lblLoyal"
+            android:id="@+id/txtDiscountDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:fontFamily="@font/montserratr"
             android:gravity="left"
-            android:text="Loyal Customer Discount"
+            android:text=""
             android:textColor="@color/gray"
             android:textSize="15sp"
             android:textStyle="bold"

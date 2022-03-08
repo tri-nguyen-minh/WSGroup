@@ -15,7 +15,7 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
-public class DialogBoxDiscountSingle extends Dialog {
+public class DialogBoxDiscountCard extends Dialog {
 
     private ImageView imgCloseDialogBox;
     private TextView txtDiscountDescription, txtDiscountCode, txtDiscountPrice, txtDiscountQuantity,
@@ -26,7 +26,7 @@ public class DialogBoxDiscountSingle extends Dialog {
     private Discount discount;
     private String userId;
 
-    public DialogBoxDiscountSingle(Activity activity, Discount discount, String userId) {
+    public DialogBoxDiscountCard(Activity activity, Discount discount, String userId) {
         super(activity);
         this.discount = discount;
         this.userId = userId;
@@ -37,6 +37,7 @@ public class DialogBoxDiscountSingle extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_discount_single);
+        setCancelable(false);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
         txtDiscountDescription = findViewById(R.id.txtDiscountDescription);

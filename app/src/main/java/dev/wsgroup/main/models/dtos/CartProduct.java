@@ -120,9 +120,6 @@ public class CartProduct implements Serializable {
         supplier.setAddress(jsonObject.getString("supplieraddress"));
         product.setSupplier(supplier);
         cartProduct.setProduct(product);
-
-//        work with type of product
-
         return cartProduct;
     }
 }

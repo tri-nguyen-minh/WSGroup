@@ -72,8 +72,8 @@ public class APIProductCaller {
                     }
                 }
             };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, StringUtils.PRODUCT_API_URL,
-                    new JSONObject(), listener, errorListener);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                    StringUtils.PRODUCT_API_URL, new JSONObject(), listener, errorListener);
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

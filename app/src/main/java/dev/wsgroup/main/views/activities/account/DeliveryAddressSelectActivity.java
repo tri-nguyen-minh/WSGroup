@@ -247,6 +247,7 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         };
         adapter.setAddressList(customerAddressList);
         recViewAddress.setAdapter(adapter);
-        recViewAddress.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        recViewAddress.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                LinearLayoutManager.VERTICAL, false));
     }
 }

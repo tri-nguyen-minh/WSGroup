@@ -6,7 +6,8 @@ import java.io.Serializable;
 
 public class Discount implements Serializable {
 
-    private String id, supplierId, code, description, starDate, endDate, productId;
+    private String id, code, description, starDate, endDate, productId;
+    private Supplier supplier;
     private boolean status;
     private double discountPrice, minPrice;
     private int quantity;
@@ -22,12 +23,12 @@ public class Discount implements Serializable {
         this.id = id;
     }
 
-    public String getSupplierId() {
-        return supplierId;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setSupplierId(String supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public String getCode() {
@@ -113,15 +114,17 @@ public class Discount implements Serializable {
     public static Discount getObjectFromJSON(JSONObject data) throws Exception {
         Discount discount = new Discount();
         discount.setId(data.getString("discountCodeId"));
-        discount.setSupplierId(data.getString("supplierid"));
+        Supplier supplier = new Supplier();
+        supplier.setId(data.getString("supplierId"));
+        discount.setSupplier(supplier);
         discount.setCode(data.getString("code"));
         discount.setDescription(data.getString("description"));
         discount.setStarDate(data.getString("startdate"));
         discount.setEndDate(data.getString("enddate"));
-        discount.setProductId(data.getString("productid"));
+        discount.setProductId(data.getString("productId"));
         discount.setStatusByString(data.getString("status"));
-        discount.setDiscountPrice(data.getDouble("discountprice"));
-        discount.setMinPrice(data.getDouble("minimunpricecondition"));
+        discount.setDiscountPrice(data.getDouble("discountPrice"));
+        discount.setMinPrice(data.getDouble("minimunPriceCondition"));
         discount.setQuantity(data.getInt("quantity"));
         return discount;
     }

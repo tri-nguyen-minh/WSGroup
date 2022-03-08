@@ -22,7 +22,6 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
@@ -40,37 +39,17 @@ public class APICartCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     CartProduct cartProduct;
-                    Supplier supplier;
                     cartProductList = new ArrayList<>();
                     List<CartProduct> retailList = new ArrayList<>();
                     List<CartProduct> campaignList = new ArrayList<>();
-//                    HashMap<String, List<CartProduct>> retailCart = new HashMap<>();
-//                    HashMap<String, List<CartProduct>> campaignCart = new HashMap<>();
-//                    List<Supplier> supplierRetailList = new ArrayList<>();
-//                    List<Supplier> supplierCampaignList = new ArrayList<>();
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length();i++) {
                             cartProduct = CartProduct.getObjectFromJSON(jsonArray.getJSONObject(i));
-                            supplier = cartProduct.getProduct().getSupplier();
                             if (!cartProduct.getCampaignFlag()) {
                                 retailList.add(cartProduct);
-//                                cartProductList = retailCart.get(supplier.getId());
-//                                if(cartProductList == null) {
-//                                    supplierRetailList.add(supplier);
-//                                    cartProductList = new ArrayList<>();
-//                                }
-//                                cartProductList.add(cartProduct);
-//                                retailCart.put(supplier.getId(), cartProductList);
                             } else {
                                 campaignList.add(cartProduct);
-//                                cartProductList = campaignCart.get(supplier.getId());
-//                                if(cartProductList == null) {
-//                                    supplierCampaignList.add(supplier);
-//                                    cartProductList = new ArrayList<>();
-//                                }
-//                                cartProductList.add(cartProduct);
-//                                campaignCart.put(supplier.getId(), cartProductList);
                             }
                         }
                         APIListener.onCartListFound(retailList, campaignList);
@@ -87,8 +66,8 @@ public class APICartCaller {
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, StringUtils.CART_API_URL,
-                    new JSONObject(), listener, errorListener) {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                    StringUtils.CART_API_URL, new JSONObject(), listener, errorListener) {
 
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -103,7 +82,8 @@ public class APICartCaller {
         }
     }
 
-    public  static void addCartItem(String token, CartProduct cartProduct, Application application, APIListener APIListener) {
+    public  static void addCartItem(String token, CartProduct cartProduct,
+                                    Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -137,8 +117,8 @@ public class APICartCaller {
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, StringUtils.CART_API_URL,
-                    jsonObject, listener, errorListener) {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                    StringUtils.CART_API_URL, jsonObject, listener, errorListener) {
 
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -157,7 +137,8 @@ public class APICartCaller {
         }
     }
 
-    public static void updateCartItem(String token, CartProduct cartProduct, Application application, APIListener APIListener) {
+    public static void updateCartItem(String token, CartProduct cartProduct,
+                                      Application application, APIListener APIListener) {
         String url = StringUtils.CART_API_URL + cartProduct.getId();
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -199,7 +180,8 @@ public class APICartCaller {
         }
     }
 
-    public static void deleteCartItem(String token, String cartId, Application application, APIListener APIListener) {
+    public static void deleteCartItem(String token, String cartId,
+                                      Application application, APIListener APIListener) {
         String url = StringUtils.CART_API_URL + cartId;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);

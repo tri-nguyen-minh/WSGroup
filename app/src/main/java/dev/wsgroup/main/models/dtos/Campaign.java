@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Campaign implements Serializable {
     private String id, supplierId, productId, startDate, endDate, code, status, description;
-    private int minQuantity, maxQuantity, orderCount, quantityCount;
+    private int minQuantity, maxQuantity, orderCount, quantityCount, advancePercentage;
     private double savingPrice;
     private boolean shareFlag;
 
@@ -77,6 +77,14 @@ public class Campaign implements Serializable {
         this.maxQuantity = maxQuantity;
     }
 
+    public int getAdvancePercentage() {
+        return advancePercentage;
+    }
+
+    public void setAdvancePercentage(int advancePercentage) {
+        this.advancePercentage = advancePercentage;
+    }
+
     public int getOrderCount() {
         return orderCount;
     }
@@ -141,6 +149,7 @@ public class Campaign implements Serializable {
         campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
         campaign.setOrderCount(data.getInt("numorderwaiting"));
         campaign.setShareFlag(data.getBoolean("isshare"));
+        campaign.setAdvancePercentage(data.getInt("advancefee"));
         return campaign;
     }
 

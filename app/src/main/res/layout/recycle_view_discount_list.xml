@@ -28,8 +28,8 @@
                 android:fontFamily="@font/montserratr"
                 android:gravity="left"
                 android:text="Uses:"
-                android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textColor="@color/gray_darker"
+                android:textSize="13sp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -42,8 +42,9 @@
                 android:fontFamily="@font/montserratr"
                 android:gravity="left"
                 android:text="000"
-                android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textColor="@color/gray_darker"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/lblDiscountUse"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -56,8 +57,8 @@
                 android:fontFamily="@font/montserratr"
                 android:gravity="left"
                 android:text="Expires on"
-                android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textColor="@color/gray_darker"
+                android:textSize="13sp"
                 app:layout_constraintRight_toLeftOf="@id/txtDiscountEndDate"/>
 
             <TextView
@@ -67,8 +68,9 @@
                 android:fontFamily="@font/montserratr"
                 android:gravity="left"
                 android:text="Jul 12, 2021"
-                android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textColor="@color/gray_darker"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 app:layout_constraintRight_toRightOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -84,29 +86,66 @@
             tools:text="I'm testing this text fiewidl now so dont ask me "
             android:textSize="16sp"
             android:maxLines="1"
-            android:textColor="@color/black"
+            android:textColor="@color/gray_darker"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutDiscountCondition"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/layoutDiscountPrice"/>
+            app:layout_constraintBottom_toTopOf="@id/layoutDiscountInfo"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutDiscountPrice"
+            android:id="@+id/layoutDiscountInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/txtDiscountDescription"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <LinearLayout
-                android:id="@+id/linearLayoutDiscountPercentage"
+                android:id="@+id/linearLayoutDiscountCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="right"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/linearLayoutDiscountPrice">
+
+                <TextView
+                    android:id="@+id/lblDiscountCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="CODE:"
+                    android:textColor="@color/gray_darker"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/txtDiscountCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="KHAIMOS199"
+                    android:textColor="@color/gray_darker"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayoutDiscountPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:gravity="right"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearLayoutDiscountCode"
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
@@ -133,6 +172,17 @@
                     android:textSize="16sp"/>
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSelect"
+                style="@style/style_button_dialog_box"
+                android:layout_width="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:text="SELECT"
+                android:textStyle="normal"
+                android:textSize="14dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

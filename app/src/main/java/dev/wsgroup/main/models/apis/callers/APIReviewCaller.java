@@ -63,8 +63,8 @@ public class APIReviewCaller {
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, StringUtils.REVIEW_API_URL,
-                    jsonObject, listener, errorListener) {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                    StringUtils.REVIEW_API_URL, jsonObject, listener, errorListener) {
 
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -79,7 +79,8 @@ public class APIReviewCaller {
         }
     }
 
-    public static void getReviewId(String reviewId, Application application, APIListener APIListener) {
+    public static void getReviewId(String reviewId,
+                                   Application application, APIListener APIListener) {
         url = StringUtils.REVIEW_API_URL + reviewId;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -118,7 +119,8 @@ public class APIReviewCaller {
         }
     }
 
-    public static void getReviewByOrderProductId(String orderId, Application application, APIListener APIListener) {
+    public static void getReviewByOrderProductId(String orderId,
+                                                 Application application, APIListener APIListener) {
         url = StringUtils.REVIEW_API_URL + "?orderDetailId=" + orderId;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);

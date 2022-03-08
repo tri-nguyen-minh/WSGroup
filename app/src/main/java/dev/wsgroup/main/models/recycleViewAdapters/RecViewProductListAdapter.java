@@ -30,7 +30,8 @@ import dev.wsgroup.main.views.activities.productviews.ProductDetailActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
-public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProductListAdapter.ViewHolder> {
+public class RecViewProductListAdapter
+        extends RecyclerView.Adapter<RecViewProductListAdapter.ViewHolder> {
 
 
     private List<Product> productsList;
@@ -64,7 +65,6 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
         }
         holder.txtProductName.setText(productsList.get(position).getName());
 
-//        API get order Count
         holder.txtProductOrderCount
                 .setText(MethodUtils.formatOrderOrReviewCount(productsList.get(position).getOrderCount()));
         holder.lblProductOrderCount
@@ -72,10 +72,13 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
 
         String productId = productsList.get(position).getProductId();
         if(productsList.get(position).getImageList().size() > 0) {
-            Glide.with(context).load(productsList.get(position).getImageList().get(0)).into(holder.imgProduct);
+            Glide.with(context)
+                 .load(productsList.get(position).getImageList().get(0))
+                 .into(holder.imgProduct);
         }
         holder.txtCampaign.bringToFront();
-        holder.txtRetailPrice.setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
+        holder.txtRetailPrice
+                .setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
         holder.ratingProduct.setRating((float)productsList.get(position).getRating());
         holder.productCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +91,8 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
                     public void onProductFound(Product product) {
                         super.onProductFound(product);
                         dialogBoxLoading.dismiss();
-                        Intent intent = new Intent(activity.getApplicationContext(), ProductDetailActivity.class);
+                        Intent intent = new Intent(activity.getApplicationContext(),
+                                                    ProductDetailActivity.class);
                         intent.putExtra("PRODUCT_ID", product.getProductId());
                         activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
                     }
@@ -97,9 +101,9 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
                     public void onFailedAPICall(int errorCode) {
                         super.onFailedAPICall(errorCode);
                         dialogBoxLoading.dismiss();
-                        DialogBoxAlert dialogBox =
-                                new DialogBoxAlert(activity,
-                                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL,"");
+                        DialogBoxAlert dialogBox = new DialogBoxAlert(activity,
+                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                                StringUtils.MES_ERROR_FAILED_API_CALL,"");
                         dialogBox.show();
                     }
                 });
@@ -116,7 +120,7 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
         private CardView productCard;
         private ImageView imgProduct;
         private TextView txtCampaign, txtProductName, txtProductOrderCount, txtRetailPrice;
-        private TextView lblProductOrderCount, lblRetailPrice;
+        private TextView lblProductOrderCount;
         private RatingBar ratingProduct;
 
         public ViewHolder(View view) {
@@ -128,7 +132,6 @@ public class RecViewProductListAdapter extends RecyclerView.Adapter<RecViewProdu
             txtProductOrderCount = view.findViewById(R.id.txtHomeRecViewProductOrderCount);
             txtRetailPrice = view.findViewById(R.id.txtRecViewHomeRetailPrice);
             lblProductOrderCount = view.findViewById(R.id.lblProductOrderCount);
-//            lblRetailPrice = view.findViewById(R.id.lblRetailPrice);
             ratingProduct = view.findViewById(R.id.ratingRecViewHomeProduct);
         }
     }

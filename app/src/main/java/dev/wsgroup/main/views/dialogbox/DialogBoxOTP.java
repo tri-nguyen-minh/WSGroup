@@ -56,6 +56,7 @@ public class DialogBoxOTP extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_otp);
+        setCancelable(false);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         txtOTPHeader = findViewById(R.id.txtOTPHeader);

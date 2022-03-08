@@ -1,10 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +11,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -68,7 +68,8 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         layoutLoading.setVisibility(View.VISIBLE);
         layoutScreen.setVisibility(View.INVISIBLE);
 
-        APIAddressCaller.getAllAddress(token, null, getApplication(), new APIListener() {
+        APIAddressCaller.getAllAddress(token, null,
+                getApplication(), new APIListener() {
             @Override
             public void onAddressListFound(List<Address> addressList) {
                 super.onAddressListFound(addressList);
@@ -108,7 +109,8 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         layoutNoDefaultAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressActivity.this, getApplicationContext(),
+                dialogBoxAddress
+                        = new DialogBoxAddress(DeliveryAddressActivity.this, getApplicationContext(),
                         null, true) {
                     @Override
                     public void onAddressAdd(Address address) {
@@ -220,6 +222,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         };
         adapter.setAddressList(customerAddressList);
         recViewAddress.setAdapter(adapter);
-        recViewAddress.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        recViewAddress.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                LinearLayoutManager.VERTICAL, false));
     }
 }

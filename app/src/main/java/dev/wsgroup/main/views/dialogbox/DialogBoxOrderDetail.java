@@ -78,7 +78,9 @@ public class DialogBoxOrderDetail extends Dialog{
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_order_detail);
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        setCancelable(false);
+        getWindow()
+                .setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         btnConfirmAddToCart = findViewById(R.id.btnConfirmAddToCart);
         btnConfirmPurchase = findViewById(R.id.btnConfirmPurchase);
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
@@ -149,7 +151,8 @@ public class DialogBoxOrderDetail extends Dialog{
                 } else {
                     boolean duplicateProduct = false;
                     for (CartProduct cartProductInList: cartProductList) {
-                        if(cartProductInList.getProduct().getProductId().equals(cartProduct.getProduct().getProductId())) {
+                        if(cartProductInList.getProduct().getProductId()
+                                .equals(cartProduct.getProduct().getProductId())) {
                             cartProduct.getQuantity();
                             cartProduct.setId(cartProductInList.getId());
                             cartProduct.setQuantity(cartProduct.getQuantity() + cartProductInList.getQuantity());
@@ -169,7 +172,8 @@ public class DialogBoxOrderDetail extends Dialog{
             @Override
             public void onClick(View v) {
                 Order order = getOrder();
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_IMMEDIATE_CHECKOUT) {
+                DialogBoxConfirm dialogBoxConfirm
+                        = new DialogBoxConfirm(activity, StringUtils.MES_CONFIRM_IMMEDIATE_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
                         dismiss();
@@ -268,8 +272,8 @@ public class DialogBoxOrderDetail extends Dialog{
                 public void onClick(View v) {
                     if (retailPurchaseOutOfStock) {
                         DialogBoxAlert dialogBox =
-                                new DialogBoxAlert(activity,
-                                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_OUT_OF_STOCK, "");
+                                new DialogBoxAlert(activity, IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                                        StringUtils.MES_ERROR_OUT_OF_STOCK, "");
                         dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         dialogBox.show();
                     } else {
@@ -424,7 +428,8 @@ public class DialogBoxOrderDetail extends Dialog{
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 

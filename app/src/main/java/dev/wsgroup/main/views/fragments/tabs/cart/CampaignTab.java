@@ -206,6 +206,7 @@ public class CampaignTab extends Fragment {
                 orderProduct.setCampaign(cartProduct.getCampaign());
                 selectedProductList.add(orderProduct);
                 Order order = new Order();
+                order.setTotalPrice(totalPrice);
                 order.setCampaign(cartProduct.getCampaign());
                 order.setSupplier(supplier);
                 order.setInCart(true);

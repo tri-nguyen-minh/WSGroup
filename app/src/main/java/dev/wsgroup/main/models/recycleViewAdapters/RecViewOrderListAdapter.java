@@ -27,7 +27,8 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.OrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
-public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderListAdapter.ViewHolder> {
+public class RecViewOrderListAdapter
+        extends RecyclerView.Adapter<RecViewOrderListAdapter.ViewHolder> {
 
     private Context context;
     private Activity activity;
@@ -53,37 +54,45 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
+//        still need to work on discount
+
         holder.constraintLayoutDiscount.setVisibility(View.GONE);
         holder.constraintLayoutDeliverDate.setVisibility(View.GONE);
         holder.constraintLayoutReturnDate.setVisibility(View.GONE);
         holder.constraintLayoutCancelDate.setVisibility(View.GONE);
-        holder.txtOrderPrice.setText(MethodUtils.formatPriceString(orderList.get(position).getTotalPrice()));
+        holder.txtOrderPrice
+                .setText(MethodUtils.formatPriceString(orderList.get(position).getTotalPrice()));
         holder.txtSupplier.setText(orderList.get(position).getSupplier().getName());
         int productCount = orderList.get(position).getOrderProductList().size();
         holder.txtProductCount.setText(productCount + "");
         holder.lblProduct.setText((productCount == 1) ? "product" : "products");
         if (orderList.get(position).getCustomerDiscount() != null) {
             holder.constraintLayoutDiscount.setVisibility(View.VISIBLE);
-            holder.txtDiscountPrice.setText(MethodUtils.formatPriceString(orderList.get(position).getDiscountPrice()));
-
+            holder.txtDiscountPrice
+                    .setText(MethodUtils.formatPriceString(orderList.get(position).getDiscountPrice()));
         }
-        if (orderList.get(position).getPayment() == null) {
+        if (orderList.get(position).getPaymentMethod().equals("cod")) {
             holder.txtPayment.setText("Payment on Delivery");
         } else {
-
+            holder.txtPayment.setText("Payment via VNPay");
         }
         holder.txtAddress.setText(orderList.get(position).getAddress().getAddressString());
         String status = orderList.get(position).getStatus();
-        holder.txtOrderDate.setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateCreated()));
+        holder.txtOrderDate
+                .setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateCreated()));
         if (MethodUtils.checkDeliveredOrder(status)) {
             holder.constraintLayoutDeliverDate.setVisibility(View.VISIBLE);
-            holder.txtDeliverDate.setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
+            holder.txtDeliverDate
+                    .setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
         } else if (MethodUtils.checkReturnedOrder(status)){
             holder.constraintLayoutReturnDate.setVisibility(View.VISIBLE);
-            holder.txtReturnDate.setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
+            holder.txtReturnDate
+                    .setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
         } else if (MethodUtils.checkCancelledOrder(status)){
             holder.constraintLayoutCancelDate.setVisibility(View.VISIBLE);
-            holder.txtCancelDate.setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
+            holder.txtCancelDate
+                    .setText(MethodUtils.formatDateWithTime(orderList.get(position).getDateUpdated()));
         }
         RecViewOrderingProductPriceAdapter adapter = new RecViewOrderingProductPriceAdapter(context);
         adapter.setOrderProductList(orderList.get(position).getOrderProductList());
@@ -95,12 +104,13 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
             @Override
             public void onClick(View view) {
                 dialogBoxLoading = new DialogBoxLoading(activity);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 Order order = orderList.get(position);
                 if (order.getCampaign() != null) {
-                    APICampaignCaller.getCampaignById(order.getCampaign().getId(), activity.getApplication(),
-                                                new APIListener() {
+                    APICampaignCaller.getCampaignById(order.getCampaign().getId(),
+                            activity.getApplication(), new APIListener() {
                         @Override
                         public void onCampaignFound(Campaign campaign) {
                             super.onCampaignFound(campaign);
@@ -132,8 +142,9 @@ public class RecViewOrderListAdapter extends RecyclerView.Adapter<RecViewOrderLi
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private RelativeLayout layoutParent;
-        private TextView txtOrderPrice, txtSupplier, txtProductCount, lblProduct, txtDiscountCode, txtDiscountPrice,
-                txtPayment, txtAddress, txtOrderDate, txtDeliverDate, txtReturnDate, txtCancelDate;
+        private TextView txtOrderPrice, txtSupplier, txtProductCount, lblProduct,
+                txtDiscountCode, txtDiscountPrice, txtPayment, txtAddress,
+                txtOrderDate, txtDeliverDate, txtReturnDate, txtCancelDate;
         private ConstraintLayout constraintLayoutDiscount, constraintLayoutDeliverDate,
                 constraintLayoutReturnDate, constraintLayoutCancelDate;
         private RecyclerView recViewOrderProduct;

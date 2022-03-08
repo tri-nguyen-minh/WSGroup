@@ -1,6 +1,8 @@
 package dev.wsgroup.main.views.activities.ordering;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,12 +19,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.R;
+import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APIDiscountCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
+import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Order;
+import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderSupplierListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
@@ -41,9 +49,11 @@ public class ConfirmActivity extends AppCompatActivity {
     private LinearLayout layoutCampaign, layoutOrderList;
     private RelativeLayout layoutLoading;
 
+    private SharedPreferences sharedPreferences;
     private ArrayList<Order> orderList;
-    private List<List<CustomerDiscount>> discountList;
-    private int requestCode;
+    private Map<String, CustomerDiscount> discountMap;
+    private String token;
+    private int requestCode, count;
     private Campaign campaign;
     private RecViewOrderSupplierListAdapter adapter;
 
@@ -68,6 +78,9 @@ public class ConfirmActivity extends AppCompatActivity {
         layoutOrderList = findViewById(R.id.layoutOrderList);
         layoutLoading = findViewById(R.id.layoutLoading);
 
+
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN", "");
         orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
         requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         layoutOrderList.setVisibility(View.INVISIBLE);
@@ -75,8 +88,7 @@ public class ConfirmActivity extends AppCompatActivity {
 
         if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
             layoutCampaign.setVisibility(View.GONE);
-
-            setupRecViewOrderList();
+            discountMap = new HashMap<>();
         } else {
             campaign = orderList.get(0).getCampaign();
             txtCampaignTag.setText(campaign.getShareFlag() ? "Sharing Campaign" : "Single Campaign");
@@ -88,8 +100,8 @@ public class ConfirmActivity extends AppCompatActivity {
             txtCampaignQuantityCount.setText(campaign.getMinQuantity() + "");
             progressBarQuantityCount.setMax(campaign.getMinQuantity());
             progressBarQuantityCount.setProgress(campaign.getQuantityCount());
-            setupRecViewOrderList();
         }
+        setupRecViewOrderList();
 
         imgBackFromCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +140,13 @@ public class ConfirmActivity extends AppCompatActivity {
     private void setupRecViewOrderList() {
         adapter = new RecViewOrderSupplierListAdapter(getApplicationContext(),
                 ConfirmActivity.this, requestCode, IntegerUtils.REQUEST_ORDER_NOTE) {
-
+            @Override
+            public void setCustomerDiscount(int position, CustomerDiscount customerDiscount) {
+                if (customerDiscount != null) {
+                    customerDiscount.getDiscount().setSupplier(orderList.get(position).getSupplier());
+                }
+                orderList.get(position).setCustomerDiscount(customerDiscount);
+            }
         };
         adapter.setList(orderList);
         recViewCheckoutOrderProduct.setAdapter(adapter);

@@ -258,73 +258,35 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:paddingBottom="10dp">
 
+                    <RelativeLayout
+                        android:id="@+id/layoutLoading"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingTop="50dp">
+
+                        <ProgressBar
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true"
+                            android:indeterminateTint="@color/blue_main"/>
+
+                    </RelativeLayout>
+
                     <LinearLayout
+                        android:id="@+id/layoutReceipt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:background="@color/gray_light">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/white"
-                            android:paddingBottom="5dp">
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recViewOrderProductPrice"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/gray_lighter"
-                                android:nestedScrollingEnabled="false"
-                                android:paddingBottom="1dp"/>
-
-                        </RelativeLayout>
+                        android:background="@color/gray_lighter">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="20dp"
                             android:paddingVertical="10dp"
-                            android:background="@color/white">
-
-                            <TextView
-                                android:id="@+id/lblTotalPrice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left"
-                                android:text="Total"
-                                android:textColor="@color/gray_darker"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
-
-                            <TextView
-                                android:id="@+id/txtTotalPrice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserratr"
-                                android:text="0.000d"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="17dp"
-                                android:textStyle="bold"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintRight_toRightOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingHorizontal="20dp"
-                            android:paddingVertical="10dp"
-                            android:layout_marginTop="1dp"
                             android:background="@color/white">
 
                             <TextView
@@ -356,8 +318,78 @@
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/white"
+                            android:paddingBottom="5dp"
+                            android:layout_marginTop="1dp">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recViewOrderProductPrice"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/gray_lighter"
+                                android:nestedScrollingEnabled="false"
+                                android:paddingBottom="1dp"/>
+
+                        </RelativeLayout>
+
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/layoutDiscount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="10dp"
+                            android:layout_marginBottom="3dp"
+                            android:background="@color/white">
+
+                            <TextView
+                                android:id="@+id/lblTotalPrice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/montserratr"
+                                android:gravity="left"
+                                android:text="Total"
+                                android:textColor="@color/gray_darker"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <TextView
+                                android:id="@+id/txtTotalPrice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/montserratr"
+                                android:text="0.000d"
+                                android:textColor="@color/gray_dark"
+                                android:textSize="17dp"
+                                android:textStyle="bold"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recViewDiscountList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/gray_lighter"
+                            android:nestedScrollingEnabled="false"
+                            android:paddingBottom="1dp"/>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recViewLoyalStatusList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/gray_lighter"
+                            android:nestedScrollingEnabled="false"
+                            android:paddingBottom="1dp"/>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutCampaignSaving"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingBottom="10dp"
@@ -391,11 +423,11 @@
                                 android:textSize="17dp"
                                 android:textStyle="bold"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintRight_toLeftOf="@id/txtDiscountPrice"
+                                app:layout_constraintRight_toLeftOf="@id/txtCampaignSaving"
                                 app:layout_constraintBottom_toBottomOf="parent"/>
 
                             <TextView
-                                android:id="@+id/txtDiscountPrice"
+                                android:id="@+id/txtCampaignSaving"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/montserratr"
@@ -412,53 +444,9 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            android:visibility="gone">
-
-                            <LinearLayout
-                                android:id="@+id/layoutCampaignDate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent">
-
-                                <TextView
-                                    android:id="@+id/lblCampaignDate"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="5dp"
-                                    android:fontFamily="@font/montserratr"
-                                    android:gravity="left"
-                                    android:text="End on"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp"/>
-
-                                <TextView
-                                    android:id="@+id/txtDiscountEndDate"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/montserratr"
-                                    android:gravity="right"
-                                    android:text="Jul 12, 2021"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold"/>
-
-                            </LinearLayout>
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:paddingHorizontal="20dp"
-                            android:paddingTop="10dp"
+                            android:paddingVertical="10dp"
                             android:background="@color/white">
 
                             <TextView
@@ -495,7 +483,7 @@
 
         <Button
             android:id="@+id/btnConfirmOrder"
-            android:text="CHECKOUT WITH VNPAY"
+            android:text="CONFIRM ORDER"
             style="@style/style_button_account"
             android:textSize="16sp"
             android:layout_marginVertical="10dp"

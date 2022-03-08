@@ -25,15 +25,16 @@ import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIOrderCaller {
 
     private static RequestQueue requestQueue;
     private static List<Order> orderList;
-    private static int count;
 
-    public  static void addOrder(String token, Order order, Application application, APIListener APIListener) {
+    public  static void addOrder(String token, Order order,
+                                 Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -57,23 +58,17 @@ public class APIOrderCaller {
                 jsonObjectProduct.put("productName", product.getName());
                 jsonObjectProduct.put("image", product.getImageLink());
                 jsonObjectProduct.put("quantity", cartProduct.getQuantity());
-//                if(order.getCampaignId().isEmpty()) {
-//                    jsonObjectProduct.put("price", product.getRetailPrice());
-//                    totalPrice *= product.getRetailPrice();
-//                } else {
-//                    jsonObjectProduct.put("price", product.getCampaign().getSavingPrice());
-//                    totalPrice *= product.getCampaign().getSavingPrice();
-//                }
                 jsonObjectProduct.put("price", product.getRetailPrice());
                 jsonObjectProduct.put("totalPrice", orderProduct.getTotalPrice());
                 jsonObjectProduct.put("typeofproduct", cartProduct.getProductType());
                 jsonObjectProduct.put("notes", orderProduct.getNote());
                 productArray.put(jsonObjectProduct);
             }
-            jsonObjectOrder.put("campaignId", (campaign == null) ? JSONObject.NULL : campaign.getId());
+            jsonObjectOrder.put("paymentMethod", order.getPaymentMethod());
+            jsonObjectOrder.put("campaignId", (campaign == null)
+                                                        ? JSONObject.NULL: campaign.getId());
             jsonObjectOrder.put("isWholesale", (campaign == null) ? false : true);
             jsonObjectOrder.put("addressId", order.getAddress().getId());
-            jsonObjectOrder.put("paymentId", order.getPayment().getId());
             jsonObjectOrder.put("discountPrice", order.getDiscountPrice());
             jsonObjectOrder.put("shippingFee", order.getShippingFee());
             jsonObjectOrder.put("supplierId", order.getSupplier().getId());
@@ -85,6 +80,7 @@ public class APIOrderCaller {
             }
 
             jsonObjectOrder.put("products", productArray);
+            System.out.println(jsonObjectOrder);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -126,7 +122,8 @@ public class APIOrderCaller {
     }
 
 
-    public static void getOrderByStatus(String token, String status, List<Order> list, Application application, APIListener APIListener) {
+    public static void getOrderByStatus(String token, String status, List<Order> list,
+                                        Application application, APIListener APIListener) {
         String url = StringUtils.ORDER_API_URL + "customer?status=" + status;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -149,12 +146,6 @@ public class APIOrderCaller {
                                         orderWithCampaignIndexList.add(orderList.indexOf(order));
                                     }
                                 }
-//                                if (orderWithCampaignIndexList.size() > 0) {
-//                                    count = 0;
-//                                    for (int index : orderWithCampaignIndexList) {
-//
-//                                    }
-//                                }
                             }
                             APIListener.onOrderFound(orderList);
                         } else {
@@ -170,6 +161,8 @@ public class APIOrderCaller {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -181,6 +174,62 @@ public class APIOrderCaller {
                     Map<String, String> header = new HashMap<>();
                     header.put("cookie", token);
                     return header;
+                }
+            };
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public  static void updateOrderPaymentStatus(String token, Order order, String status,
+                                                 boolean advanceFlag, double price, String vnpRef,
+                                                 Application application, APIListener APIListener) {
+        String url = StringUtils.ORDER_API_URL + "payment";
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("orderId", order.getId());
+            jsonObject.put("status", status);
+            jsonObject.put("isAdvanced", advanceFlag);
+            jsonObject.put("amount", price);
+            jsonObject.put("vnp_TxnRef", vnpRef);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String message = response.getString("message");
+                        if (message.equals("successful")) {
+                            APIListener.onUpdateOrderSuccessful();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
                 }
             };
             requestQueue.add(request);

@@ -40,20 +40,25 @@ public class RecViewCampaignListAdapter extends RecyclerView.Adapter<RecViewCamp
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtCampaignNote.setText(campaignList.get(position).getDescription());
-        holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaignList.get(position).getSavingPrice()));
-        holder.txtCampaignTag.setText(campaignList.get(position).getShareFlag() ? "Sharing Campaign" : "Single Campaign");
+        holder.txtCampaignPrice
+              .setText(MethodUtils.formatPriceString(campaignList.get(position).getSavingPrice()));
+        holder.txtCampaignTag
+              .setText(campaignList.get(position).getShareFlag() ? "Sharing Campaign" : "Single Campaign");
         holder.txtCampaignQuantity.setText(campaignList.get(position).getMinQuantity() + "");
         holder.txtCampaignMaxQuantity.setText(campaignList.get(position).getMaxQuantity() + "");
-        holder.txtDiscountEndDate.setText(MethodUtils.formatDate(campaignList.get(position).getEndDate()));
+        holder.txtDiscountEndDate
+              .setText(MethodUtils.formatDate(campaignList.get(position).getEndDate()));
         holder.txtCampaignOrderCount.setText(campaignList.get(position).getOrderCount() + "");
         holder.txtCampaignQuantityCount.setText(campaignList.get(position).getQuantityCount() + "");
         holder.txtCampaignQuantityBar.setText(campaignList.get(position).getMinQuantity() + "");
-        holder.lblProductOrderCount.setText((campaignList.get(position).getOrderCount() == 1) ? "order" : "orders");
+        holder.lblProductOrderCount
+              .setText((campaignList.get(position).getOrderCount() == 1) ? "order" : "orders");
         holder.lblProductOrderCountSeparator.setText("/");
         holder.progressBarQuantityCount.setMax(campaignList.get(position).getMinQuantity());
         holder.progressBarQuantityCount.setProgress(campaignList.get(position).getQuantityCount());
         holder.progressBarQuantityCount.getProgressDrawable().setColorFilter(
-                context.getResources().getColor(R.color.blue_main), android.graphics.PorterDuff.Mode.SRC_IN);
+                context.getResources().getColor(R.color.blue_main),
+                android.graphics.PorterDuff.Mode.SRC_IN);
         if (!campaignList.get(position).getStatus().equals("active")) {
             holder.btnSelect.setVisibility(View.GONE);
         } else {
@@ -75,9 +80,10 @@ public class RecViewCampaignListAdapter extends RecyclerView.Adapter<RecViewCamp
     public void executeOnCampaignSelected(Campaign campaign) {}
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtCampaignNote, txtCampaignPrice, txtCampaignTag, txtDiscountEndDate,
-                txtCampaignQuantity, txtCampaignMaxQuantity, txtCampaignOrderCount, txtCampaignQuantityCount,
-                txtCampaignQuantityBar, lblProductOrderCount, lblProductOrderCountSeparator;
+        private TextView txtCampaignNote, txtCampaignPrice, txtCampaignTag,
+                txtDiscountEndDate, txtCampaignQuantity, txtCampaignMaxQuantity,
+                txtCampaignOrderCount, txtCampaignQuantityCount, txtCampaignQuantityBar,
+                lblProductOrderCount, lblProductOrderCountSeparator;
         private ProgressBar progressBarQuantityCount;
         private Button btnSelect;
 

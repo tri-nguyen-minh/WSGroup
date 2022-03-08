@@ -3,6 +3,8 @@ package dev.wsgroup.main.views.fragments.tabs.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -27,15 +29,20 @@ import java.util.Map;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIDiscountCaller;
+import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
+import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
+import dev.wsgroup.main.models.dtos.LoyaltyStatus;
+import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxSetupPayment;
 
 public class HomeTab extends Fragment {
 
@@ -95,18 +102,40 @@ public class HomeTab extends Fragment {
         imgProductDetailMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = "99ba5ad1-612c-493f-8cdb-2c2af92ae95a";
-                APIDiscountCaller.getCustomerDiscountByCondition(sharedPreferences.getString("TOKEN", ""), list, 1000000, id,
-                        null, getActivity().getApplication(), new APIListener() {
-                            @Override
-                            public void onDiscountListFound(List<CustomerDiscount> discountList) {
-                                System.out.println("size " + discountList.size());
-                            }
-                        });
-//                APIDiscountCaller.getCustomerDiscountByCondition(sharedPreferences.getString("TOKEN", ""), null, 100000, id,
-//                        null, getActivity().getApplication(), new APIListener());
-//                APIDiscountCaller.getCustomerDiscountByStatus(sharedPreferences.getString("TOKEN", ""), "ready", null,
-//                        getActivity().getApplication(), new APIListener());
+
+                String token = sharedPreferences.getString("TOKEN","");
+                APIDiscountCaller.getCustomerDiscountByDiscountCode(token, "8e77e9fa-7a91-4a0c-a83e-0525726bbdca", "KHAIMOS199", getActivity().getApplication(), new APIListener() {
+                    @Override
+                    public void onDiscountListFound(List<CustomerDiscount> discountList) {
+                        if (discountList.size() > 0) {
+                            System.out.println(discountList.get(0).getDiscount().getId() + " - " + discountList.get(0).getDiscount().getCode());
+                        } else {
+                            System.out.println("not found");
+                        }
+                    }
+                });
+//                APISupplierCaller.getCustomerLoyaltyStatus(token, "99ba5ad1-612c-493f-8cdb-2c2af92ae95a", getActivity().getApplication(), new APIListener() {
+//                    @Override
+//                    public void onLoyaltyStatusFound(LoyaltyStatus status) {
+//                    }
+//                });
+//                Order order = new Order();
+//                order.setId("8f259f8e-7df9-4502-b93b-08744e271143");
+//                APIOrderCaller.updateOrderPaymentStatus(sharedPreferences.getString("TOKEN",""),
+//                        order, "created", false, 300000, "033333", getActivity().getApplication(), new APIListener() {
+//                            @Override
+//                            public void onUpdateOrderSuccessful() {
+//                                System.out.println("success");
+//                            }
+//                        });
+//                DialogBoxSetupPayment dialogBoxSetupPayment = new DialogBoxSetupPayment(getActivity(), 20000) {
+//                    @Override
+//                    public void onBankSelected(String bank) {
+//                        System.out.println(bank);
+//                    }
+//                };
+//                dialogBoxSetupPayment.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                dialogBoxSetupPayment.show();
             }
         });
 
@@ -172,7 +201,8 @@ public class HomeTab extends Fragment {
         RecViewProductListAdapter adapter = new RecViewProductListAdapter(getContext(), getActivity());
         adapter.setProductsList(productList);
         recViewHomePopularProduct.setAdapter(adapter);
-        recViewHomePopularProduct.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+        recViewHomePopularProduct.setLayoutManager(new LinearLayoutManager(getContext(),
+                LinearLayoutManager.HORIZONTAL, false));
         lblViewMorePopularProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -144,7 +144,8 @@ public class APICampaignCaller {
         }
     }
 
-    public static void getCampaignById(String campaignId, Application application, APIListener APIListener) {
+    public static void getCampaignById(String campaignId,
+                                       Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }

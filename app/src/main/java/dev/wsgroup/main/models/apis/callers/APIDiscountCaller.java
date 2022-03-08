@@ -108,20 +108,18 @@ public class APIDiscountCaller {
             }
             jsonObject1.put("minPriceCondition", price);
             jsonObject1.put("suppId", supplierId);
-            System.out.println("jsonObject1 "+jsonObject1);
-            System.out.println("jsonObject2 "+jsonObject2);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
                         count--;
-                        System.out.println(count + " - " + response);
                         discountList = (list == null) ? new ArrayList<>() : list;
                         JSONArray data = response.getJSONArray("data");
                         CustomerDiscount customerDiscount;
                         if (data.length() > 0) {
                             for (int i = 0; i < data.length(); i++) {
-                                customerDiscount = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
+                                customerDiscount
+                                        = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
                                 if (!checkDuplicateCustomerDiscount(customerDiscount)) {
                                     discountList.add(customerDiscount);
                                 }
@@ -176,6 +174,7 @@ public class APIDiscountCaller {
             e.printStackTrace();
         }
     }
+
     public static void getCustomerDiscountByCondition(String token, List<OrderProduct> orderProductList,
                                                       double price, String supplierId,
                                                       List<CustomerDiscount> list,
@@ -185,6 +184,7 @@ public class APIDiscountCaller {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
+        System.out.println(url);
         try {
             JSONObject jsonObject1 = new JSONObject();
             JSONObject jsonObject2 = null;
@@ -205,20 +205,20 @@ public class APIDiscountCaller {
             }
             jsonObject1.put("minPriceCondition", price);
             jsonObject1.put("suppId", supplierId);
-            System.out.println("jsonObject1 "+jsonObject1);
-            System.out.println("jsonObject2 "+jsonObject2);
+            System.out.println(jsonObject1);
+            System.out.println(jsonObject2);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
                         count--;
-                        System.out.println(count + " - " + response);
                         discountList = (list == null) ? new ArrayList<>() : list;
                         JSONArray data = response.getJSONArray("data");
                         CustomerDiscount customerDiscount;
                         if (data.length() > 0) {
                             for (int i = 0; i < data.length(); i++) {
-                                customerDiscount = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
+                                customerDiscount
+                                        = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
                                 if (!checkDuplicateCustomerDiscount(customerDiscount)) {
                                     discountList.add(customerDiscount);
                                 }
@@ -269,6 +269,67 @@ public class APIDiscountCaller {
                 };
                 requestQueue.add(request2);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getCustomerDiscountByDiscountCode(String token, String supplierId, String code,
+                                                         Application application,
+                                                      APIListener APIListener) {
+        String url = StringUtils.DISCOUNT_API_URL + "customerDiscountCodeAndSuppId";
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("discountCode", code);
+            jsonObject.put("supplierId", supplierId);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        System.out.println(response);
+                        List<CustomerDiscount> discountList = new ArrayList<>();
+                        JSONArray data = response.getJSONArray("data");
+                        CustomerDiscount customerDiscount;
+                        if (data.length() > 0) {
+                            for (int i = 0; i < data.length(); i++) {
+                                customerDiscount
+                                        = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
+                                discountList.add(customerDiscount);
+                            }
+                        }
+                        APIListener.onDiscountListFound(discountList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
+                }
+            };
+
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(error.toString().contains("NoConnectionError")) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+            };
+            requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
         }

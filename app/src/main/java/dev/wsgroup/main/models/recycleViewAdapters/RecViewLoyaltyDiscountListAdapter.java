@@ -4,24 +4,23 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.LoyaltyStatus;
+import dev.wsgroup.main.models.utils.MethodUtils;
 
-public class RecViewLoyaltyDiscountList extends RecyclerView.Adapter<RecViewLoyaltyDiscountList.ViewHolder> {
+public class RecViewLoyaltyDiscountListAdapter
+        extends RecyclerView.Adapter<RecViewLoyaltyDiscountListAdapter.ViewHolder> {
 
     private Context context;
     private List<LoyaltyStatus> loyaltyStatusList;
 
-    public RecViewLoyaltyDiscountList(Context context) {
+    public RecViewLoyaltyDiscountListAdapter(Context context) {
         this.context = context;
     }
 
@@ -38,8 +37,10 @@ public class RecViewLoyaltyDiscountList extends RecyclerView.Adapter<RecViewLoya
     }
 
     @Override
-    public void onBindViewHolder(RecViewLoyaltyDiscountList.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(RecViewLoyaltyDiscountListAdapter.ViewHolder holder, int position) {
+        holder.txtSupplierName.setText(loyaltyStatusList.get(position).getSupplier().getName());
+        holder.txtDiscountPrice
+                .setText(MethodUtils.formatPriceString(loyaltyStatusList.get(position).getDiscountPrice()));
     }
 
     @Override

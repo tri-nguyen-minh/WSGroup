@@ -1,9 +1,12 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class LoyaltyStatus implements Serializable {
-    private String id, supplierId;
+    private String id;
+    private Supplier supplier;
     private int discountPercent;
     private double discountPrice;
 
@@ -18,12 +21,12 @@ public class LoyaltyStatus implements Serializable {
         this.id = id;
     }
 
-    public String getSupplierId() {
-        return supplierId;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setSupplierId(String supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public int getDiscountPercent() {
@@ -40,5 +43,15 @@ public class LoyaltyStatus implements Serializable {
 
     public double getDiscountPrice() {
         return discountPrice;
+    }
+
+    public static LoyaltyStatus getObjectFromJSON(JSONObject data) throws Exception {
+        LoyaltyStatus status = new LoyaltyStatus();
+        status.setId(data.getString("id"));
+        Supplier supplier = new Supplier();
+        supplier.setId(data.getString("supplierid"));
+        status.setSupplier(supplier);
+        status.setDiscountPercent(data.getInt("discountpercent"));
+        return status;
     }
 }

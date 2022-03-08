@@ -27,6 +27,7 @@ public class DialogBoxSelectImage extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_select_image);
+        setCancelable(false);
 
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
         btnTakePhoto = findViewById(R.id.btnTakePhoto);

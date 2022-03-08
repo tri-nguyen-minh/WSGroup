@@ -1,6 +1,5 @@
 package dev.wsgroup.main.models.apis;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,8 @@ public class APIListener {
 
     public void onProductListFound(List<Product> productList) {}
 
-    public void onCartListFound(List<CartProduct> retailCartProductList, List<CartProduct> campaignCartProductList) {}
+    public void onCartListFound(List<CartProduct> retailCartProductList,
+                                List<CartProduct> campaignCartProductList) {}
 
     public void onProductFound(Product product) {}
 
@@ -47,6 +47,8 @@ public class APIListener {
     public void onCampaignMapFound(Map<String, List<Campaign>> campaignMap) {}
 
     public void onOrderSuccessful(Order order) {}
+
+    public void onUpdateOrderSuccessful() {}
 
     public void onOrderFound(List<Order> orderList) {}
 

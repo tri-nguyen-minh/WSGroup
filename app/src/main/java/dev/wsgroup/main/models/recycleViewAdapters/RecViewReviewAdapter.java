@@ -16,7 +16,8 @@ import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
-public class RecViewReviewAdapter extends RecyclerView.Adapter<RecViewReviewAdapter.ViewHolder> {
+public class RecViewReviewAdapter
+        extends RecyclerView.Adapter<RecViewReviewAdapter.ViewHolder> {
 
     private Context context;
     private List<Review> reviewList;
@@ -40,7 +41,8 @@ public class RecViewReviewAdapter extends RecyclerView.Adapter<RecViewReviewAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtCustomerName.setText(reviewList.get(position).getUser().getDisplayName());
-        holder.txtDate.setText(MethodUtils.formatDateWithTime(reviewList.get(position).getCreateDate()));
+        holder.txtDate
+                .setText(MethodUtils.formatDateWithTime(reviewList.get(position).getCreateDate()));
         holder.ratingProduct.setRating((float) reviewList.get(position).getRating());
         holder.txtReview.setText(reviewList.get(position).getDescription());
     }
@@ -54,8 +56,6 @@ public class RecViewReviewAdapter extends RecyclerView.Adapter<RecViewReviewAdap
         private ImageView imgAccountAvatar;
         private TextView txtCustomerName, txtDate, txtReview;
         private MaterialRatingBar ratingProduct;
-//        private RatingBar ratingProduct;
-
 
         public ViewHolder(View view) {
             super(view);

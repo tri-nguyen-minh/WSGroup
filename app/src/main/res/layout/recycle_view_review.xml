@@ -106,7 +106,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="25dp"
                     android:progressTint="@color/gold"
-                    android:secondaryProgressTint="@color/gold"
+                    android:secondaryProgressTint="@color/gray"
+                    android:progressBackgroundTint="@color/gray"
                     android:numStars="5"
                     android:stepSize="0.5"
                     android:theme="@style/ratingBar"
@@ -143,7 +144,6 @@
             android:textSize="16sp"
             android:maxLength="100"
             android:gravity="left|top"
-            android:textColor="@color/gray_darker"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

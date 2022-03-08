@@ -20,7 +20,8 @@ import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAddress;
 
-public class RecViewAddressListAdapter extends RecyclerView.Adapter<RecViewAddressListAdapter.ViewHolder> {
+public class RecViewAddressListAdapter
+        extends RecyclerView.Adapter<RecViewAddressListAdapter.ViewHolder> {
 
     private Context context;
     private Activity activity;
@@ -64,11 +65,13 @@ public class RecViewAddressListAdapter extends RecyclerView.Adapter<RecViewAddre
 
                         @Override
                         public void onAddressDelete() {
-                            onAddressChange(addressList.get(position), position, IntegerUtils.ADDRESS_ACTION_DELETE);
+                            onAddressChange(addressList.get(position), position,
+                                    IntegerUtils.ADDRESS_ACTION_DELETE);
                             notifyDataSetChanged();
                         }
                     };
-                    dialogBoxAddress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialogBoxAddress.getWindow()
+                                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBoxAddress.show();
                 }
             });
@@ -101,11 +104,13 @@ public class RecViewAddressListAdapter extends RecyclerView.Adapter<RecViewAddre
                         @Override
                         public void onAddressDelete() {
                             super.onAddressDelete();
-                            onAddressChange(addressList.get(position), position, IntegerUtils.ADDRESS_ACTION_DELETE);
+                            onAddressChange(addressList.get(position), position,
+                                    IntegerUtils.ADDRESS_ACTION_DELETE);
                             notifyDataSetChanged();
                         }
                     };
-                    dialogBoxAddress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialogBoxAddress.getWindow()
+                                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBoxAddress.show();
                     return true;
                 }

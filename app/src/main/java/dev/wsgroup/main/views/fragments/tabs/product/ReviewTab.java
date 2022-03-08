@@ -94,7 +94,8 @@ public class ReviewTab extends Fragment {
         adapter = new RecViewReviewAdapter(getContext());
         adapter.setReviewList(reviewList);
         recViewReview.setAdapter(adapter);
-        recViewReview.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        recViewReview.setLayoutManager(new LinearLayoutManager(getContext(),
+                LinearLayoutManager.VERTICAL, false));
         setReviewLoadedState();
     }
 

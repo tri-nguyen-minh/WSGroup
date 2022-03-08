@@ -3,7 +3,6 @@ package dev.wsgroup.main.models.dtos;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class Review implements Serializable {
     private String id, orderId, productId, description;

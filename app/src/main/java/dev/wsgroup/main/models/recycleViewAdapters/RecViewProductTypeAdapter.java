@@ -20,7 +20,11 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 
-public class RecViewProductTypeAdapter  extends RecyclerView.Adapter<RecViewProductTypeAdapter.ViewHolder> {
+
+//    MARKED FOR DELETE
+
+public class RecViewProductTypeAdapter
+        extends RecyclerView.Adapter<RecViewProductTypeAdapter.ViewHolder> {
 
     private int code;
     private Context context;
@@ -61,23 +65,6 @@ public class RecViewProductTypeAdapter  extends RecyclerView.Adapter<RecViewProd
             holder.cardRecViewTypeOfProduct.getBackground().setTint(context.getResources().getColor(R.color.gray_dark));
             holder.layoutRecViewTypeOfProduct.getBackground().setTint(context.getResources().getColor(R.color.gray_lighter));
             holder.txtRecViewTypeOfProduct.setTextColor(context.getResources().getColor(R.color.black));
-
-//            holder.cardRecViewTypeOfProduct.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    type = typeList.get(position);
-//                    notifyDataSetChanged();
-//                }
-//            });
-//            if (type.equals(typeList.get(position))) {
-//                holder.cardRecViewTypeOfProduct.getBackground().setTint(context.getResources().getColor(R.color.blue_dark));
-//                holder.layoutRecViewTypeOfProduct.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
-//                holder.txtRecViewTypeOfProduct.setTextColor(context.getResources().getColor(R.color.white));
-//            } else {
-//                holder.cardRecViewTypeOfProduct.getBackground().setTint(context.getResources().getColor(R.color.gray_dark));
-//                holder.layoutRecViewTypeOfProduct.getBackground().setTint(context.getResources().getColor(R.color.gray_lighter));
-//                holder.txtRecViewTypeOfProduct.setTextColor(context.getResources().getColor(R.color.black));
-//            }
         }
     }
 

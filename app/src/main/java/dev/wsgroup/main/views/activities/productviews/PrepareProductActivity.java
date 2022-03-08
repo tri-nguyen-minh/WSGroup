@@ -300,6 +300,7 @@ public class PrepareProductActivity extends AppCompatActivity {
         orderProduct.setCampaign(cartProduct.getCampaign());
         selectedProductList.add(orderProduct);
         Order order = new Order();
+        order.setTotalPrice(totalPrice);
         order.setCampaign(cartProduct.getCampaign());
         order.setSupplier(product.getSupplier());
         order.setInCart(false);
@@ -316,12 +317,9 @@ public class PrepareProductActivity extends AppCompatActivity {
         cartProduct.setProduct(product);
         cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
         cartProduct.setProductType(product.getTypeOfProduct());
-        if (campaign != null) {
-            cartProduct.setCampaign(campaign);
-            cartProduct.setCampaignFlag(true);
-        } else {
-            cartProduct.setCampaignFlag(false);
-        }
+        cartProduct.setCampaign(campaign);
+        cartProduct.setCampaignFlag(campaign != null);
+        System.out.println("check campaign" + campaign == null);
         return cartProduct;
     }
 

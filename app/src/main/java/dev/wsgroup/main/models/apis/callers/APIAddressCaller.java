@@ -29,7 +29,8 @@ public class APIAddressCaller {
     private static String url;
     private static List<Address> addressList;
 
-    public static void getAllAddress(String token, List<Address> list, Application application, APIListener APIListener) {
+    public static void getAllAddress(String token, List<Address> list,
+                                     Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + "All";
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -82,7 +83,8 @@ public class APIAddressCaller {
         }
     }
 
-    public static void getDefaultAddress(String token, Application application, APIListener APIListener) {
+    public static void getDefaultAddress(String token,
+                                         Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + "default";
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -129,7 +131,8 @@ public class APIAddressCaller {
         }
     }
 
-    public static void AddAddress(String token, Address address, Application application, APIListener APIListener) {
+    public static void AddAddress(String token, Address address,
+                                  Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -158,7 +161,8 @@ public class APIAddressCaller {
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, StringUtils.ADDRESS_API_URL,
+            JsonObjectRequest request
+                    = new JsonObjectRequest(Request.Method.POST, StringUtils.ADDRESS_API_URL,
                     jsonObject, listener, errorListener) {
 
                 @Override
@@ -174,7 +178,8 @@ public class APIAddressCaller {
         }
     }
 
-    public static void UpdateAddress(String token, Address address, Application application, APIListener APIListener) {
+    public static void UpdateAddress(String token, Address address,
+                                     Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + address.getId();
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -222,7 +227,8 @@ public class APIAddressCaller {
         }
     }
 
-    public static void DeleteAddress(String token, Address address, Application application, APIListener APIListener) {
+    public static void DeleteAddress(String token, Address address,
+                                     Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + address.getId();
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);

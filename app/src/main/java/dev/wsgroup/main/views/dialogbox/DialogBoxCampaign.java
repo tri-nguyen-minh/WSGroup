@@ -39,6 +39,7 @@ public class DialogBoxCampaign extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_campaign);
+        setCancelable(false);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         layoutCampaign = findViewById(R.id.layoutCampaign);
