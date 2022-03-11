@@ -126,7 +126,8 @@ public class RetailTab extends Fragment {
                         ordersList.add(order);
                     }
                 }
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(getActivity(), StringUtils.MES_CONFIRM_CHECKOUT) {
+                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(getActivity(),
+                                                        StringUtils.MES_CONFIRM_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
                         Intent confirmOrderIntent = new Intent(getContext(), ConfirmActivity.class);
@@ -144,7 +145,8 @@ public class RetailTab extends Fragment {
 
     private void getCartFromSession() {
         try {
-            sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+            sharedPreferences = getActivity().getSharedPreferences("PREFERENCE",
+                                                                    Context.MODE_PRIVATE);
             cartList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
         } catch (Exception e) {
@@ -216,8 +218,9 @@ public class RetailTab extends Fragment {
                                 }
                                 try {
                                     sharedPreferences.edit()
-                                            .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) cartList))
-                                            .commit();
+                                            .putString("RETAIL_CART",
+                                                    ObjectSerializer.serialize((Serializable) cartList))
+                                            .apply();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

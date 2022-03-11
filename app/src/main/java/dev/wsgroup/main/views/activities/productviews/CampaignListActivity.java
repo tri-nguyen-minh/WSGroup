@@ -1,11 +1,5 @@
 package dev.wsgroup.main.views.activities.productviews;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -14,6 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -24,11 +23,10 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.fragments.CampaignFragment;
-import dev.wsgroup.main.views.fragments.OrderFragment;
 
 public class CampaignListActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromCampaignList, imgCampaignListMessage, imgCampaignListHome;
+    private ImageView imgBackFromCampaignList, imgCampaignListHome;
     private TextView txtProductRetailPrice;
     private Button btnSelectBasePrice;
     private ViewPager historyViewPager;
@@ -44,7 +42,6 @@ public class CampaignListActivity extends AppCompatActivity {
         this.getSupportActionBar().hide();
 
         imgBackFromCampaignList = findViewById(R.id.imgBackFromCampaignList);
-        imgCampaignListMessage = findViewById(R.id.imgCampaignListMessage);
         imgCampaignListHome = findViewById(R.id.imgCampaignListHome);
         txtProductRetailPrice = findViewById(R.id.txtProductRetailPrice);
         btnSelectBasePrice = findViewById(R.id.btnSelectBasePrice);
@@ -95,12 +92,14 @@ public class CampaignListActivity extends AppCompatActivity {
         tabCommon.setText("Upcoming");
         historyTabLayout.addTab(tabCommon);
 
-        historyTabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
+        historyTabLayout.setTabTextColors(getResources().getColor(R.color.black),
+                                            getResources().getColor(R.color.black));
         NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override
             public Fragment getItem(int position) {
-                return  new CampaignFragment(historyTabLayout.getTabAt(position).getText().toString());
+                return  new CampaignFragment(historyTabLayout.getTabAt(position)
+                                                             .getText().toString());
             }
 
             @Override
@@ -121,7 +120,8 @@ public class CampaignListActivity extends AppCompatActivity {
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 if (tab.getIcon() != null)
-                    tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
+                    tab.getIcon().setColorFilter(getResources()
+                                 .getColor(R.color.black), PorterDuff.Mode.SRC_IN);
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {

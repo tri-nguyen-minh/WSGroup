@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -52,14 +53,14 @@ public class DetailTab extends Fragment {
             txtSupplierName, txtMoreSuppliersProductsName;
     private RecyclerView recViewMoreSuppliersProducts;
     private ViewFlipper viewFlipperProduct;
-    private ImageView imgCommonFlipper;
+    private ImageView imgCommonFlipper, imgProductCategory;
     private TextView txtProductName, txtProductOrderCount, txtProductReviewCount,
             txtRatingProduct, txtRetailPrice, txtCampaignCount, lblDescriptionLength,
             txtLoyaltyDiscount, lblLoyaltyDiscount, lblLoyaltyTag;
     private MaterialRatingBar ratingProduct;
-//    private RatingBar ratingProduct;
     private LinearLayout linearLayoutCampaign;
-    private ConstraintLayout constraintLayoutSupplierName, layoutSelectCampaign, layoutLoyalty;
+    private ConstraintLayout constraintLayoutSupplierName, layoutSelectCampaign, layoutLoyalty,
+            constraintLayoutProductCategory;
     private Button btnPurchaseProduct;
     private LinearLayout layoutProductQuantityWithCampaign, layoutMoreSuppliersProducts;
 
@@ -68,6 +69,7 @@ public class DetailTab extends Fragment {
     private Product product;
     private Supplier supplier;
     private String userId;
+    private boolean orderCountCheck, ratingCheck;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,6 +88,7 @@ public class DetailTab extends Fragment {
         txtMoreSuppliersProductsName = view.findViewById(R.id.txtMoreSuppliersProductsName);
         recViewMoreSuppliersProducts = view.findViewById(R.id.recViewMoreSuppliersProducts);
         viewFlipperProduct = view.findViewById(R.id.viewFlipperProduct);
+        imgProductCategory = view.findViewById(R.id.imgProductCategory);
         txtProductName = view.findViewById(R.id.txtProductName);
         txtProductOrderCount = view.findViewById(R.id.txtProductOrderCount);
         txtProductReviewCount = view.findViewById(R.id.txtProductReviewCount);
@@ -101,9 +104,10 @@ public class DetailTab extends Fragment {
         constraintLayoutSupplierName = view.findViewById(R.id.constraintLayoutSupplierName);
         layoutSelectCampaign = view.findViewById(R.id.layoutSelectCampaign);
         layoutLoyalty = view.findViewById(R.id.layoutLoyalty);
+        constraintLayoutProductCategory = view.findViewById(R.id.constraintLayoutProductCategory);
+        btnPurchaseProduct = view.findViewById(R.id.btnPurchaseProduct);
         layoutProductQuantityWithCampaign = view.findViewById(R.id.layoutProductQuantityWithCampaign);
         layoutMoreSuppliersProducts = view.findViewById(R.id.layoutMoreSuppliersProducts);
-        btnPurchaseProduct = view.findViewById(R.id.btnPurchaseProduct);
 
         sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
@@ -115,6 +119,8 @@ public class DetailTab extends Fragment {
         }
         lblDescriptionLength.setText("Show more");
         txtProductDescription.setMaxLines(4);
+        imgProductCategory.setVisibility(View.GONE);
+        layoutMoreSuppliersProducts.setVisibility(View.GONE);
 
         constraintLayoutSupplierName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,11 +213,19 @@ public class DetailTab extends Fragment {
         } else {
             layoutLoyalty.setVisibility(View.GONE);
         }
-
         APICategoryCaller.getCategoryById(product.getCategoryId(), getActivity().getApplication(), new APIListener() {
             @Override
             public void onCategoryFound(Category category) {
-                txtProductCategory.setText(category.getName());
+                if (category != null) {
+                    txtProductCategory.setText(category.getName());
+                    imgProductCategory.setVisibility(View.VISIBLE);
+                    constraintLayoutProductCategory.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+//                            cate
+                        }
+                    });
+                }
             }
         });
         getSupplierProductList();
@@ -221,13 +235,49 @@ public class DetailTab extends Fragment {
         APIProductCaller.getProductListBySupplierId(product.getSupplier().getId(),null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onProductListFound(List<Product> productList) {
-                if(!productList.isEmpty()) {
+                if(productList.size() > 1) {
                     for (int i = (productList.size() - 1); i >= 0; i--) {
                         if (productList.get(i).getProductId().equals(product.getProductId())) {
                             productList.remove(i);
                             i = 0;
                         }
                     }
+                    orderCountCheck = false; ratingCheck = false;
+                    APIListener mostPopularListener = new APIListener() {
+                        @Override
+                        public void onProductOrderCountFound(Map<String, Integer> countList) {
+                            for (Product product : productList) {
+                                if (countList.get(product.getProductId()) != null) {
+                                    product.setOrderCount(countList.get(product.getProductId()));
+                                }else {
+                                    product.setOrderCount(0);
+                                }
+                            }
+                            orderCountCheck = true;
+                            setupMoreProductView(productList);
+                        }
+                        @Override
+                        public void onRatingListCount(Map<String, Double> ratingList) {
+                            for (Product product : productList) {
+                                if (ratingList.get(product.getProductId()) != null) {
+                                    product.setRating(ratingList.get(product.getProductId()));
+                                } else {
+                                    product.setRating(0);
+                                }
+                            }
+                            ratingCheck = true;
+                            setupMoreProductView(productList);
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            setupNoProductView();
+                        }
+                    };
+                    APIProductCaller.getOrderCountByProductList(productList,
+                            getActivity().getApplication(), mostPopularListener);
+                    APIProductCaller.getRatingByProductIdList(productList,
+                            getActivity().getApplication(), mostPopularListener);
                     setupMoreProductView(productList);
                 } else {
                     setupNoProductView();
@@ -241,12 +291,14 @@ public class DetailTab extends Fragment {
     }
 
     private void setupMoreProductView(List<Product> productList) {
-        layoutMoreSuppliersProducts.setVisibility(View.VISIBLE);
-        RecViewProductListAdapter adapter = new RecViewProductListAdapter(getContext(), getActivity());
-        adapter.setProductsList(productList);
-        recViewMoreSuppliersProducts.setAdapter(adapter);
-        recViewMoreSuppliersProducts.setLayoutManager(new LinearLayoutManager(getContext(),
-                LinearLayoutManager.HORIZONTAL, false));
+        if (orderCountCheck && ratingCheck) {
+            layoutMoreSuppliersProducts.setVisibility(View.VISIBLE);
+            RecViewProductListAdapter adapter = new RecViewProductListAdapter(getContext(), getActivity());
+            adapter.setProductsList(productList);
+            recViewMoreSuppliersProducts.setAdapter(adapter);
+            recViewMoreSuppliersProducts.setLayoutManager(new LinearLayoutManager(getContext(),
+                    LinearLayoutManager.HORIZONTAL, false));
+        }
     }
 
     private void setupNoProductView() {

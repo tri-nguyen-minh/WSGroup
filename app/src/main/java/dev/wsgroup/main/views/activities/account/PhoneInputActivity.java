@@ -1,8 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,11 +14,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.dtos.User;
-import dev.wsgroup.main.models.services.FirebasePhoneAuthService;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
@@ -57,7 +56,8 @@ public class PhoneInputActivity extends AppCompatActivity {
         layoutExistingAccount = findViewById(R.id.layoutExistingAccount);
         layoutParent = findViewById(R.id.layoutParent);
 
-        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_REGISTER);
+        requestCode = getIntent().getIntExtra("REQUEST_CODE",
+                                                IntegerUtils.REQUEST_REGISTER);
 
         editPhone.setText("091392173");
         btnSendOTP.setEnabled(false);
@@ -82,10 +82,14 @@ public class PhoneInputActivity extends AppCompatActivity {
                 String stringPhone = "0" + editPhone.getText().toString();
                 if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
                     btnSendOTP.setEnabled(false);
-                    btnSendOTP.getBackground().setTint(getResources().getColor(R.color.gray_light));
+                    btnSendOTP.getBackground()
+                              .setTint(getResources()
+                              .getColor(R.color.gray_light));
                 } else {
                     btnSendOTP.setEnabled(true);
-                    btnSendOTP.getBackground().setTint(getResources().getColor(R.color.blue_main));
+                    btnSendOTP.getBackground()
+                              .setTint(getResources()
+                              .getColor(R.color.blue_main));
                 }
             }
 
@@ -126,11 +130,13 @@ public class PhoneInputActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dialogBoxLoading = new DialogBoxLoading(PhoneInputActivity.this);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 String stringPhone = "0" + editPhone.getText().toString();
 
-                APIUserCaller.findUserByPhoneNumber(stringPhone, getApplication(), new APIListener() {
+                APIUserCaller.findUserByPhoneNumber(stringPhone,
+                        getApplication(), new APIListener() {
                     @Override
                     public void onUserFound(User user, String message) {
                         if(requestCode != IntegerUtils.REQUEST_REGISTER) {
@@ -185,8 +191,10 @@ public class PhoneInputActivity extends AppCompatActivity {
 
     private void sendOTP(String stringPhone) {
         DialogBoxOTP dialogBoxOTP =
-                new DialogBoxOTP(PhoneInputActivity.this, getApplicationContext(), stringPhone, requestCode);
-        dialogBoxOTP.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                new DialogBoxOTP(PhoneInputActivity.this,
+                        getApplicationContext(), stringPhone, requestCode);
+        dialogBoxOTP.getWindow()
+                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxOTP.show();
     }
 
@@ -198,7 +206,8 @@ public class PhoneInputActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 

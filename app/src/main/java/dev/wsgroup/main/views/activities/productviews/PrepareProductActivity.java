@@ -1,8 +1,5 @@
 package dev.wsgroup.main.views.activities.productviews;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 
@@ -47,8 +47,8 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 public class PrepareProductActivity extends AppCompatActivity {
 
     private ConstraintLayout layoutParent, layoutSelectCampaign;
-    private ImageView imgBackFromPrepareProduct, imgPrepareProductMessage,
-                imgPrepareProductHome, imgProduct, imgProductQuantityMinus, imgProductQuantityPlus;
+    private ImageView imgBackFromPrepareProduct,imgPrepareProductHome, imgProduct,
+            imgProductQuantityMinus, imgProductQuantityPlus;
     private EditText editProductQuantity;
     private TextView txtProductName, txtNumberInStorage, txtProductPriceORG,
                     txtProductPrice, txtTotalPrice, txtPricingDescription, txtCampaignTag;
@@ -57,14 +57,11 @@ public class PrepareProductActivity extends AppCompatActivity {
     private Product product;
     private Campaign campaign;
     private SharedPreferences sharedPreferences;
-    private String cartTag, supplierListTag;
+    private String cartTag;
     private int quantity, minQuantity, maxQuantity;
     private double price, totalPrice;
     private DialogBoxLoading dialogBoxLoading;
-//    private List<Supplier> supplierList;
-//    private HashMap<String, List<CartProduct>> cart;
     private List<CartProduct> cartList;
-//    private List<CartProduct> cartProductList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +72,6 @@ public class PrepareProductActivity extends AppCompatActivity {
         layoutParent = findViewById(R.id.layoutParent);
         layoutSelectCampaign = findViewById(R.id.layoutSelectCampaign);
         imgBackFromPrepareProduct = findViewById(R.id.imgBackFromPrepareProduct);
-        imgPrepareProductMessage = findViewById(R.id.imgPrepareProductMessage);
         imgPrepareProductHome = findViewById(R.id.imgPrepareProductHome);
         imgProduct = findViewById(R.id.imgProduct);
         imgProductQuantityMinus = findViewById(R.id.imgProductQuantityMinus);
@@ -186,7 +182,8 @@ public class PrepareProductActivity extends AppCompatActivity {
         layoutSelectCampaign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent campaignSelectIntent = new Intent(getApplicationContext(), CampaignListActivity.class);
+                Intent campaignSelectIntent
+                        = new Intent(getApplicationContext(), CampaignListActivity.class);
                 campaignSelectIntent.putExtra("PRODUCT", product);
                 startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_SELECT_CAMPAIGN);
             }
@@ -196,17 +193,13 @@ public class PrepareProductActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 dialogBoxLoading = new DialogBoxLoading(PrepareProductActivity.this);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 cartTag = (campaign != null) ? "CAMPAIGN_CART" : "RETAIL_CART";
-//                supplierListTag = (campaign != null) ? "SUPPLIER_CAMPAIGN_LIST" : "SUPPLIER_RETAIL_LIST";
                 try {
                     cartList = (List<CartProduct>) ObjectSerializer
                             .deserialize(sharedPreferences.getString(cartTag, ""));
-//                    cart = (HashMap<String, List<CartProduct>>) ObjectSerializer
-//                            .deserialize(sharedPreferences.getString(cartTag, ""));
-//                    supplierList = (ArrayList<Supplier>) ObjectSerializer
-//                            .deserialize(sharedPreferences.getString(supplierListTag, ""));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -219,7 +212,8 @@ public class PrepareProductActivity extends AppCompatActivity {
                     if (dialogBoxLoading.isShowing()) {
                         dialogBoxLoading.dismiss();
                     }
-                    DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(PrepareProductActivity.this,
+                    DialogBoxConfirm confirmLogoutBox
+                            = new DialogBoxConfirm(PrepareProductActivity.this,
                             StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
                         @Override
                         public void onYesClicked() {
@@ -227,44 +221,10 @@ public class PrepareProductActivity extends AppCompatActivity {
                             updateCartProduct(cartProduct);
                         }
                     };
-                    confirmLogoutBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    confirmLogoutBox.getWindow()
+                                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     confirmLogoutBox.show();
                 }
-//                if (supplierList == null) {
-//                    addCartProduct(cartProduct);
-//                } else if (supplierList.size() == 0) {
-//                    addCartProduct(cartProduct);
-//                } else {
-//                    boolean duplicateProduct = false;
-//                    cartProductList = cart.get(product.getSupplier().getId());
-//                    if (cartProductList != null) {
-//                        for (CartProduct cProduct : cartProductList) {
-//                            if (cProduct.getProduct().getProductId().equals(product.getProductId())) {
-//                                cartProduct.setId(cProduct.getId());
-//                                duplicateProduct = true;
-//                            }
-//                        }
-//                        if (duplicateProduct) {
-//                            if (dialogBoxLoading.isShowing()) {
-//                                dialogBoxLoading.dismiss();
-//                            }
-//                            DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(PrepareProductActivity.this,
-//                                    StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
-//                                @Override
-//                                public void onYesClicked() {
-//                                    dialogBoxLoading.show();
-//                                    updateCartProduct(cartProduct);
-//                                }
-//                            };
-//                            confirmLogoutBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//                            confirmLogoutBox.show();
-//                        } else {
-//                            addCartProduct(cartProduct);
-//                        }
-//                    } else {
-//                        addCartProduct(cartProduct);
-//                    }
-//                }
             }
         });
 
@@ -279,7 +239,8 @@ public class PrepareProductActivity extends AppCompatActivity {
                         startInstantOrder();
                     }
                 };
-                dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxConfirm.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxConfirm.show();
             }
         });
@@ -287,7 +248,8 @@ public class PrepareProductActivity extends AppCompatActivity {
 
     private void startInstantOrder() {
         CartProduct cartProduct = getCartProduct();
-        int request = cartProduct.getCampaignFlag() ? IntegerUtils.REQUEST_ORDER_CAMPAIGN : IntegerUtils.REQUEST_ORDER_RETAIL;
+        int request = cartProduct.getCampaignFlag()
+                ? IntegerUtils.REQUEST_ORDER_CAMPAIGN : IntegerUtils.REQUEST_ORDER_RETAIL;
         ArrayList<Order> ordersList = new ArrayList<>();
         List<OrderProduct> selectedProductList = new ArrayList<>();
         OrderProduct orderProduct = new OrderProduct();
@@ -319,7 +281,6 @@ public class PrepareProductActivity extends AppCompatActivity {
         cartProduct.setProductType(product.getTypeOfProduct());
         cartProduct.setCampaign(campaign);
         cartProduct.setCampaignFlag(campaign != null);
-        System.out.println("check campaign" + campaign == null);
         return cartProduct;
     }
 
@@ -331,8 +292,9 @@ public class PrepareProductActivity extends AppCompatActivity {
                         cartList.add(cartProduct);
                         try {
                             sharedPreferences.edit()
-                                    .putString(cartTag, ObjectSerializer.serialize((Serializable) cartList))
-                                    .commit();
+                                    .putString(cartTag,
+                                            ObjectSerializer.serialize((Serializable) cartList))
+                                    .apply();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -390,16 +352,19 @@ public class PrepareProductActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void setClickableQuantityButton(ImageView view, boolean clickable) {
         view.setEnabled(clickable);
         if (clickable) {
-            view.setColorFilter(getApplicationContext().getResources().getColor(R.color.gray_dark));
+            view.setColorFilter(getApplicationContext().getResources()
+                                                       .getColor(R.color.gray_dark));
         } else {
-            view.setColorFilter(getApplicationContext().getResources().getColor(R.color.gray_light));
+            view.setColorFilter(getApplicationContext().getResources()
+                                                       .getColor(R.color.gray_light));
         }
     }
 

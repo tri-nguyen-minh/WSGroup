@@ -28,6 +28,7 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.CartProduct;
+import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
@@ -38,6 +39,7 @@ import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
 import dev.wsgroup.main.views.activities.account.DeliveryAddressActivity;
 import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
+import dev.wsgroup.main.views.activities.message.MessageListActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
 public class ProfileTab extends Fragment {
@@ -52,8 +54,9 @@ public class ProfileTab extends Fragment {
 
     private SharedPreferences sharedPreferences;
     private List<CartProduct> retailList, campaignList;
+    private List<Message> messageList;
     private String token, username;
-    private int cartCount;
+    private int cartCount, messageCount;
     private GoogleSignInOptions options;
 
     @Override
@@ -92,6 +95,8 @@ public class ProfileTab extends Fragment {
         progressBarLoading.setVisibility(View.VISIBLE);
         layoutProfileAvatar.setVisibility(View.INVISIBLE);
         cardViewCartCount.setVisibility(View.INVISIBLE);
+        cardViewMessageCount.setVisibility(View.INVISIBLE);
+        cardViewNotificationCount.setVisibility(View.INVISIBLE);
 
         APIUserCaller.findUserByToken(token, getActivity().getApplication(), new APIListener() {
             @Override
@@ -99,6 +104,7 @@ public class ProfileTab extends Fragment {
                 user.setUsername(username);
                 setUpSimpleProfile(user);
                 editCartCountByUser();
+                editUnreadMessageCountByUser();
             }
 
             @Override
@@ -116,7 +122,9 @@ public class ProfileTab extends Fragment {
         layoutMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+//                Intent messageIntent = new Intent(getContext(), MessageListActivity.class);
+//                messageIntent.putExtra("MAIN_TAB_POSITION", 2);
+//                startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
             }
         });
 
@@ -171,7 +179,7 @@ public class ProfileTab extends Fragment {
                 DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(getActivity(), StringUtils.MES_CONFIRM_LOG_OUT) {
                     @Override
                     public void onYesClicked() {
-                        sharedPreferences.edit().clear().commit();
+                        sharedPreferences.edit().clear().apply();
                         options = new GoogleSignInOptions
                                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                                 .requestEmail()
@@ -211,6 +219,35 @@ public class ProfileTab extends Fragment {
                 txtCartCount.setText(cartCount + "");
             } else {
                 cardViewCartCount.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void editUnreadMessageCountByUser() {
+        try {
+            messageList = (List<Message>) ObjectSerializer
+                    .deserialize(sharedPreferences.getString("MESSAGE_LIST", ""));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (messageList == null) {
+            cardViewMessageCount.setVisibility(View.INVISIBLE);
+        } else {
+            if (messageList.size() == 0) {
+                cardViewMessageCount.setVisibility(View.INVISIBLE);
+            } else {
+                messageCount = 0;
+                for (Message message : messageList) {
+                    if (!message.getMessageRead()) {
+                        messageCount++;
+                    }
+                }
+                if (messageCount > 0) {
+                    cardViewMessageCount.setVisibility(View.VISIBLE);
+                    txtMessageCount.setText(messageCount + "");
+                } else {
+                    cardViewMessageCount.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }

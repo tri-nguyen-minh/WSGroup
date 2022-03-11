@@ -8,10 +8,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,37 +33,37 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
-public class RecViewProductListAdapter
-        extends RecyclerView.Adapter<RecViewProductListAdapter.ViewHolder> {
+public class RecViewProductSearchAdapter
+        extends RecyclerView.Adapter<RecViewProductSearchAdapter.ViewHolder> {
 
     private List<Product> productsList;
     private Context context;
     private Activity activity;
     private DialogBoxLoading dialogBoxLoading;
 
-    public void setProductsList(List<Product> productsList) {
-        this.productsList = productsList;
-    }
-
-    public RecViewProductListAdapter(Context context, Activity activity) {
+    public RecViewProductSearchAdapter(Context context, Activity activity) {
         this.context = context;
         this.activity = activity;
+    }
+
+    public void setProductsList(List<Product> productsList) {
+        this.productsList = productsList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
-                .inflate(R.layout.recycle_view_product_list, parent, false);
+                .inflate(R.layout.recycle_view_search_product, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(RecViewProductListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtCampaign.setVisibility(View.GONE);
         if (productsList.get(position).getStatus().equals("incampaign")) {
             holder.txtCampaign.setVisibility(View.VISIBLE);
-            holder.txtCampaign.setText("Ongoing Campaign");
+            holder.txtCampaign.setText("Ongoing\nCampaign");
         }
         holder.txtProductName.setText(productsList.get(position).getName());
 
@@ -73,15 +75,16 @@ public class RecViewProductListAdapter
         String productId = productsList.get(position).getProductId();
         if(productsList.get(position).getImageList().size() > 0) {
             Glide.with(context)
-                 .load(productsList.get(position).getImageList().get(0))
-                 .into(holder.imgProduct);
+                    .load(productsList.get(position).getImageList().get(0))
+                    .into(holder.imgProduct);
         }
         holder.txtCampaign.bringToFront();
         holder.txtRetailPrice
                 .setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
         holder.ratingProduct.setIsIndicator(true);
         holder.ratingProduct.setRating( (float) productsList.get(position).getRating());
-        holder.productCard.setOnClickListener(new View.OnClickListener() {
+        holder.txtRatingProduct.setText(productsList.get(position).getRating() + "");
+        holder.layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialogBoxLoading = new DialogBoxLoading(activity);
@@ -93,7 +96,7 @@ public class RecViewProductListAdapter
                         super.onProductFound(product);
                         dialogBoxLoading.dismiss();
                         Intent intent = new Intent(activity.getApplicationContext(),
-                                                    ProductDetailActivity.class);
+                                ProductDetailActivity.class);
                         intent.putExtra("PRODUCT_ID", product.getProductId());
                         activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
                     }
@@ -118,23 +121,23 @@ public class RecViewProductListAdapter
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView productCard;
+        private FrameLayout layoutParent;
         private ImageView imgProduct;
-        private TextView txtCampaign, txtProductName, txtProductOrderCount, txtRetailPrice;
-        private TextView lblProductOrderCount;
+        private TextView txtCampaign, txtProductName, txtProductOrderCount, txtRetailPrice,
+                lblProductOrderCount, txtRatingProduct;
         private MaterialRatingBar ratingProduct;
 
         public ViewHolder(View view) {
             super(view);
-            productCard = view.findViewById(R.id.cardRecViewHoneProduct);
-            imgProduct = view.findViewById(R.id.imgRecViewHomeProduct);
+            layoutParent = view.findViewById(R.id.layoutParent);
+            imgProduct = view.findViewById(R.id.imgRecViewProduct);
             txtCampaign = view.findViewById(R.id.txtCampaign);
-            txtProductName = view.findViewById(R.id.txtHomeRecViewProductName);
-            txtProductOrderCount = view.findViewById(R.id.txtHomeRecViewProductOrderCount);
-            txtRetailPrice = view.findViewById(R.id.txtRecViewHomeRetailPrice);
+            txtProductName = view.findViewById(R.id.txtProductName);
+            txtProductOrderCount = view.findViewById(R.id.txtRecViewProductOrderCount);
+            txtRetailPrice = view.findViewById(R.id.txtRecViewRetailPrice);
             lblProductOrderCount = view.findViewById(R.id.lblProductOrderCount);
-            ratingProduct = view.findViewById(R.id.ratingRecViewHomeProduct);
+            txtRatingProduct = view.findViewById(R.id.txtRatingProduct);
+            ratingProduct = view.findViewById(R.id.ratingProduct);
         }
     }
 }
-

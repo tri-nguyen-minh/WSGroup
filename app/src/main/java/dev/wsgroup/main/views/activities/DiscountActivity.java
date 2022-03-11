@@ -31,16 +31,10 @@ import dev.wsgroup.main.views.fragments.tabs.cart.RetailTab;
 
 public class DiscountActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromDiscount, imgDiscountMessage, imgDiscountHome;
-//    private LinearLayout layoutFailedGettingDiscount, layoutNoDiscount;
-    private ConstraintLayout layoutDiscount;
+    private ImageView imgBackFromDiscount, imgDiscountHome;
     private TabLayout discountTabLayout;
     private ViewPager discountViewPager;
-    private TextView lblRetryGetDiscount;
     private TabLayout.Tab tabCommon;
-
-    private SharedPreferences sharedPreferences;
-    private List<CustomerDiscount> discountList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +44,10 @@ public class DiscountActivity extends AppCompatActivity {
 
 
         imgBackFromDiscount = findViewById(R.id.imgBackFromDiscount);
-        imgDiscountMessage = findViewById(R.id.imgDiscountMessage);
         imgDiscountHome = findViewById(R.id.imgDiscountHome);
         discountTabLayout = findViewById(R.id.discountTabLayout);
         discountViewPager = findViewById(R.id.discountViewPager);
-        lblRetryGetDiscount = findViewById(R.id.lblRetryGetDiscount);
 
-        layoutDiscount.setVisibility(View.INVISIBLE);
         setupDiscountList();
 
         imgBackFromDiscount.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +71,7 @@ public class DiscountActivity extends AppCompatActivity {
         discountViewPager.setAdapter(null);
 
         tabCommon = discountTabLayout.newTab();
-            tabCommon.setText("USABLE");
+        tabCommon.setText("APPLICABLE");
         discountTabLayout.addTab(tabCommon);
 
         tabCommon = discountTabLayout.newTab();
@@ -96,7 +87,8 @@ public class DiscountActivity extends AppCompatActivity {
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override
             public Fragment getItem(int position) {
-                Fragment fragment = new DiscountFragment(discountTabLayout.getTabAt(position).getText().toString());
+                Fragment fragment
+                        = new DiscountFragment(discountTabLayout.getTabAt(position).getText().toString());
                 return fragment;
             }
 

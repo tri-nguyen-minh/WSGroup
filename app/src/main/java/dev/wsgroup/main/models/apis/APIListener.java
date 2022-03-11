@@ -9,6 +9,7 @@ import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.LoyaltyStatus;
+import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Review;
@@ -40,6 +41,8 @@ public class APIListener {
 
     public void onCategoryFound(Category category) {}
 
+    public void onCategoryListFound(List<Category> categoryList) {}
+
     public void onCampaignFound(Campaign campaign) {}
 
     public void onCampaignListFound(List<Campaign> campaignList) {}
@@ -60,9 +63,13 @@ public class APIListener {
 
     public void onSupplierFound(Supplier supplier) {}
 
+    public void onSupplierListFound(List<Supplier> supplierList) {}
+
     public void onReviewFound(Review review) {}
 
     public void onReviewListFound(List<Review> reviewList) {}
+
+    public void onRatingListCount(Map<String, Double> ratingList) {}
 
     public void onReviewCountFound(int count, double rating) {}
 
@@ -73,5 +80,9 @@ public class APIListener {
     public void onLoyaltyStatusFound(LoyaltyStatus status) {}
 
     public void onDiscountListFound(List<CustomerDiscount> discountList) {}
+
+    public void onUseDiscountSuccessful() {}
+
+    public void onMessageListFound(List<Message> messageList) {}
 
 }

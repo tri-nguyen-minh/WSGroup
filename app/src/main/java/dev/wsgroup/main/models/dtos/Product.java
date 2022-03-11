@@ -211,6 +211,7 @@ public class Product implements Serializable {
         typeList.add("type");
         product.setOrderCount(0);
         product.setReviewCount(0);
+        product.setRating(0);
         return product;
     }
 }

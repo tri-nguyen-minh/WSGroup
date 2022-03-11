@@ -1,8 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.User;
@@ -46,7 +46,8 @@ public class OTPConfirmActivity extends AppCompatActivity {
 //        String ID = Settings.Secure.getString(getContentResolver(),
 //                Settings.Secure.ANDROID_ID);
 
-        txtPhoneNumber.setText(phoneNumber.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "$1 $2 $3"));
+        txtPhoneNumber.setText(phoneNumber
+                      .replaceFirst("(\\d{3})(\\d{3})(\\d+)", "$1 $2 $3"));
         cardViewBackFromOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +82,8 @@ public class OTPConfirmActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String OTPInput = editOTP.getText().toString();
                 if(OTP.equals(OTPInput)) {
-                    int requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_REGISTER);
+                    int requestCode= getIntent().getIntExtra("REQUEST_CODE",
+                                                                IntegerUtils.REQUEST_REGISTER);
                     Intent nextIntent = null;
                     if (requestCode == 1) {
                         nextIntent = new Intent(getApplicationContext(), AccountDetailActivity.class);

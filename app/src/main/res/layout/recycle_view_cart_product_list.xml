@@ -109,14 +109,6 @@
                         android:orientation="horizontal"
                         app:layout_constraintGuide_percent="0.2"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recViewProductTypeTag"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toTopOf="@id/guidelineProductDetailCartHorizontal"/>
-
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

@@ -4,10 +4,10 @@ public class IntegerUtils {
     public static final int REQUEST_COMMON = 1;
     public static final int REQUEST_LOGIN = 2;
     public static final int REQUEST_LOGIN_FOR_CART = 3;
+    public static final int REQUEST_LOGIN_FOR_MESSAGE = 7;
     public static final int REQUEST_SELECT_ADDRESS = 4;
     public static final int REQUEST_INSTANT_CHECKOUT = 5;
     public static final int REQUEST_NOTE_READ_ONLY = 6;
-    public static final int REQUEST_ORDER_AFTER_CHECKOUT = 7;
     public static final int REQUEST_SELECT_CAMPAIGN = 8;
     public static final int REQUEST_MAKE_PURCHASE = 9;
     public static final int REQUEST_REGISTER = 10;
@@ -16,8 +16,6 @@ public class IntegerUtils {
     public static final int REQUEST_TAKE_IMAGE = 13;
     public static final int REQUEST_ORDER_RETAIL = 14;
     public static final int REQUEST_ORDER_CAMPAIGN = 15;
-    public static final int REQUEST_ORDER_NOTE = 16;
-    public static final int REQUEST_ORDER_REVIEW = 17;
 
     public static final int ERROR_API = 1;
     public static final int ERROR_PARSING_JSON = 2;
@@ -33,9 +31,14 @@ public class IntegerUtils {
     public static final int CONFIRM_ACTION_CODE_FAILED = 2;
     public static final int CONFIRM_ACTION_CODE_ALERT = 3;
 
-    public static final int IDENTIFIER_PRODUCT_TYPE_COMMON = 1;
-    public static final int IDENTIFIER_PRODUCT_TYPE_SELECTED = 2;
+    public static final int IDENTIFIER_DISCOUNT_SELECT = 1;
+    public static final int IDENTIFIER_DISCOUNT_VIEW = 2;
 
     public static final int IDENTIFIER_RETAIL_CART = 1;
     public static final int IDENTIFIER_CAMPAIGN_CART = 2;
+
+    public static final int IDENTIFIER_SEARCH_BAR = 1;
+    public static final int IDENTIFIER_SEARCH_SUPPLIER = 2;
+    public static final int IDENTIFIER_SEARCH_CATEGORY = 3;
+
 }

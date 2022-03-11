@@ -751,12 +751,12 @@
                             android:maxLines="1"
                             android:ellipsize="end"
                             app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/icSupplierName"
+                            app:layout_constraintRight_toLeftOf="@id/imgSupplierName"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"/>
 
                         <ImageView
-                            android:id="@+id/icSupplierName"
+                            android:id="@+id/imgSupplierName"
                             android:layout_width="35dp"
                             android:layout_height="35dp"
                             android:scaleY="1.2"
@@ -1067,12 +1067,12 @@
                             android:maxLines="1"
                             android:ellipsize="end"
                             app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/icProductCategory"
+                            app:layout_constraintRight_toLeftOf="@id/imgProductCategory"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"/>
 
                         <ImageView
-                            android:id="@+id/icProductCategory"
+                            android:id="@+id/imgProductCategory"
                             android:layout_width="35dp"
                             android:layout_height="35dp"
                             android:scaleY="1.2"

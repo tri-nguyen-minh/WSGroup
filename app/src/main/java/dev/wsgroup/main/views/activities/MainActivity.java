@@ -9,6 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -24,14 +25,17 @@ import java.util.Map;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
+import dev.wsgroup.main.models.apis.callers.APIChatCaller;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
+import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
 import dev.wsgroup.main.views.fragments.tabs.main.HistoryTab;
@@ -47,9 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private List<CartProduct> retailCartProductList, campaignCartProductList;
-
+    private List<Message> messageList;
     private String userId, token;
     private int tabPosition;
+    private boolean cartCheck, messageCheck, notificationCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +82,25 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onUserFound(User user, String message) {
                     user.setToken(token);
-                    sharedPreferences.edit().putString("TOKEN", user.getToken()).commit();
+                    sharedPreferences.edit().putString("TOKEN", user.getToken()).apply();
+                    notificationCheck = true;
                     setUpShoppingCart(tabPosition);
+                    setUpMessageList(tabPosition);
                 }
 
                 @Override
                 public void onFailedAPICall(int errorCode) {
-                    sharedPreferences.edit().clear().commit();
+                    sharedPreferences.edit().clear().apply();
                     userId = "";
                     setUpShoppingCart(tabPosition);
+                    setUpMessageList(tabPosition);
                 }
             });
         }
     }
 
     private void setUpShoppingCart(int tabPosition) {
+        cartCheck = false;
         token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
@@ -99,13 +108,34 @@ public class MainActivity extends AppCompatActivity {
                                         List<CartProduct> campaignList) {
                 retailCartProductList = retailList;
                 campaignCartProductList = campaignList;
+                cartCheck = true;
                 putSessionCart(tabPosition);
             }
             @Override
             public void onFailedAPICall(int code) {
                 retailCartProductList = new ArrayList<>();
                 campaignCartProductList = new ArrayList<>();
+                cartCheck = true;
                 putSessionCart(tabPosition);
+            }
+        });
+    }
+
+    private void setUpMessageList(int tabPosition) {
+        messageCheck = false;
+        APIChatCaller.getCustomerChatMessages(token, null, getApplication(), new APIListener() {
+            @Override
+            public void onMessageListFound(List<Message> list) {
+                messageList = list;
+                messageCheck = true;
+                storeMessageList(tabPosition);
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                messageList = new ArrayList<>();
+                messageCheck = true;
+                storeMessageList(tabPosition);
             }
         });
     }
@@ -113,13 +143,31 @@ public class MainActivity extends AppCompatActivity {
     private void putSessionCart(int tabPosition) {
         try {
             sharedPreferences.edit()
-                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCartProductList))
-                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .commit();
+                    .putString("RETAIL_CART",
+                            ObjectSerializer.serialize((Serializable) retailCartProductList))
+                    .putString("CAMPAIGN_CART",
+                            ObjectSerializer.serialize((Serializable) campaignCartProductList))
+                    .apply();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setupTabLayout(tabPosition);
+        if (cartCheck && messageCheck && notificationCheck) {
+            setupTabLayout(tabPosition);
+        }
+    }
+
+    private void storeMessageList(int tabPosition) {
+        try {
+            sharedPreferences.edit()
+                    .putString("MESSAGE_LIST",
+                            ObjectSerializer.serialize((Serializable) messageList))
+                    .apply();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (cartCheck && messageCheck && notificationCheck) {
+            setupTabLayout(tabPosition);
+        }
     }
 
     private void setupTabLayout(int tabPosition) {
@@ -234,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
                 tabPosition = data.getIntExtra("MAIN_TAB_POSITION",0);
             }
             setUpShoppingCart(tabPosition);
+            setUpMessageList(tabPosition);
         }
     }
 }

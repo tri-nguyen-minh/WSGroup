@@ -71,12 +71,11 @@ public class RecViewOrderSupplierListAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        orderProductList = orderList.get(position).getOrderProductList();
         holder.txtRecViewOrderSupplierName.setText(orderList.get(position).getSupplier().getName());
         holder.lblTotalPrice.setText("Total Order Price");
         holder.lblNoDiscount.setText("No Discount");
         setupDiscountLayout(holder, position);
-        price = getTotalPrice();
+        price = getTotalPrice(position);
         holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
         RecViewOrderProductListAdapter adapter
                 = new RecViewOrderProductListAdapter(context, activity, requestState);
@@ -116,6 +115,8 @@ public class RecViewOrderSupplierListAdapter
                         String code = holder.editDiscount.getText().toString();
                         if (code.isEmpty()) {
                             setupNoDiscountState(holder);
+                            price = getTotalPrice(position);
+                            holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
                             setCustomerDiscount(position, null);
                         } else {
                             setupLoadDiscountState(holder);
@@ -124,17 +125,28 @@ public class RecViewOrderSupplierListAdapter
                                     activity.getApplication(), new APIListener() {
                                 @Override
                                 public void onDiscountListFound(List<CustomerDiscount> discountList) {
-                                    if (discountList.size() > 0) {
-                                        checkUnwantedDiscount(orderList.get(position), discountList);
+                                        if (discountList.size() > 0) {
+                                            checkUnwantedDiscount(orderList.get(position), discountList);
+                                        }
+                                        if (discountList.size() == 0) {
+                                            setupNoDiscountState(holder);
+                                            price = getTotalPrice(position);
+                                            holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
+                                            setCustomerDiscount(position, null);
+                                        } else {
+                                            CustomerDiscount discount = discountList.get(0);
+                                            setupDiscountFoundState(holder);
+                                            applyDiscount(holder, discount.getDiscount(), position);
+                                            setCustomerDiscount(position, discount);
+                                        }
                                     }
-                                    if (discountList.size() == 0) {
-                                        setupNoDiscountState(holder);
-                                    } else {
-                                        CustomerDiscount discount = discountList.get(0);
-                                        setupDiscountFoundState(holder);
-                                        applyDiscount(holder, discount.getDiscount());
-                                        setCustomerDiscount(position, discount);
-                                    }
+
+                                @Override
+                                public void onFailedAPICall(int code) {
+                                    setupNoDiscountState(holder);
+                                    price = getTotalPrice(position);
+                                    holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
+                                    setCustomerDiscount(position, null);
                                 }
                             });
                         }
@@ -142,6 +154,7 @@ public class RecViewOrderSupplierListAdapter
                 }
             });
         } else {
+            orderProductList = orderList.get(position).getOrderProductList();
             holder.layoutDiscount.setVisibility(View.GONE);
             holder.lblTotalPrice.setVisibility(View.VISIBLE);
             OrderProduct orderProduct = orderProductList.get(0);
@@ -152,8 +165,9 @@ public class RecViewOrderSupplierListAdapter
         }
     }
 
-    private double getTotalPrice() {
+    private double getTotalPrice(int position) {
         double totalPrice = 0;
+        orderProductList = orderList.get(position).getOrderProductList();
         if (requestState == IntegerUtils.REQUEST_ORDER_RETAIL) {
             for (OrderProduct orderProduct : orderProductList) {
                 totalPrice += (orderProduct.getProduct().getRetailPrice() * orderProduct.getQuantity());
@@ -215,7 +229,7 @@ public class RecViewOrderSupplierListAdapter
                                 @Override
                                 public void setSelectedDiscount(CustomerDiscount discount) {
                                     setupDiscountFoundState(holder);
-                                    applyDiscount(holder, discount.getDiscount());
+                                    applyDiscount(holder, discount.getDiscount(), position);
                                     setCustomerDiscount(position, discount);
                                 }
                             };
@@ -273,8 +287,8 @@ public class RecViewOrderSupplierListAdapter
         return count;
     }
 
-    private void applyDiscount(ViewHolder holder, Discount discount) {
-        price = getTotalPrice();
+    private void applyDiscount(ViewHolder holder, Discount discount, int position) {
+        price = getTotalPrice(position);
         double discountPrice = discount.getDiscountPrice();
         holder.editDiscount.setText(discount.getCode());
         holder.lblNoDiscount.setText(discount.getDescription());

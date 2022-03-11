@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/gray_lighter"
     tools:context=".views.activities.OrderActivity">
-    
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutOrderDetailHeader"
         style="@style/style_header_layout"
@@ -31,19 +31,55 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:tint="@color/white" />
 
-        <ImageView
-            android:id="@+id/imgOrderDetailMessage"
-            style="@style/style_icon"
-            android:src="@drawable/ic_message"
-            android:layout_marginHorizontal="15dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/imgOrderDetailHome"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:tint="@color/white" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutNoOrder"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/gray_lighter"
+        app:layout_constraintTop_toBottomOf="@id/layoutOrderDetailHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:text="AN ERROR HAS OCCURRED\nWHEN RETRIEVING\nYOUR ORDER"
+            style="@style/style_empty_note" />
+
+        <TextView
+            android:id="@+id/lblRetryGetOrder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/montserratr"
+            android:gravity="center"
+            android:text="CLICK HERE TO TRY AGAIN"
+            android:textColor="@color/blue_main"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:background="@color/gray_lighter"
+        app:layout_constraintTop_toBottomOf="@id/layoutOrderDetailHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue_main"/>
+
+    </RelativeLayout>
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewMain"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollIndicators="none"
@@ -315,21 +351,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <RelativeLayout
-                    android:id="@+id/layoutLoading"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:background="@color/gray_lighter">
-
-                    <ProgressBar
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:indeterminate="true"
-                        android:indeterminateTint="@color/blue_main"/>
-
-                </RelativeLayout>
-
                 <LinearLayout
                     android:id="@+id/layoutProductList"
                     android:layout_width="match_parent"
@@ -360,7 +381,7 @@
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:id="@+id/txtTotalPrice"
+                                android:id="@+id/txtTotalPrice"
                             android:gravity="center|right"
                             android:textSize="16sp"
                             android:ellipsize="end"
@@ -378,42 +399,66 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutDiscount"
                         style="@style/style_profile_tab"
-                        android:paddingVertical="0dp"
-                        android:paddingHorizontal="10dp"
-                        android:background="@color/white"
                         android:layout_marginTop="2dp"
+                        android:background="@color/white"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/layoutPhone"
-                        app:layout_constraintBottom_toBottomOf="parent">
+                        app:layout_constraintTop_toBottomOf="@id/layoutPhone">
 
                         <TextView
                             android:id="@+id/lblDiscount"
-                            android:text="Discount"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
                             style="@style/style_label_account_info"
-                            android:paddingHorizontal="10dp"
-                            android:textSize="15sp"
                             android:gravity="left"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:id="@+id/txtTotalDiscount"
-                            android:gravity="center|right"
+                            android:paddingHorizontal="10dp"
+                            android:text="Discount"
                             android:textSize="15sp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:layout_marginLeft="10dp"
-                            android:textColor="@color/gray"
-                            android:text="00.000d"
                             android:textStyle="bold"
-                            app:layout_constraintLeft_toRightOf="@+id/lblDiscount"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            style="@style/style_txt_account_info" />
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:gravity="right|center"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toRightOf="@+id/lblDiscount"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="3dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserratr"
+                                android:gravity="center|right"
+                                android:maxLines="1"
+                                android:text="-"
+                                android:textColor="@color/gray"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/txtTotalDiscount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserratr"
+                                android:gravity="center|right"
+                                android:maxLines="1"
+                                android:text="00.000d"
+                                android:textColor="@color/gray"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -440,21 +485,44 @@
                             android:gravity="left"
                             android:textStyle="bold"/>
 
-                        <TextView
-                            android:id="@+id/txtAdvanced"
-                            android:gravity="center|right"
-                            android:textSize="15sp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:layout_marginLeft="10dp"
-                            android:textColor="@color/gray"
-                            android:text="00.000d"
-                            android:textStyle="bold"
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:gravity="right|center"
+                            android:orientation="horizontal"
                             app:layout_constraintLeft_toRightOf="@+id/lblAdvanced"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            style="@style/style_txt_account_info" />
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="3dp"
+                                android:gravity="center|right"
+                                android:textSize="15sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:layout_marginLeft="10dp"
+                                android:textColor="@color/gray"
+                                android:text="-"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/montserratr" />
+
+                            <TextView
+                                android:id="@+id/txtAdvanced"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center|right"
+                                android:textSize="15sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textColor="@color/gray"
+                                android:text="00.000d"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/montserratr" />
+
+                        </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

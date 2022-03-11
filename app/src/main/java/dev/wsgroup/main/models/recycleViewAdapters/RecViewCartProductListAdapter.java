@@ -73,13 +73,6 @@ public class RecViewCartProductListAdapter
                  .into(holder.imgRecViewProduct);
         }
 
-        RecViewProductTypeAdapter adapter = new RecViewProductTypeAdapter(context, activity,
-                IntegerUtils.IDENTIFIER_PRODUCT_TYPE_SELECTED);
-        adapter.setTypeList(shoppingCart.get(position).getTypeList());
-        holder.recViewProductTypeTag.setAdapter(adapter);
-        holder.recViewProductTypeTag.setLayoutManager(new LinearLayoutManager(context,
-                RecyclerView.HORIZONTAL, false));
-
         if (identifier == IntegerUtils.IDENTIFIER_RETAIL_CART) {
             holder.checkboxCartProduct.setVisibility(View.VISIBLE);
             setCheckboxSelected(holder, shoppingCart.get(position).getSelectedFlag());
@@ -356,7 +349,6 @@ public class RecViewCartProductListAdapter
                 txtCampaignTag, txtProductPriceORG, txtProductPrice, txtTotalPrice;
         private Button btnDeleteCartProducts, btnCheckout;
         private EditText editProductQuantity;
-        private RecyclerView recViewProductTypeTag;
         private RelativeLayout layoutParent;
 
         public ViewHolder(View view) {
@@ -375,7 +367,6 @@ public class RecViewCartProductListAdapter
             btnDeleteCartProducts= view.findViewById(R.id.btnDeleteCartProducts);
             btnCheckout = view.findViewById(R.id.btnCheckout);
             editProductQuantity = view.findViewById(R.id.editProductQuantity);
-            recViewProductTypeTag = view.findViewById(R.id.recViewProductTypeTag);
             layoutParent = view.findViewById(R.id.layoutParent);
         }
     }

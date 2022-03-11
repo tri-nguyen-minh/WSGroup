@@ -13,8 +13,12 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.LoyaltyStatus;
@@ -27,10 +31,10 @@ public class APISupplierCaller {
 
     private static RequestQueue requestQueue;
     private static String url;
+    private static List<Supplier> supplierList;
 
 
-
-    public static void getSupplierById(String supplierId,
+    public static void getSupplierById(String token, String supplierId,
                                        Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -46,8 +50,8 @@ public class APISupplierCaller {
                         Supplier supplier = Supplier.getObjectFromJSON(data);
                         APIListener.onSupplierFound(supplier);
                     } catch (Exception e) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                     }
                 }
             };
@@ -64,7 +68,15 @@ public class APISupplierCaller {
             };
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
-                    new JSONObject(), listener, errorListener);
+                    new JSONObject(), listener, errorListener) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+            };
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,8 +113,6 @@ public class APISupplierCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
-                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     if(error.toString().contains("NoConnectionError")) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
                     } else {
@@ -125,6 +135,61 @@ public class APISupplierCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getSupplierListByAccountId(Set<String> accountIdSet, List<Supplier> list,
+                                                  Application application, APIListener APIListener) {
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        url = StringUtils.USER_API_URL + "getListAccountIdBySupplierId";
+        try {
+            JSONObject jsonObject = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            for (String string : accountIdSet) {
+                jsonArray.put(string);
+            }
+            jsonObject.put("listAccountIds", jsonArray);
+            System.out.println(jsonObject);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        supplierList = (list == null) ? new ArrayList<>() : list;
+                        JSONArray data = response.getJSONArray("data");
+                        if (data.length() > 0) {
+                            Supplier supplier;
+                            for (int i = 0; i < data.length(); i++) {
+                                supplier = Supplier.getObjectFromJSON(data.getJSONObject(i));
+                                supplierList.add(supplier);
+                            }
+                        }
+                        APIListener.onSupplierListFound(supplierList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
+                }
+            };
+
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(error.toString().contains("NoConnectionError")) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
+                }
+            };
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
+                    jsonObject, listener, errorListener);
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

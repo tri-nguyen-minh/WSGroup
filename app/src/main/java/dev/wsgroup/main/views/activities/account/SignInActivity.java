@@ -46,7 +46,6 @@ public class SignInActivity extends AppCompatActivity {
 
     private boolean passwordDisplayedFlag;
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
     private DialogBoxLoading dialogBoxLoading;
     private GoogleSignInOptions options;
     private GoogleSignInClient client;
@@ -78,7 +77,8 @@ public class SignInActivity extends AppCompatActivity {
         editUsername.setText("Customer");
         editPassword.setText("Password1!");
 
-        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        editPassword.setInputType(InputType.TYPE_CLASS_TEXT
+                | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         btnSignIn.setEnabled(false);
         btnSignIn.getBackground().setTint(getResources().getColor(R.color.gray_light));
 
@@ -92,10 +92,14 @@ public class SignInActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!checkEmptyField()) {
                     btnSignIn.setEnabled(true);
-                    btnSignIn.getBackground().setTint(getResources().getColor(R.color.blue_main));
+                    btnSignIn.getBackground()
+                             .setTint(getResources()
+                             .getColor(R.color.blue_main));
                 } else {
                     btnSignIn.setEnabled(false);
-                    btnSignIn.getBackground().setTint(getResources().getColor(R.color.gray_light));
+                    btnSignIn.getBackground()
+                             .setTint(getResources()
+                             .getColor(R.color.gray_light));
                 }
             }
 
@@ -152,11 +156,13 @@ public class SignInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!editPassword.getText().toString().isEmpty()) {
                     if (passwordDisplayedFlag) {
-                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT
+                                | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                         imgDisplayPassword.setImageResource(R.drawable.ic_visibility_off);
                         passwordDisplayedFlag = false;
                     } else {
-                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
+                        editPassword.setInputType(InputType.TYPE_CLASS_TEXT
+                                | InputType.TYPE_TEXT_VARIATION_NORMAL);
                         imgDisplayPassword.setImageResource(R.drawable.ic_visibility_on);
                         passwordDisplayedFlag = true;
                     }
@@ -172,8 +178,10 @@ public class SignInActivity extends AppCompatActivity {
                 if(username.isEmpty() || password.isEmpty()) {
                     DialogBoxAlert dialogBox =
                             new DialogBoxAlert(SignInActivity.this,
-                                    IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FIELD_EMPTY, "");
-                    dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                    IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                                    StringUtils.MES_ERROR_FIELD_EMPTY, "");
+                    dialogBox.getWindow()
+                             .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBox.show();
                 } else {
                     loginWithUsernameAndPassword(username, password);
@@ -213,7 +221,8 @@ public class SignInActivity extends AppCompatActivity {
         dialogBoxLoading = new DialogBoxLoading(SignInActivity.this);
         dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxLoading.show();
-        APIUserCaller.logInWithUsernameAndPassword(stringUsername, stringPassword, getApplication(), new APIListener() {
+        APIUserCaller.logInWithUsernameAndPassword(stringUsername, stringPassword,
+                getApplication(), new APIListener() {
             @Override
             public void onUserFound(User user, String message) {
                 signInAccount(user);
@@ -227,25 +236,28 @@ public class SignInActivity extends AppCompatActivity {
                 DialogBoxAlert dialogBox;
                 if(errorCode == IntegerUtils.ERROR_API) {
                     dialogBox = new DialogBoxAlert(SignInActivity.this,
-                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_LOG_IN, "");
+                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                            StringUtils.MES_ERROR_FAILED_LOG_IN, "");
                 } else {
                     dialogBox = new DialogBoxAlert(SignInActivity.this,
-                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL, "");
+                            IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
+                            StringUtils.MES_ERROR_FAILED_API_CALL, "");
                 }
-                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.getWindow()
+                         .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBox.show();
             }
         });
     }
 
     private void signInAccount(User user) {
-        editor = sharedPreferences.edit();
-        editor.putString("USER_ID", user.getUserId());
-//        editor.putString("USERNAME", user.getUsername());
-        editor.putString("PHONE", user.getPhoneNumber());
-        editor.putString("PASSWORD", editPassword.getText().toString());
-        editor.putString("TOKEN", user.getToken());
-        editor.commit();
+        sharedPreferences.edit()
+                .putString("USER_ID", user.getUserId())
+                .putString("ACCOUNT_ID", user.getAccountId())
+                .putString("PHONE", user.getPhoneNumber())
+                .putString("PASSWORD", editPassword.getText().toString())
+                .putString("TOKEN", user.getToken())
+                .apply();
         if (dialogBoxLoading.isShowing()) {
             dialogBoxLoading.dismiss();
         }
@@ -254,12 +266,14 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private boolean checkEmptyField() {
-        if (editUsername.getText().toString().isEmpty() || editPassword.getText().toString().isEmpty()) {
+        if (editUsername.getText().toString().isEmpty()
+                || editPassword.getText().toString().isEmpty()) {
             return true;
         }
         return false;
@@ -279,7 +293,8 @@ public class SignInActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_GOOGLE_SIGN_IN) {
             dialogBoxLoading = new DialogBoxLoading(SignInActivity.this);
-            dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialogBoxLoading.getWindow()
+                            .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxLoading.show();
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
@@ -291,12 +306,6 @@ public class SignInActivity extends AppCompatActivity {
                 user.setPhoneNumber("1");
                 user.setMail(googleAccount.getEmail());
                 loginGoogle(user);
-//                System.out.println(googleAccount.getIdToken());
-//                System.out.println(googleAccount.getDisplayName());
-//                System.out.println(googleAccount.getEmail());
-//                System.out.println(googleAccount.getFamilyName());
-//                System.out.println(googleAccount.getGivenName());
-//                System.out.println(googleAccount.getId());
             } catch (Exception e) {
                 e.printStackTrace();
             }

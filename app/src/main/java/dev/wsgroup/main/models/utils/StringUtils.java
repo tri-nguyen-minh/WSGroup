@@ -16,6 +16,7 @@ public class StringUtils {
     public static final String REVIEW_API_URL = BASE_URL + "api/comment/";
     public static final String PAYMENT_API_URL = BASE_URL + "api/payment/";
     public static final String DISCOUNT_API_URL = BASE_URL + "api/customerdiscountcode/";
+    public static final String CHAT_API_URL = BASE_URL + "api/chat/";
 
     public static final String APPLICATION_JSON = "application/json";
 
@@ -41,7 +42,7 @@ public class StringUtils {
     public static final String MES_CONFIRM_ORDER_METHOD = "Confirm order's delivery and payment method?";
     public static final String MES_CONFIRM_CANCEL_ORDER = "Your order has not been processed.\nAre you sure you want to leave?";
     public static final String MES_CONFIRM_CANCEL_ORDER_DESC = "Your current order will be lost!";
-    public static final String MES_CONFIRM_REQUIRE_PAYMENT = "Please complete the final payment to process the order!";
+    public static final String MES_CONFIRM_REQUIRE_PAYMENT = "Please complete the final payment to process your order!";
     public static final String MES_CONFIRM_REQUIRE_ADVANCE = "You must complete a required advanced payment before your order can be finalized.";
     public static final String MES_CONFIRM_COMPLETE_PAYMENT = "Complete payment for this order?";
 

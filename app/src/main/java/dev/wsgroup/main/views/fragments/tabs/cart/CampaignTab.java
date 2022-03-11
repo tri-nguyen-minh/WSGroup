@@ -85,11 +85,10 @@ public class CampaignTab extends Fragment {
 
     private void getCartFromSession() {
         try {
-            sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+            sharedPreferences = getActivity().getSharedPreferences("PREFERENCE",
+                                                                    Context.MODE_PRIVATE);
             cartList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
-//            supplierCampaignList = (ArrayList<Supplier>) ObjectSerializer
-//                    .deserialize(sharedPreferences.getString("SUPPLIER_CAMPAIGN_LIST", ""));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -169,8 +168,9 @@ public class CampaignTab extends Fragment {
                                 }
                                 try {
                                     sharedPreferences.edit()
-                                            .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) cartList))
-                                            .commit();
+                                            .putString("CAMPAIGN_CART",
+                                                    ObjectSerializer.serialize((Serializable) cartList))
+                                            .apply();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

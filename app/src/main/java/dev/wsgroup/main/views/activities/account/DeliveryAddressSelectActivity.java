@@ -1,10 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -15,6 +10,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         setupLayout();
 
         if (currentAddress != null) {
-            APIAddressCaller.getAllAddress(token, null, getApplication(), new APIListener() {
+            APIAddressCaller.getAllAddress(token, null,
+                    getApplication(), new APIListener() {
                 @Override
                 public void onAddressListFound(List<Address> addressList) {
                     super.onAddressListFound(addressList);
@@ -109,8 +110,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         layoutNoDefaultAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressSelectActivity.this, getApplicationContext(),
-                        null, true) {
+                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressSelectActivity.this,
+                        getApplicationContext(), null, true) {
                     @Override
                     public void onAddressAdd(Address address) {
                         super.onAddressAdd(address);
@@ -121,7 +122,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         setupCheckBox(checkboxDefaultAddress, true);
                     }
                 };
-                dialogBoxAddress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxAddress.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxAddress.show();
             }
         });
@@ -139,8 +141,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         layoutDefaultAddress.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressSelectActivity.this, getApplicationContext(),
-                        defaultAddress, true) {
+                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressSelectActivity.this,
+                        getApplicationContext(), defaultAddress, true) {
                     @Override
                     public void onAddressUpdate(Address address) {
                         super.onAddressUpdate(address);
@@ -148,7 +150,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         setupDefaultAddress(address);
                     }
                 };
-                dialogBoxAddress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxAddress.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxAddress.show();
                 return true;
             }
@@ -157,8 +160,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         layoutAddAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressSelectActivity.this, getApplicationContext(),
-                        null, false) {
+                dialogBoxAddress = new DialogBoxAddress(DeliveryAddressSelectActivity.this,
+                        getApplicationContext(), null, false) {
                     @Override
                     public void onAddressAdd(Address address) {
                         super.onAddressAdd(address);
@@ -166,7 +169,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         setupAddressList();
                     }
                 };
-                dialogBoxAddress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxAddress.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxAddress.show();
             }
         });
@@ -193,10 +197,12 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
     private void setupCheckBox(ImageView checkbox, boolean selected) {
         if (!selected) {
             checkbox.setImageResource(R.drawable.ic_checkbox_unchecked);
-            checkbox.setColorFilter(getApplicationContext().getResources().getColor(R.color.gray));
+            checkbox.setColorFilter(getApplicationContext().getResources()
+                                                           .getColor(R.color.gray));
         } else {
             checkbox.setImageResource(R.drawable.ic_checkbox_checked);
-            checkbox.setColorFilter(getApplicationContext().getResources().getColor(R.color.blue_main));
+            checkbox.setColorFilter(getApplicationContext().getResources()
+                                                           .getColor(R.color.blue_main));
         }
     }
     private void clearAddressListSelection() {
@@ -242,7 +248,6 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         break;
                     }
                 }
-//                setupAddressList();
             }
         };
         adapter.setAddressList(customerAddressList);

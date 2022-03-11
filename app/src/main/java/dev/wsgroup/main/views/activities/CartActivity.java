@@ -42,19 +42,16 @@ import dev.wsgroup.main.views.fragments.tabs.cart.RetailTab;
 
 public class CartActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromCart, imgCartMessage, imgCartHome;
+    private ImageView imgBackFromCart, imgCartHome;
     private LinearLayout layoutFailedGettingCart, layoutNoShoppingCart;
     private ConstraintLayout layoutCart, layoutLoading;
     private TabLayout cartTabLayout;
     private ViewPager cartViewPager;
-    private TextView txtCartDescription, lblRetryGetCart;
+    private TextView lblRetryGetCart;
     private TabLayout.Tab tabCommon;
 
     private SharedPreferences sharedPreferences;
-    private List<Supplier> supplierRetailList, supplierCampaignList;
-    private HashMap<String, List<CartProduct>> retailCart, campaignCart;
     private List<CartProduct> retailCartProductList, campaignCartProductList;
-    private int retailCount, campaignCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +60,6 @@ public class CartActivity extends AppCompatActivity {
         this.getSupportActionBar().hide();
 
         imgBackFromCart = findViewById(R.id.imgBackFromCart);
-        imgCartMessage = findViewById(R.id.imgCartMessage);
         imgCartHome = findViewById(R.id.imgCartHome);
         layoutFailedGettingCart = findViewById(R.id.layoutFailedGettingCart);
         layoutNoShoppingCart = findViewById(R.id.layoutNoShoppingCart);
@@ -71,7 +67,6 @@ public class CartActivity extends AppCompatActivity {
         layoutLoading = findViewById(R.id.layoutLoading);
         cartTabLayout = findViewById(R.id.cartTabLayout);
         cartViewPager = findViewById(R.id.cartViewPager);
-        txtCartDescription = findViewById(R.id.txtCartDescription);
         lblRetryGetCart = findViewById(R.id.lblRetryGetCart);
 
         layoutLoading.setVisibility(View.VISIBLE);
@@ -83,7 +78,7 @@ public class CartActivity extends AppCompatActivity {
         imgBackFromCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_OK);
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
@@ -252,15 +247,17 @@ public class CartActivity extends AppCompatActivity {
     private void putCartToSession() {
         try {
             sharedPreferences.edit()
-                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCartProductList))
-                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .commit();
+                    .putString("RETAIL_CART",
+                            ObjectSerializer.serialize((Serializable) retailCartProductList))
+                    .putString("CAMPAIGN_CART",
+                            ObjectSerializer.serialize((Serializable) campaignCartProductList))
+                    .apply();
 //            sharedPreferences.edit()
 //                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCart))
 //                    .putString("SUPPLIER_RETAIL_LIST", ObjectSerializer.serialize((Serializable) supplierRetailList))
 //                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCart))
 //                    .putString("SUPPLIER_CAMPAIGN_LIST", ObjectSerializer.serialize((Serializable) supplierCampaignList))
-//                    .commit();
+//                    .apply();
         } catch (IOException e) {
             e.printStackTrace();
         }

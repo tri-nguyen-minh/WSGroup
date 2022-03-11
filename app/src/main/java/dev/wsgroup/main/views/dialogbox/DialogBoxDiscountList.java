@@ -16,6 +16,7 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewDiscountListAdapter;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 
 public class DialogBoxDiscountList extends Dialog {
 
@@ -51,7 +52,7 @@ public class DialogBoxDiscountList extends Dialog {
             }
         });
 
-        adapter = new RecViewDiscountListAdapter(context) {
+        adapter = new RecViewDiscountListAdapter(context, IntegerUtils.IDENTIFIER_DISCOUNT_SELECT) {
             @Override
             public void onDiscountSelected(CustomerDiscount discount) {
                 dismiss();

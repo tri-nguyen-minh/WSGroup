@@ -1,5 +1,13 @@
 package dev.wsgroup.main.views.activities.productviews;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -7,23 +15,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.google.android.material.tabs.TabLayout;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +42,6 @@ import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
-import dev.wsgroup.main.views.dialogbox.DialogBoxOrderDetail;
 import dev.wsgroup.main.views.fragments.tabs.product.DetailTab;
 import dev.wsgroup.main.views.fragments.tabs.product.ReviewTab;
 
@@ -55,10 +50,11 @@ public class ProductDetailActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private TabLayout.Tab tabCommon;
-    private ImageView imgProductDetailMessage, imgBackFromProductDetail, imgProductDetailHome;
+    private ImageView imgBackFromProductDetail, imgProductDetailHome;
     private TextView  txtProductDetailCartCount;
     private CardView cardViewProductDetailCartCount;
-    private ConstraintLayout constraintLayoutShoppingCart, layoutLoading,layoutMainLayout;
+    private ConstraintLayout constraintLayoutShoppingCart, layoutLoading, layoutMainLayout,
+            constraintLayoutMessage;
 
     private SharedPreferences sharedPreferences;
     private String userId, productId, token;
@@ -77,7 +73,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         {
             tabLayout = findViewById(R.id.productTabLayout);
             viewPager = findViewById(R.id.productViewPager);
-            imgProductDetailMessage = findViewById(R.id.imgProductDetailMessage);
             imgBackFromProductDetail = findViewById(R.id.imgBackFromProductDetail);
             imgProductDetailHome = findViewById(R.id.imgProductDetailHome);
             txtProductDetailCartCount = findViewById(R.id.txtProductDetailCartCount);
@@ -122,13 +117,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                 }
             }
         });
-//        btnPurchaseProduct.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                product.setCampaign(null);
-//                startDialogBoxProductDetail();
-//            }
-//        });
     }
 
     private void loadProduct() {
@@ -139,7 +127,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         orderCountStatus = false;
         reviewCountStatus = false;
         loyaltyCheckStatus = false;
-        APIProductCaller.getProductById(productId, getApplication(), new APIListener() {
+        APIProductCaller.getProductById(productId,
+                getApplication(), new APIListener() {
             @Override
             public void onProductFound(Product foundProduct) {
                 product = foundProduct;
@@ -176,7 +165,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                         finishSetup(product);
                     }
                 });
-                APIReviewCaller.getReviewCountByProductId(productId, getApplication(), new APIListener() {
+                APIReviewCaller.getReviewCountByProductId(productId,
+                        getApplication(), new APIListener() {
                     @Override
                     public void onReviewCountFound(int count, double rating) {
                         product.setReviewCount(count);
@@ -194,7 +184,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                     }
                 });
                 if (!token.isEmpty()) {
-                    APISupplierCaller.getCustomerLoyaltyStatus(token, product.getSupplier().getId(), getApplication(), new APIListener() {
+                    APISupplierCaller.getCustomerLoyaltyStatus(token, product.getSupplier().getId(),
+                            getApplication(), new APIListener() {
                         @Override
                         public void onLoyaltyStatusFound(LoyaltyStatus status) {
                             supplier = product.getSupplier();
@@ -251,7 +242,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             Intent SignInIntent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivityForResult(SignInIntent, IntegerUtils.REQUEST_LOGIN);
         } else {
-            Intent campaignSelectIntent = new Intent(getApplicationContext(), PrepareProductActivity.class);
+            Intent campaignSelectIntent
+                    = new Intent(getApplicationContext(), PrepareProductActivity.class);
             campaignSelectIntent.putExtra("PRODUCT", product);
             startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_MAKE_PURCHASE);
         }
@@ -271,7 +263,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         tabLayout.addTab(tabCommon);
 
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        tabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
+        tabLayout.setTabTextColors(getResources().getColor(R.color.black),
+                                    getResources().getColor(R.color.black));
 
         NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
@@ -338,14 +331,11 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void setUpShoppingCart() {
-        System.out.println("setupcart");
         token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
             public void onCartListFound(List<CartProduct> retailList,
                                         List<CartProduct> campaignList) {
-                System.out.println(retailList.size());
-                System.out.println(campaignList.size());
                 putSessionCart(retailList, campaignList);
                 editShoppingCart();
             }
@@ -362,9 +352,11 @@ public class ProductDetailActivity extends AppCompatActivity {
                                 List<CartProduct> campaignList) {
         try {
             sharedPreferences.edit()
-                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailList))
-                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignList))
-                    .commit();
+                    .putString("RETAIL_CART",
+                            ObjectSerializer.serialize((Serializable) retailList))
+                    .putString("CAMPAIGN_CART",
+                            ObjectSerializer.serialize((Serializable) campaignList))
+                    .apply();
         } catch (IOException e) {
             e.printStackTrace();
         }

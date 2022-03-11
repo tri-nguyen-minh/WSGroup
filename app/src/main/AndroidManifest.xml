@@ -15,8 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WSGroup"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".views.activities.DiscountActivity"></activity>
+        android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true">
+        <activity android:name=".views.activities.message.MessageListActivity"></activity>
+        <activity android:name=".views.activities.productviews.SearchProductActivity" />
+        <activity android:name=".views.activities.DiscountActivity" />
         <activity android:name=".views.activities.productviews.CampaignListActivity" />
         <activity android:name=".views.activities.productviews.PrepareProductActivity" />
         <activity android:name=".views.activities.account.DeliveryAddressActivity" />

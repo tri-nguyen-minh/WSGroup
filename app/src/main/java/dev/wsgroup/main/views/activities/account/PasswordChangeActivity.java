@@ -1,8 +1,5 @@
 package dev.wsgroup.main.views.activities.account;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +13,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -124,7 +124,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 dialogBoxLoading = new DialogBoxLoading(PasswordChangeActivity.this);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 errorMessage = checkValidInput();
                 if(errorMessage != null) {
@@ -133,7 +134,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
                 } else {
                     String oldPassword = editOldPassword.getText().toString();
                     String newPassword = editNewPassword.getText().toString();
-                    APIUserCaller.logInWithUsernameAndPassword(username, oldPassword, getApplication(), new APIListener() {
+                    APIUserCaller.logInWithUsernameAndPassword(username, oldPassword,
+                            getApplication(), new APIListener() {
                         @Override
                         public void onUserFound(User user, String message) {
                             if (oldPassword.equals(newPassword)) {
@@ -141,13 +143,16 @@ public class PasswordChangeActivity extends AppCompatActivity {
                                 dialogBoxLoading.dismiss();
                                 alertError(errorMessage);
                             } else {
-                                APIUserCaller.updatePassword(token, newPassword, getApplication(), new APIListener() {
+                                APIUserCaller.updatePassword(token, newPassword,
+                                        getApplication(), new APIListener() {
                                     @Override
                                     public void onUpdateProfileSuccessful() {
                                         super.onUpdateProfileSuccessful();
                                         dialogBoxLoading.dismiss();
-                                        DialogBoxAlert dialogBox = new DialogBoxAlert(PasswordChangeActivity.this,
-                                                IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,StringUtils.MES_SUCCESSFUL_UPDATE_PASSWORD,"") {
+                                        DialogBoxAlert dialogBox
+                                                = new DialogBoxAlert(PasswordChangeActivity.this,
+                                                IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
+                                                StringUtils.MES_SUCCESSFUL_UPDATE_PASSWORD,"") {
                                             @Override
                                             public void onClickAction() {
                                                 imgBackFromChangePassword.performClick();
@@ -212,10 +217,14 @@ public class PasswordChangeActivity extends AppCompatActivity {
     private void enableButtonUpdate() {
         if(checkEmptyFields() || !checkMatchingPassword()) {
             btnSaveEdit.setEnabled(false);
-            btnSaveEdit.getBackground().setTint(getResources().getColor(R.color.gray_light));
+            btnSaveEdit.getBackground()
+                       .setTint(getResources()
+                       .getColor(R.color.gray_light));
         } else {
             btnSaveEdit.setEnabled(true);
-            btnSaveEdit.getBackground().setTint(getResources().getColor(R.color.blue_main));
+            btnSaveEdit.getBackground()
+                       .setTint(getResources()
+                       .getColor(R.color.blue_main));
         }
     }
 
@@ -227,7 +236,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

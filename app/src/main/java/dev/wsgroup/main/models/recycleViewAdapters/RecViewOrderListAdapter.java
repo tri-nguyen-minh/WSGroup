@@ -34,6 +34,7 @@ public class RecViewOrderListAdapter
     private Activity activity;
     private List<Order> orderList;
     private DialogBoxLoading dialogBoxLoading;
+    private double totalPrice;
 
     public void setOrderList(List<Order> orderList) {
         this.orderList = orderList;
@@ -61,8 +62,11 @@ public class RecViewOrderListAdapter
         holder.constraintLayoutDeliverDate.setVisibility(View.GONE);
         holder.constraintLayoutReturnDate.setVisibility(View.GONE);
         holder.constraintLayoutCancelDate.setVisibility(View.GONE);
+        totalPrice = orderList.get(position).getTotalPrice();
+        totalPrice -= (orderList.get(position).getDiscountPrice()
+                        + orderList.get(position).getAdvanceFee());
         holder.txtOrderPrice
-                .setText(MethodUtils.formatPriceString(orderList.get(position).getTotalPrice()));
+                .setText(MethodUtils.formatPriceString(totalPrice));
         holder.txtSupplier.setText(orderList.get(position).getSupplier().getName());
         int productCount = orderList.get(position).getOrderProductList().size();
         holder.txtProductCount.setText(productCount + "");
@@ -103,33 +107,34 @@ public class RecViewOrderListAdapter
         holder.layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogBoxLoading = new DialogBoxLoading(activity);
-                dialogBoxLoading.getWindow()
-                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialogBoxLoading.show();
-                Order order = orderList.get(position);
-                if (order.getCampaign() != null) {
-                    APICampaignCaller.getCampaignById(order.getCampaign().getId(),
-                            activity.getApplication(), new APIListener() {
-                        @Override
-                        public void onCampaignFound(Campaign campaign) {
-                            super.onCampaignFound(campaign);
-                            order.getOrderProductList().get(0).getProduct().setCampaign(campaign);
-                            dialogBoxLoading.dismiss();
-                            goToOrderDetail(order);
-                        }
-                    });
-                } else {
-                    dialogBoxLoading.dismiss();
-                    goToOrderDetail(order);
-                }
+                goToOrderDetail(orderList.get(position).getId());
+//                dialogBoxLoading = new DialogBoxLoading(activity);
+//                dialogBoxLoading.getWindow()
+//                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                dialogBoxLoading.show();
+//                Order order = orderList.get(position);
+//                if (order.getCampaign() != null) {
+//                    APICampaignCaller.getCampaignById(order.getCampaign().getId(),
+//                            activity.getApplication(), new APIListener() {
+//                        @Override
+//                        public void onCampaignFound(Campaign campaign) {
+//                            super.onCampaignFound(campaign);
+//                            order.getOrderProductList().get(0).getProduct().setCampaign(campaign);
+//                            dialogBoxLoading.dismiss();
+//                            goToOrderDetail(order);
+//                        }
+//                    });
+//                } else {
+//                    dialogBoxLoading.dismiss();
+//                    goToOrderDetail(order);
+//                }
             }
         });
     }
 
-    private void goToOrderDetail(Order order) {
+    private void goToOrderDetail(String orderId) {
         Intent orderDetailIntent = new Intent(context, OrderActivity.class);
-        orderDetailIntent.putExtra("ORDER", order);
+        orderDetailIntent.putExtra("ORDER_ID", orderId);
         orderDetailIntent.putExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         activity.startActivity(orderDetailIntent);
     }

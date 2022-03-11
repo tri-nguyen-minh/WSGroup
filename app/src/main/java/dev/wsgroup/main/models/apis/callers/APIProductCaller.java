@@ -39,21 +39,17 @@ public class APIProductCaller {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    JSONObject jsonObject = null;
-                    product = null;
                     try {
+                        product = null;
+                        productList = (list == null) ? new ArrayList<>() : list;
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
-                            productList = (list == null) ? new ArrayList<>() : list;
                             for (int i = 0; i < jsonArray.length();i++) {
-                                jsonObject = jsonArray.getJSONObject(i);
-                                product = Product.getObjectFromJSON(jsonObject);
+                                product = Product.getObjectFromJSON(jsonArray.getJSONObject(i));
                                 productList.add(product);
                             }
-                            APIListener.onProductListFound(productList);
-                        } else {
-                            APIListener.onProductListFound(new ArrayList<>());
                         }
+                        APIListener.onProductListFound(productList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -62,7 +58,6 @@ public class APIProductCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     if(error.toString().contains("NoConnectionError")) {
@@ -136,17 +131,15 @@ public class APIProductCaller {
                     product = null;
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
+                        productList = (list == null) ? new ArrayList<>() : list;
                         if (jsonArray.length() > 0) {
-                            productList = (list == null) ? new ArrayList<>() : list;
                             for (int i = 0; i < jsonArray.length();i++) {
                                 jsonObject = jsonArray.getJSONObject(i);
                                 product = Product.getObjectFromJSON(jsonObject);
                                 productList.add(product);
                             }
-                            APIListener.onProductListFound(productList);
-                        } else {
-                            APIListener.onProductListFound(new ArrayList<>());
                         }
+                        APIListener.onProductListFound(productList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -287,6 +280,112 @@ public class APIProductCaller {
                     20000,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getRatingByProductIdList(List<Product> productList,
+                                                Application application, APIListener APIListener) {
+        String url = StringUtils.PRODUCT_API_URL + "products/rating";
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        try {
+            JSONObject jsonObject = new JSONObject();
+            JSONArray array = new JSONArray();
+            for (Product product : productList) {
+                array.put(product.getProductId());
+            }
+            jsonObject.put("productIds", array);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    JSONObject jsonObject = null;
+                    product = null;
+                    try {
+                        JSONArray jsonArray = response.getJSONArray("data");
+                        Map<String, Double> ratingList = new HashMap<>();
+                        String id;
+                        double rating;
+                        if (jsonArray.length() > 0) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                id = jsonArray.getJSONObject(i).getString("productid");
+                                rating = jsonArray.getJSONObject(i).getDouble("rating");
+                                ratingList.put(id, rating);
+                            }
+                        }
+                        APIListener.onRatingListCount(ratingList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
+                }
+            };
+
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(error.toString().contains("NoConnectionError")) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObject, listener, errorListener);
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void searchProductByNameOrSupplier(String search, List<Product> list,
+                                                     Application application, APIListener APIListener) {
+        String url = StringUtils.PRODUCT_API_URL + "searchProduct";
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("value", search);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    product = null;
+                    productList = (list == null) ? new ArrayList<>() : list;
+                    try {
+                        JSONArray jsonArray = response.getJSONArray("data");
+                        if (jsonArray.length() > 0) {
+                            for (int i = 0; i < jsonArray.length();i++) {
+                                product = Product.getObjectFromJSON(jsonArray.getJSONObject(i));
+                                productList.add(product);
+                            }
+                        }
+                        APIListener.onProductListFound(productList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
+                }
+            };
+
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(error.toString().contains("NoConnectionError")) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonObject, listener, errorListener);
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

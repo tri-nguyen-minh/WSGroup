@@ -19,18 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.apis.callers.APIDiscountCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
-import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Order;
-import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderSupplierListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
@@ -44,16 +37,14 @@ public class ConfirmActivity extends AppCompatActivity {
     private TextView txtCampaignDescription, txtCampaignPrice, txtCampaignOrderCount,
                     txtCampaignOrderQuantityCount, txtCampaignQuantityCount, txtCampaignTag;
     private ProgressBar progressBarQuantityCount;
-    private RecyclerView recViewCheckoutOrderProduct;
+    private RecyclerView recViewOrderProduct;
     private Button btnConfirmOrder;
     private LinearLayout layoutCampaign, layoutOrderList;
     private RelativeLayout layoutLoading;
 
     private SharedPreferences sharedPreferences;
     private ArrayList<Order> orderList;
-    private Map<String, CustomerDiscount> discountMap;
-    private String token;
-    private int requestCode, count;
+    private int requestCode;
     private Campaign campaign;
     private RecViewOrderSupplierListAdapter adapter;
 
@@ -72,7 +63,7 @@ public class ConfirmActivity extends AppCompatActivity {
         txtCampaignQuantityCount = findViewById(R.id.txtCampaignQuantityCount);
         txtCampaignTag = findViewById(R.id.txtCampaignTag);
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
-        recViewCheckoutOrderProduct = findViewById(R.id.recViewCheckoutOrderProduct);
+        recViewOrderProduct = findViewById(R.id.recViewCheckoutOrderProduct);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
         layoutCampaign = findViewById(R.id.layoutCampaign);
         layoutOrderList = findViewById(R.id.layoutOrderList);
@@ -80,7 +71,6 @@ public class ConfirmActivity extends AppCompatActivity {
 
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("TOKEN", "");
         orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
         requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         layoutOrderList.setVisibility(View.INVISIBLE);
@@ -88,7 +78,6 @@ public class ConfirmActivity extends AppCompatActivity {
 
         if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
             layoutCampaign.setVisibility(View.GONE);
-            discountMap = new HashMap<>();
         } else {
             campaign = orderList.get(0).getCampaign();
             txtCampaignTag.setText(campaign.getShareFlag() ? "Sharing Campaign" : "Single Campaign");
@@ -122,16 +111,19 @@ public class ConfirmActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DialogBoxConfirm dialogBoxConfirm
-                        = new DialogBoxConfirm(ConfirmActivity.this, StringUtils.MES_CONFIRM_ORDER) {
+                        = new DialogBoxConfirm(ConfirmActivity.this,
+                                                StringUtils.MES_CONFIRM_ORDER) {
                     @Override
                     public void onYesClicked() {
-                        Intent orderInfoIntent = new Intent(getApplicationContext(), InfoActivity.class);
+                        Intent orderInfoIntent
+                                = new Intent(getApplicationContext(), InfoActivity.class);
                         orderInfoIntent.putExtra("ORDER_LIST", orderList);
                         orderInfoIntent.putExtra("REQUEST_CODE", requestCode);
                         startActivityForResult(orderInfoIntent, requestCode);
                     }
                 };
-                dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxConfirm.getWindow()
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxConfirm.show();
             }
         });
@@ -139,20 +131,21 @@ public class ConfirmActivity extends AppCompatActivity {
 
     private void setupRecViewOrderList() {
         adapter = new RecViewOrderSupplierListAdapter(getApplicationContext(),
-                ConfirmActivity.this, requestCode, IntegerUtils.REQUEST_ORDER_NOTE) {
+                ConfirmActivity.this, requestCode) {
             @Override
             public void setCustomerDiscount(int position, CustomerDiscount customerDiscount) {
                 if (customerDiscount != null) {
-                    customerDiscount.getDiscount().setSupplier(orderList.get(position).getSupplier());
+                    customerDiscount.getDiscount()
+                                    .setSupplier(orderList.get(position).getSupplier());
                 }
                 orderList.get(position).setCustomerDiscount(customerDiscount);
             }
         };
         adapter.setList(orderList);
-        recViewCheckoutOrderProduct.setAdapter(adapter);
-        recViewCheckoutOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+        recViewOrderProduct.setAdapter(adapter);
+        recViewOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                                             LinearLayoutManager.VERTICAL, false));
-        recViewCheckoutOrderProduct.setNestedScrollingEnabled(false);
+        recViewOrderProduct.setNestedScrollingEnabled(false);
         layoutLoading.setVisibility(View.GONE);
         layoutOrderList.setVisibility(View.VISIBLE);
     }
