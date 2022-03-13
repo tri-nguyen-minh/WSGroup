@@ -34,6 +34,7 @@ public class APIChatCaller {
     private static RequestQueue requestQueue;
     private static String url;
     private static List<Message> messageList;
+    private static int count;
 
     public static void getCustomerChatMessages(String token, List<Message> list,
                                                 Application application, APIListener APIListener) {
@@ -86,6 +87,171 @@ public class APIChatCaller {
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
                     new JSONObject(), listener, errorListener) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getConversation(String token, String userId, String supplierId,
+                                               Application application, APIListener APIListener) {
+        url = StringUtils.CHAT_API_URL + "getChatMessage/SenderOrReceiver";
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        try {
+            count = 2;
+            System.out.println(token);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        if (count == 2) {
+                            messageList = new ArrayList<>();
+                        }
+                        count--;
+                        System.out.println(response);
+                        JSONArray data = response.getJSONArray("data");
+                        Message message;
+                        if (data.length() > 0) {
+                            for (int i = 0; i < data.length(); i++) {
+                                message = Message.getObjectFromJSON(data.getJSONObject(i));
+                                messageList.add(message);
+                            }
+                        }
+                        if (count == 0) {
+                            Collections.sort(messageList, new Comparator<Message>() {
+                                @Override
+                                public int compare(Message msg1, Message msg2) {
+                                    Date date1 = null, date2 = null;
+                                    if (msg1.getCreateDate() != null && msg2.getCreateDate() != null) {
+                                        try {
+                                            date1 = MethodUtils.convertStringToDate(msg1.getCreateDate());
+                                            date2 = MethodUtils.convertStringToDate(msg2.getCreateDate());
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    return date2.compareTo(date1);
+                                }
+                            });
+                            APIListener.onMessageListFound(messageList);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onMessageListFound(new ArrayList<>());
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                }
+            };
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("from", userId);
+            jsonObject.put("to", supplierId);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            requestQueue.add(request);
+            jsonObject = new JSONObject();
+            jsonObject.put("from", supplierId);
+            jsonObject.put("to", userId);
+            request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateReadMessages(String token, String userId, String supplierId,
+                                       Application application, APIListener APIListener) {
+        url = StringUtils.CHAT_API_URL + "updateStatusToRead";
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        try {
+            count = 2;
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    count--;
+                    if (count == 0) {
+                        APIListener.onUpdateMessageSuccessful();
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                }
+            };
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("from", userId);
+            jsonObject.put("to", supplierId);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("cookie", token);
+                    return header;
+                }
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            requestQueue.add(request);
+            jsonObject = new JSONObject();
+            jsonObject.put("from", supplierId);
+            jsonObject.put("to", userId);
+            request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
 
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {

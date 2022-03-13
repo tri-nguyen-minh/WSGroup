@@ -154,7 +154,6 @@ public class APISupplierCaller {
                 jsonArray.put(string);
             }
             jsonObject.put("listAccountIds", jsonArray);
-            System.out.println(jsonObject);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 
                 @Override
@@ -188,7 +187,7 @@ public class APISupplierCaller {
                 }
             };
 
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
                     jsonObject, listener, errorListener);
             requestQueue.add(request);
         } catch (Exception e) {

@@ -9,14 +9,13 @@ import java.util.List;
 
 public class Product implements Serializable {
 
-    private String productId, name, description, categoryId, typeOfProduct, status;
+    private String productId, name, description, categoryId, status;
     private Supplier supplier;
     private double retailPrice;
     private int quantity, orderCount, reviewCount;
     private double rating;
     private String imageLink;
     private List<String> imageList;
-    private List<String> typeList;
     private Campaign campaign;
     private List<Campaign> campaignList;
     private List<Review> reviewList;
@@ -104,20 +103,6 @@ public class Product implements Serializable {
         this.rating = rating;
     }
 
-    public String getTypeOfProduct() {
-        return typeOfProduct;
-    }
-
-    public void setTypeOfProduct(String typeOfProduct) {
-        this.typeOfProduct = typeOfProduct;
-        List<String> productTypeList = new ArrayList<>();
-        if (!typeOfProduct.isEmpty()) {
-            productTypeList.add(typeOfProduct);
-        }
-        productTypeList.add("test");
-        this.typeList = productTypeList;
-    }
-
     public List<Campaign> getCampaignList() {
         return campaignList;
     }
@@ -164,14 +149,6 @@ public class Product implements Serializable {
         setImageList(imageList);
     }
 
-    public List<String> getTypeList() {
-        return typeList;
-    }
-
-    public void setTypeList(List<String> typeList) {
-        this.typeList = typeList;
-    }
-
     public Campaign getCampaign() {
         return campaign;
     }
@@ -194,7 +171,6 @@ public class Product implements Serializable {
         product.setName(jsonObject.getString("name"));
         product.setCategoryId(jsonObject.getString("categoryid"));
         product.setDescription(jsonObject.getString("description"));
-        product.setTypeOfProduct(jsonObject.getString("typeofproduct"));
         product.setQuantity(jsonObject.getInt("quantity"));
         product.setRetailPrice(jsonObject.getDouble("retailprice"));
         product.setStatus(jsonObject.getString("status"));
@@ -204,11 +180,6 @@ public class Product implements Serializable {
         supplier.setAddress(jsonObject.getString("supplieraddress"));
         product.setSupplier(supplier);
         product.setImageLink(jsonObject.getString("image"));
-        List<String> typeList = new ArrayList<>();
-        if (!product.getTypeOfProduct().isEmpty()) {
-            typeList.add(product.getTypeOfProduct());
-        }
-        typeList.add("type");
         product.setOrderCount(0);
         product.setReviewCount(0);
         product.setRating(0);

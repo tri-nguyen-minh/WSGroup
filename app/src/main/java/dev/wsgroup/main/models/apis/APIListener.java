@@ -85,4 +85,6 @@ public class APIListener {
 
     public void onMessageListFound(List<Message> messageList) {}
 
+    public void onUpdateMessageSuccessful() {}
+
 }

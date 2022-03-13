@@ -91,7 +91,6 @@ public class APICartCaller {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("productId", cartProduct.getProduct().getProductId());
             jsonObject.put("quantity", cartProduct.getQuantity());
-            jsonObject.put("typeofproduct", cartProduct.getProductType());
             Campaign campaign = cartProduct.getCampaign();
             jsonObject.put("inCampaign", (campaign != null));
             if (campaign != null) {
@@ -147,7 +146,6 @@ public class APICartCaller {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("productId", cartProduct.getProduct().getProductId());
             jsonObject.put("quantity", cartProduct.getQuantity());
-            jsonObject.put("typeofproduct", cartProduct.getProductType());
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

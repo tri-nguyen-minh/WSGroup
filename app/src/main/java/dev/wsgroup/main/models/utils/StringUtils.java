@@ -20,7 +20,7 @@ public class StringUtils {
 
     public static final String APPLICATION_JSON = "application/json";
 
-    public static final String PHONE_REGEX = "0[1-9][0-9]{8,9}";
+    public static final String PHONE_REGEX = "0[1-9][0-9]{7,8}";
     public static final String USERNAME_REGEX = "[a-zA-z0-9_]{6,12}";
     public static final String PASSWORD_REGEX = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*_-]).{8,20}$";
     public static final String MAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'" +

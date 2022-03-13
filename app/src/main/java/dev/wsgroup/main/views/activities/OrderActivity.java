@@ -42,20 +42,20 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxSetupPayment;
 
 public class OrderActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromOrderDetail, imgOrderDetailHome, imgSupplierAvatar;
+    private ImageView imgBackFromOrderDetail, imgOrderDetailHome;
     private TextView txtOrderCode, txtPhoneNumber, txtDeliveryAddress, txtPayment,
             txtStatus, txtSupplierName, txtSupplierAddress, txtTotalPrice,
             txtTotalDiscount, txtAdvanced, lblRetryGetOrder;
     private RelativeLayout layoutLoading;
-    private LinearLayout layoutProductList, layoutNoOrder;
+    private LinearLayout layoutNoOrder;
     private RecyclerView recViewOrderProduct;
     private Button btnAdditionalAction;
     private ConstraintLayout layoutDiscount, layoutAdvance;
     private NestedScrollView scrollViewMain;
 
-    private String phone, token, userId, status, orderId;
+    private String phone, token, userId, orderId, status;
     private double totalPrice, discountPrice, advancedFee;
-    private int requestCode, productCount;
+    private int productCount;
     private Order order;
     private OrderProduct orderProduct;
     private List<OrderProduct> orderProductList;
@@ -74,7 +74,6 @@ public class OrderActivity extends AppCompatActivity {
 
         imgBackFromOrderDetail = findViewById(R.id.imgBackFromOrderDetail);
         imgOrderDetailHome = findViewById(R.id.imgOrderDetailHome);
-        imgSupplierAvatar = findViewById(R.id.imgSupplierAvatar);
         txtOrderCode = findViewById(R.id.txtOrderCode);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
         txtDeliveryAddress = findViewById(R.id.txtDeliveryAddress);
@@ -87,7 +86,6 @@ public class OrderActivity extends AppCompatActivity {
         txtAdvanced = findViewById(R.id.txtAdvanced);
         lblRetryGetOrder = findViewById(R.id.lblRetryGetOrder);
         layoutLoading = findViewById(R.id.layoutLoading);
-        layoutProductList = findViewById(R.id.layoutProductList);
         layoutNoOrder = findViewById(R.id.layoutNoOrder);
         recViewOrderProduct = findViewById(R.id.recViewOrderProduct);
         btnAdditionalAction = findViewById(R.id.btnAdditionalAction);
@@ -97,7 +95,6 @@ public class OrderActivity extends AppCompatActivity {
 
         totalPrice = 0; discountPrice = 0; advancedFee = 0;
         orderId = getIntent().getStringExtra("ORDER_ID");
-        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         phone = sharedPreferences.getString("PHONE", "");
         token = sharedPreferences.getString("TOKEN", "");
@@ -374,7 +371,7 @@ public class OrderActivity extends AppCompatActivity {
                                     @Override
                                     public void onCompletedPayment(String vnpRef) {
                                         APIOrderCaller.updateOrderPaymentStatus(token, order,
-                                                "advanced", true, totalPrice, vnpRef,
+                                                status, false, totalPrice, vnpRef,
                                                 getApplication(), new APIListener() {
                                                     @Override
                                                     public void onUpdateOrderSuccessful() {

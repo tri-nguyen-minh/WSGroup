@@ -31,6 +31,7 @@ import java.util.Set;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APIChatCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Message;
@@ -142,16 +143,9 @@ public class HomeTab extends Fragment {
             public void onClick(View v) {
                 System.out.println("testing");
                 String token = sharedPreferences.getString("TOKEN","");
-//                APIChatCaller.getCustomerChatMessages(token, messages, getActivity().getApplication(), new APIListener() {
-//                    @Override
-//                    public void onMessageListFound(List<Message> messageList) {
-//                        if (messageList.size() > 0) {
-//                            for (Message message : messageList) {
-//                                System.out.println(MethodUtils.formatDateWithTime(message.getCreateDate()) + " - " + message.getMessage());
-//                            }
-//                        }
-//                    }
-//                });
+                APIChatCaller.updateReadMessages(token, "179989ab-5a63-4bb0-ba53-1c202dfb5340",
+                        "9a7ccab9-4974-4322-844d-c07dcb9cb70d", getActivity().getApplication(), new APIListener() {
+                });
             }
         });
 
@@ -161,13 +155,13 @@ public class HomeTab extends Fragment {
         constraintLayoutMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if (userId.isEmpty()) {
-//                    Intent signInIntent = new Intent(getContext(), SignInActivity.class);
-//                    startActivityForResult(signInIntent, IntegerUtils.REQUEST_LOGIN_FOR_MESSAGE);
-//                } else {
-//                    Intent messageIntent = new Intent(getContext(), MessageListActivity.class);
-//                    startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
-//                }
+                if (userId.isEmpty()) {
+                    Intent signInIntent = new Intent(getContext(), SignInActivity.class);
+                    startActivityForResult(signInIntent, IntegerUtils.REQUEST_LOGIN_FOR_MESSAGE);
+                } else {
+                    Intent messageIntent = new Intent(getContext(), MessageListActivity.class);
+                    startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
+                }
             }
         });
 

@@ -1,11 +1,15 @@
 package dev.wsgroup.main.views.activities.message;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,9 +26,14 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIChatCaller;
 import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
+import dev.wsgroup.main.models.dtos.Conversation;
 import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Supplier;
+import dev.wsgroup.main.models.dtos.User;
+import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageListAdapter;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class MessageListActivity extends AppCompatActivity {
 
@@ -36,9 +45,13 @@ public class MessageListActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private List<Message> messageList;
-    private List<Supplier> conversationList;
+    private List<Conversation> conversationList;
+    private Conversation conversation;
+    private User user;
     private String token, accountId, foreignAccountId;
     private final String CUSTOMER_SERVICE_ACCOUNT_ID = "SERVICE";
+    private RecViewMessageListAdapter adapter;
+    private DialogBoxLoading dialogBoxLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +67,6 @@ public class MessageListActivity extends AppCompatActivity {
         lblRetryGetMessage = findViewById(R.id.lblRetryGetMessage);
         recViewMessageList = findViewById(R.id.recViewMessageList);
 
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("TOKEN", "");
-        accountId = sharedPreferences.getString("ACCOUNT_ID", "");
         getMessageList();
 
         imgBackFromMessageList.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +91,11 @@ public class MessageListActivity extends AppCompatActivity {
     }
 
     private void getMessageList() {
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN", "");
+        accountId = sharedPreferences.getString("ACCOUNT_ID", "");
+        user = new User();
+        user.setAccountId(accountId);
         setLoadingState();
         APIChatCaller.getCustomerChatMessages(token, messageList, getApplication(), new APIListener() {
             @Override
@@ -108,17 +123,31 @@ public class MessageListActivity extends AppCompatActivity {
             } else {
                 foreignAccountId = message.getFromId();
             }
+            System.out.println("foreign " + foreignAccountId);
             supplierAccountIdSet.add(foreignAccountId);
         }
-        conversationList = new ArrayList<>();
+        System.out.println("set " + supplierAccountIdSet.size());
+        List<Supplier> supplierList = new ArrayList<>();
         Supplier service = new Supplier();
+
+//        hard code customer service
         service.setId(CUSTOMER_SERVICE_ACCOUNT_ID);
-        conversationList.add(service);
-        APISupplierCaller.getSupplierListByAccountId(supplierAccountIdSet, conversationList,
+        service.setName("Customer Service");
+        service.setAvatarLink("https://firebasestorage.googleapis.com/v0/b/wsg-authen-144ba.appspot.com/o/images%2FCustomer1_avatar?alt=media&token=57ae86ad-b6bc-42bc-92d1-5ab363555b44");
+        supplierList.add(service);
+
+        APISupplierCaller.getSupplierListByAccountId(supplierAccountIdSet, supplierList,
                 getApplication(), new APIListener() {
             @Override
             public void onSupplierListFound(List<Supplier> list) {
-                conversationList = list;
+                conversationList = new ArrayList<>();
+                for (Supplier supplier : list) {
+                    conversation = new Conversation();
+                    conversation.setMainUser(user);
+                    conversation.setSupplier(supplier);
+                    conversation.setLastMessage(getLastMessage(supplier.getAccountId()));
+                    conversationList.add(conversation);
+                }
                 setConversationList();
             }
 
@@ -130,7 +159,42 @@ public class MessageListActivity extends AppCompatActivity {
     }
 
     private void setConversationList() {
+        adapter = new RecViewMessageListAdapter(getApplicationContext()) {
+            @Override
+            public void onConversationSelected(String userId, String supplierId) {
+                dialogBoxLoading = new DialogBoxLoading(MessageListActivity.this);
+                dialogBoxLoading.getWindow()
+                        .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBoxLoading.show();
+                APIChatCaller.updateReadMessages(token, userId, supplierId, getApplication(), new APIListener() {
+                    @Override
+                    public void onUpdateMessageSuccessful() {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        Intent messageIntent = new Intent(getApplicationContext(), MessageActivity.class);
+                        messageIntent.putExtra("USER_ID", userId);
+                        messageIntent.putExtra("SUPPLIER_ID", supplierId);
+                        startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
+                    }
+                });
+            }
+        };
+        adapter.setConversationList(conversationList);
+        recViewMessageList.setAdapter(adapter);
+        recViewMessageList.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                LinearLayoutManager.VERTICAL, false));
+        setListFoundState();
+    }
 
+    private Message getLastMessage(String id) {
+        for (int i = messageList.size() - 1;i >= 0;i--) {
+            if (messageList.get(i).getFromId().equals(id)
+                    || messageList.get(i).getToId().equals(id)) {
+                return messageList.get(i);
+            }
+        }
+        return null;
     }
 
     private void setLoadingState() {
@@ -162,4 +226,9 @@ public class MessageListActivity extends AppCompatActivity {
         recViewMessageList.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        getMessageList();
+    }
 }

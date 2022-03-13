@@ -82,8 +82,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onUserFound(User user, String message) {
                     user.setToken(token);
-                    sharedPreferences.edit().putString("TOKEN", user.getToken()).apply();
+
+//                    remove when apply notif
                     notificationCheck = true;
+
+                    sharedPreferences.edit().putString("TOKEN", user.getToken()).apply();
                     setUpShoppingCart(tabPosition);
                     setUpMessageList(tabPosition);
                 }
@@ -101,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpShoppingCart(int tabPosition) {
         cartCheck = false;
-        token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
             public void onCartListFound(List<CartProduct> retailList,
@@ -276,11 +278,15 @@ public class MainActivity extends AppCompatActivity {
             layoutMainPage.setVisibility(View.INVISIBLE);
             layoutLoading.setVisibility(View.VISIBLE);
             sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+            token = sharedPreferences.getString("TOKEN", "");
             userId = sharedPreferences.getString("USER_ID", "");
             tabPosition = 0;
             if(data != null) {
                 tabPosition = data.getIntExtra("MAIN_TAB_POSITION",0);
             }
+//            remove when apply notif
+            notificationCheck = true;
+
             setUpShoppingCart(tabPosition);
             setUpMessageList(tabPosition);
         }

@@ -278,7 +278,6 @@ public class PrepareProductActivity extends AppCompatActivity {
         CartProduct cartProduct = new CartProduct();
         cartProduct.setProduct(product);
         cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
-        cartProduct.setProductType(product.getTypeOfProduct());
         cartProduct.setCampaign(campaign);
         cartProduct.setCampaignFlag(campaign != null);
         return cartProduct;

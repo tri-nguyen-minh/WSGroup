@@ -70,17 +70,16 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
         this.getSupportActionBar().hide();
-        {
-            tabLayout = findViewById(R.id.productTabLayout);
-            viewPager = findViewById(R.id.productViewPager);
-            imgBackFromProductDetail = findViewById(R.id.imgBackFromProductDetail);
-            imgProductDetailHome = findViewById(R.id.imgProductDetailHome);
-            txtProductDetailCartCount = findViewById(R.id.txtProductDetailCartCount);
-            cardViewProductDetailCartCount = findViewById(R.id.cardViewProductDetailCartCount);
-            constraintLayoutShoppingCart = findViewById(R.id.constraintLayoutShoppingCart);
-            layoutLoading = findViewById(R.id.layoutLoading);
-            layoutMainLayout = findViewById(R.id.layoutMainLayout);
-        }
+
+        tabLayout = findViewById(R.id.productTabLayout);
+        viewPager = findViewById(R.id.productViewPager);
+        imgBackFromProductDetail = findViewById(R.id.imgBackFromProductDetail);
+        imgProductDetailHome = findViewById(R.id.imgProductDetailHome);
+        txtProductDetailCartCount = findViewById(R.id.txtProductDetailCartCount);
+        cardViewProductDetailCartCount = findViewById(R.id.cardViewProductDetailCartCount);
+        constraintLayoutShoppingCart = findViewById(R.id.constraintLayoutShoppingCart);
+        layoutLoading = findViewById(R.id.layoutLoading);
+        layoutMainLayout = findViewById(R.id.layoutMainLayout);
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");

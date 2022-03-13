@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CartProduct implements Serializable {
-    private String id, productType;
+    private String id;
     private List<String> typeList;
     private int quantity;
     private Product product;
@@ -32,20 +32,6 @@ public class CartProduct implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public String getProductType() {
-        return productType;
-    }
-
-    public void setProductType(String productType) {
-        this.productType = productType;
-        List<String> productTypeList = new ArrayList<>();
-        if (!productType.isEmpty()) {
-            productTypeList.add(productType);
-        }
-        productTypeList.add("test");
-        this.typeList = productTypeList;
     }
 
     public boolean getSelectedFlag() {
@@ -100,7 +86,6 @@ public class CartProduct implements Serializable {
         CartProduct cartProduct = new CartProduct();
         cartProduct.setId(jsonObject.getString("id"));
         cartProduct.setQuantity(jsonObject.getInt("quantity"));
-        cartProduct.setProductType(jsonObject.getString("typeofproduct"));
         cartProduct.setCampaignFlag(jsonObject.getBoolean("incampaign"));
         if (cartProduct.getCampaignFlag()) {
             Campaign campaign = new Campaign();

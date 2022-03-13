@@ -27,8 +27,9 @@ public class APIPaymentCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
+            System.out.println(price);
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("amount", (int) price);
+            jsonObject.put("amount", (price * 100));
             jsonObject.put("bankCode", bankString);
             jsonObject.put("orderDescription", orderDescription);
             jsonObject.put("orderType", orderType);

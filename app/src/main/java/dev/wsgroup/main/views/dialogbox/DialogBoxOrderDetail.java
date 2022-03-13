@@ -134,7 +134,6 @@ public class DialogBoxOrderDetail extends Dialog{
                 CartProduct cartProduct = new CartProduct();
                 cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
                 cartProduct.setProduct(product);
-                cartProduct.setProductType(product.getTypeOfProduct());
                 HashMap<String, List<CartProduct>> shoppingCart = null;
                 List<CartProduct> cartProductList;
                 try {

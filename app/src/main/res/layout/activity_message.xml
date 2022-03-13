@@ -2,19 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutParent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_lighter"
-    tools:context=".views.activities.message.MessageListActivity">
+    tools:context=".views.activities.message.MessageActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutMessageListHeader"
+        android:id="@+id/layoutMessageHeader"
         style="@style/style_header_layout"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
 
         <ImageView
-            android:id="@+id/imgBackFromMessageList"
+            android:id="@+id/imgBackFromMessage"
             style="@style/style_icon"
             android:src="@drawable/ic_arrow_left"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -23,21 +24,22 @@
             app:tint="@color/white" />
 
         <TextView
+            android:id="@+id/txtHeader"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:fontFamily="@font/montserratm"
             android:gravity="center"
-            android:text="MESSAGE LIST"
+            android:text="MESSAGES"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/imgBackFromMessageList"
+            app:layout_constraintLeft_toRightOf="@id/imgBackFromMessage"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/imgMessageListHome"/>
+            app:layout_constraintRight_toLeftOf="@id/imgMessageHome"/>
 
         <ImageView
-            android:id="@+id/imgMessageListHome"
+            android:id="@+id/imgMessageHome"
             style="@style/style_icon"
             android:src="@drawable/ic_home"
             app:layout_constraintTop_toTopOf="parent"
@@ -48,12 +50,13 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
+        android:id="@+id/layoutBody"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/layoutMessageListHeader"
+        app:layout_constraintTop_toBottomOf="@+id/layoutMessageHeader"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/layoutWriteMessage">
 
         <RelativeLayout
             android:id="@+id/layoutLoading"
@@ -69,17 +72,26 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/layoutNoMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="@color/gray_lighter">
 
             <TextView
-                android:text="NO MESSAGES"
+                android:text="YOU HAVE NOT MESSAGED"
                 style="@style/style_empty_note" />
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/txtNewMessageSupplierName"
+                android:layout_marginTop="10dp"
+                android:text="(K12 _ HCM) Dao Ngoc Tien"
+                android:textColor="@color/gray_darker"
+                style="@style/style_empty_note" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layoutFailedGettingMessage"
@@ -87,6 +99,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
+            android:visibility="gone"
             android:background="@color/gray_lighter">
 
             <TextView
@@ -108,10 +121,52 @@
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recViewMessageList"
+            android:id="@+id/recViewMessage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:paddingBottom="10dp"/>
 
     </FrameLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutWriteMessage"
+        style="@style/style_header_layout"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <EditText
+            android:id="@+id/editWriteMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:layout_marginRight="15dp"
+            style="@style/style_otp_box"
+            android:text=""
+            android:hint="Write your message..."
+            android:gravity="left|center"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:maxLines="4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/txtSend"/>
+
+        <TextView
+            android:id="@+id/txtSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:text="SEND"
+            android:textSize="18sp"
+            android:fontFamily="@font/montserratm"
+            android:textStyle="bold"
+            android:textColor="@color/blue_dark"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

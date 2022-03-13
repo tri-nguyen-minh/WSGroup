@@ -62,8 +62,8 @@ public class MethodUtils {
         return "0" + phone;
     }
 
-    public static String formatDate(String dateString){
-        String returnedDate = "";
+    public static String formatDate(String dateString) {
+        String returnedDate;
         SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
         SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
@@ -76,9 +76,8 @@ public class MethodUtils {
     }
 
     public static String formatDateWithTime(String dateString){
-        String returnedDate = "";
+        String returnedDate;
         SimpleDateFormat format = new SimpleDateFormat("HH:mm MMM dd, yyyy");
-        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
             returnedDate = format.format(convertStringToDate(dateString));
         } catch (Exception e) {
@@ -127,10 +126,29 @@ public class MethodUtils {
     }
 
     public static String getVNPayRef(String url) {
-        String vnpRef = "";
+        String vnpRef;
         vnpRef = url.substring(url.indexOf("vnp_TxnRef="), url.indexOf("&vnp_SecureHash"));
         vnpRef = vnpRef.substring(vnpRef.indexOf("=") + 1);
         return vnpRef;
+    }
+
+    public static boolean compareDatesByDay(String dateString1, String dateString2) throws Exception {
+        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
+        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        return format.format(dateParse.parse(dateString1)).equals(format.format(dateParse.parse(dateString2)));
+    }
+
+    public static String convertTime(String dateString) {
+    String returnedDate;
+    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        try {
+        returnedDate = format.format(dateParse.parse(dateString));
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+        return returnedDate;
     }
 
     public static String getVolleyErrorMessage(VolleyError error) {
@@ -155,19 +173,25 @@ public class MethodUtils {
 
     public static void main(String[] args) {
         try {
-//            List<Review> reviews = new ArrayList<>();
-//            Review review = new Review();
-//            review.setCreateDate("2022-02-12T14:36:49.958Z");
-//            review.setRating(1);
-//            reviews.add(review);
-//            review = new Review();
-//            review.setCreateDate("2022-01-27T17:25:59.996Z");
-//            review.setRating(3);
-//            reviews.add(review);
-//            review = new Review();
-//            review.setCreateDate("2022-02-12T07:05:33.288Z");
-//            review.setRating(4.5);
-//            reviews.add(review);
+            List<Review> reviews = new ArrayList<>();
+            Review review = new Review();
+            review.setCreateDate("2022-02-12T14:36:49.958Z");
+            review.setRating(1);
+            reviews.add(review);
+            review = new Review();
+            review.setCreateDate("2022-01-27T17:25:59.996Z");
+            review.setRating(3);
+            reviews.add(review);
+            review = new Review();
+            review.setCreateDate("2022-02-12T07:05:33.288Z");
+            review.setRating(4.5);
+            reviews.add(review);
+            System.out.println(compareDatesByDay(reviews.get(0).getCreateDate(), reviews.get(2).getCreateDate()));
+            for (int i = 0; i < reviews.size();i++) {
+                if (i == (reviews.size() - 1) || reviews.get(i + 1).getRating() > 0) {
+                    System.out.println(reviews.get(i).getRating());
+                }
+            }
 //            Collections.sort(reviews, new Comparator<Review>() {
 //                @Override
 //                public int compare(Review review1, Review review2) {
@@ -189,44 +213,7 @@ public class MethodUtils {
 //            for (Review r : reviews) {
 //                System.out.println(r.getRating() + " - " + formatDateWithTime(r.getCreateDate()));
 //            }
-//            Collections.sort(reviews, new Comparator<Review>() {
-//                @Override
-//                public int compare(Review review1, Review review2) {
-//                    return review1.getRating() > review2.getRating() ? -1 :
-//                            (review1.getRating() < review2.getRating() ? 1 : 0);
-//                }
-//            });
-//            System.out.println("By Rating");
-//            for (Review r : reviews) {
-//                System.out.println(r.getRating() + " - " + formatDateWithTime(r.getCreateDate()));
-//            }
-            String url = "https://server-wsg.herokuapp.com/api/order/payment?order_id=5f9c07de-699b-417d-b5e9-cfc345412da1&vnp_Amount=40000000&vnp_BankCode=NCB&vnp_BankTranNo=20220307123714&vnp_CardType=ATM&vnp_OrderInfo=topup+tesst&vnp_PayDate=20220307123709&vnp_ResponseCode=00&vnp_TmnCode=REKSYL10&vnp_TransactionNo=13700330&vnp_TransactionStatus=00&vnp_TxnRef=050350&vnp_SecureHash=982baa2e7c9cd6b60e3c87db510f6ecceb62a6f0c71b7fc1a3ee10364520d8dd5c109687e245ad83e7467effb97ef57534622028968c01a9193b63f2e30996d2";
-            System.out.println(getVNPayRef(url));
-//            List<String> sortData = new ArrayList<>();
-//            sortData.add("2022-02-12T14:36:49.958Z");
-//            sortData.add("2022-02-11T22:33:43.396Z");
-//            sortData.add("2022-01-27T17:25:59.996Z");
-//            sortData.add("2022-02-12T12:05:33.288Z");
-//            Collections.sort(sortData, new Comparator<String>() {
-//                @Override
-//                public int compare(String s1, String s2) {
-//                    Date date1 = null, date2 = null;
-//                    try {
-//                        date1 = convertStringToDate(s1);
-//                        date2 = convertStringToDate(s2);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    if (false) {
-//                        return date1.compareTo(date2);
-//                    } else {
-//                        return date2.compareTo(date1);
-//                    }
-//                }
-//            });
-//            for (String s : sortData) {
-//                System.out.println(s);
-//            }
+//            Date date = convertStringToDate(review.getCreateDate());
         } catch (Exception e) {
             e.printStackTrace();
         }

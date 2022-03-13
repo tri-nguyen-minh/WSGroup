@@ -122,9 +122,9 @@ public class ProfileTab extends Fragment {
         layoutMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent messageIntent = new Intent(getContext(), MessageListActivity.class);
-//                messageIntent.putExtra("MAIN_TAB_POSITION", 2);
-//                startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
+                Intent messageIntent = new Intent(getContext(), MessageListActivity.class);
+                messageIntent.putExtra("MAIN_TAB_POSITION", 2);
+                startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
             }
         });
 

@@ -60,7 +60,6 @@ public class APIOrderCaller {
                 jsonObjectProduct.put("quantity", cartProduct.getQuantity());
                 jsonObjectProduct.put("price", product.getRetailPrice());
                 jsonObjectProduct.put("totalPrice", orderProduct.getTotalPrice());
-                jsonObjectProduct.put("typeofproduct", cartProduct.getProductType());
                 jsonObjectProduct.put("notes", orderProduct.getNote());
                 productArray.put(jsonObjectProduct);
             }

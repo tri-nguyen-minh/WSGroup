@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderProduct implements Serializable {
-    private String id, productType, note, orderCode;
+    private String id, note, orderCode;
     private int quantity;
     private double price, totalPrice;
     private Product product;
@@ -26,20 +26,6 @@ public class OrderProduct implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getProductType() {
-        return productType;
-    }
-
-    public void setProductType(String productType) {
-        this.productType = productType;
-        List<String> productTypeList = new ArrayList<>();
-        if (!productType.isEmpty()) {
-            productTypeList.add(productType);
-        }
-        productTypeList.add("test");
-        this.typeList = productTypeList;
     }
 
     public String getNote() {

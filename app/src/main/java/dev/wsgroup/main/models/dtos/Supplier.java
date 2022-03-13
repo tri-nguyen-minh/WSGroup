@@ -80,6 +80,7 @@ public class Supplier implements Serializable {
     public static Supplier getObjectFromJSON(JSONObject data) throws Exception{
         Supplier supplier = new Supplier();
         supplier.setId(data.getString("id"));
+        supplier.setAccountId(data.getString("accountid"));
         supplier.setName(data.getString("name"));
         supplier.setMail(data.getString("email"));
         supplier.setAddress(data.getString("address"));

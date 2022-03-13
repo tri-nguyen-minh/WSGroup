@@ -84,34 +84,34 @@ public class RecViewOrderProductListAdapter
                 dialogBox.show();
             }
         });
-        if (order.getStatus() != null) {
-            if (order.getStatus().equals("completed")) {
-                holder.layoutReview.setVisibility(View.VISIBLE);
-                holder.txtReviewStatus.setText("Write Review");
-                if (orderProductList.get(position).getReview() != null) {
-                    holder.txtReviewStatus.setText("View Review");
-                }
-                holder.layoutReview.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DialogBoxReview dialogBox = new DialogBoxReview(activity, context,
-                                orderProductList.get(position)) {
-                            @Override
-                            public void onConfirmReview(Review review) {
-                                addingReview(review);
-                            }
-                        };
-                        dialogBox.getWindow()
-                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        dialogBox.show();
-                    }
-                });
-            } else {
-                holder.layoutReview.setVisibility(View.GONE);
-            }
-        } else {
+//        if (order.getStatus() != null) {
+//            if (order.getStatus().equals("completed")) {
+//                holder.layoutReview.setVisibility(View.VISIBLE);
+//                holder.txtReviewStatus.setText("Write Review");
+//                if (orderProductList.get(position).getReview() != null) {
+//                    holder.txtReviewStatus.setText("View Review");
+//                }
+//                holder.layoutReview.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        DialogBoxReview dialogBox = new DialogBoxReview(activity, context,
+//                                orderProductList.get(position)) {
+//                            @Override
+//                            public void onConfirmReview(Review review) {
+//                                addingReview(review);
+//                            }
+//                        };
+//                        dialogBox.getWindow()
+//                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                        dialogBox.show();
+//                    }
+//                });
+//            } else {
+//                holder.layoutReview.setVisibility(View.GONE);
+//            }
+//        } else {
             holder.layoutReview.setVisibility(View.GONE);
-        }
+//        }
     }
 
     public void addingReview(Review review) {}
