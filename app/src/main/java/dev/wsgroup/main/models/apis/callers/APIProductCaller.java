@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
@@ -40,12 +41,12 @@ public class APIProductCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        product = null;
                         productList = (list == null) ? new ArrayList<>() : list;
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
                             for (int i = 0; i < jsonArray.length();i++) {
-                                product = Product.getObjectFromJSON(jsonArray.getJSONObject(i));
+                                product = Product.getObjectFromJSON(jsonArray.getJSONObject(i),
+                                                                                false);
                                 productList.add(product);
                             }
                         }
@@ -89,7 +90,7 @@ public class APIProductCaller {
                     try {
                         JSONObject jsonObject = response.getJSONObject("data");
                         if(jsonObject != null) {
-                            product = Product.getObjectFromJSON(jsonObject);
+                            product = Product.getObjectFromJSON(jsonObject, false);
                             APIListener.onProductFound(product);
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -128,14 +129,13 @@ public class APIProductCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     JSONObject jsonObject;
-                    product = null;
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
                         productList = (list == null) ? new ArrayList<>() : list;
                         if (jsonArray.length() > 0) {
                             for (int i = 0; i < jsonArray.length();i++) {
                                 jsonObject = jsonArray.getJSONObject(i);
-                                product = Product.getObjectFromJSON(jsonObject);
+                                product = Product.getObjectFromJSON(jsonObject, false);
                                 productList.add(product);
                             }
                         }
@@ -361,7 +361,7 @@ public class APIProductCaller {
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
                             for (int i = 0; i < jsonArray.length();i++) {
-                                product = Product.getObjectFromJSON(jsonArray.getJSONObject(i));
+                                product = Product.getObjectFromJSON(jsonArray.getJSONObject(i), false);
                                 productList.add(product);
                             }
                         }
@@ -386,6 +386,66 @@ public class APIProductCaller {
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
                     url, jsonObject, listener, errorListener);
+            requestQueue.add(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getProductByCategoryList(List<Category> categoryList, List<Product> list,
+                                                Application application, APIListener APIListener) {
+        if(requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(application);
+        }
+        String url = StringUtils.PRODUCT_API_URL + "getListProductByCates";
+        try {
+            JSONObject jsonObject = new JSONObject();
+            JSONArray array = new JSONArray();
+            for (Category category : categoryList) {
+                array.put(category.getCategoryId());
+            }
+            jsonObject.put("listCategories", array);
+            System.out.println(jsonObject);
+            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    System.out.println(response);
+                    try {
+                        JSONObject productJSON;
+                        productList = (list == null) ? new ArrayList<>() : list;
+                        JSONArray data = response.getJSONArray("data");
+                        if (data.length() > 0) {
+                            for (int i = 0; i < data.length();i++) {
+                                productJSON = data.getJSONObject(i);
+                                product = Product.getObjectFromJSON(productJSON, true);
+                                productList.add(product);
+                            }
+                        }
+                        APIListener.onProductListFound(productList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
+                    }
+                }
+            };
+            Response.ErrorListener errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                }
+            };
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
+                    jsonObject, listener, errorListener) {
+
+                @Override
+                public String getBodyContentType() {
+                    return StringUtils.APPLICATION_JSON;
+                }
+            };
+            request.setRetryPolicy(new DefaultRetryPolicy(
+                    20000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

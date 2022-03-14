@@ -40,15 +40,13 @@ public class DialogBoxOTP extends Dialog {
     private Context context;
     private Activity activity;
     private String phoneNumber;
-    private int requestCode;
     private FirebasePhoneAuthService service;
 
-    public DialogBoxOTP(Activity activity, Context context, String phoneNumber, int requestCode) {
+    public DialogBoxOTP(Activity activity, Context context, String phoneNumber) {
         super(activity);
         this.context = context;
         this.activity = activity;
         this.phoneNumber = phoneNumber;
-        this.requestCode = requestCode;
     }
 
     @Override
@@ -90,23 +88,7 @@ public class DialogBoxOTP extends Dialog {
             public void onVerificationComplete(boolean result) {
                 super.onVerificationComplete(result);
                 if(result) {
-                    DialogBoxAlert dialogBox =
-                            new DialogBoxAlert(activity,
-                                    IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS, StringUtils.MES_SUCCESSFUL_OTP,"") {
-                                @Override
-                                public void onClickAction() {
-                                    Intent nextIntent;
-                                    if (requestCode == IntegerUtils.REQUEST_REGISTER) {
-                                        nextIntent = new Intent(context, AccountDetailActivity.class);
-                                    } else {
-                                        nextIntent = new Intent(context, PasswordChangeActivity.class);
-                                    }
-                                    nextIntent.putExtra("PHONE", phoneNumber);
-                                    activity.startActivityForResult(nextIntent, requestCode);
-                                }
-                            };
-                    dialogBox.show();
-                    dismiss();
+                    onVerificationSuccessful();
                 } else {
                     displayError(StringUtils.MES_ERROR_INVALID_OTP);
                 }
@@ -171,6 +153,9 @@ public class DialogBoxOTP extends Dialog {
             }
         });
         generateOTP();
+    }
+
+    public void onVerificationSuccessful() {
     }
 
     private void displayError(String errorMessage) {

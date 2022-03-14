@@ -48,6 +48,7 @@ import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
+import dev.wsgroup.main.views.dialogbox.DialogBoxOTP;
 import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
 
 public class AccountInformationActivity extends AppCompatActivity {
@@ -64,7 +65,9 @@ public class AccountInformationActivity extends AppCompatActivity {
     private String token, username, phone, avatarLink;
     private User user;
     private DialogBoxLoading dialogBoxLoading;
+    private DialogBoxAlert dialogBoxAlert;
     private Uri uri;
+    private String errorMessage;
     private boolean dataLoaded;
 
     @Override
@@ -109,16 +112,16 @@ public class AccountInformationActivity extends AppCompatActivity {
                 editAccountInfoPhone.setText(user.getPhoneNumber());
                 editAccountInfoMail.setText(user.getMail());
                 avatarLink = user.getAvatarLink();
-                loadAvatarFromFirebase();
+                Glide.with(getApplicationContext()).load(avatarLink).into(imgAccountInfoAvatar);
+                layoutProfileAvatar.setVisibility(View.VISIBLE);
+                progressBarLoading.setVisibility(View.INVISIBLE);
                 dataLoaded = true;
                 enablingSaveButton();
             }
         });
 
         editAccountInfoUsername.setEnabled(false);
-        editAccountInfoPhone.setEnabled(false);
         editAccountInfoUsername.setTextColor(getResources().getColor(R.color.gray));
-        editAccountInfoPhone.setTextColor(getResources().getColor(R.color.gray));
 
         View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
             @Override
@@ -189,9 +192,11 @@ public class AccountInformationActivity extends AppCompatActivity {
         editAccountInfoFirstName.setOnFocusChangeListener(listener);
         editAccountInfoLastName.setOnFocusChangeListener(listener);
         editAccountInfoMail.setOnFocusChangeListener(listener);
+        editAccountInfoPhone.setOnFocusChangeListener(listener);
         editAccountInfoFirstName.addTextChangedListener(textWatcher);
         editAccountInfoLastName.addTextChangedListener(textWatcher);
         editAccountInfoMail.addTextChangedListener(textWatcher);
+        editAccountInfoPhone.addTextChangedListener(textWatcher);
 
         layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +210,9 @@ public class AccountInformationActivity extends AppCompatActivity {
                 if (editAccountInfoMail.hasFocus()) {
                     editAccountInfoMail.clearFocus();
                 }
+                if (editAccountInfoPhone.hasFocus()) {
+                    editAccountInfoPhone.clearFocus();
+                }
             }
         });
 
@@ -213,16 +221,56 @@ public class AccountInformationActivity extends AppCompatActivity {
             public void onClick(View view) {
                 dialogBoxLoading = new DialogBoxLoading(AccountInformationActivity.this);
                 dialogBoxLoading.getWindow()
-                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                uploadImageToFirebase();
+                if (!editAccountInfoPhone.getText().toString().equals(user.getPhoneNumber())) {
+                    phone = editAccountInfoPhone.getText().toString();
+                    APIUserCaller.findUserByPhoneNumber(phone,
+                            getApplication(), new APIListener() {
+                                @Override
+                                public void onUserFound(User user, String message) {
+                                    errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
+                                    displayError();
+                                }
+                                @Override
+                                public void onFailedAPICall(int errorCode) {
+                                    super.onFailedAPICall(errorCode);
+                                    switch (errorCode) {
+                                        case IntegerUtils.ERROR_API:
+                                        case IntegerUtils.ERROR_PARSING_JSON: {
+                                            errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                                            displayError();
+                                            break;
+                                        }
+                                        case IntegerUtils.ERROR_NO_USER: {
+                                            errorMessage = StringUtils.MES_ALERT_OTP_REQUIRE;
+                                            dialogBoxAlert = new DialogBoxAlert(AccountInformationActivity.this,
+                                                    IntegerUtils.CONFIRM_ACTION_CODE_ALERT, errorMessage,"") {
+                                                @Override
+                                                public void onClickAction() {
+                                                    sendOTP();
+                                                }
+                                            };
+                                            dialogBoxAlert.show();
+                                            break;
+                                        }
+                                    }
+                                }
+                            });
+                } else {
+                    if (!checkAvatarChanged()) {
+                        updateUser();
+                    } else {
+                        uploadImageToFirebase();
+                    }
+                }
             }
         });
     }
 
     private void enablingSaveButton() {
         if (dataLoaded) {
-            if (checkEmptyFields() || !checkInfoChanged()) {
+            if (checkEmptyFields() || !checkInfoChanged() || checkInvalidInput()) {
                 btnSaveEdit.setEnabled(false);
                 btnSaveEdit.getBackground()
                            .setTint(getApplicationContext().getResources()
@@ -243,12 +291,20 @@ public class AccountInformationActivity extends AppCompatActivity {
         if (editAccountInfoLastName.getText().toString().isEmpty()) {
             return true;
         }
+        if (editAccountInfoPhone.getText().toString().isEmpty()) {
+            return true;
+        }
         return false;
     }
 
     private boolean checkInvalidInput() {
         if(!editAccountInfoMail.getText().toString().isEmpty()) {
             if (!editAccountInfoMail.getText().toString().matches(StringUtils.MAIL_REGEX)) {
+                return true;
+            }
+        }
+        if (!editAccountInfoPhone.getText().toString().isEmpty()) {
+            if (!editAccountInfoPhone.getText().toString().matches(StringUtils.PHONE_REGEX)) {
                 return true;
             }
         }
@@ -259,6 +315,7 @@ public class AccountInformationActivity extends AppCompatActivity {
         String firstName = editAccountInfoFirstName.getText().toString();
         String lastname = editAccountInfoLastName.getText().toString();
         String mail = editAccountInfoMail.getText().toString();
+        String phone = editAccountInfoPhone.getText().toString();
         if (!firstName.equals(user.getFirstName())) {
             return true;
         }
@@ -266,6 +323,9 @@ public class AccountInformationActivity extends AppCompatActivity {
             return true;
         }
         if (!mail.equals(user.getMail())) {
+            return true;
+        }
+        if (!phone.equals(user.getPhoneNumber())) {
             return true;
         }
         return checkAvatarChanged();
@@ -323,7 +383,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                             @Override
                             public Task<Uri> then(Task<UploadTask.TaskSnapshot> task) throws Exception {
                                 if (!task.isSuccessful()) {
-                                    displayUploadFailed();
+                                    errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                                    displayError();
                                     throw task.getException();
                                 }
                                 return ref.getDownloadUrl();
@@ -336,7 +397,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                                     avatarLink = task.getResult().toString();
                                     updateUser();
                                 } else {
-                                    displayUploadFailed();
+                                    errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                                    displayError();
                                 }
                             }
                         });
@@ -346,7 +408,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Exception e) {
                         e.printStackTrace();
-                        displayUploadFailed();
+                        errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                        displayError();
                     }
                 });
 
@@ -355,7 +418,8 @@ public class AccountInformationActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 e.printStackTrace();
-                displayUploadFailed();
+                errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                displayError();
             }
         });
     }
@@ -366,6 +430,7 @@ public class AccountInformationActivity extends AppCompatActivity {
         updatedUser.setFirstName(editAccountInfoFirstName.getText().toString());
         updatedUser.setLastName(editAccountInfoLastName.getText().toString());
         updatedUser.setMail(editAccountInfoMail.getText().toString());
+        updatedUser.setPhoneNumber(phone);
         updatedUser.setAvatarLink(avatarLink);
         APIUserCaller.updateUserProfile(updatedUser, getApplication(), new APIListener() {
             @Override
@@ -376,6 +441,11 @@ public class AccountInformationActivity extends AppCompatActivity {
                 user.setFirstName(updatedUser.getFirstName());
                 user.setLastName(updatedUser.getLastName());
                 user.setMail(updatedUser.getMail());
+                user.setAvatarLink(avatarLink);
+                if (!phone.equals(user.getPhoneNumber())) {
+                    sharedPreferences.edit().putString("PHONE", phone);
+                    user.setPhoneNumber(phone);
+                }
                 DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
                         IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
                         StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"");
@@ -397,25 +467,35 @@ public class AccountInformationActivity extends AppCompatActivity {
         });
     }
 
-    private void displayUploadFailed() {
-        DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                StringUtils.MES_ERROR_FAILED_API_CALL,"") {
+    private void sendOTP() {
+        DialogBoxOTP dialogBoxOTP = new DialogBoxOTP(AccountInformationActivity.this,
+                getApplicationContext(), phone) {
             @Override
-            public void onClickAction() {
-                super.onClickAction();
-                avatarLink = "";
-                updateUser();
+            public void onVerificationSuccessful() {
+                DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
+                        IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
+                        StringUtils.MES_SUCCESSFUL_OTP,"") {
+                    @Override
+                    public void onClickAction() {
+                        updateUser();
+                    }
+                };
+                dialogBox.show();
+                dismiss();
             }
         };
-        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialogBox.show();
+        dialogBoxOTP.getWindow()
+                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBoxOTP.show();
     }
 
-    private void loadAvatarFromFirebase() {
-        Glide.with(getApplicationContext()).load(avatarLink).into(imgAccountInfoAvatar);
-        layoutProfileAvatar.setVisibility(View.VISIBLE);
-        progressBarLoading.setVisibility(View.INVISIBLE);
+    private void displayError() {
+        if (dialogBoxLoading.isShowing()) {
+            dialogBoxLoading.dismiss();
+        }
+        dialogBoxAlert = new DialogBoxAlert(AccountInformationActivity.this,
+                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
+        dialogBoxAlert.show();
     }
 
     @Override

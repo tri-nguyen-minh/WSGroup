@@ -272,6 +272,7 @@ public class APIUserCaller {
             jsonObject.put("lastName", user.getLastName());
             jsonObject.put("email", user.getMail());
             jsonObject.put("avt", user.getAvatarLink());
+            jsonObject.put("phone", user.getPhoneNumber());
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 
                 @Override

@@ -252,6 +252,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private void signInAccount(User user) {
         sharedPreferences.edit()
+                .putString("USERNAME", user.getUsername())
                 .putString("USER_ID", user.getUserId())
                 .putString("ACCOUNT_ID", user.getAccountId())
                 .putString("PHONE", user.getPhoneNumber())

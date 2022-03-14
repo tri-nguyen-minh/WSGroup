@@ -79,7 +79,7 @@ public class PhoneInputActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String stringPhone = "0" + editPhone.getText().toString();
+                String stringPhone = editPhone.getText().toString();
                 if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
                     btnSendOTP.setEnabled(false);
                     btnSendOTP.getBackground()
@@ -133,8 +133,7 @@ public class PhoneInputActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                String stringPhone = "0" + editPhone.getText().toString();
-
+                String stringPhone = editPhone.getText().toString();
                 APIUserCaller.findUserByPhoneNumber(stringPhone,
                         getApplication(), new APIListener() {
                     @Override
@@ -190,9 +189,31 @@ public class PhoneInputActivity extends AppCompatActivity {
     }
 
     private void sendOTP(String stringPhone) {
-        DialogBoxOTP dialogBoxOTP =
-                new DialogBoxOTP(PhoneInputActivity.this,
-                        getApplicationContext(), stringPhone, requestCode);
+        DialogBoxOTP dialogBoxOTP = new DialogBoxOTP(PhoneInputActivity.this,
+                getApplicationContext(), stringPhone) {
+            @Override
+            public void onVerificationSuccessful() {
+                DialogBoxAlert dialogBox = new DialogBoxAlert(PhoneInputActivity.this,
+                        IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
+                        StringUtils.MES_SUCCESSFUL_OTP,"") {
+                            @Override
+                            public void onClickAction() {
+                                Intent nextIntent;
+                                if (requestCode == IntegerUtils.REQUEST_REGISTER) {
+                                    nextIntent = new Intent(getApplicationContext(),
+                                                            AccountDetailActivity.class);
+                                } else {
+                                    nextIntent = new Intent(getApplicationContext(),
+                                                            PasswordChangeActivity.class);
+                                }
+                                nextIntent.putExtra("PHONE", stringPhone);
+                                startActivityForResult(nextIntent, requestCode);
+                            }
+                        };
+                dialogBox.show();
+                dismiss();
+            }
+        };
         dialogBoxOTP.getWindow()
                     .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxOTP.show();

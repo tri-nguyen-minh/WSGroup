@@ -43,7 +43,6 @@ public class StringUtils {
     public static final String MES_CONFIRM_CANCEL_ORDER = "Your order has not been processed.\nAre you sure you want to leave?";
     public static final String MES_CONFIRM_CANCEL_ORDER_DESC = "Your current order will be lost!";
     public static final String MES_CONFIRM_REQUIRE_PAYMENT = "Please complete the final payment to process your order!";
-    public static final String MES_CONFIRM_REQUIRE_ADVANCE = "You must complete a required advanced payment before your order can be finalized.";
     public static final String MES_CONFIRM_COMPLETE_PAYMENT = "Complete payment for this order?";
 
     public static final String MES_ERROR_FAILED_API_CALL = "An error has occurred.\nPlease try again later.";
@@ -65,6 +64,8 @@ public class StringUtils {
     public static final String MES_ERROR_PAYMENT_FAILED = "The payment has not been completed.";
 
     public static final String MES_ALERT_CAMPAIGN_CART_ORDER = "Order within Campaign can only be completed individually.";
+    public static final String MES_ALERT_ADVANCE_REQUIRE = "You must complete a required advanced payment before your order can be finalized.";
+    public static final String MES_ALERT_OTP_REQUIRE = "We will send you an OTP to confirm your new phone number.";
 
     public static final String DES_INVALID_USERNAME = "Your Username should be:\n" +
             "";

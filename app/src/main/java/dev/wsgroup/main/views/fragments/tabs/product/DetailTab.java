@@ -45,6 +45,7 @@ import dev.wsgroup.main.views.activities.SupplierActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
 import dev.wsgroup.main.views.activities.productviews.CampaignListActivity;
 import dev.wsgroup.main.views.activities.productviews.PrepareProductActivity;
+import dev.wsgroup.main.views.activities.productviews.SearchProductActivity;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 public class DetailTab extends Fragment {
@@ -54,9 +55,9 @@ public class DetailTab extends Fragment {
     private RecyclerView recViewMoreSuppliersProducts;
     private ViewFlipper viewFlipperProduct;
     private ImageView imgCommonFlipper, imgProductCategory;
-    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount,
-            txtRatingProduct, txtRetailPrice, txtCampaignCount, lblDescriptionLength,
-            txtLoyaltyDiscount, lblLoyaltyDiscount, lblLoyaltyTag;
+    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount, txtRatingProduct,
+            txtRetailPrice, txtCampaignCount, lblDescriptionLength, txtLoyaltyDiscount,
+            lblLoyaltyDiscount, lblLoyaltyTag, lblLayoutCampaign, lblCampaignCount;
     private MaterialRatingBar ratingProduct;
     private LinearLayout linearLayoutCampaign;
     private ConstraintLayout constraintLayoutSupplierName, layoutSelectCampaign, layoutLoyalty,
@@ -99,6 +100,8 @@ public class DetailTab extends Fragment {
         txtLoyaltyDiscount = view.findViewById(R.id.txtLoyaltyDiscount);
         lblLoyaltyDiscount = view.findViewById(R.id.lblLoyaltyDiscount);
         lblLoyaltyTag = view.findViewById(R.id.lblLoyaltyTag);
+        lblLayoutCampaign = view.findViewById(R.id.lblLayoutCampaign);
+        lblCampaignCount = view.findViewById(R.id.lblCampaignCount);
         ratingProduct = view.findViewById(R.id.ratingProduct);
         linearLayoutCampaign = view.findViewById(R.id.linearLayoutCampaign);
         constraintLayoutSupplierName = view.findViewById(R.id.constraintLayoutSupplierName);
@@ -184,22 +187,25 @@ public class DetailTab extends Fragment {
             viewFlipperProduct.setOutAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.anim_slide_out_left));
             viewFlipperProduct.startFlipping();
         }
+        linearLayoutCampaign.setVisibility(View.VISIBLE);
+        layoutSelectCampaign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent campaignSelectIntent = new Intent(getContext(), CampaignListActivity.class);
+                campaignSelectIntent.putExtra("PRODUCT", product);
+                startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_SELECT_CAMPAIGN);
+            }
+        });
+        txtProductQuantity.setVisibility(View.VISIBLE);
+        layoutProductQuantityWithCampaign.setVisibility(View.GONE);
+        txtProductQuantity.setText(product.getQuantity() + "");
         if(product.getCampaignList().size() > 0) {
-            linearLayoutCampaign.setVisibility(View.VISIBLE);
             txtCampaignCount.setText(product.getCampaignList().size() + "");
-            layoutSelectCampaign.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent campaignSelectIntent = new Intent(getContext(), CampaignListActivity.class);
-                    campaignSelectIntent.putExtra("PRODUCT", product);
-                    startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_SELECT_CAMPAIGN);
-                }
-            });
+            lblCampaignCount.setText(product.getCampaignList().size() > 1 ?
+                                        "Ongoing Campaigns" : "Ongoing Campaign");
         } else {
-            linearLayoutCampaign.setVisibility(View.GONE);
-            txtProductQuantity.setVisibility(View.VISIBLE);
-            layoutProductQuantityWithCampaign.setVisibility(View.GONE);
-            txtProductQuantity.setText(product.getQuantity() + "");
+            txtCampaignCount.setText("All");
+            lblCampaignCount.setText("Campaigns");
         }
         txtProductDescription.setText(product.getDescription());
         supplier = product.getSupplier();
@@ -219,10 +225,16 @@ public class DetailTab extends Fragment {
                 if (category != null) {
                     txtProductCategory.setText(category.getName());
                     imgProductCategory.setVisibility(View.VISIBLE);
+                    constraintLayoutProductCategory.setOnClickListener(null);
                     constraintLayoutProductCategory.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-//                            cate
+                            Intent searchIntent
+                                    = new Intent(getContext(), SearchProductActivity.class);
+                            searchIntent.putExtra("IDENTIFIER",
+                                                    IntegerUtils.IDENTIFIER_SEARCH_CATEGORY);
+                            searchIntent.putExtra("SEARCH_STRING", category.getCategoryId());
+                            startActivityForResult(searchIntent, IntegerUtils.REQUEST_COMMON);
                         }
                     });
                 }

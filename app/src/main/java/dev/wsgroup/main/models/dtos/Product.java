@@ -165,7 +165,8 @@ public class Product implements Serializable {
         this.reviewList = reviewList;
     }
 
-    public static Product getObjectFromJSON(JSONObject jsonObject) throws Exception {
+    public static Product getObjectFromJSON(JSONObject jsonObject, boolean simpleForm)
+                                                                            throws Exception {
         Product product = new Product();
         product.setProductId(jsonObject.getString("id"));
         product.setName(jsonObject.getString("name"));
@@ -176,8 +177,10 @@ public class Product implements Serializable {
         product.setStatus(jsonObject.getString("status"));
         Supplier supplier = new Supplier();
         supplier.setId(jsonObject.getString("supplierid"));
-        supplier.setName(jsonObject.getString("suppliername"));
-        supplier.setAddress(jsonObject.getString("supplieraddress"));
+        if (!simpleForm) {
+            supplier.setName(jsonObject.getString("suppliername"));
+            supplier.setAddress(jsonObject.getString("supplieraddress"));
+        }
         product.setSupplier(supplier);
         product.setImageLink(jsonObject.getString("image"));
         product.setOrderCount(0);

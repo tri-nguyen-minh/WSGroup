@@ -2,6 +2,7 @@ package dev.wsgroup.main.models.recycleViewAdapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +18,8 @@ import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Category;
-
-
-//    MARKED FOR DELETE
+import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.views.activities.productviews.SearchProductActivity;
 
 public class RecViewCategoryAdapter
         extends RecyclerView.Adapter<RecViewCategoryAdapter.ViewHolder> {
@@ -51,7 +51,13 @@ public class RecViewCategoryAdapter
         holder.cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent searchIntent
+                        = new Intent(context, SearchProductActivity.class);
+                searchIntent.putExtra("IDENTIFIER",
+                        IntegerUtils.IDENTIFIER_SEARCH_CATEGORY);
+                searchIntent.putExtra("SEARCH_STRING", categoryList.get(position)
+                                                                         .getCategoryId());
+                activity.startActivityForResult(searchIntent, IntegerUtils.REQUEST_COMMON);
             }
         });
     }

@@ -462,7 +462,7 @@ public class InfoActivity extends AppCompatActivity {
             description = "Advance Fee: " + MethodUtils.formatPriceString(advancePrice);
             dialogBoxAlert = new DialogBoxAlert(InfoActivity.this,
                     IntegerUtils.CONFIRM_ACTION_CODE_ALERT,
-                    StringUtils.MES_CONFIRM_REQUIRE_ADVANCE, description) {
+                    StringUtils.MES_ALERT_ADVANCE_REQUIRE, description) {
                 @Override
                 public void onClickAction() {
                     super.onClickAction();

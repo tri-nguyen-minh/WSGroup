@@ -25,6 +25,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:tint="@color/white" />
 
+        <TextView
+            android:id="@+id/txtHeader"
+            android:text="SUPPLIER'S  PROFILE"
+            style="@style/style_txt_header"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/imgBackFromSupplier"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/imgSupplierHome"/>
+
         <ImageView
             android:id="@+id/imgSupplierHome"
             style="@style/style_icon"

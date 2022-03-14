@@ -25,14 +25,8 @@
 
         <TextView
             android:id="@+id/txtHeader"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:fontFamily="@font/montserratm"
-            android:gravity="center"
             android:text="MESSAGES"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
+            style="@style/style_txt_header"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/imgBackFromMessage"
             app:layout_constraintBottom_toBottomOf="parent"

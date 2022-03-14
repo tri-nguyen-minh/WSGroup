@@ -17,12 +17,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
+import dev.wsgroup.main.models.apis.callers.APICategoryCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
+import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductSearchAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
@@ -31,11 +34,12 @@ import dev.wsgroup.main.views.activities.MainActivity;
 public class SearchProductActivity extends AppCompatActivity {
 
     private EditText editSearchProduct;
-    private TextView txtProductListCount, lblProductListCount;
+    private TextView txtProductSearchCount, lblProductSearchCount, txtProductCategoryCount,
+            lblProductCategoryCount, txtCategory, lblRetryGetProduct;
     private ImageView imgBackFromSearch, imgSearchHome;
     private RelativeLayout layoutLoading, layoutNoProductFound;
     private ConstraintLayout layoutParent;
-    private LinearLayout layoutList;
+    private LinearLayout layoutList, layoutSearch, layoutCategory, layoutFailedGettingProduct;
     private RecyclerView recViewSearchProductList;
 
     private String searchString;
@@ -44,6 +48,7 @@ public class SearchProductActivity extends AppCompatActivity {
     private int identifier;
     private APIListener listener;
     private List<Product> productList;
+    private Category category;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,33 +57,50 @@ public class SearchProductActivity extends AppCompatActivity {
         this.getSupportActionBar().hide();
 
         editSearchProduct = findViewById(R.id.editSearchProduct);
-        txtProductListCount = findViewById(R.id.txtProductListCount);
-        lblProductListCount = findViewById(R.id.lblProductListCount);
+        txtProductSearchCount = findViewById(R.id.txtProductSearchCount);
+        lblProductSearchCount = findViewById(R.id.lblProductSearchCount);
+        txtProductCategoryCount = findViewById(R.id.txtProductCategoryCount);
+        lblProductCategoryCount = findViewById(R.id.lblProductCategoryCount);
+        txtCategory = findViewById(R.id.txtCategory);
+        lblRetryGetProduct = findViewById(R.id.lblRetryGetProduct);
         imgBackFromSearch = findViewById(R.id.imgBackFromSearch);
         imgSearchHome = findViewById(R.id.imgSearchHome);
         layoutLoading = findViewById(R.id.layoutLoading);
         layoutNoProductFound = findViewById(R.id.layoutNoProductFound);
         layoutParent = findViewById(R.id.layoutParent);
         layoutList = findViewById(R.id.layoutList);
+        layoutSearch = findViewById(R.id.layoutSearch);
+        layoutCategory = findViewById(R.id.layoutCategory);
+        layoutFailedGettingProduct = findViewById(R.id.layoutFailedGettingProduct);
         recViewSearchProductList = findViewById(R.id.recViewSearchProductList);
 
         setNoProductState();
         identifier = getIntent().getIntExtra("IDENTIFIER", IntegerUtils.IDENTIFIER_SEARCH_BAR);
         switch (identifier) {
             case IntegerUtils.IDENTIFIER_SEARCH_BAR: {
+                System.out.println("in search");
                 editSearchProduct.setVisibility(View.VISIBLE);
                 editSearchProduct.requestFocus();
+                layoutSearch.setVisibility(View.VISIBLE);
+                layoutCategory.setVisibility(View.GONE);
                 break;
             }
             case IntegerUtils.IDENTIFIER_SEARCH_SUPPLIER: {
+                System.out.println("in supplier");
                 searchString = getIntent().getStringExtra("SEARCH_STRING");
                 editSearchProduct.setText(searchString);
+                layoutSearch.setVisibility(View.VISIBLE);
+                layoutCategory.setVisibility(View.GONE);
                 runSearch();
                 break;
 
             }
             case IntegerUtils.IDENTIFIER_SEARCH_CATEGORY: {
+                System.out.println("in category");
                 searchString = getIntent().getStringExtra("SEARCH_STRING");
+                editSearchProduct.setVisibility(View.GONE);
+                layoutSearch.setVisibility(View.GONE);
+                layoutCategory.setVisibility(View.VISIBLE);
                 runSearchCategory();
                 break;
             }
@@ -151,33 +173,52 @@ public class SearchProductActivity extends AppCompatActivity {
                 }
             }
         });
+        lblRetryGetProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runSearchCategory();
+            }
+        });
     }
 
     private void runSearchCategory() {
         orderCountCheck = false; ratingCheck = false;
         setLoadingState();
-
-//        search by category
-
-//        APIProductCaller.searchProductByNameOrSupplier(searchString, null,
-//                getApplication(), new APIListener() {
-//            @Override
-//            public void onProductListFound(List<Product> list) {
-//                if (list.size() == 0) {
-//                    setNoProductState();
-//                } else {
-//                    productList = list;
-//                    APIProductCaller.getOrderCountByProductList(productList,
-//                            getApplication(), listener);
-//                    APIProductCaller.getRatingByProductIdList(productList,
-//                            getApplication(), listener);
-//                }
-//            }
-//            @Override
-//            public void onFailedAPICall(int code) {
-//                setNoProductState();
-//            }
-//        });
+        APICategoryCaller.getCategoryById(searchString, getApplication(), new APIListener() {
+            @Override
+            public void onCategoryFound(Category foundCategory) {
+                if (foundCategory != null) {
+                    category = foundCategory;
+                    List<Category> list = new ArrayList<>();
+                    list.add(category);
+                    APIProductCaller.getProductByCategoryList(list, null,
+                            getApplication(), new APIListener() {
+                        @Override
+                        public void onProductListFound(List<Product> list) {
+                            if (list.size() == 0) {
+                                setNoProductState();
+                            } else {
+                                productList = list;
+                                APIProductCaller.getOrderCountByProductList(productList,
+                                        getApplication(), listener);
+                                APIProductCaller.getRatingByProductIdList(productList,
+                                        getApplication(), listener);
+                            }
+                        }
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            setFailedState();
+                        }
+                    });
+                } else {
+                    setFailedState();
+                }
+            }
+            @Override
+            public void onFailedAPICall(int code) {
+                setFailedState();
+            }
+        });
     }
 
     private void runSearch() {
@@ -206,8 +247,16 @@ public class SearchProductActivity extends AppCompatActivity {
 
     private void setupListView(List<Product> productList) {
         if (orderCountCheck && ratingCheck) {
-            txtProductListCount.setText(productList.size() + "");
-            lblProductListCount.setText(productList.size() > 1 ? "Products Found" : "Product Found");
+            if (identifier == IntegerUtils.IDENTIFIER_SEARCH_CATEGORY) {
+                txtCategory.setText(category.getName());
+                txtProductCategoryCount.setText(productList.size() + "");
+                lblProductCategoryCount.setText(productList.size() > 1 ?
+                                                "Products Found" : "Product Found");
+            } else {
+                txtProductSearchCount.setText(productList.size() + "");
+                lblProductSearchCount.setText(productList.size() > 1 ?
+                                                "Products" : "Product");
+            }
             adapter = new RecViewProductSearchAdapter(getApplicationContext(),
                     SearchProductActivity.this);
             adapter.setProductsList(productList);
@@ -222,18 +271,28 @@ public class SearchProductActivity extends AppCompatActivity {
         layoutLoading.setVisibility(View.VISIBLE);
         layoutNoProductFound.setVisibility(View.INVISIBLE);
         layoutList.setVisibility(View.INVISIBLE);
+        layoutFailedGettingProduct.setVisibility(View.INVISIBLE);
     }
 
     private void setNoProductState() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutNoProductFound.setVisibility(View.VISIBLE);
         layoutList.setVisibility(View.INVISIBLE);
+        layoutFailedGettingProduct.setVisibility(View.INVISIBLE);
     }
 
     private void setProductFoundState() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutNoProductFound.setVisibility(View.INVISIBLE);
         layoutList.setVisibility(View.VISIBLE);
+        layoutFailedGettingProduct.setVisibility(View.INVISIBLE);
+    }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutNoProductFound.setVisibility(View.INVISIBLE);
+        layoutList.setVisibility(View.INVISIBLE);
+        layoutFailedGettingProduct.setVisibility(View.VISIBLE);
     }
 
     private void hideKeyboard(View view) {

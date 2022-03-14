@@ -23,6 +23,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:tint="@color/white" />
 
+        <TextView
+            android:text="CUSTOMER  DISCOUNTS"
+            style="@style/style_txt_header"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/imgBackFromDiscount"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/imgDiscountHome"/>
+
         <ImageView
             android:id="@+id/imgDiscountHome"
             style="@style/style_icon"

@@ -22,6 +22,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:tint="@color/white" />
 
+        <TextView
+            android:id="@+id/txtHeader"
+            android:text="CONFIRM  ORDER"
+            style="@style/style_txt_header"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/imgBackFromCheckout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/imgCheckoutHome"/>
+
         <ImageView
             android:id="@+id/imgCheckoutHome"
             style="@style/style_icon"

@@ -135,6 +135,9 @@ public class APIOrderCaller {
                         if (jsonArray.length() > 0) {
                             Order order;
                             for (int i = 0; i < jsonArray.length(); i++) {
+                                if (status.equals("completed")) {
+                                    System.out.println(jsonArray.getJSONObject(i));
+                                }
                                 order = Order.getObjectFromJSON(jsonArray.getJSONObject(i));
                                 if (order.getStatus().equals(status)) {
                                     orderList.add(order);

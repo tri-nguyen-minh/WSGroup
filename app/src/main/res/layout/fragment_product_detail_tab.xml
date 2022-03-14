@@ -333,7 +333,8 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:text="Ongoing Campaign"
+                            android:id="@+id/lblLayoutCampaign"
+                            android:text="Product's Campaign"
                             android:layout_marginTop="10dp"
                             android:layout_marginBottom="7dp"
                             style="@style/style_background_header"/>
