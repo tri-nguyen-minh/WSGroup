@@ -4,14 +4,18 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.OrderProduct;
+import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
 public class RecViewOrderingProductPriceAdapter
@@ -19,6 +23,8 @@ public class RecViewOrderingProductPriceAdapter
 
     private Context context;
     private List<OrderProduct> orderProductList;
+    private OrderProduct orderProduct;
+    private Product product;
 
     public RecViewOrderingProductPriceAdapter(Context context) {
         this.context = context;
@@ -38,11 +44,18 @@ public class RecViewOrderingProductPriceAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtProductName.setText(orderProductList.get(position).getProduct().getName());
-        double price = orderProductList.get(position).getQuantity();
-        price *= orderProductList.get(position).getPrice();
+        orderProduct = orderProductList.get(position);
+        product = orderProduct.getProduct();
+        if (!product.getImageList().isEmpty()) {
+            Glide.with(context)
+                 .load(product.getImageList().get(0))
+                 .into(holder.imgRecViewProduct);
+        }
+        holder.txtProductName.setText(product.getName());
+        double price = orderProduct.getQuantity();
+        price *= orderProduct.getPrice();
         holder.txtProductPrice.setText(MethodUtils.formatPriceString(price));
-        holder.txtQuantityCount.setText(orderProductList.get(position).getQuantity() + "");
+        holder.txtQuantityCount.setText(orderProduct.getQuantity() + "");
     }
 
     @Override
@@ -51,10 +64,12 @@ public class RecViewOrderingProductPriceAdapter
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        private ImageView imgRecViewProduct;
         private TextView txtProductName, txtProductPrice, txtQuantityCount;
 
         public ViewHolder(View view) {
             super(view);
+            imgRecViewProduct = view.findViewById(R.id.imgRecViewProduct);
             txtProductName = view.findViewById(R.id.txtProductName);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
             txtQuantityCount = view.findViewById(R.id.txtQuantityCount);

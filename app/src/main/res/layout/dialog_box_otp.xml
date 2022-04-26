@@ -15,22 +15,36 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:paddingVertical="30dp">
+        android:paddingBottom="15dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="20dp"
-            android:fontFamily="@font/montserratr"
-            android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="CONFIRM OTP"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutDialogCampaign"
+            style="@style/style_header_layout"
+            android:background="@color/blue_main">
+
+            <TextView
+                android:text="CONFIRM PHONE NUMBER"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/style_dialog_box_header" />
+
+            <ImageView
+                android:id="@+id/imgCloseDialogBox"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="right"
+                android:src="@drawable/ic_cross"
+                app:tint="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp">
 
             <TextView
                 android:id="@+id/txtOTPHeader"
@@ -67,7 +81,7 @@
             android:fontFamily="@font/montserratr"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textStyle="bold"/>
 
         <EditText
@@ -75,9 +89,9 @@
             android:hint="000000"
             style="@style/style_otp_box"
             android:maxLength="6"
+            android:singleLine="true"
             android:textSize="22dp"
-            android:padding="10dp"
-            android:layout_marginBottom="10dp"/>
+            android:padding="10dp"/>
 
         <Button
             android:id="@+id/btnConfirmOTP"
@@ -86,21 +100,18 @@
             android:backgroundTint="@color/blue_main"
             android:paddingHorizontal="30dp"
             android:paddingVertical="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginHorizontal="50dp"/>
+            android:layout_marginTop="30dp"/>
 
-        <LinearLayout
-            android:id="@+id/layoutResendOTP"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:id="@+id/txtResendOTP"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_height="match_parent"
                 android:fontFamily="@font/montserratr"
                 android:gravity="center"
                 android:text="Re-send a new OTP"
@@ -108,49 +119,47 @@
                 android:textSize="16sp"
                 android:textStyle="bold"/>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutOTPCountdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/layoutOTPCountdown"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginRight="7dp"
-                android:fontFamily="@font/montserratr"
-                android:gravity="center"
-                android:text="Wait"
-                android:textColor="@color/black"
-                android:textSize="15sp"/>
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center">
 
-            <TextView
-                android:id="@+id/txtCountdownClock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:fontFamily="@font/montserratr"
-                android:gravity="center"
-                android:text="00"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="center"
+                    android:text="Wait"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="7dp"
-                android:fontFamily="@font/montserratr"
-                android:gravity="center"
-                android:text="to re-send OTP"
-                android:textColor="@color/black"
-                android:textSize="15sp"/>
+                <TextView
+                    android:id="@+id/txtCountdownClock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="center"
+                    android:text="00"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="center"
+                    android:text="to re-send OTP"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

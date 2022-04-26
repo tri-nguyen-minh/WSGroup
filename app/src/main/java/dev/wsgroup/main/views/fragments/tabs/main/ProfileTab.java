@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -15,27 +16,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
 import dev.wsgroup.main.R;
+import dev.wsgroup.main.models.apis.callers.APIChatCaller;
+import dev.wsgroup.main.models.apis.callers.APINotificationCaller;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Message;
+import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.dtos.User;
+import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.DiscountActivity;
-import dev.wsgroup.main.views.activities.MainActivity;
+import dev.wsgroup.main.views.activities.NotificationActivity;
 import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
 import dev.wsgroup.main.views.activities.account.DeliveryAddressActivity;
 import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
@@ -45,24 +52,26 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 public class ProfileTab extends Fragment {
 
     private ImageView imgAccountAvatar;
-    private TextView txtProfileTabUsername, txtNotificationCount, txtMessageCount, txtCartCount;
-    private ProgressBar progressBarLoading;
-    private LinearLayout layoutProfileAvatar, layoutDiscount, layoutAccountInfo,
-            layoutChangePassword, layoutDeliveryAddress, layoutLogout;
+    private TextView txtProfileTabUsername, txtNotificationCount,
+            txtMessageCount, txtCartCount, lblRetry;
+    private LinearLayout layoutProfileAvatar, layoutDiscount, layoutLoyalty, layoutAccountInfo,
+            layoutChangePassword, layoutDeliveryAddress, layoutLogout, layoutNotification,
+            layoutMessage, layoutCart, layoutFailed;
     private CardView cardViewNotificationCount, cardViewMessageCount, cardViewCartCount;
-    private LinearLayout layoutNotification, layoutMessage, layoutCart;
+    private ConstraintLayout layoutScreen;
+    private RelativeLayout layoutLoading;
 
     private SharedPreferences sharedPreferences;
     private List<CartProduct> retailList, campaignList;
-    private List<Message> messageList;
-    private String token, username;
-    private int cartCount, messageCount;
-    private GoogleSignInOptions options;
+    private String token, username, accountId, googleId;
+    private int cartCount, messageCount, notificationCount;
+    private boolean messageLoading, notificationLoading;
+
+    private FirebaseDatabaseReferences firebaseReferences;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         return inflater.inflate(R.layout.fragment_main_profile_tab, container, false);
     }
 
@@ -75,47 +84,32 @@ public class ProfileTab extends Fragment {
         txtNotificationCount = view.findViewById(R.id.txtNotificationCount);
         txtMessageCount = view.findViewById(R.id.txtMessageCount);
         txtCartCount = view.findViewById(R.id.txtCartCount);
-        progressBarLoading = view.findViewById(R.id.progressBarLoading);
+        lblRetry = view.findViewById(R.id.lblRetry);
         layoutProfileAvatar = view.findViewById(R.id.layoutProfileAvatar);
         layoutDiscount = view.findViewById(R.id.layoutDiscount);
+        layoutLoyalty = view.findViewById(R.id.layoutLoyalty);
         layoutAccountInfo = view.findViewById(R.id.layoutAccountInfo);
         layoutChangePassword = view.findViewById(R.id.layoutChangePassword);
         layoutDeliveryAddress = view.findViewById(R.id.layoutDeliveryAddress);
         layoutLogout = view.findViewById(R.id.layoutLogout);
-        cardViewNotificationCount = view.findViewById(R.id.cardViewNotificationCount);
-        cardViewMessageCount = view.findViewById(R.id.cardViewMessageCount);
-        cardViewCartCount = view.findViewById(R.id.cardViewCartCount);
         layoutNotification = view.findViewById(R.id.layoutNotification);
         layoutMessage = view.findViewById(R.id.layoutMessage);
         layoutCart = view.findViewById(R.id.layoutCart);
+        layoutFailed = view.findViewById(R.id.layoutFailed);
+        cardViewNotificationCount = view.findViewById(R.id.cardViewNotificationCount);
+        cardViewMessageCount = view.findViewById(R.id.cardViewMessageCount);
+        cardViewCartCount = view.findViewById(R.id.cardViewCartCount);
+        layoutScreen = view.findViewById(R.id.layoutScreen);
+        layoutLoading = view.findViewById(R.id.layoutLoading);
 
-        username = sharedPreferences.getString("USERNAME","");
-        token = sharedPreferences.getString("TOKEN","");
-
-        progressBarLoading.setVisibility(View.VISIBLE);
-        layoutProfileAvatar.setVisibility(View.INVISIBLE);
-        cardViewCartCount.setVisibility(View.INVISIBLE);
-        cardViewMessageCount.setVisibility(View.INVISIBLE);
-        cardViewNotificationCount.setVisibility(View.INVISIBLE);
-
-        APIUserCaller.findUserByToken(token, getActivity().getApplication(), new APIListener() {
-            @Override
-            public void onUserFound(User user, String message) {
-                user.setUsername(username);
-                setUpSimpleProfile(user);
-                editCartCountByUser();
-                editUnreadMessageCountByUser();
-            }
-
-            @Override
-            public void onFailedAPICall(int errorCode) {
-            }
-        });
+        setupView();
 
         layoutNotification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent messageIntent = new Intent(getContext(), NotificationActivity.class);
+                messageIntent.putExtra("MAIN_TAB_POSITION", 2);
+                startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
             }
         });
 
@@ -131,7 +125,7 @@ public class ProfileTab extends Fragment {
         layoutCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent cartIntent = new Intent(getActivity().getApplicationContext(), CartActivity.class);
+                Intent cartIntent = new Intent(getContext(), CartActivity.class);
                 cartIntent.putExtra("MAIN_TAB_POSITION", 2);
                 startActivityForResult(cartIntent, IntegerUtils.REQUEST_COMMON);
             }
@@ -160,6 +154,8 @@ public class ProfileTab extends Fragment {
             public void onClick(View v) {
                 Intent accountInfoIntent = new Intent(getContext(), PasswordChangeActivity.class);
                 accountInfoIntent.putExtra("MAIN_TAB_POSITION", 2);
+                accountInfoIntent.putExtra("REQUEST_CODE",
+                        IntegerUtils.REQUEST_PASSWORD_UPDATE);
                 startActivityForResult(accountInfoIntent, IntegerUtils.REQUEST_COMMON);
             }
         });
@@ -176,29 +172,178 @@ public class ProfileTab extends Fragment {
         layoutLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(getActivity(), StringUtils.MES_CONFIRM_LOG_OUT) {
+                DialogBoxConfirm confirmLogoutBox = new DialogBoxConfirm(getActivity(),
+                        StringUtils.MES_CONFIRM_LOG_OUT) {
                     @Override
                     public void onYesClicked() {
-                        sharedPreferences.edit().clear().apply();
-                        options = new GoogleSignInOptions
-                                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                .requestEmail()
-                                .build();
-                        GoogleSignIn.getClient(getContext(), options).signOut();
-                        startActivity(new Intent(getContext(), MainActivity.class));
+                        MethodUtils.logoutAction(getContext(), getActivity());
                     }
                 };
-                confirmLogoutBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                confirmLogoutBox.getWindow()
+                        .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 confirmLogoutBox.show();
+            }
+        });
+        lblRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setupView();
             }
         });
     }
 
-    private void setUpSimpleProfile(User user) {
-        txtProfileTabUsername.setText(user.getFirstName() + " " + user.getLastName());
-        Glide.with(getContext()).load(user.getAvatarLink()).into(imgAccountAvatar);
-        progressBarLoading.setVisibility(View.INVISIBLE);
-        layoutProfileAvatar.setVisibility(View.VISIBLE);
+    private void setupView() {
+        setLoadingState();
+        if (getActivity() == null) {
+            setFailedState();
+        } else {
+            sharedPreferences = getActivity().getSharedPreferences("PREFERENCE",
+                    Context.MODE_PRIVATE);
+            token = sharedPreferences.getString("TOKEN", "");
+            if (!token.isEmpty()) {
+                APIUserCaller.findUserByToken(token,
+                        getActivity().getApplication(), new APIListener() {
+                    @Override
+                    public void onUserFound(User user, String message) {
+                        user.setToken(token);
+                        username = user.getUsername();
+                        accountId = user.getAccountId();
+                        googleId = user.getGoogleId();
+                        txtProfileTabUsername.setText(user.getDisplayName());
+                        Glide.with(getContext()).load(user.getAvatarLink()).into(imgAccountAvatar);
+                        if (!googleId.isEmpty() && !googleId.equals("null") ) {
+                            layoutChangePassword.setVisibility(View.GONE);
+                        }
+                        editCartCountByUser();
+                        editUnreadMessageCountByUser();
+                        editUnreadNotificationCountByUser();
+                        setRealtimeFirebase();
+                        setReadyState();
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(getContext(), getActivity());
+                        } else {
+                            setFailedState();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void setRealtimeFirebase() {
+        firebaseReferences = new FirebaseDatabaseReferences();
+        firebaseReferences.getUserMessages(accountId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!messageLoading) {
+                    editUnreadMessageCountByUser();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) { }
+        });
+        firebaseReferences.getUserNotifications(accountId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!notificationLoading) {
+                    editUnreadNotificationCountByUser();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) { }
+        });
+    }
+
+    private void editUnreadMessageCountByUser() {
+        messageLoading = true;
+        if (getActivity() == null) {
+            setFailedState();
+        } else {
+            APIChatCaller.getCustomerChatMessages(token, null,
+                    getActivity().getApplication(), new APIListener() {
+                @Override
+                public void onMessageListFound(List<Message> list) {
+                    getUnreadMessagesCount(list);
+                    if (messageCount == 0) {
+                        cardViewMessageCount.setVisibility(View.INVISIBLE);
+                    } else {
+                        cardViewMessageCount.setVisibility(View.VISIBLE);
+                        txtMessageCount.setText(messageCount + "");
+                    }
+                    messageLoading = false;
+                }
+
+                @Override
+                public void onFailedAPICall(int code) {
+                    if (code == IntegerUtils.ERROR_NO_USER) {
+                        MethodUtils.displayErrorAccountMessage(getContext(), getActivity());
+                    } else {
+                        cardViewMessageCount.setVisibility(View.INVISIBLE);
+                        messageLoading = false;
+                    }
+                }
+            });
+        }
+    }
+
+    private void editUnreadNotificationCountByUser() {
+        notificationLoading = true;
+        if (getActivity() == null) {
+            setFailedState();
+        } else {
+            APINotificationCaller.getUsersNotifications(token,
+                    getActivity().getApplication(), new APIListener() {
+                @Override
+                public void onNotificationListFound(List<Notification> list) {
+                    getUnreadNotificationsCount(list);
+                    if (notificationCount == 0) {
+                        cardViewNotificationCount.setVisibility(View.INVISIBLE);
+                    } else {
+                        cardViewNotificationCount.setVisibility(View.VISIBLE);
+                        txtNotificationCount.setText(notificationCount + "");
+                    }
+                    notificationLoading = false;
+                }
+
+                @Override
+                public void onFailedAPICall(int code) {
+                    if (code == IntegerUtils.ERROR_NO_USER) {
+                        MethodUtils.displayErrorAccountMessage(getContext(), getActivity());
+                    } else {
+                        cardViewNotificationCount.setVisibility(View.INVISIBLE);
+                        notificationLoading = false;
+                    }
+                }
+            });
+        }
+    }
+
+    private void getUnreadMessagesCount(List<Message> list) {
+        messageCount = 0;
+        if (list.size() > 0) {
+            for (Message message : list) {
+                if (message.getToId().equals(accountId) && !message.getMessageRead()) {
+                    messageCount++;
+                }
+            }
+        }
+    }
+
+    private void getUnreadNotificationsCount(List<Notification> list) {
+        notificationCount = 0;
+        if (list.size() > 0) {
+            for (Notification notification : list) {
+                if (!notification.getNotificationRead()) {
+                    notificationCount++;
+                }
+            }
+        }
     }
 
     private void editCartCountByUser() {
@@ -210,7 +355,7 @@ public class ProfileTab extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(retailList == null && campaignList == null) {
+        if (retailList == null && campaignList == null) {
             cardViewCartCount.setVisibility(View.INVISIBLE);
         } else {
             if (retailList.size() > 0 || campaignList.size() > 0) {
@@ -223,32 +368,22 @@ public class ProfileTab extends Fragment {
         }
     }
 
-    private void editUnreadMessageCountByUser() {
-        try {
-            messageList = (List<Message>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("MESSAGE_LIST", ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (messageList == null) {
-            cardViewMessageCount.setVisibility(View.INVISIBLE);
-        } else {
-            if (messageList.size() == 0) {
-                cardViewMessageCount.setVisibility(View.INVISIBLE);
-            } else {
-                messageCount = 0;
-                for (Message message : messageList) {
-                    if (!message.getMessageRead()) {
-                        messageCount++;
-                    }
-                }
-                if (messageCount > 0) {
-                    cardViewMessageCount.setVisibility(View.VISIBLE);
-                    txtMessageCount.setText(messageCount + "");
-                } else {
-                    cardViewMessageCount.setVisibility(View.INVISIBLE);
-                }
-            }
-        }
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutFailed.setVisibility(View.GONE);
+        layoutScreen.setVisibility(View.GONE);
     }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutFailed.setVisibility(View.VISIBLE);
+        layoutScreen.setVisibility(View.GONE);
+    }
+
+    private void setReadyState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutFailed.setVisibility(View.GONE);
+        layoutScreen.setVisibility(View.VISIBLE);
+    }
+
 }

@@ -2,6 +2,7 @@ package dev.wsgroup.main.models.apis.callers;
 
 import android.app.Application;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -14,6 +15,7 @@ import org.json.JSONObject;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIPaymentCaller {
@@ -27,7 +29,6 @@ public class APIPaymentCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
-            System.out.println(price);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("amount", (price * 100));
             jsonObject.put("bankCode", bankString);
@@ -49,6 +50,8 @@ public class APIPaymentCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -60,6 +63,8 @@ public class APIPaymentCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

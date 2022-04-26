@@ -4,14 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     tools:context=".views.fragments.tabs.cart.CampaignTab">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutLoading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_lighter">
+        android:background="@color/gray_background">
 
         <ProgressBar
             android:id="@+id/progressBarLoading"
@@ -32,7 +32,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/gray_lighter">
+        android:background="@color/gray_background">
 
         <TextView
             android:text="YOUR SHOPPING CART\nDOESN'T HAVE ANY\nCAMPAIGN ORDER"

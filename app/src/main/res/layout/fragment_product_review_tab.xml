@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     tools:context=".views.fragments.tabs.product.ReviewTab">
 
     <RelativeLayout
@@ -28,7 +28,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/gray_lighter">
+        android:background="@color/gray_background">
 
         <TextView
             android:text="THIS PRODUCT HAS NOT\nBEEN REVIEWED"
@@ -149,7 +149,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="5dp">
+            android:padding="5dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"

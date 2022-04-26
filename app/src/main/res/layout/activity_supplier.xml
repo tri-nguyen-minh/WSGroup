@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     tools:context=".views.activities.SupplierActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,7 +51,7 @@
         android:layout_height="0dp"
         android:gravity="center"
         android:paddingVertical="20dp"
-        android:background="@color/gray_lighter"
+        android:background="@color/gray_background"
         app:layout_constraintTop_toBottomOf="@id/layoutSupplierHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -69,7 +69,7 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/gray_lighter"
+        android:background="@color/gray_background"
         app:layout_constraintTop_toBottomOf="@id/layoutSupplierHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -84,7 +84,7 @@
             android:layout_marginTop="15dp"
             android:fontFamily="@font/montserratr"
             android:gravity="center"
-            android:text="CLICK HERE TO TRY AGAIN"
+            android:text="CLICK TO TRY AGAIN"
             android:textColor="@color/blue_main"
             android:textSize="17sp"
             android:textStyle="bold"/>
@@ -102,7 +102,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -140,7 +141,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/gray_lighter"
+                android:background="@color/gray_background"
                 android:orientation="vertical"
                 android:paddingTop="2dp">
 
@@ -184,7 +185,6 @@
                         android:textSize="16sp"
                         android:ellipsize="end"
                         android:text=""
-                        android:layout_marginLeft="1dp"
                         android:background="@color/white"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -233,7 +233,6 @@
                         android:textSize="16sp"
                         android:ellipsize="end"
                         android:text=""
-                        android:layout_marginLeft="1dp"
                         android:background="@color/white"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -290,7 +289,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:paddingVertical="20dp"
-                        android:background="@color/gray_lighter">
+                        android:background="@color/gray_background">
 
                         <ProgressBar
                             android:layout_width="wrap_content"
@@ -332,7 +331,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:paddingVertical="20dp"
-                        android:background="@color/gray_lighter">
+                        android:background="@color/gray_background">
 
                         <ProgressBar
                             android:layout_width="wrap_content"

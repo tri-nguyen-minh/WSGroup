@@ -7,8 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,9 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -38,10 +34,10 @@ import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewCartSupplierListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
-import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.activities.order.ConfirmOrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -158,36 +154,40 @@ public class CampaignTab extends Fragment {
                 String token = sharedPreferences.getString("TOKEN", "" );
                 APICartCaller.deleteCartItem(token, cartProductId,
                         getActivity().getApplication(), new APIListener() {
-                            @Override
-                            public void onUpdateCartItemSuccessful() {
-                                layoutCartDetail.setVisibility(View.INVISIBLE);
-                                layoutLoading.setVisibility(View.VISIBLE);
-                                int index = findCartProductIndexById(cartProductId);
-                                if (index >= 0) {
-                                    cartList.remove(index);
-                                }
-                                try {
-                                    sharedPreferences.edit()
-                                            .putString("CAMPAIGN_CART",
-                                                    ObjectSerializer.serialize((Serializable) cartList))
-                                            .apply();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                    @Override
+                    public void onUpdateSuccessful() {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        layoutCartDetail.setVisibility(View.INVISIBLE);
+                        layoutLoading.setVisibility(View.VISIBLE);
+                        int index = findCartProductIndexById(cartProductId);
+                        if (index >= 0) {
+                            cartList.remove(index);
+                        }
+                        try {
+                            sharedPreferences.edit()
+                                    .putString("CAMPAIGN_CART",
+                                            ObjectSerializer.serialize((Serializable) cartList))
+                                    .commit();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-                            @Override
-                            public void onFailedAPICall(int code) {
-                                if (dialogBoxLoading.isShowing()) {
-                                    dialogBoxLoading.dismiss();
-                                }
-                                DialogBoxAlert dialogBox =
-                                        new DialogBoxAlert(getActivity(),
-                                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                                                StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                                dialogBox.show();
-                            }
-                        });
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(getContext(),
+                                    getActivity());
+                        } else {
+                            MethodUtils.displayErrorAPIMessage(getActivity());
+                        }
+                    }
+                });
             }
 
             @Override
@@ -211,11 +211,12 @@ public class CampaignTab extends Fragment {
                 order.setSupplier(supplier);
                 order.setInCart(true);
                 order.setOrderProductList(selectedProductList);
+                order.setLoyaltyDiscountPercent(0);
                 ordersList.add(order);
                 DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(getActivity(), StringUtils.MES_CONFIRM_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
-                        Intent confirmOrderIntent = new Intent(getContext(), ConfirmActivity.class);
+                        Intent confirmOrderIntent = new Intent(getContext(), ConfirmOrderActivity.class);
                         confirmOrderIntent.putExtra("ORDER_LIST", ordersList);
                         confirmOrderIntent.putExtra("REQUEST_CODE", IntegerUtils.REQUEST_ORDER_CAMPAIGN);
                         confirmOrderIntent.putExtra("CART_STATUS", true);
@@ -227,13 +228,6 @@ public class CampaignTab extends Fragment {
 
             }
         };
-        adapter.setCartList(supplierCampaignList, campaignCart);
-        recViewCartSupplier.setAdapter(adapter);
-        recViewCartSupplier.setLayoutManager(new LinearLayoutManager(getContext(),
-                LinearLayoutManager.VERTICAL,false));
-    }
-
-    private void finishRecView() {
         adapter.setCartList(supplierCampaignList, campaignCart);
         recViewCartSupplier.setAdapter(adapter);
         recViewCartSupplier.setLayoutManager(new LinearLayoutManager(getContext(),

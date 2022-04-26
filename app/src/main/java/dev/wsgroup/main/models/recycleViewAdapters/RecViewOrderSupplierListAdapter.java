@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -24,6 +24,8 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIDiscountCaller;
+import dev.wsgroup.main.models.dtos.Campaign;
+import dev.wsgroup.main.models.dtos.CampaignMilestone;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Order;
@@ -111,7 +113,7 @@ public class RecViewOrderSupplierListAdapter
                 @Override
                 public void onFocusChange(View view, boolean focus) {
                     if (!focus) {
-                        hideKeyboard(view);
+                        MethodUtils.hideKeyboard(view, context);
                         String code = holder.editDiscount.getText().toString();
                         if (code.isEmpty()) {
                             setupNoDiscountState(holder);
@@ -125,28 +127,32 @@ public class RecViewOrderSupplierListAdapter
                                     activity.getApplication(), new APIListener() {
                                 @Override
                                 public void onDiscountListFound(List<CustomerDiscount> discountList) {
-                                        if (discountList.size() > 0) {
-                                            checkUnwantedDiscount(orderList.get(position), discountList);
-                                        }
-                                        if (discountList.size() == 0) {
-                                            setupNoDiscountState(holder);
-                                            price = getTotalPrice(position);
-                                            holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
-                                            setCustomerDiscount(position, null);
-                                        } else {
-                                            CustomerDiscount discount = discountList.get(0);
-                                            setupDiscountFoundState(holder);
-                                            applyDiscount(holder, discount.getDiscount(), position);
-                                            setCustomerDiscount(position, discount);
-                                        }
+                                    if (discountList.size() > 0) {
+                                        checkUnwantedDiscount(orderList.get(position), discountList);
                                     }
+                                    if (discountList.size() == 0) {
+                                        setupNoDiscountState(holder);
+                                        price = getTotalPrice(position);
+                                        holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
+                                        setCustomerDiscount(position, null);
+                                    } else {
+                                        CustomerDiscount discount = discountList.get(0);
+                                        setupDiscountFoundState(holder);
+                                        applyDiscount(holder, discount.getDiscount(), position);
+                                        setCustomerDiscount(position, discount);
+                                    }
+                                }
 
                                 @Override
                                 public void onFailedAPICall(int code) {
-                                    setupNoDiscountState(holder);
-                                    price = getTotalPrice(position);
-                                    holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
-                                    setCustomerDiscount(position, null);
+                                    if (code == IntegerUtils.ERROR_NO_USER) {
+                                        MethodUtils.displayErrorAccountMessage(context, activity);
+                                    } else {
+                                        setupNoDiscountState(holder);
+                                        price = getTotalPrice(position);
+                                        holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
+                                        setCustomerDiscount(position, null);
+                                    }
                                 }
                             });
                         }
@@ -158,7 +164,17 @@ public class RecViewOrderSupplierListAdapter
             holder.layoutDiscount.setVisibility(View.GONE);
             holder.lblTotalPrice.setVisibility(View.VISIBLE);
             OrderProduct orderProduct = orderProductList.get(0);
-            price = orderProduct.getCampaign().getSavingPrice();
+            Campaign campaign = orderProduct.getCampaign();
+            price = orderProduct.getProduct().getRetailPrice();
+            double totalPrice = orderProduct.getCampaign().getPrice();
+            if (campaign.getShareFlag()) {
+                CampaignMilestone milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
+                        orderProduct.getQuantity() + campaign.getQuantityCount());
+                if (milestone != null) {
+                    totalPrice = milestone.getPrice();
+                }
+            }
+            price -= totalPrice;
             price *= orderProduct.getQuantity();
             holder.txtDiscountPrice.setVisibility(View.VISIBLE);
             holder.txtDiscountPrice.setText(MethodUtils.formatPriceString(price));
@@ -174,8 +190,15 @@ public class RecViewOrderSupplierListAdapter
             }
         } else {
             OrderProduct orderProduct = orderProductList.get(0);
-            totalPrice = orderProduct.getProduct().getRetailPrice();
-            totalPrice -= orderProduct.getCampaign().getSavingPrice();
+            Campaign campaign = orderProduct.getCampaign();
+            totalPrice = orderProduct.getCampaign().getPrice();
+            if (campaign.getShareFlag()) {
+                CampaignMilestone milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
+                        orderProduct.getQuantity() + campaign.getQuantityCount());
+                if (milestone != null) {
+                    totalPrice = milestone.getPrice();
+                }
+            }
             totalPrice *= orderProduct.getQuantity();
         }
         return totalPrice;
@@ -224,8 +247,9 @@ public class RecViewOrderSupplierListAdapter
                             displayNoDiscountAlert();
                         } else {
                             customerDiscountList = discountList;
-                            DialogBoxDiscountList dialogBox = new DialogBoxDiscountList(activity,
-                                    context, customerDiscountList) {
+                            DialogBoxDiscountList dialogBox = new DialogBoxDiscountList( activity,
+                                    context, customerDiscountList,
+                                    IntegerUtils.IDENTIFIER_DISCOUNT_SELECT) {
                                 @Override
                                 public void setSelectedDiscount(CustomerDiscount discount) {
                                     setupDiscountFoundState(holder);
@@ -244,7 +268,11 @@ public class RecViewOrderSupplierListAdapter
                         if (dialogBoxLoading.isShowing()) {
                             dialogBoxLoading.dismiss();
                         }
-                        displayNoDiscountAlert();
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(context, activity);
+                        } else {
+                            displayNoDiscountAlert();
+                        }
                     }
                 });
     }
@@ -303,13 +331,6 @@ public class RecViewOrderSupplierListAdapter
         dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxAlert.show();
     }
-
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
 
     public void setCustomerDiscount(int position, CustomerDiscount customerDiscount) {}
 

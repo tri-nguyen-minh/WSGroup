@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/gray_lighter">
+        android:background="@color/gray_background">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutDialogCampaign"
@@ -18,17 +18,11 @@
             android:background="@color/blue_main">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratm"
-                android:gravity="left"
-                android:text="APPLICABLE DISCOUNTS"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:text="APPLICABLE  DISCOUNTS"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/style_dialog_box_header" />
 
             <ImageView
                 android:id="@+id/imgCloseDialogBox"

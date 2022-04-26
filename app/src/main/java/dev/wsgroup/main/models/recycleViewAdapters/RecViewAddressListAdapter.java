@@ -18,6 +18,7 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAddress;
 
 public class RecViewAddressListAdapter
@@ -68,6 +69,11 @@ public class RecViewAddressListAdapter
                             onAddressChange(addressList.get(position), position,
                                     IntegerUtils.ADDRESS_ACTION_DELETE);
                             notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onUpdateFailed() {
+                            MethodUtils.displayErrorAPIMessage(activity);
                         }
                     };
                     dialogBoxAddress.getWindow()

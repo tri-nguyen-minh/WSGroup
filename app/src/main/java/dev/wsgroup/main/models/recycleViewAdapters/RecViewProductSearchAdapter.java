@@ -94,7 +94,9 @@ public class RecViewProductSearchAdapter
                     @Override
                     public void onProductFound(Product product) {
                         super.onProductFound(product);
-                        dialogBoxLoading.dismiss();
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
                         Intent intent = new Intent(activity.getApplicationContext(),
                                 ProductDetailActivity.class);
                         intent.putExtra("PRODUCT_ID", product.getProductId());
@@ -104,11 +106,10 @@ public class RecViewProductSearchAdapter
                     @Override
                     public void onFailedAPICall(int errorCode) {
                         super.onFailedAPICall(errorCode);
-                        dialogBoxLoading.dismiss();
-                        DialogBoxAlert dialogBox = new DialogBoxAlert(activity,
-                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                                StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                        dialogBox.show();
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        MethodUtils.displayErrorAPIMessage(activity);
                     }
                 });
             }

@@ -3,6 +3,7 @@ package dev.wsgroup.main.models.apis.callers;
 import android.app.Application;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,6 +24,7 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICartCaller {
@@ -60,10 +62,15 @@ public class APICartCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
@@ -76,6 +83,8 @@ public class APICartCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,10 +103,11 @@ public class APICartCaller {
             Campaign campaign = cartProduct.getCampaign();
             jsonObject.put("inCampaign", (campaign != null));
             if (campaign != null) {
-                jsonObject.put("campaignId", campaign.getId());
+                jsonObject.put("campaignId" , campaign.getId());
             } else {
                 jsonObject.put("campaignId", JSONObject.NULL);
             }
+//            jsonObject.put("supplierId", cartProduct.getProduct().getSupplier().getId());
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -113,7 +123,13 @@ public class APICartCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
@@ -130,6 +146,8 @@ public class APICartCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,19 +161,28 @@ public class APICartCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
+            System.out.println(url);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("productId", cartProduct.getProduct().getProductId());
             jsonObject.put("quantity", cartProduct.getQuantity());
+            System.out.println(jsonObject);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    APIListener.onUpdateCartItemSuccessful();
+                    System.out.println(response);
+                    APIListener.onUpdateSuccessful();
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url,
@@ -172,6 +199,8 @@ public class APICartCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,16 +215,24 @@ public class APICartCaller {
         }
         try {
             JSONObject jsonObject = new JSONObject();
+            System.out.println("url" + url);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    APIListener.onUpdateCartItemSuccessful();
+                    System.out.println(response);
+                    APIListener.onUpdateSuccessful();
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url,
@@ -212,6 +249,8 @@ public class APICartCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

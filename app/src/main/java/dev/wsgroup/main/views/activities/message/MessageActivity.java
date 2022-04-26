@@ -1,15 +1,24 @@
 package dev.wsgroup.main.views.activities.message;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -21,41 +30,69 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIChatCaller;
 import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
 import dev.wsgroup.main.models.dtos.Message;
+import dev.wsgroup.main.models.dtos.MessageFirebase;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageAdapter;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageListAdapter;
+import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
+import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
+import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
 
 public class MessageActivity extends AppCompatActivity {
 
     private ConstraintLayout layoutParent;
-    private ImageView imgBackFromMessage, imgMessageHome;
+    private ImageView imgBackFromMessage, imgMessageHome, imgMessageImage;
     private RelativeLayout layoutLoading;
     private LinearLayout layoutNoMessage, layoutFailedGettingMessage;
     private RecyclerView recViewMessage;
     private EditText editWriteMessage;
-    private TextView txtSend, lblRetryGetMessage;
+    private TextView txtSend, lblRetryGetMessage, txtNewMessageSupplierName;
     private FrameLayout layoutBody;
 
     private SharedPreferences sharedPreferences;
+    private FirebaseDatabaseReferences references;
     private List<Message> messageList;
     private String token, userAccountId, supplierAccountId;
+    private DialogBoxAlert dialogBoxAlert;
     private Supplier supplier;
-    private final String CUSTOMER_SERVICE_ACCOUNT_ID = "SERVICE";
+    private Message newMessage;
     private boolean messageCheck, profileCheck;
     private RecViewMessageAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
     private View.OnClickListener listener;
+    private final String CUSTOMER_SERVICE_ACCOUNT_ID = "SERVICE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +103,7 @@ public class MessageActivity extends AppCompatActivity {
         layoutParent = findViewById(R.id.layoutParent);
         imgBackFromMessage = findViewById(R.id.imgBackFromMessage);
         imgMessageHome = findViewById(R.id.imgMessageHome);
+        imgMessageImage = findViewById(R.id.imgMessageImage);
         layoutLoading = findViewById(R.id.layoutLoading);
         layoutNoMessage = findViewById(R.id.layoutNoMessage);
         layoutFailedGettingMessage = findViewById(R.id.layoutFailedGettingMessage);
@@ -73,9 +111,14 @@ public class MessageActivity extends AppCompatActivity {
         editWriteMessage = findViewById(R.id.editWriteMessage);
         txtSend = findViewById(R.id.txtSend);
         lblRetryGetMessage = findViewById(R.id.lblRetryGetMessage);
+        txtNewMessageSupplierName = findViewById(R.id.txtNewMessageSupplierName);
         layoutBody = findViewById(R.id.layoutBody);
 
+        recViewMessage.setItemViewCacheSize(10);
+
+        references = new FirebaseDatabaseReferences();
         getConversation();
+
         listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +131,7 @@ public class MessageActivity extends AppCompatActivity {
         imgBackFromMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(RESULT_OK);
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
@@ -111,10 +154,38 @@ public class MessageActivity extends AppCompatActivity {
                     editWriteMessage.setMaxLines(4);
                     editWriteMessage.setEllipsize(null);
                 } else {
-                    hideKeyboard(view);
+                    MethodUtils.hideKeyboard(view, getApplicationContext());
                     editWriteMessage.setMaxLines(1);
                     editWriteMessage.setEllipsize(TextUtils.TruncateAt.END);
                 }
+            }
+        });
+        imgMessageImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (editWriteMessage.hasFocus()) {
+                    editWriteMessage.clearFocus();
+                }
+                DialogBoxSelectImage dialogBox
+                        = new DialogBoxSelectImage(MessageActivity.this) {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void executeTakePhoto() {
+                        if (checkSelfPermission(Manifest.permission.CAMERA)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(new String[] {Manifest.permission.CAMERA}, 101);
+                        } else {
+                            takeImage();
+                        }
+                    }
+
+                    @Override
+                    public void executeSelectPhoto() {
+                        selectImage();
+                    }
+                };
+                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.show();
             }
         });
         layoutParent.setOnClickListener(listener);
@@ -123,7 +194,10 @@ public class MessageActivity extends AppCompatActivity {
         txtSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (editWriteMessage.hasFocus()) {
+                    editWriteMessage.clearFocus();
+                }
+                sendNewMessage(editWriteMessage.getText().toString(), null);
             }
         });
     }
@@ -133,24 +207,59 @@ public class MessageActivity extends AppCompatActivity {
         token = sharedPreferences.getString("TOKEN", "");
         userAccountId = getIntent().getStringExtra("USER_ID");
         supplierAccountId = getIntent().getStringExtra("SUPPLIER_ID");
+        System.out.println(userAccountId);
+        System.out.println(supplierAccountId);
         setLoadingState();
+        messageList = new ArrayList<>();
         messageCheck = false; profileCheck = false;
         getMessageList();
         getProfile();
     }
 
     private void getMessageList() {
-        APIChatCaller.getConversation(token, userAccountId, supplierAccountId, getApplication(), new APIListener() {
+//        APIChatCaller.getConversation(token, userAccountId, supplierAccountId, getApplication(), new APIListener() {
+//            @Override
+//            public void onMessageListFound(List<Message> list) {
+//                messageList = list;
+//                messageCheck = true;
+//                setConversation();
+//            }
+//
+//            @Override
+//            public void onFailedAPICall(int code) {
+//                if (code == IntegerUtils.ERROR_NO_USER) {
+//                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+//                            MessageActivity.this);
+//                } else {
+//                    setFailedState();
+//                }
+//            }
+//        });
+        references.getConversation(userAccountId, supplierAccountId).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onMessageListFound(List<Message> list) {
-                messageList = list;
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println("start checking: " + snapshot.getChildrenCount());
+                MessageFirebase message;
+                messageList = new ArrayList<>();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    message = data.getValue(MessageFirebase.class);
+                    newMessage = new Message();
+                    newMessage.setCreateDate(MethodUtils.getFormattedCurrentDate());
+                    newMessage.setMessageRead(false);
+                    newMessage.setMessage(message.getMessage());
+                    newMessage.setFromId(message.getFrom());
+                    newMessage.setToId(message.getTo());
+                    newMessage.setLink(message.getFile());
+                    messageList.add(0, newMessage);
+                }
                 messageCheck = true;
                 setConversation();
             }
 
             @Override
-            public void onFailedAPICall(int code) {
-                setFailedState();
+            public void onCancelled(DatabaseError error) {
+                System.out.println("failed");
+                System.out.println(error);
             }
         });
     }
@@ -170,6 +279,7 @@ public class MessageActivity extends AppCompatActivity {
                 public void onSupplierListFound(List<Supplier> supplierList) {
                     if (supplierList.size() > 0) {
                         supplier = supplierList.get(0);
+                        txtNewMessageSupplierName.setText(supplier.getName());
                         profileCheck = true;
                         setConversation();
                     } else {
@@ -187,24 +297,122 @@ public class MessageActivity extends AppCompatActivity {
 
     private void setConversation() {
         if (messageCheck && profileCheck) {
+            adapter = new RecViewMessageAdapter(getApplicationContext(),
+                    MessageActivity.this, userAccountId) {
+                @Override
+                public void onClick() {
+                    if (editWriteMessage.hasFocus()) {
+                        editWriteMessage.clearFocus();
+                    }
+                }
+            };
+            recViewMessage.setAdapter(adapter);
+            linearLayoutManager = new LinearLayoutManager(getApplicationContext(),
+                    LinearLayoutManager.VERTICAL, true);
+            recViewMessage.setLayoutManager(linearLayoutManager);
             if (messageList.isEmpty()) {
                 setNoMessageState();
             } else {
-                adapter = new RecViewMessageAdapter(getApplicationContext(), userAccountId) {
-                    @Override
-                    public void onClick() {
-                        if (editWriteMessage.hasFocus()) {
-                            editWriteMessage.clearFocus();
-                        }
-                    }
-                };
+                System.out.println("message count: " + messageList.size());
                 adapter.setMessageList(messageList);
-                recViewMessage.setAdapter(adapter);
-                recViewMessage.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                        LinearLayoutManager.VERTICAL, true));
                 setListFoundState();
             }
         }
+    }
+    public void takeImage() {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, IntegerUtils.REQUEST_TAKE_IMAGE);
+    }
+
+    public void selectImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, IntegerUtils.REQUEST_SELECT_IMAGE);
+    }
+
+    private void sendNewMessage(String message, String image) {
+        imgMessageImage.setEnabled(false);
+        editWriteMessage.setEnabled(false);
+        txtSend.setEnabled(false);
+        newMessage = new Message();
+        newMessage.setFromId(userAccountId);
+        newMessage.setToId(supplierAccountId);
+        if (message != null) {
+            newMessage.setMessage(editWriteMessage.getText().toString());
+        }
+        if (image != null) {
+            newMessage.setLink(image);
+        }
+        references.addMessage(newMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                editWriteMessage.setText("");
+                imgMessageImage.setEnabled(true);
+                editWriteMessage.setEnabled(true);
+                txtSend.setEnabled(true);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void uploadImageToFirebase(Uri uri) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageReference = storage.getReference();
+                StorageReference ref = storageReference.child("images/messages/" + UUID.randomUUID());
+                StorageMetadata metadata = new StorageMetadata.Builder()
+                        .setContentType("image/jpeg")
+                        .build();
+                UploadTask uploadTask = ref.putFile(uri, metadata);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot,
+                                Task<Uri>>() {
+                            @Override
+                            public Task<Uri> then(Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                if (!task.isSuccessful()) {
+                                    MethodUtils.displayErrorAPIMessage(MessageActivity.this);
+                                    throw task.getException();
+                                }
+                                return ref.getDownloadUrl();
+                            }
+                        });
+                        urlTask.addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    sendNewMessage(null, task.getResult().toString());
+                                } else {
+                                    MethodUtils.displayErrorAPIMessage(MessageActivity.this);
+                                }
+                            }
+                        });
+                    }
+                });
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        e.printStackTrace();
+                        MethodUtils.displayErrorAPIMessage(MessageActivity.this);
+                    }
+                });
+
+            }
+        }).addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                MethodUtils.displayErrorAPIMessage(MessageActivity.this);
+            }
+        });
     }
 
     private void setLoadingState() {
@@ -219,7 +427,6 @@ public class MessageActivity extends AppCompatActivity {
         layoutNoMessage.setVisibility(View.VISIBLE);
         layoutFailedGettingMessage.setVisibility(View.GONE);
         recViewMessage.setVisibility(View.GONE);
-
     }
 
     private void setFailedState() {
@@ -236,9 +443,38 @@ public class MessageActivity extends AppCompatActivity {
         recViewMessage.setVisibility(View.VISIBLE);
     }
 
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101
+                && grantResults.length != 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            takeImage();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromMessage.performClick();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && data != null) {
+            Uri uri = null;
+            if (requestCode == IntegerUtils.REQUEST_TAKE_IMAGE) {
+                Bitmap image = (Bitmap) data.getExtras().get("data");
+                uri = MethodUtils.getImageUri(getApplicationContext(), image);
+            } else if (requestCode == IntegerUtils.REQUEST_SELECT_IMAGE) {
+                uri = data.getData();
+            }
+            if (uri != null) {
+                uploadImageToFirebase(uri);
+            } else {
+                MethodUtils.displayErrorAPIMessage(MessageActivity.this);
+            }
+
+        }
     }
 }

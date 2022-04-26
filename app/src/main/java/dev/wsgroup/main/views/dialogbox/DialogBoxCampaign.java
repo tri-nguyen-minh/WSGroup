@@ -56,7 +56,7 @@ public class DialogBoxCampaign extends Dialog {
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
 
         campaign = product.getCampaign();
-        txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getSavingPrice()));
+        txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
         txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate()));
         txtCampaignNote.setText(campaign.getDescription());
         txtCampaignOrderCount.setText(campaign.getOrderCount() + "");

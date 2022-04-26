@@ -54,14 +54,14 @@ public class DetailTab extends Fragment {
             txtSupplierName, txtMoreSuppliersProductsName;
     private RecyclerView recViewMoreSuppliersProducts;
     private ViewFlipper viewFlipperProduct;
-    private ImageView imgCommonFlipper, imgProductCategory;
-    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount, txtRatingProduct,
-            txtRetailPrice, txtCampaignCount, lblDescriptionLength, txtLoyaltyDiscount,
-            lblLoyaltyDiscount, lblLoyaltyTag, lblLayoutCampaign, lblCampaignCount;
+    private ImageView imgCommonFlipper, imgProductCategory, imgProduct;
+    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount,
+            txtRatingProduct, txtRetailPrice, txtCampaignCount, lblDescriptionLength,
+            txtLoyaltyDiscount, lblCampaignCount;
     private MaterialRatingBar ratingProduct;
     private LinearLayout linearLayoutCampaign;
-    private ConstraintLayout constraintLayoutSupplierName, layoutSelectCampaign, layoutLoyalty,
-            constraintLayoutProductCategory;
+    private ConstraintLayout constraintLayoutSupplierName, layoutSelectCampaign,
+            layoutLoyalty, constraintLayoutProductCategory;
     private Button btnPurchaseProduct;
     private LinearLayout layoutProductQuantityWithCampaign, layoutMoreSuppliersProducts;
 
@@ -90,6 +90,7 @@ public class DetailTab extends Fragment {
         recViewMoreSuppliersProducts = view.findViewById(R.id.recViewMoreSuppliersProducts);
         viewFlipperProduct = view.findViewById(R.id.viewFlipperProduct);
         imgProductCategory = view.findViewById(R.id.imgProductCategory);
+        imgProduct = view.findViewById(R.id.imgProduct);
         txtProductName = view.findViewById(R.id.txtProductName);
         txtProductOrderCount = view.findViewById(R.id.txtProductOrderCount);
         txtProductReviewCount = view.findViewById(R.id.txtProductReviewCount);
@@ -98,9 +99,6 @@ public class DetailTab extends Fragment {
         txtCampaignCount = view.findViewById(R.id.txtCampaignCount);
         lblDescriptionLength = view.findViewById(R.id.lblDescriptionLength);
         txtLoyaltyDiscount = view.findViewById(R.id.txtLoyaltyDiscount);
-        lblLoyaltyDiscount = view.findViewById(R.id.lblLoyaltyDiscount);
-        lblLoyaltyTag = view.findViewById(R.id.lblLoyaltyTag);
-        lblLayoutCampaign = view.findViewById(R.id.lblLayoutCampaign);
         lblCampaignCount = view.findViewById(R.id.lblCampaignCount);
         ratingProduct = view.findViewById(R.id.ratingProduct);
         linearLayoutCampaign = view.findViewById(R.id.linearLayoutCampaign);
@@ -115,7 +113,7 @@ public class DetailTab extends Fragment {
         sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
         intent = getActivity().getIntent();
-        product = (Product)intent.getSerializableExtra("PRODUCT");
+        product = (Product) intent.getSerializableExtra("PRODUCT");
 
         if(product != null) {
             setProduct();
@@ -172,22 +170,29 @@ public class DetailTab extends Fragment {
         txtProductReviewCount.setText(MethodUtils.formatOrderOrReviewCount(product.getReviewCount()));
         ratingProduct.setRating((float) product.getRating());
         ratingProduct.setIsIndicator(true);
-        if(product.getImageList() != null) {
-            for (String imageLink : product.getImageList()) {
-                imgCommonFlipper = new ImageView(getContext());
-                Glide.with(getContext()).load(imageLink).into(imgCommonFlipper);
-                viewFlipperProduct.addView(imgCommonFlipper);
+        if(product.getImageList() != null && !product.getImageList().isEmpty()) {
+            if (product.getImageList().size() > 1) {
+                imgProduct.setVisibility(View.GONE);
+                viewFlipperProduct.setVisibility(View.VISIBLE);
+                for (String imageLink : product.getImageList()) {
+                    imgCommonFlipper = new ImageView(getContext());
+                    Glide.with(getContext()).load(imageLink).into(imgCommonFlipper);
+                    viewFlipperProduct.addView(imgCommonFlipper);
+                }
+                viewFlipperProduct.setAutoStart(true);
+                viewFlipperProduct.setFlipInterval(4000);
+                viewFlipperProduct.setInAnimation(AnimationUtils.loadAnimation(getContext(),
+                        R.anim.anim_slide_in_left));
+                viewFlipperProduct.setOutAnimation(AnimationUtils.loadAnimation(getContext(),
+                        R.anim.anim_slide_out_left));
+                viewFlipperProduct.startFlipping();
+            } else {
+                imgProduct.setVisibility(View.VISIBLE);
+                viewFlipperProduct.setVisibility(View.GONE);
+                Glide.with(getContext()).load(product.getImageList().get(0)).into(imgProduct);
             }
-            imgCommonFlipper = new ImageView(getContext());
-            imgCommonFlipper.setImageResource(R.drawable.img_unavailable);
-            viewFlipperProduct.addView(imgCommonFlipper);
-            viewFlipperProduct.setAutoStart(true);
-            viewFlipperProduct.setFlipInterval(4000);
-            viewFlipperProduct.setInAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.anim_slide_in_left));
-            viewFlipperProduct.setOutAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.anim_slide_out_left));
-            viewFlipperProduct.startFlipping();
         }
-        linearLayoutCampaign.setVisibility(View.VISIBLE);
+        linearLayoutCampaign.setVisibility(View.GONE);
         layoutSelectCampaign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -198,28 +203,35 @@ public class DetailTab extends Fragment {
         });
         txtProductQuantity.setVisibility(View.VISIBLE);
         layoutProductQuantityWithCampaign.setVisibility(View.GONE);
-        txtProductQuantity.setText(product.getQuantity() + "");
-        if(product.getCampaignList().size() > 0) {
-            txtCampaignCount.setText(product.getCampaignList().size() + "");
-            lblCampaignCount.setText(product.getCampaignList().size() > 1 ?
-                                        "Ongoing Campaigns" : "Ongoing Campaign");
-        } else {
-            txtCampaignCount.setText("All");
-            lblCampaignCount.setText("Campaigns");
+        txtProductQuantity.setText(getAvailableQuantity() + "");
+        int count = getActiveCampaignCount();
+        if(count > 0) {
+            linearLayoutCampaign.setVisibility(View.VISIBLE);
+            txtCampaignCount.setText(count + "");
+            lblCampaignCount.setText(count > 1 ? "Ongoing Campaigns" : "Ongoing Campaign");
         }
         txtProductDescription.setText(product.getDescription());
         supplier = product.getSupplier();
         txtSupplierName.setText(supplier.getName());
         txtMoreSuppliersProductsName.setText(supplier.getName());
-        if (supplier.getLoyaltyStatus() != null) {
+        if (supplier.getLoyaltyStatus() != null
+                && supplier.getLoyaltyStatus().getDiscountPercent() != 0) {
             layoutLoyalty.setVisibility(View.VISIBLE);
             txtLoyaltyDiscount.setText(supplier.getLoyaltyStatus().getDiscountPercent() + "%");
-            lblLoyaltyTag.setText("Loyal Customer Discount");
-            lblLoyaltyDiscount.setText("OFF");
         } else {
             layoutLoyalty.setVisibility(View.GONE);
         }
-        APICategoryCaller.getCategoryById(product.getCategoryId(), getActivity().getApplication(), new APIListener() {
+        if (getAvailableQuantity() == 0) {
+            btnPurchaseProduct.setEnabled(false);
+            btnPurchaseProduct.getBackground().setTint(getContext().getResources()
+                              .getColor(R.color.gray_light));
+        } else {
+            btnPurchaseProduct.setEnabled(true);
+            btnPurchaseProduct.getBackground().setTint(getContext().getResources()
+                              .getColor(R.color.blue_main));
+        }
+        APICategoryCaller.getCategoryById(product.getCategoryId(),
+                getActivity().getApplication(), new APIListener() {
             @Override
             public void onCategoryFound(Category category) {
                 if (category != null) {
@@ -243,8 +255,32 @@ public class DetailTab extends Fragment {
         getSupplierProductList();
     }
 
+    private int getActiveCampaignCount() {
+        int count = 0;
+        if (product.getCampaignList().size() > 0) {
+            for (Campaign campaign : product.getCampaignList()) {
+                if (campaign.getStatus().equals("active")) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private int getAvailableQuantity() {
+        int count = 0;
+        if (product.getCampaignList().size() > 0) {
+            for (Campaign campaign : product.getCampaignList()) {
+                count += campaign.getMaxQuantity();
+            }
+        }
+        count = product.getQuantity() - count;
+        return Math.max(count, 0);
+    }
+
     private void getSupplierProductList() {
-        APIProductCaller.getProductListBySupplierId(product.getSupplier().getId(),null, getActivity().getApplication(), new APIListener() {
+        APIProductCaller.getProductListBySupplierId(product.getSupplier().getId(),
+                null, getActivity().getApplication(), new APIListener() {
             @Override
             public void onProductListFound(List<Product> productList) {
                 if(productList.size() > 1) {
@@ -254,8 +290,9 @@ public class DetailTab extends Fragment {
                             i = 0;
                         }
                     }
+
                     orderCountCheck = false; ratingCheck = false;
-                    APIListener mostPopularListener = new APIListener() {
+                    APIListener listener = new APIListener() {
                         @Override
                         public void onProductOrderCountFound(Map<String, Integer> countList) {
                             for (Product product : productList) {
@@ -287,9 +324,9 @@ public class DetailTab extends Fragment {
                         }
                     };
                     APIProductCaller.getOrderCountByProductList(productList,
-                            getActivity().getApplication(), mostPopularListener);
+                            getActivity().getApplication(), listener);
                     APIProductCaller.getRatingByProductIdList(productList,
-                            getActivity().getApplication(), mostPopularListener);
+                            getActivity().getApplication(), listener);
                     setupMoreProductView(productList);
                 } else {
                     setupNoProductView();
@@ -304,6 +341,7 @@ public class DetailTab extends Fragment {
 
     private void setupMoreProductView(List<Product> productList) {
         if (orderCountCheck && ratingCheck) {
+            System.out.println("supplier list: " + productList.size());
             layoutMoreSuppliersProducts.setVisibility(View.VISIBLE);
             RecViewProductListAdapter adapter = new RecViewProductListAdapter(getContext(), getActivity());
             adapter.setProductsList(productList);

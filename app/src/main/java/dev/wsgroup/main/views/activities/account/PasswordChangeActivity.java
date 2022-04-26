@@ -7,12 +7,13 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -22,6 +23,7 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
@@ -33,9 +35,11 @@ public class PasswordChangeActivity extends AppCompatActivity {
     private EditText editOldPassword, editNewPassword, editConfirmPassword;
     private Button btnSaveEdit;
     private ConstraintLayout layoutParent;
+    private RelativeLayout layoutOldPassword;
 
     private SharedPreferences sharedPreferences;
-    private String username, token, errorMessage;
+    private int requestCode;
+    private String username, accountId, token, errorMessage;
     private DialogBoxLoading dialogBoxLoading;
 
     @Override
@@ -51,17 +55,26 @@ public class PasswordChangeActivity extends AppCompatActivity {
         editConfirmPassword = findViewById(R.id.editConfirmPassword);
         btnSaveEdit = findViewById(R.id.btnSaveEdit);
         layoutParent = findViewById(R.id.layoutParent);
+        layoutOldPassword = findViewById(R.id.layoutOldPassword);
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         username = sharedPreferences.getString("USERNAME", "");
+        accountId = getIntent().getStringExtra("ACCOUNT_ID");
         token = sharedPreferences.getString("TOKEN", "");
 
+        if (requestCode == IntegerUtils.REQUEST_PASSWORD_UPDATE) {
+            layoutOldPassword.setVisibility(View.VISIBLE);
+        } else {
+            layoutOldPassword.setVisibility(View.GONE);
+        }
         enableButtonUpdate();
+
         View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(view);
+                    MethodUtils.hideKeyboard(view, getApplicationContext());
                 }
             }
         };
@@ -129,74 +142,99 @@ public class PasswordChangeActivity extends AppCompatActivity {
                 dialogBoxLoading.show();
                 errorMessage = checkValidInput();
                 if(errorMessage != null) {
-                    dialogBoxLoading.dismiss();
-                    alertError(errorMessage);
+                    alertError();
                 } else {
-                    String oldPassword = editOldPassword.getText().toString();
                     String newPassword = editNewPassword.getText().toString();
-                    APIUserCaller.logInWithUsernameAndPassword(username, oldPassword,
-                            getApplication(), new APIListener() {
-                        @Override
-                        public void onUserFound(User user, String message) {
-                            if (oldPassword.equals(newPassword)) {
-                                errorMessage = StringUtils.MES_ERROR_DUPLICATE_OLD_PASSWORD;
-                                dialogBoxLoading.dismiss();
-                                alertError(errorMessage);
-                            } else {
-                                APIUserCaller.updatePassword(token, newPassword,
-                                        getApplication(), new APIListener() {
-                                    @Override
-                                    public void onUpdateProfileSuccessful() {
-                                        super.onUpdateProfileSuccessful();
-                                        dialogBoxLoading.dismiss();
-                                        DialogBoxAlert dialogBox
-                                                = new DialogBoxAlert(PasswordChangeActivity.this,
-                                                IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
-                                                StringUtils.MES_SUCCESSFUL_UPDATE_PASSWORD,"") {
-                                            @Override
-                                            public void onClickAction() {
-                                                imgBackFromChangePassword.performClick();
+                    if (requestCode == IntegerUtils.REQUEST_PASSWORD_UPDATE) {
+                        String oldPassword = editOldPassword.getText().toString();
+                        APIUserCaller.logInWithUsernameAndPassword(username, oldPassword,
+                                                getApplication(), new APIListener() {
+                            @Override
+                            public void onUserFound(User user, String message) {
+                                if (oldPassword.equals(newPassword)) {
+                                    errorMessage = StringUtils.MES_ERROR_DUPLICATE_OLD_PASSWORD;
+                                    alertError();
+                                } else {
+                                    APIUserCaller.updatePassword(user.getAccountId(), newPassword,
+                                            getApplication(), new APIListener() {
+                                        @Override
+                                        public void onUpdateSuccessful() {
+                                            if (dialogBoxLoading.isShowing()) {
+                                                dialogBoxLoading.dismiss();
                                             }
-                                        };
-                                        dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                        dialogBox.show();
-                                    }
+                                            displayFinalMessage();
+                                        }
 
-                                    @Override
-                                    public void onFailedAPICall(int code) {
-                                        errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
-                                        dialogBoxLoading.dismiss();
-                                        alertError(errorMessage);
-                                    }
-                                });
+                                        @Override
+                                        public void onFailedAPICall(int code) {
+                                            errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                                            alertError();
+                                        }
+                                    });
+                                }
                             }
-                        }
+                            @Override
+                            public void onFailedAPICall(int code) {
+                                if (code == IntegerUtils.ERROR_API) {
+                                    errorMessage = StringUtils.MES_ERROR_WRONG_OLD_PASSWORD;
+                                } else {
+                                    errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                                }
+                                alertError();
+                            }
+                        });
+                    } else {
+                        APIUserCaller.updatePassword(accountId, newPassword,
+                                getApplication(), new APIListener() {
+                            @Override
+                            public void onUpdateSuccessful() {
+                                if (dialogBoxLoading.isShowing()) {
+                                    dialogBoxLoading.dismiss();
+                                }
+                                displayFinalMessage();
+                            }
 
-                        @Override
-                        public void onFailedAPICall(int code) {
-                            if (code == IntegerUtils.ERROR_API) {
-                                errorMessage = StringUtils.MES_ERROR_WRONG_OLD_PASSWORD;
-                            } else {
+                            @Override
+                            public void onFailedAPICall(int code) {
                                 errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                                alertError();
                             }
-                            dialogBoxLoading.dismiss();
-                            alertError(errorMessage);
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
     }
 
-    private void alertError(String error) {
+    private void displayFinalMessage() {
+        DialogBoxAlert dialogBox
+                = new DialogBoxAlert(PasswordChangeActivity.this,
+                IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
+                StringUtils.MES_SUCCESSFUL_UPDATE_PASSWORD,"") {
+            @Override
+            public void onClickAction() {
+                setResult(RESULT_OK);
+                finish();
+            }
+        };
+        dialogBox.getWindow()
+                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBox.show();
+    }
+
+    private void alertError() {
+        if (dialogBoxLoading.isShowing()) {
+            dialogBoxLoading.dismiss();
+        }
         DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(PasswordChangeActivity.this,
-                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, error,"");
+                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
         dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxAlert.show();
     }
 
     private boolean checkEmptyFields() {
-        if(editOldPassword.getText().toString().isEmpty()) {
+        if(editOldPassword.getText().toString().isEmpty()
+                            && requestCode == IntegerUtils.REQUEST_PASSWORD_UPDATE) {
             return true;
         }
         if (editNewPassword.getText().toString().isEmpty()) {
@@ -235,9 +273,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
         return null;
     }
 
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    @Override
+    public void onBackPressed() {
+        imgBackFromChangePassword.performClick();
     }
 }

@@ -3,6 +3,7 @@ package dev.wsgroup.main.models.apis.callers;
 import android.app.Application;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,9 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.Message;
-import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
@@ -61,8 +60,8 @@ public class APIChatCaller {
                                     Date date1 = null, date2 = null;
                                     if (msg1.getCreateDate() != null && msg2.getCreateDate() != null) {
                                         try {
-                                            date1 = MethodUtils.convertStringToDate(msg1.getCreateDate());
-                                            date2 = MethodUtils.convertStringToDate(msg2.getCreateDate());
+                                            date1 = MethodUtils.convertToDate(msg1.getCreateDate());
+                                            date2 = MethodUtils.convertToDate(msg2.getCreateDate());
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -79,10 +78,15 @@ public class APIChatCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
@@ -99,6 +103,8 @@ public class APIChatCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +119,6 @@ public class APIChatCaller {
         }
         try {
             count = 2;
-            System.out.println(token);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -122,7 +127,6 @@ public class APIChatCaller {
                             messageList = new ArrayList<>();
                         }
                         count--;
-                        System.out.println(response);
                         JSONArray data = response.getJSONArray("data");
                         Message message;
                         if (data.length() > 0) {
@@ -138,8 +142,8 @@ public class APIChatCaller {
                                     Date date1 = null, date2 = null;
                                     if (msg1.getCreateDate() != null && msg2.getCreateDate() != null) {
                                         try {
-                                            date1 = MethodUtils.convertStringToDate(msg1.getCreateDate());
-                                            date2 = MethodUtils.convertStringToDate(msg2.getCreateDate());
+                                            date1 = MethodUtils.convertToDate(msg1.getCreateDate());
+                                            date2 = MethodUtils.convertToDate(msg2.getCreateDate());
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -156,12 +160,15 @@ public class APIChatCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     System.out.println(error);
                     System.out.println(MethodUtils.getVolleyErrorMessage(error));
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JSONObject jsonObject = new JSONObject();
@@ -180,6 +187,8 @@ public class APIChatCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
             jsonObject = new JSONObject();
             jsonObject.put("from", supplierId);
@@ -198,6 +207,8 @@ public class APIChatCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,17 +228,20 @@ public class APIChatCaller {
                 public void onResponse(JSONObject response) {
                     count--;
                     if (count == 0) {
-                        APIListener.onUpdateMessageSuccessful();
+                        APIListener.onUpdateSuccessful();
                     }
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     System.out.println(error);
                     System.out.println(MethodUtils.getVolleyErrorMessage(error));
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JSONObject jsonObject = new JSONObject();
@@ -246,6 +260,8 @@ public class APIChatCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
             jsonObject = new JSONObject();
             jsonObject.put("from", supplierId);
@@ -264,6 +280,8 @@ public class APIChatCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

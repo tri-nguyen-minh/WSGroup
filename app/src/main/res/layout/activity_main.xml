@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".views.activities.MainActivity"
     android:orientation="vertical"
-    android:background="@color/gray_lighter">
+    android:background="@color/gray_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutMainPage"
@@ -60,5 +60,31 @@
             app:layout_constraintRight_toRightOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutFailed"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/gray_background">
+
+        <TextView
+            android:text="AN ERROR HAS OCCURRED"
+            style="@style/style_empty_note" />
+
+        <TextView
+            android:id="@+id/lblRetry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/montserratr"
+            android:gravity="center"
+            android:text="CLICK TO TRY AGAIN"
+            android:textColor="@color/blue_main"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

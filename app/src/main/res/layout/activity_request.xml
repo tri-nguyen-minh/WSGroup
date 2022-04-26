@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutParent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/gray_background"
+    tools:context=".views.activities.order.RequestActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutReturnHeader"
+        style="@style/style_header_layout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <ImageView
+            android:id="@+id/imgBackFromReturnRequest"
+            style="@style/style_icon"
+            android:src="@drawable/ic_arrow_left"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/txtHeader"
+            style="@style/style_txt_header"
+            android:text=""
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/imgBackFromReturnRequest"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/imgReturnRequestHome"/>
+
+        <ImageView
+            android:id="@+id/imgReturnRequestHome"
+            style="@style/style_icon"
+            android:src="@drawable/ic_home"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:background="@color/gray_background"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutReturnHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue_main"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutFailedGettingRequest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <TextView
+            android:text="AN ERROR HAS OCCURRED"
+            style="@style/style_empty_note" />
+
+        <TextView
+            android:id="@+id/lblRetry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/montserratr"
+            android:gravity="center"
+            android:text="CLICK TO TRY AGAIN"
+            android:textColor="@color/blue_main"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutRequest"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/layoutReturnHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:text="Order"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="7dp"
+                style="@style/style_background_header"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:background="@color/white"
+                android:layout_marginTop="2dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblCode"
+                    android:text="Order Code"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="10dp"
+                    android:gravity="left"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtOrderCode"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="10dp"
+                    app:layout_constraintLeft_toRightOf="@+id/lblCode"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:background="@color/white"
+                android:layout_marginTop="2dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblSupplier"
+                    android:text="Supplier"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="10dp"
+                    android:gravity="left"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtSupplier"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="10dp"
+                    app:layout_constraintLeft_toRightOf="@+id/lblSupplier"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:background="@color/white"
+                android:layout_marginTop="2dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblPrice"
+                    android:text="Order Price"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="10dp"
+                    android:gravity="left"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtPrice"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/red"
+                    app:layout_constraintLeft_toRightOf="@+id/lblPrice"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:background="@color/white"
+                android:layout_marginTop="2dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblRecipient"
+                    android:text="Request To"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="10dp"
+                    android:gravity="left"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtRecipient"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="10dp"
+                    app:layout_constraintLeft_toRightOf="@+id/lblRecipient"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lblReason"
+            android:text="Reason"
+            android:layout_marginBottom="7dp"
+            style="@style/style_background_header"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_search_bar"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="5dp" >
+
+            <EditText
+                android:id="@+id/editReason"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:fontFamily="@font/montserratr"
+                android:textColor="@color/gray_darker"
+                android:textColorHint="@color/gray"
+                android:gravity="left|top"
+                android:hint="State your reason..."
+                android:inputType="textMultiLine"
+                android:maxLength="200"
+                android:padding="5dp"
+                android:textSize="14sp"/>
+
+            <LinearLayout
+                android:id="@+id/layoutLetterCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:paddingHorizontal="5dp"
+                android:paddingBottom="5dp">
+
+                <TextView
+                    android:id="@+id/txtLetterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="0"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/lblLetterSeparator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="/"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/lblLetterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="200"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="2dp">
+
+            <TextView
+                android:text="Images (Maximum: 6)"
+                style="@style/style_background_header"
+                android:layout_width="wrap_content"
+                android:gravity="left"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/lblSelectImage"
+                style="@style/style_background_header"
+                android:text="Select Images"
+                android:textColor="@color/blue_dark"
+                android:layout_width="wrap_content"
+                android:gravity="right"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recViewImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnSubmitRequest"
+            style="@style/style_button_dialog_box"
+            android:layout_width="match_parent"
+            android:textSize="14dp"
+            android:paddingVertical="10dp"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginVertical="10dp"
+            android:text="SUBMIT REQUEST" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

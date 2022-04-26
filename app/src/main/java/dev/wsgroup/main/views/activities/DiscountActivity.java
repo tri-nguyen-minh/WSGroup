@@ -53,7 +53,7 @@ public class DiscountActivity extends AppCompatActivity {
         imgBackFromDiscount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_CANCELED);
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
@@ -82,13 +82,16 @@ public class DiscountActivity extends AppCompatActivity {
         tabCommon.setText("EXPIRED");
         discountTabLayout.addTab(tabCommon);
 
-        discountTabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
+        discountTabLayout.setTabTextColors(getResources().getColor(R.color.black),
+                                            getResources().getColor(R.color.black));
         NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override
             public Fragment getItem(int position) {
                 Fragment fragment
-                        = new DiscountFragment(discountTabLayout.getTabAt(position).getText().toString());
+                        = new DiscountFragment(discountTabLayout.getTabAt(position)
+                                                                .getText()
+                                                                .toString());
                 return fragment;
             }
 
@@ -100,7 +103,8 @@ public class DiscountActivity extends AppCompatActivity {
         discountViewPager.setAdapter(adapter);
         discountTabLayout.clearOnTabSelectedListeners();
         discountViewPager.clearOnPageChangeListeners();
-        discountViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(discountTabLayout));
+        discountViewPager.addOnPageChangeListener(
+                                new TabLayout.TabLayoutOnPageChangeListener(discountTabLayout));
         discountTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -115,5 +119,10 @@ public class DiscountActivity extends AppCompatActivity {
         });
         discountTabLayout.selectTab(discountTabLayout.getTabAt(0));
         discountViewPager.setCurrentItem(discountTabLayout.getSelectedTabPosition());
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromDiscount.performClick();
     }
 }

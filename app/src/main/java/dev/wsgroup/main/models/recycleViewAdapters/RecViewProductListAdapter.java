@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,12 @@ public class RecViewProductListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_product_list, parent, false);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+        view.setLayoutParams(new ViewGroup.LayoutParams(width / 2,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -87,27 +94,13 @@ public class RecViewProductListAdapter
                 dialogBoxLoading = new DialogBoxLoading(activity);
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                APIProductCaller.getProductById(productId, activity.getApplication(), new APIListener() {
-                    @Override
-                    public void onProductFound(Product product) {
-                        super.onProductFound(product);
-                        dialogBoxLoading.dismiss();
-                        Intent intent = new Intent(activity.getApplicationContext(),
-                                                    ProductDetailActivity.class);
-                        intent.putExtra("PRODUCT_ID", product.getProductId());
-                        activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int errorCode) {
-                        super.onFailedAPICall(errorCode);
-                        dialogBoxLoading.dismiss();
-                        DialogBoxAlert dialogBox = new DialogBoxAlert(activity,
-                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                                StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                        dialogBox.show();
-                    }
-                });
+                Intent intent = new Intent(context, ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_ID", productId);
+                intent.putExtra("MAIN_TAB_POSITION", 0);
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
             }
         });
     }

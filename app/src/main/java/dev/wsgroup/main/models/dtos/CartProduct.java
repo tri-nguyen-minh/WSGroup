@@ -87,6 +87,7 @@ public class CartProduct implements Serializable {
         cartProduct.setId(jsonObject.getString("id"));
         cartProduct.setQuantity(jsonObject.getInt("quantity"));
         cartProduct.setCampaignFlag(jsonObject.getBoolean("incampaign"));
+//        cartProduct.setCampaignFlag(jsonObject.getBoolean("inCampaign"));
         if (cartProduct.getCampaignFlag()) {
             Campaign campaign = new Campaign();
             campaign.setId(jsonObject.getString("campaignid"));
@@ -104,6 +105,17 @@ public class CartProduct implements Serializable {
         supplier.setName(jsonObject.getString("suppliername"));
         supplier.setAddress(jsonObject.getString("supplieraddress"));
         product.setSupplier(supplier);
+//        Product product = new Product();
+//        product.setProductId(jsonObject.getJSONObject("product").getString("productid"));
+//        product.setName(jsonObject.getJSONObject("product").getString("productname"));
+//        product.setRetailPrice(jsonObject.getJSONObject("product").getDouble("productretailprice"));
+//        product.setQuantity(jsonObject.getJSONObject("product").getInt("productquantity"));
+//        product.setImageLink(jsonObject.getJSONObject("product").getString("productimage"));
+//        Supplier supplier = new Supplier();
+//        supplier.setId(jsonObject.getJSONObject("supplier").getString("supplierid"));
+//        supplier.setName(jsonObject.getJSONObject("supplier").getString("suppliername"));
+//        supplier.setAddress(jsonObject.getJSONObject("supplier").getString("supplieraddress"));
+//        product.setSupplier(supplier);
         cartProduct.setProduct(product);
         return cartProduct;
     }

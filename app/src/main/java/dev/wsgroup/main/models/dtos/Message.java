@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 
-    private String id, fromId, toId, message, createDate;
+    private String id, fromId, toId, message, createDate, link;
     private boolean messageRead;
     private Supplier supplier;
 
@@ -53,6 +53,14 @@ public class Message implements Serializable {
         this.createDate = createDate;
     }
 
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
     public boolean getMessageRead() {
         return messageRead;
     }
@@ -69,6 +77,7 @@ public class Message implements Serializable {
         message.setMessage(data.getString("message"));
         message.setMessageRead(data.getString("status").equals("read"));
         message.setCreateDate(data.getString("createdat"));
+        message.setLink(data.getString("file"));
         return message;
     }
 }

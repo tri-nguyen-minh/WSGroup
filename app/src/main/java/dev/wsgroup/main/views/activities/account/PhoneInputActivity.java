@@ -22,6 +22,7 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
@@ -39,8 +40,7 @@ public class PhoneInputActivity extends AppCompatActivity {
     private int requestCode;
     private String errorMessage;
     private DialogBoxLoading dialogBoxLoading;
-
-
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +59,19 @@ public class PhoneInputActivity extends AppCompatActivity {
         requestCode = getIntent().getIntExtra("REQUEST_CODE",
                                                 IntegerUtils.REQUEST_REGISTER);
 
-        editPhone.setText("091392173");
+        if(requestCode != IntegerUtils.REQUEST_REGISTER) {
+            layoutExistingAccount.setVisibility(View.INVISIBLE);
+        }
+
+//        editPhone.setText("091392173");
         btnSendOTP.setEnabled(false);
         btnSendOTP.getBackground().setTint(getResources().getColor(R.color.gray_light));
 
         editPhone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(v);
+                    MethodUtils.hideKeyboard(view, getApplicationContext());
                 }
             }
         });
@@ -79,7 +83,7 @@ public class PhoneInputActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String stringPhone = editPhone.getText().toString();
+                String stringPhone = "0" + editPhone.getText().toString();
                 if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
                     btnSendOTP.setEnabled(false);
                     btnSendOTP.getBackground()
@@ -108,10 +112,6 @@ public class PhoneInputActivity extends AppCompatActivity {
             }
         });
 
-        if(requestCode != IntegerUtils.REQUEST_REGISTER) {
-            layoutExistingAccount.setVisibility(View.INVISIBLE);
-        }
-
         imgBackFromPhoneInput.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,17 +133,15 @@ public class PhoneInputActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                String stringPhone = editPhone.getText().toString();
+                String stringPhone = "0" + editPhone.getText().toString();
                 APIUserCaller.findUserByPhoneNumber(stringPhone,
                         getApplication(), new APIListener() {
                     @Override
-                    public void onUserFound(User user, String message) {
+                    public void onUserFound(User foundUser, String message) {
+                        user = foundUser;
                         if(requestCode != IntegerUtils.REQUEST_REGISTER) {
                             sendOTP(stringPhone);
                         } else {
-                            if (dialogBoxLoading.isShowing()) {
-                                dialogBoxLoading.dismiss();
-                            }
                             errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
                             displayError();
                         }
@@ -154,21 +152,17 @@ public class PhoneInputActivity extends AppCompatActivity {
                         switch (errorCode) {
                             case IntegerUtils.ERROR_API:
                             case IntegerUtils.ERROR_PARSING_JSON: {
-                                if (dialogBoxLoading.isShowing()) {
-                                    dialogBoxLoading.dismiss();
-                                }
                                 errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
                                 displayError();
                                 break;
                             }
                             case IntegerUtils.ERROR_NO_USER: {
-                                if (dialogBoxLoading.isShowing()) {
-                                    dialogBoxLoading.dismiss();
-                                }
                                 if(requestCode != IntegerUtils.REQUEST_REGISTER) {
                                     errorMessage = StringUtils.MES_ERROR_NO_NUMBER_FOUND;
                                     displayError();
                                 } else {
+                                    user = new User();
+                                    user.setPhoneNumber(stringPhone);
                                     sendOTP(stringPhone);
                                 }
                                 break;
@@ -198,20 +192,39 @@ public class PhoneInputActivity extends AppCompatActivity {
                         StringUtils.MES_SUCCESSFUL_OTP,"") {
                             @Override
                             public void onClickAction() {
+                                if (dialogBoxLoading.isShowing()) {
+                                    dialogBoxLoading.dismiss();
+                                }
                                 Intent nextIntent;
                                 if (requestCode == IntegerUtils.REQUEST_REGISTER) {
                                     nextIntent = new Intent(getApplicationContext(),
-                                                            AccountDetailActivity.class);
+                                                            CompleteAccountActivity.class);
                                 } else {
                                     nextIntent = new Intent(getApplicationContext(),
                                                             PasswordChangeActivity.class);
+                                    nextIntent.putExtra("REQUEST_CODE",
+                                                        IntegerUtils.REQUEST_PASSWORD_FORGET);
                                 }
+                                nextIntent.putExtra("USER", user);
                                 nextIntent.putExtra("PHONE", stringPhone);
                                 startActivityForResult(nextIntent, requestCode);
                             }
                         };
                 dialogBox.show();
                 dismiss();
+            }
+
+            @Override
+            public void onVerificationFailed() {
+                errorMessage = StringUtils.MES_ERROR_INVALID_OTP;
+                displayError();
+            }
+
+            @Override
+            public void onClosingDialogBox() {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
             }
         };
         dialogBoxOTP.getWindow()
@@ -220,16 +233,12 @@ public class PhoneInputActivity extends AppCompatActivity {
     }
 
     private void displayError() {
-        DialogBoxAlert dialogBox =
-                new DialogBoxAlert(PhoneInputActivity.this,
+        if (dialogBoxLoading.isShowing()) {
+            dialogBoxLoading.dismiss();
+        }
+        DialogBoxAlert dialogBox = new DialogBoxAlert(PhoneInputActivity.this,
                         IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
         dialogBox.show();
-    }
-
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
@@ -239,9 +248,16 @@ public class PhoneInputActivity extends AppCompatActivity {
             setResult(Activity.RESULT_CANCELED, getIntent());
             finish();
         } else if (resultCode == RESULT_OK) {
-            getIntent().putExtra("USER", (User) data.getSerializableExtra("USER"));
-            setResult(Activity.RESULT_OK, getIntent());
+            if (requestCode == IntegerUtils.REQUEST_REGISTER) {
+                getIntent().putExtra("USER", data.getSerializableExtra("USER"));
+                setResult(Activity.RESULT_OK, getIntent());
+            }
             finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromPhoneInput.performClick();
     }
 }

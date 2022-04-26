@@ -31,7 +31,6 @@
                 android:gravity="center"
                 android:fontFamily="@font/montserratr"
                 android:textStyle="bold"
-                tools:text="w"
                 android:textSize="14sp"
                 android:textColor="@color/gray_dark"/>
 

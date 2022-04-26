@@ -11,14 +11,15 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -29,6 +30,7 @@ import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
+import dev.wsgroup.main.models.dtos.CampaignMilestone;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
@@ -42,8 +44,10 @@ public class RecViewCartProductListAdapter
     private Context context;
     private Activity activity;
     private SharedPreferences sharedPreferences;
-    private int identifier, quantity, minQuantity, maxQuantity;
+    private int identifier, quantity, minQuantity, maxQuantity, milestoneQuantity;
     private double price, totalPrice;
+    private Campaign campaign;
+    private CampaignMilestone milestone;
 
     public RecViewCartProductListAdapter(Context context, Activity activity, int identifier) {
         sharedPreferences = activity.getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
@@ -72,13 +76,12 @@ public class RecViewCartProductListAdapter
                  .load(shoppingCart.get(position).getProduct().getImageList().get(0))
                  .into(holder.imgRecViewProduct);
         }
-
         if (identifier == IntegerUtils.IDENTIFIER_RETAIL_CART) {
+            holder.layoutBasePrice.setVisibility(View.VISIBLE);
+            holder.layoutCampaign.setVisibility(View.GONE);
             holder.checkboxCartProduct.setVisibility(View.VISIBLE);
             setCheckboxSelected(holder, shoppingCart.get(position).getSelectedFlag());
             holder.txtPricingDescription.setText("Retail Price");
-            holder.txtCampaignTag.setVisibility(View.GONE);
-            holder.txtProductPriceORG.setVisibility(View.GONE);
             holder.btnCheckout.setVisibility(View.GONE);
             holder.checkboxCartProduct.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -93,15 +96,25 @@ public class RecViewCartProductListAdapter
                 }
             });
         } else {
-            holder.checkboxCartProduct.setVisibility(View.GONE);
-            holder.txtPricingDescription
-                  .setText(shoppingCart.get(position).getCampaign().getDescription());
-            boolean sharing = shoppingCart.get(position).getCampaign().getShareFlag();
-            holder.txtCampaignTag.setText(sharing ? "Sharing Campaign" : "Single Campaign");
-            holder.txtProductPriceORG.setVisibility(View.VISIBLE);
-            holder.txtProductPriceORG.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-            price = shoppingCart.get(0).getProduct().getRetailPrice();
+            campaign = shoppingCart.get(position).getCampaign();
+            price = shoppingCart.get(position).getProduct().getRetailPrice();
             holder.txtProductPriceORG.setText(MethodUtils.formatPriceString(price));
+            holder.txtProductPriceORG.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.layoutBasePrice.setVisibility(View.GONE);
+            holder.layoutCampaign.setVisibility(View.VISIBLE);
+            holder.txtCampaignNote.setText(campaign.getDescription());
+            holder.lblQuantityCountSeparator.setText("/");
+            holder.checkboxCartProduct.setVisibility(View.GONE);
+            if (!campaign.getShareFlag()) {
+                holder.txtCampaignTag.setText("Single Campaign");
+                holder.layoutNextMilestone.setVisibility(View.GONE);
+                holder.layoutPreviousMilestone.setVisibility(View.GONE);
+                holder.layoutCampaignInfo.setVisibility(View.GONE);
+                price = campaign.getPrice();
+                holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
+                holder.txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
+                holder.txtCampaignQuantityBar.setText(campaign.getMinQuantity() + "");
+            }
             holder.btnCheckout.setVisibility(View.VISIBLE);
             holder.btnCheckout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -110,7 +123,6 @@ public class RecViewCartProductListAdapter
                 }
             });
         }
-        getPurchasePrice(position);
         holder.txtProductPrice.setText(MethodUtils.formatPriceString(price));
         quantity = shoppingCart.get(position).getQuantity();
         minQuantity = getMinQuantity(position);
@@ -120,11 +132,12 @@ public class RecViewCartProductListAdapter
         } else if (quantity > maxQuantity) {
             quantity = maxQuantity;
         }
-        setupQuantityButtons(holder);
-        setTotalPrice(holder, position);
         holder.editProductQuantity.setText(quantity + "");
         holder.txtNumberInStorage.setText(maxQuantity + "");
-
+        updateSharingCampaignLayout(holder, position);
+        getPurchasePrice(position);
+        setupQuantityButtons(holder);
+        setTotalPrice(holder, position);
         holder.layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,18 +167,16 @@ public class RecViewCartProductListAdapter
 
         holder.editProductQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(v);
+                    MethodUtils.hideKeyboard(view, context);
                 }
             }
         });
 
         holder.editProductQuantity.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -178,10 +189,11 @@ public class RecViewCartProductListAdapter
                     } else if (quantity > maxQuantity) {
                         holder.editProductQuantity.setText(maxQuantity + "");
                     } else {
-                        setupQuantityButtons(holder);
-                        setTotalPrice(holder, position);
                         CartProduct cartProduct = shoppingCart.get(position);
                         cartProduct.setQuantity(quantity);
+                        setupQuantityButtons(holder);
+                        updateSharingCampaignLayout(holder, position);
+                        setTotalPrice(holder, position);
                         updateCartItem(cartProduct, holder);
                     }
                 } catch (Exception e) {
@@ -190,9 +202,7 @@ public class RecViewCartProductListAdapter
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) { }
         });
 
         holder.btnDeleteCartProducts.setOnClickListener(new View.OnClickListener() {
@@ -212,10 +222,65 @@ public class RecViewCartProductListAdapter
         });
     }
 
+    private void updateSharingCampaignLayout(ViewHolder holder, int position) {
+        if (identifier == IntegerUtils.IDENTIFIER_CAMPAIGN_CART) {
+            campaign = shoppingCart.get(position).getCampaign();
+            if (campaign != null && campaign.getShareFlag()) {
+                holder.txtCampaignTag.setText("Sharing Campaign");
+                milestoneQuantity = Integer.parseInt(holder.editProductQuantity.getText().toString())
+                        + campaign.getQuantityCount();
+                milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
+                        milestoneQuantity);
+                holder.layoutNextMilestone.setVisibility(View.VISIBLE);
+                holder.layoutPreviousMilestone.setVisibility(View.VISIBLE);
+                holder.layoutCampaignInfo.setVisibility(View.VISIBLE);
+                if (milestone == null) {
+                    price = campaign.getPrice();
+                    holder.lblCampaignNextMilestone.setText("Next milestone:");
+                    milestoneQuantity = campaign.getMilestoneList().get(0).getQuantity();
+                    holder.txtCampaignNextMilestone.setText(milestoneQuantity + "");
+                    holder.layoutPreviousMilestone.setVisibility(View.GONE);
+                } else {
+                    price = milestone.getPrice();
+                    if (milestone.equals(campaign.getMilestoneList()
+                                              .get(campaign.getMilestoneList().size() - 1))) {
+                        holder.lblCampaignNextMilestone.setText("Final milestone reached!");
+                        milestoneQuantity = campaign.getMaxQuantity();
+                        holder.txtCampaignNextMilestone.setText("");
+                    } else {
+                        holder.lblCampaignNextMilestone.setText("Next milestone:");
+                        milestoneQuantity = campaign.getMilestoneList()
+                                                    .get(campaign.getMilestoneList().indexOf(milestone) + 1)
+                                                    .getQuantity();
+                        holder.txtCampaignPreviousMilestone.setText(milestone.getQuantity() + "");
+                        holder.txtCampaignNextMilestone.setText(milestoneQuantity + "");
+                    }
+                }
+                holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(price));
+                quantity = shoppingCart.get(position).getQuantity() + campaign.getQuantityCount();
+                if (quantity > campaign.getMaxQuantity()) {
+                    quantity = campaign.getMaxQuantity();
+                }
+                holder.txtCampaignQuantityCount.setText(quantity + "");
+                holder.txtCampaignQuantityBar.setText(milestoneQuantity + "");
+                holder.progressBarQuantityCount.setMax(milestoneQuantity);
+                holder.progressBarQuantityCount.setProgress(quantity);
+            }
+        }
+    }
+
     private void getPurchasePrice(int position) {
         price = shoppingCart.get(position).getProduct().getRetailPrice();
         if (identifier == IntegerUtils.IDENTIFIER_CAMPAIGN_CART) {
-            price -= shoppingCart.get(position).getCampaign().getSavingPrice();
+            campaign = shoppingCart.get(position).getCampaign();
+            price = shoppingCart.get(position).getCampaign().getPrice();
+            if (campaign.getShareFlag()) {
+                milestoneQuantity = shoppingCart.get(position).getQuantity() + campaign.getQuantityCount();
+                milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(), milestoneQuantity);
+                if (milestone != null) {
+                    price = milestone.getPrice();
+                }
+            }
         }
     }
 
@@ -225,6 +290,7 @@ public class RecViewCartProductListAdapter
     }
 
     private void setTotalPrice(ViewHolder holder, int position) {
+        quantity = Integer.parseInt(holder.editProductQuantity.getText().toString());
         totalPrice = calculateTotalPrice(position);
         holder.txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
     }
@@ -243,12 +309,10 @@ public class RecViewCartProductListAdapter
     }
 
     private int getMinQuantity(int position) {
-        int quantity = 0;
+        int quantity = 1;
         if (shoppingCart.get(position).getCampaignFlag()) {
             Campaign campaign = shoppingCart.get(position).getCampaign();
-            if (!campaign.getShareFlag()) {
-                quantity = campaign.getMinQuantity();
-            }
+            quantity = campaign.getMinQuantity();
         }
         return quantity;
     }
@@ -298,7 +362,7 @@ public class RecViewCartProductListAdapter
         APICartCaller.updateCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
                 activity.getApplication(), new APIListener() {
                     @Override
-                    public void onUpdateCartItemSuccessful() {
+                    public void onUpdateSuccessful() {
                         holder.btnCheckout.setEnabled(true);
                         holder.btnCheckout.getBackground()
                               .setTint(context.getResources().getColor(R.color.blue_main));
@@ -313,9 +377,14 @@ public class RecViewCartProductListAdapter
 
                     @Override
                     public void onFailedAPICall(int code) {
-                        holder.btnCheckout.setEnabled(true);
-                        holder.btnCheckout.getBackground()
-                              .setTint(context.getResources().getColor(R.color.blue_main));
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(context, activity);
+                        } else {
+                            MethodUtils.displayErrorAPIMessage(activity);
+                            holder.btnCheckout.setEnabled(true);
+                            holder.btnCheckout.getBackground()
+                                    .setTint(context.getResources().getColor(R.color.blue_main));
+                        }
                     }
                 });
     }
@@ -331,12 +400,6 @@ public class RecViewCartProductListAdapter
     public void onCheckout(int position) {
     }
 
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
     @Override
     public int getItemCount() {
         return shoppingCart.size();
@@ -346,10 +409,17 @@ public class RecViewCartProductListAdapter
         private ImageView checkboxCartProduct, imgRecViewProduct,
                 imgProductQuantityMinus, imgProductQuantityPlus;
         private TextView txtRecViewCartProductName, txtNumberInStorage, txtPricingDescription,
-                txtCampaignTag, txtProductPriceORG, txtProductPrice, txtTotalPrice;
+                txtProductPrice, txtTotalPrice, txtCampaignTag, txtCampaignNote,
+                txtProductPriceORG, txtCampaignPrice, lblCampaignNextMilestone,
+                txtCampaignNextMilestone, txtCampaignPreviousMilestone,
+                txtCampaignQuantityCount, txtCampaignQuantityBar, lblQuantityCountSeparator;
         private Button btnDeleteCartProducts, btnCheckout;
         private EditText editProductQuantity;
         private RelativeLayout layoutParent;
+        private ConstraintLayout layoutBasePrice;
+        private LinearLayout layoutCampaign, layoutNextMilestone,
+                layoutPreviousMilestone, layoutCampaignInfo;
+        private ProgressBar progressBarQuantityCount;
 
         public ViewHolder(View view) {
             super(view);
@@ -360,14 +430,28 @@ public class RecViewCartProductListAdapter
             txtRecViewCartProductName = view.findViewById(R.id.txtRecViewCartProductName);
             txtNumberInStorage = view.findViewById(R.id.txtNumberInStorage);
             txtPricingDescription = view.findViewById(R.id.txtPricingDescription);
-            txtCampaignTag = view.findViewById(R.id.txtCampaignTag);
-            txtProductPriceORG = view.findViewById(R.id.txtProductPriceORG);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
             txtTotalPrice = view.findViewById(R.id.txtTotalPrice);
+            txtCampaignTag = view.findViewById(R.id.txtCampaignTag);
+            txtCampaignNote = view.findViewById(R.id.txtCampaignNote);
+            txtProductPriceORG = view.findViewById(R.id.txtProductPriceORG);
+            txtCampaignPrice = view.findViewById(R.id.txtCampaignPrice);
+            lblCampaignNextMilestone = view.findViewById(R.id.lblCampaignNextMilestone);
+            txtCampaignNextMilestone = view.findViewById(R.id.txtCampaignNextMilestone);
+            txtCampaignPreviousMilestone = view.findViewById(R.id.txtCampaignPreviousMilestone);
+            txtCampaignQuantityCount = view.findViewById(R.id.txtCampaignQuantityCount);
+            txtCampaignQuantityBar = view.findViewById(R.id.txtCampaignQuantityBar);
+            lblQuantityCountSeparator = view.findViewById(R.id.lblQuantityCountSeparator);
             btnDeleteCartProducts= view.findViewById(R.id.btnDeleteCartProducts);
             btnCheckout = view.findViewById(R.id.btnCheckout);
             editProductQuantity = view.findViewById(R.id.editProductQuantity);
             layoutParent = view.findViewById(R.id.layoutParent);
+            layoutBasePrice = view.findViewById(R.id.layoutBasePrice);
+            layoutCampaign = view.findViewById(R.id.layoutCampaign);
+            layoutNextMilestone = view.findViewById(R.id.layoutNextMilestone);
+            layoutPreviousMilestone = view.findViewById(R.id.layoutPreviousMilestone);
+            layoutCampaignInfo = view.findViewById(R.id.layoutCampaignInfo);
+            progressBarQuantityCount = view.findViewById(R.id.progressBarQuantityCount);
         }
     }
 }

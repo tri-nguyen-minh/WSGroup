@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +40,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
-import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.activities.order.ConfirmOrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -59,11 +57,11 @@ public class RetailTab extends Fragment {
     private RecViewCartSupplierListAdapter adapter;
     private List<Supplier> supplierRetailList;
     private HashMap<String, List<CartProduct>> retailCart;
-    private HashMap<String, List<Campaign>> campaignMap;
+    private HashMap<String, List<Campaign>> activeCampaignMap, readyCampaignMap;
     private List<CartProduct> cartList, cartProductList;
-    private List<Campaign> campaignList;
+    private List<Campaign> campaignList, tempList;
     private DialogBoxLoading dialogBoxLoading;
-    private int retailCount;
+    private int activeCampaignCount, readyCampaignCount;
     private Supplier supplier;
     private CartProduct cartProduct;
     private Product product;
@@ -123,6 +121,7 @@ public class RetailTab extends Fragment {
                         order.setSupplier(supplier);
                         order.setInCart(true);
                         order.setOrderProductList(selectedProductList);
+                        order.setLoyaltyDiscountPercent(0);
                         ordersList.add(order);
                     }
                 }
@@ -130,7 +129,7 @@ public class RetailTab extends Fragment {
                                                         StringUtils.MES_CONFIRM_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
-                        Intent confirmOrderIntent = new Intent(getContext(), ConfirmActivity.class);
+                        Intent confirmOrderIntent = new Intent(getContext(), ConfirmOrderActivity.class);
                         confirmOrderIntent.putExtra("ORDER_LIST", ordersList);
                         confirmOrderIntent.putExtra("REQUEST_CODE", IntegerUtils.REQUEST_ORDER_RETAIL);
                         confirmOrderIntent.putExtra("CART_STATUS", true);
@@ -168,29 +167,51 @@ public class RetailTab extends Fragment {
         }
     }
     private void findCampaign() {
-        campaignMap = new HashMap<>();
-        retailCount = cartList.size();
+        activeCampaignMap = new HashMap<>();
+        readyCampaignMap = new HashMap<>();
+        activeCampaignCount = cartList.size();
+        readyCampaignCount = cartList.size();
         for (CartProduct cartProduct : cartList) {
             APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
                     "active", null, getActivity().getApplication(), new APIListener() {
-                        @Override
-                        public void onCampaignListFound(List<Campaign> campaignList) {
-                            retailCount--;
-                            campaignMap.put(cartProduct.getId(), campaignList);
-                            if (retailCount == 0) {
-                                addCampaignToCart();
-                                setupAdapter();
-                            }
-                        }
-                        @Override
-                        public void onNoJSONFound() {
-                            retailCount--;
-                            if (retailCount == 0) {
-                                addCampaignToCart();
-                                setupAdapter();
-                            }
-                        }
-                    });
+                @Override
+                public void onCampaignListFound(List<Campaign> campaignList) {
+                    activeCampaignCount--;
+                    activeCampaignMap.put(cartProduct.getId(), campaignList);
+                    if (activeCampaignCount == 0 && readyCampaignCount == 0) {
+                        addCampaignToCart();
+                        setupAdapter();
+                    }
+                }
+                @Override
+                public void onNoJSONFound() {
+                    activeCampaignCount--;
+                    if (activeCampaignCount == 0 && readyCampaignCount == 0) {
+                        addCampaignToCart();
+                        setupAdapter();
+                    }
+                }
+            });
+            APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
+                    "ready", null, getActivity().getApplication(), new APIListener() {
+                @Override
+                public void onCampaignListFound(List<Campaign> campaignList) {
+                    readyCampaignCount--;
+                    readyCampaignMap.put(cartProduct.getId(), campaignList);
+                    if (activeCampaignCount == 0 && readyCampaignCount == 0) {
+                        addCampaignToCart();
+                        setupAdapter();
+                    }
+                }
+                @Override
+                public void onNoJSONFound() {
+                    readyCampaignCount--;
+                    if (activeCampaignCount == 0 && readyCampaignCount == 0) {
+                        addCampaignToCart();
+                        setupAdapter();
+                    }
+                }
+            });
         }
     }
 
@@ -208,51 +229,55 @@ public class RetailTab extends Fragment {
                 String token = sharedPreferences.getString("TOKEN", "" );
                 APICartCaller.deleteCartItem(token, cartProductId,
                         getActivity().getApplication(), new APIListener() {
-                            @Override
-                            public void onUpdateCartItemSuccessful() {
-                                layoutCartDetail.setVisibility(View.INVISIBLE);
-                                layoutLoading.setVisibility(View.VISIBLE);
-                                int index = findCartProductIndexById(cartProductId);
-                                if (index >= 0) {
-                                    cartList.remove(index);
-                                }
-                                try {
-                                    sharedPreferences.edit()
-                                            .putString("RETAIL_CART",
-                                                    ObjectSerializer.serialize((Serializable) cartList))
-                                            .apply();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                if (dialogBoxLoading.isShowing()) {
-                                    dialogBoxLoading.dismiss();
-                                }
-                                if (cartList.size() > 0) {
-                                    adaptList();
-                                    setupTotalPrice();
-                                    setupCheckoutButton();
-                                    finishRecView();
-                                    layoutCartDetail.setVisibility(View.VISIBLE);
-                                    layoutLoading.setVisibility(View.INVISIBLE);
-                                } else {
-                                    layoutNoShoppingCart.setVisibility(View.VISIBLE);
-                                    layoutLoading.setVisibility(View.INVISIBLE);
-                                    layoutCartDetail.setVisibility(View.INVISIBLE);
-                                }
-                            }
+                    @Override
+                    public void onUpdateSuccessful() {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        layoutCartDetail.setVisibility(View.INVISIBLE);
+                        layoutLoading.setVisibility(View.VISIBLE);
+                        int index = findCartProductIndexById(cartProductId);
+                        if (index >= 0) {
+                            cartList.remove(index);
+                        }
+                        try {
+                            sharedPreferences.edit()
+                                    .putString("RETAIL_CART",
+                                            ObjectSerializer.serialize((Serializable) cartList))
+                                    .commit();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        if (cartList.size() > 0) {
+                            adaptList();
+                            setupTotalPrice();
+                            setupCheckoutButton();
+                            finishRecView();
+                            layoutCartDetail.setVisibility(View.VISIBLE);
+                            layoutLoading.setVisibility(View.INVISIBLE);
+                        } else {
+                            layoutNoShoppingCart.setVisibility(View.VISIBLE);
+                            layoutLoading.setVisibility(View.INVISIBLE);
+                            layoutCartDetail.setVisibility(View.INVISIBLE);
+                        }
+                    }
 
-                            @Override
-                            public void onFailedAPICall(int code) {
-                                if (dialogBoxLoading.isShowing()) {
-                                    dialogBoxLoading.dismiss();
-                                }
-                                DialogBoxAlert dialogBox =
-                                        new DialogBoxAlert(getActivity(),
-                                                IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                                                StringUtils.MES_ERROR_FAILED_API_CALL,"");
-                                dialogBox.show();
-                            }
-                        });
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(getContext(),
+                                    getActivity());
+                        } else {
+                            MethodUtils.displayErrorAPIMessage(getActivity());
+                        }
+                    }
+                });
             }
 
             @Override
@@ -309,12 +334,18 @@ public class RetailTab extends Fragment {
     }
 
     private void addCampaignToCart() {
-        if (campaignMap.size() > 0) {
+        if (activeCampaignMap.size() > 0 || readyCampaignMap.size() > 0) {
             for (int i = 0; i < cartList.size(); i++) {
                 cartProduct = cartList.get(i);
-                campaignList = campaignMap.get(cartList.get(i).getId());
+                campaignList = activeCampaignMap.get(cartList.get(i).getId());
                 if (campaignList == null) {
                     campaignList = new ArrayList<>();
+                }
+                tempList = readyCampaignMap.get(cartList.get(i).getId());
+                if (tempList != null && tempList.size() > 0) {
+                    for (Campaign campaign : tempList) {
+                        campaignList.add(campaign);
+                    }
                 }
                 product = cartProduct.getProduct();
                 product.setCampaignList(campaignList);

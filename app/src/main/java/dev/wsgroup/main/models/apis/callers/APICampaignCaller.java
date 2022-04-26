@@ -2,6 +2,7 @@ package dev.wsgroup.main.models.apis.callers;
 
 import android.app.Application;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -20,6 +21,7 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICampaignCaller {
@@ -44,6 +46,7 @@ public class APICampaignCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
+                        System.out.println(response);
                         JSONArray data = response.getJSONArray("data");
                         campaignList = (list == null) ? new ArrayList<>() : list;
                         if(data.length() > 0) {
@@ -61,9 +64,10 @@ public class APICampaignCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -75,48 +79,42 @@ public class APICampaignCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void getCampaignListByProductIdList(List<String> productIdList, Map<String, List<Campaign>> map,
+    public static void searchCampaign(List<Campaign> list, String value,
                                                       Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
-        String url = StringUtils.CAMPAIGN_API_URL + "product";
+        String url = StringUtils.CAMPAIGN_API_URL + "searchCampaign";
         try {
             JSONObject jsonObject = new JSONObject();
-            JSONArray jsonArray = new JSONArray();
-            for (String id : productIdList) {
-                jsonArray.put(id);
-            }
-            jsonObject.put("productIds", jsonArray);
+            jsonObject.put("value", value);
+            System.out.println(url);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        JSONArray data = response.getJSONArray("data");
-                        campaignMap = (map == null) ? new HashMap<>() : map;
+                        System.out.println("camapign: " + response);
+                        JSONArray data = response.getJSONObject("data")
+                                                 .getJSONArray("campaign");
+                        campaignList = (list == null) ? new ArrayList<>() : list;
                         if(data.length() > 0) {
-                            campaignMap = new HashMap<>();
                             Campaign campaign;
-                            String productId;
                             for (int i = 0; i < data.length(); i++) {
-                                campaign = Campaign.getObjectFromJSON(data.getJSONObject(i));
-                                campaignList = campaignMap.get(campaign.getProductId());
-                                if (campaignList == null) {
-                                    campaignList = new ArrayList<>();
+                                campaign = Campaign.getSearchedObjectFromJSON(data.getJSONObject(i));
+                                if (campaign.getStatus().equals("active")) {
+                                    campaignList.add(campaign);
                                 }
-                                campaignList.add(campaign);
-                                campaignMap.put(campaign.getProductId(), campaignList);
                             }
-                            APIListener.onCampaignMapFound(campaignMap);
-                        } else {
-                            APIListener.onNoJSONFound();
                         }
+                        APIListener.onCampaignListFound(campaignList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onNoJSONFound();
@@ -124,9 +122,10 @@ public class APICampaignCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -138,6 +137,8 @@ public class APICampaignCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,6 +151,7 @@ public class APICampaignCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         String url = StringUtils.CAMPAIGN_API_URL + campaignId;
+        System.out.println(url);
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
@@ -169,9 +171,10 @@ public class APICampaignCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
@@ -183,6 +186,8 @@ public class APICampaignCaller {
                     return StringUtils.APPLICATION_JSON;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

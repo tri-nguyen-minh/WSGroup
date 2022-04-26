@@ -16,7 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -27,19 +33,26 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderListAdapter;
+import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.models.utils.StringUtils;
+import dev.wsgroup.main.views.activities.order.OrderInfoActivity;
 
 public class OrderFragment extends Fragment {
 
-    private RelativeLayout layoutLoading, layoutNoOrder;
-    private LinearLayout layoutOrderView;
+    private RelativeLayout layoutLoading;
+    private LinearLayout layoutOrderView, layoutNoOrder;
     private RecyclerView recViewOrderView;
     private Spinner spinnerSorting;
+    private TextView lblRetry;
 
     private SharedPreferences sharedPreferences;
-    private String orderStatus, token;
+    private String orderStatus, token, accountId;
     private RecViewOrderListAdapter adapter;
     private List<Order> currentOrderList;
+    private FirebaseDatabaseReferences firebaseReferences;
+    private boolean notificationLoading;
 
     private final String[] sortData = {"Last Ordered", "Last Updated"};
 
@@ -56,8 +69,6 @@ public class OrderFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("TOKEN", "");
         return inflater.inflate(R.layout.fragment_order, container, false);
     }
 
@@ -70,57 +81,72 @@ public class OrderFragment extends Fragment {
         layoutOrderView = view.findViewById(R.id.layoutOrderView);
         recViewOrderView = view.findViewById(R.id.recViewOrderView);
         spinnerSorting = view.findViewById(R.id.spinnerSorting);
+        lblRetry = view.findViewById(R.id.lblRetry);
 
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutNoOrder.setVisibility(View.INVISIBLE);
-        layoutOrderView.setVisibility(View.INVISIBLE);
-        
-        setupSpinner();
+        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN", "");
+        accountId = sharedPreferences.getString("ACCOUNT_ID", "");
+        setupList();
+        setRealtimeFirebase();
 
-        APIOrderCaller.getOrderByStatus(token, orderStatus, currentOrderList,
-                    getActivity().getApplication(), new APIListener() {
+        lblRetry.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onOrderFound(List<Order> orderList) {
-                if (orderList.size() > 0) {
-                    currentOrderList = orderList;
-                    layoutLoading.setVisibility(View.INVISIBLE);
-                    layoutNoOrder.setVisibility(View.INVISIBLE);
-                    layoutOrderView.setVisibility(View.VISIBLE);
-                    sortByCreate(false);
-                    setupOrderList();
-                } else {
-                    layoutLoading.setVisibility(View.INVISIBLE);
-                    layoutNoOrder.setVisibility(View.VISIBLE);
-                    layoutOrderView.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void onFailedAPICall(int code) {
-                layoutLoading.setVisibility(View.INVISIBLE);
-                layoutNoOrder.setVisibility(View.VISIBLE);
-                layoutOrderView.setVisibility(View.INVISIBLE);
+            public void onClick(View view) {
+                setupList();
             }
         });
     }
 
+    private void setupList() {
+        setLoadingState();
+        if (getActivity() == null) {
+            setFailedState();
+        } else {
+            setupSpinner();
+            if (!token.isEmpty()) {
+                currentOrderList = new ArrayList<>();
+                APIOrderCaller.getOrderByStatus(token, orderStatus, currentOrderList,
+                        getActivity().getApplication(), new APIListener() {
+                    @Override
+                    public void onOrderFound(List<Order> orderList) {
+                        if (orderList.size() > 0) {
+                            currentOrderList = orderList;
+                            sortByCreate(false);
+                            setupOrderList();
+                            setReadyState();
+                        } else {
+                            setFailedState();
+                        }
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(getContext(), getActivity());
+                        } else {
+                            setFailedState();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
     private void setupSpinner() {
-
-        ArrayAdapter adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, sortData);
+        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
+                R.layout.spinner_selected_item, sortData);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-
         spinnerSorting.setAdapter(adapter);
-//        spinnerSorting.setSelection(0);
         spinnerSorting.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int positionInt, long positionLong) {
+            public void onItemSelected(AdapterView<?> adapterView, View view,
+                                       int positionInt, long positionLong) {
                 layoutLoading.setVisibility(View.VISIBLE);
                 recViewOrderView.setVisibility(View.GONE);
                 switch (positionInt) {
                     case 1: {
-//                        sortByUpdate(currentOrderList, false);
                         if (currentOrderList != null) {
-                            sortByCreate(true);
+                            sortByUpdate(false);
                             setupOrderList();
                         }
                         break;
@@ -149,8 +175,8 @@ public class OrderFragment extends Fragment {
                 Date date1 = null, date2 = null;
                 if (order1.getDateCreated() != null && order2.getDateCreated() != null) {
                     try {
-                        date1 = MethodUtils.convertStringToDate(order1.getDateCreated());
-                        date2 = MethodUtils.convertStringToDate(order2.getDateCreated());
+                        date1 = MethodUtils.convertToDate(order1.getDateCreated());
+                        date2 = MethodUtils.convertToDate(order2.getDateCreated());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -164,15 +190,15 @@ public class OrderFragment extends Fragment {
         });
     }
 
-    private void sortByUpdate(List<Order> currentOrderList, boolean sortAscending) {
+    private void sortByUpdate(boolean sortAscending) {
         Collections.sort(currentOrderList, new Comparator<Order>() {
             @Override
             public int compare(Order order1, Order order2) {
                 Date date1 = null, date2 = null;
                 if (order1.getDateUpdated() != null && order2.getDateUpdated() != null) {
                     try {
-                        date1 = MethodUtils.convertStringToDate(order1.getDateUpdated());
-                        date2 = MethodUtils.convertStringToDate(order2.getDateUpdated());
+                        date1 = MethodUtils.convertToDate(order1.getDateUpdated());
+                        date2 = MethodUtils.convertToDate(order2.getDateUpdated());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -193,5 +219,42 @@ public class OrderFragment extends Fragment {
         recViewOrderView.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
         recViewOrderView.setVisibility(View.VISIBLE);
+    }
+
+    private void setRealtimeFirebase() {
+        firebaseReferences = new FirebaseDatabaseReferences();
+        firebaseReferences.getUserNotifications(accountId)
+                          .addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!notificationLoading) {
+                    setupList();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) { }
+        });
+    }
+
+    private void setLoadingState() {
+        notificationLoading = true;
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutNoOrder.setVisibility(View.GONE);
+        layoutOrderView.setVisibility(View.GONE);
+    }
+
+    private void setFailedState() {
+        notificationLoading = false;
+        layoutLoading.setVisibility(View.GONE);
+        layoutNoOrder.setVisibility(View.VISIBLE);
+        layoutOrderView.setVisibility(View.GONE);
+    }
+
+    private void setReadyState() {
+        notificationLoading = false;
+        layoutLoading.setVisibility(View.GONE);
+        layoutNoOrder.setVisibility(View.GONE);
+        layoutOrderView.setVisibility(View.VISIBLE);
     }
 }

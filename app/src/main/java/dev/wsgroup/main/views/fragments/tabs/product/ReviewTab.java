@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -76,7 +75,7 @@ public class ReviewTab extends Fragment {
         if (reviewList.size() > 0) {
             setReviewCount();
             setupReviewList();
-            setupSpinner();
+//            setupSpinner();
         } else {
             setNoReviewState();
         }
@@ -99,52 +98,51 @@ public class ReviewTab extends Fragment {
         setReviewLoadedState();
     }
 
-    private void setupSpinner() {
-
-        ArrayAdapter adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, sortData);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        spinnerSorting.setAdapter(adapter);
-        spinnerSorting.setSelection(0);
-        spinnerSorting.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int positionInt, long positionLong) {
-                setListLoadingState();
-                Collections.sort(reviewList, new Comparator<Review>() {
-                    @Override
-                    public int compare(Review review1, Review review2) {
-                        int result = 0;
-                        switch (positionInt) {
-                            case 0: {
-                                Date date1 = null, date2 = null;
-                                if (review1.getCreateDate() != null && review2.getCreateDate() != null) {
-                                    try {
-                                        date1 = MethodUtils.convertStringToDate(review1.getCreateDate());
-                                        date2 = MethodUtils.convertStringToDate(review2.getCreateDate());
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    result = date2.compareTo(date1);
-                                }
-                                break;
-                            }
-                            case 1: {
-                                result = review1.getRating() > review2.getRating() ? -1 :
-                                        (review1.getRating() < review2.getRating() ? 1 : 0);
-                                break;
-                            }
-                        }
-                        return result;
-                    }
-                });
-                setupReviewList();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-    }
+//    private void setupSpinner() {
+//        ArrayAdapter adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, sortData);
+//        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+//        spinnerSorting.setAdapter(adapter);
+//        spinnerSorting.setSelection(0);
+//        spinnerSorting.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int positionInt, long positionLong) {
+//                setListLoadingState();
+//                Collections.sort(reviewList, new Comparator<Review>() {
+//                    @Override
+//                    public int compare(Review review1, Review review2) {
+//                        int result = 0;
+//                        switch (positionInt) {
+//                            case 0: {
+//                                Date date1 = null, date2 = null;
+//                                if (review1.getCreateDate() != null && review2.getCreateDate() != null) {
+//                                    try {
+//                                        date1 = MethodUtils.convertToDate(review1.getCreateDate());
+//                                        date2 = MethodUtils.convertToDate(review2.getCreateDate());
+//                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                    result = date2.compareTo(date1);
+//                                }
+//                                break;
+//                            }
+//                            case 1: {
+//                                result = review1.getRating() > review2.getRating() ? -1 :
+//                                        (review1.getRating() < review2.getRating() ? 1 : 0);
+//                                break;
+//                            }
+//                        }
+//                        return result;
+//                    }
+//                });
+//                setupReviewList();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
+//    }
 
     private void setMainLoadingState() {
         layoutLoading.setVisibility(View.VISIBLE);

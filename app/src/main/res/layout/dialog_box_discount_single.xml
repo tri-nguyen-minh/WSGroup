@@ -18,17 +18,11 @@
             android:background="@color/blue_main">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left"
                 android:text="DISCOUNT"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/style_dialog_box_header" />
 
             <ImageView
                 android:id="@+id/imgCloseDialogBox"

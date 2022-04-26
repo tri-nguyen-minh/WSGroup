@@ -9,7 +9,9 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,7 +25,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import dev.wsgroup.main.R;
@@ -32,11 +33,12 @@ import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
-import dev.wsgroup.main.models.dtos.Product;
-import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
+import dev.wsgroup.main.models.utils.StringUtils;
+import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.fragments.tabs.cart.CampaignTab;
 import dev.wsgroup.main.views.fragments.tabs.cart.RetailTab;
 
@@ -50,8 +52,14 @@ public class CartActivity extends AppCompatActivity {
     private TextView lblRetryGetCart;
     private TabLayout.Tab tabCommon;
 
+    private boolean retailCartCheck, campaignCartCheck,
+            retailCartRemovalCheck, campaignCartRemovalCheck;
+    private String token;
+    private int campaignCount, retailCount;
     private SharedPreferences sharedPreferences;
-    private List<CartProduct> retailCartProductList, campaignCartProductList;
+    private List<CartProduct> tempRetailCartList, tempCampaignCartList,
+            retailCartProductList, campaignCartProductList;
+    private List<Campaign> campaignList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,145 +112,127 @@ public class CartActivity extends AppCompatActivity {
 
     private void setUpShoppingCart() {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN", "");
-        APICartCaller.getCartList(token, getApplication(), new APIListener() {
+        token = sharedPreferences.getString("TOKEN", "");
+        if (!token.isEmpty()) {
+            APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
             public void onCartListFound(List<CartProduct> retailList,
                                         List<CartProduct> campaignList) {
+                retailCartCheck = false; campaignCartCheck = false;
+                retailCartRemovalCheck = false; campaignCartRemovalCheck = false;
                 retailCartProductList = retailList;
                 campaignCartProductList = campaignList;
-                Comparator<CartProduct> comparator = new Comparator<CartProduct>() {
-                    @Override
-                    public int compare(CartProduct cart1, CartProduct cart2) {
-                        return cart1.getProduct().getName().compareTo(cart2.getProduct().getName());
-                    }
-                };
-                Collections.sort(retailCartProductList, comparator);
-                Collections.sort(campaignCartProductList, comparator);
+//                checkValidCart(tempRetailCartList, false);
+//                checkValidCart(tempCampaignCartList, true);
                 putCartToSession();
                 setupCustomerCart();
-//                retailCart = rCart;
-//                campaignCart = cCart;
-//                supplierRetailList = rList;
-//                supplierCampaignList = cList;
-//                if (retailCartProductList.size() > 0 || campaignCartProductList.size() > 0) {
-//                    putCartToSession();
-//                    setupEmptyCustomerCart();
-//                } else {
-//                    retailCart = new HashMap<>();
-//                    campaignCart = new HashMap<>();
-//                    supplierRetailList = new ArrayList<>();
-//                    supplierCampaignList = new ArrayList<>();
-//                    putCartToSession();
-//                    setupEmptyCustomerCart();
-//                }
             }
             @Override
             public void onFailedAPICall(int code) {
-                if (code == IntegerUtils.ERROR_API) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            CartActivity.this);
+                } else if (code == IntegerUtils.ERROR_API) {
                     setupFailedCustomerCart();
                 } else {
                     retailCartProductList = new ArrayList<>();
                     campaignCartProductList = new ArrayList<>();
-//                    retailCart = new HashMap<>();
-//                    campaignCart = new HashMap<>();
-//                    supplierRetailList = new ArrayList<>();
-//                    supplierCampaignList = new ArrayList<>();
                     putCartToSession();
                     setupEmptyCustomerCart();
                 }
             }
         });
+        }
     }
 
-//    private void finishRetailCart() {
-//        if (supplierRetailList.size() > 0) {
-//            retailCount = 0;
-//            for (Supplier supplier : supplierRetailList) {
-//                retailCartProductList = retailCart.get(supplier.getId());
-//                retailCount += retailCartProductList.size();
-//            }
-//            for (Supplier supplier : supplierRetailList) {
-//                retailCartProductList = retailCart.get(supplier.getId());
-//                for (for) {
-//                    CartProduct cartProduct = retailCartProductList.get(iterator);
-//                    APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
-//                            "active", null, getApplication(), new APIListener() {
-//                                @Override
-//                                public void onCampaignListFound(List<Campaign> campaignList) {
-//                                    super.onCampaignListFound(campaignList);
-//                                    retailCount--;
-//                                    Product product = cartProduct.getProduct();
-//                                    product.setCampaignList(campaignList);
-//                                    cartProduct.setProduct(product);
-//                                    retailCartProductList.set(iterator, cartProduct);
-//                                    if (retailCount == 0) {
-//                                        finishCampaignCart();
-//                                    }
-//                                }
-//                                @Override
-//                                public void onNoJSONFound() {
-//                                    super.onNoJSONFound();
-//                                    retailCount--;
-//                                    Product product = cartProduct.getProduct();
-//                                    product.setCampaignList(new ArrayList<Campaign>());
-//                                    cartProduct.setProduct(product);
-//                                    retailCartProductList.set(iterator, cartProduct);
-//                                    if (retailCount == 0) {
-//                                        finishCampaignCart();
-//                                    }
-//                                }
-//                            });
-//                }
-//            }
-//        } else {
-//            finishCampaignCart();
-//        }
-//    }
-//
-//    private void finishCampaignCart() {
-//        if (supplierCampaignList.size() > 0) {
-//            campaignCount = 0;
-//            for (Supplier supplier : supplierCampaignList) {
-//                campaignCartProductList = campaignCart.get(supplier.getId());
-//                campaignCount += campaignCartProductList.size();
-//            }
-//            for (Supplier supplier : supplierCampaignList) {
-//                campaignCartProductList = campaignCart.get(supplier.getId());
-//                for (CartProduct cartProduct : campaignCartProductList) {
-//                    APICampaignCaller.getCampaignById(cartProduct.getCampaign().getId(),
-//                            getApplication(), new APIListener() {
-//                                @Override
-//                                public void onCampaignFound(Campaign campaign) {
-//                                    cartProduct.setCampaign(campaign);
-//                                    campaignCount--;
-//                                    if (campaignCount == 0) {
-//                                        putCartToSession();
-//                                        setupCustomerCart();
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onNoJSONFound() {
-//                                    campaignCount--;
-//                                    if (campaignCount == 0) {
-//                                        putCartToSession();
-//                                        setupCustomerCart();
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onFailedAPICall(int code) {
-//                                    super.onFailedAPICall(code);
-//                                    setupFailedCustomerCart();
-//                                }
-//                            });
-//                }
-//            }
-//        } else {
-//            setupCustomerCart();
-//        }
-//    }
+    private void checkValidCart(List<CartProduct> cartProductList, boolean isCampaign) {
+        if (isCampaign) {
+            campaignCount = cartProductList.size();
+            for (CartProduct cartProduct : cartProductList) {
+                APICampaignCaller.getCampaignById(cartProduct.getCampaign().getId(),
+                        getApplication(), new APIListener() {
+                    @Override
+                    public void onCampaignFound(Campaign campaign) {
+                        if (!campaign.getStatus().equals("active")) {
+                            APICartCaller.deleteCartItem(token, cartProduct.getId(),
+                                    getApplication(), new APIListener() {
+                                @Override
+                                public void onUpdateSuccessful() {
+                                    cartProductList.remove(cartProduct);
+                                    campaignCartRemovalCheck = true;
+                                    campaignCount--;
+                                    if (campaignCount == 0) {
+                                        campaignCartProductList = cartProductList;
+                                        campaignCartCheck = true;
+                                        finishShoppingCart();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailedAPICall(int code) {
+                                    if (code == IntegerUtils.ERROR_NO_USER) {
+                                        MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                                                CartActivity.this);
+                                    } else {
+                                        setupFailedCustomerCart();
+                                    }
+                                }
+                            });
+                        } else {
+                            campaignCount--;
+                            if (campaignCount == 0) {
+                                campaignCartProductList = cartProductList;
+                                campaignCartCheck = true;
+                                finishShoppingCart();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onNoJSONFound() {
+                        cartProductList.remove(cartProduct);
+                        campaignCartRemovalCheck = true;
+                        campaignCount--;
+                        if (campaignCount == 0) {
+                            campaignCartProductList = cartProductList;
+                            campaignCartCheck = true;
+                            finishShoppingCart();
+                        }
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        setupFailedCustomerCart();
+                    }
+                });
+            }
+        } else {
+            retailCartProductList = cartProductList;
+            retailCartCheck = true;
+            finishShoppingCart();
+        }
+    }
+
+    private void finishShoppingCart() {
+        if (retailCartRemovalCheck || campaignCartRemovalCheck) {
+            DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(CartActivity.this,
+                    IntegerUtils.CONFIRM_ACTION_CODE_ALERT, StringUtils.MES_ALERT_INVALID_ORDER);
+            dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialogBoxAlert.show();
+        }
+        if (retailCartCheck && campaignCartCheck) {
+            Comparator<CartProduct> comparator = new Comparator<CartProduct>() {
+                @Override
+                public int compare(CartProduct cart1, CartProduct cart2) {
+                    return cart1.getProduct().getName().compareTo(cart2.getProduct().getName());
+                }
+            };
+            Collections.sort(retailCartProductList, comparator);
+            Collections.sort(campaignCartProductList, comparator);
+            putCartToSession();
+            setupCustomerCart();
+        }
+    }
 
     private void putCartToSession() {
         try {
@@ -251,13 +241,7 @@ public class CartActivity extends AppCompatActivity {
                             ObjectSerializer.serialize((Serializable) retailCartProductList))
                     .putString("CAMPAIGN_CART",
                             ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .apply();
-//            sharedPreferences.edit()
-//                    .putString("RETAIL_CART", ObjectSerializer.serialize((Serializable) retailCart))
-//                    .putString("SUPPLIER_RETAIL_LIST", ObjectSerializer.serialize((Serializable) supplierRetailList))
-//                    .putString("CAMPAIGN_CART", ObjectSerializer.serialize((Serializable) campaignCart))
-//                    .putString("SUPPLIER_CAMPAIGN_LIST", ObjectSerializer.serialize((Serializable) supplierCampaignList))
-//                    .apply();
+                    .commit();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -339,6 +323,11 @@ public class CartActivity extends AppCompatActivity {
         });
         cartTabLayout.selectTab(cartTabLayout.getTabAt(0));
         cartViewPager.setCurrentItem(cartTabLayout.getSelectedTabPosition());
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromCart.performClick();
     }
 
     @Override

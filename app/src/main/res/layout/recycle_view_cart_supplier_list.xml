@@ -6,13 +6,13 @@
     android:orientation="vertical"
     android:paddingTop="10dp"
     android:paddingBottom="5dp"
-    android:background="@color/gray_lighter">
+    android:background="@color/gray_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/gray_lighter">
+        android:background="@color/gray_background">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

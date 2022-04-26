@@ -5,8 +5,9 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class User implements Serializable {
+
     private String userId, googleId, accountId, username, phoneNumber, password,
-            firstName, lastName, mail, avatarLink, token;
+            firstName, lastName, mail, avatarLink, walletCode, walletSecret, token;
 
     private boolean status;
 
@@ -109,6 +110,22 @@ public class User implements Serializable {
         this.avatarLink = avatarLink;
     }
 
+    public String getWalletCode() {
+        return walletCode;
+    }
+
+    public void setWalletCode(String walletCode) {
+        this.walletCode = walletCode;
+    }
+
+    public String getWalletSecret() {
+        return walletSecret;
+    }
+
+    public void setWalletSecret(String walletSecret) {
+        this.walletSecret = walletSecret;
+    }
+
     public String getToken() {
         return token;
     }
@@ -137,6 +154,8 @@ public class User implements Serializable {
         user.setMail(profile.getString("email"));
         user.setAvatarLink(profile.getString("avt"));
         user.setStatus(profile.getBoolean("isdeleted"));
+        user.setWalletCode(profile.getString("eWalletCode"));
+        user.setWalletSecret(profile.getString("eWalletSecret"));
         return user;
     }
 
@@ -149,6 +168,11 @@ public class User implements Serializable {
         user.setMail(jsonObject.getString("email"));
         user.setAvatarLink(jsonObject.getString("avt"));
         user.setStatus(jsonObject.getBoolean("isdeleted"));
+        user.setGoogleId(jsonObject.getString("googleid"));
+        user.setUsername(jsonObject.getString("username"));
+        user.setPhoneNumber(jsonObject.getString("phone"));
+        user.setWalletCode(jsonObject.getString("eWalletCode"));
+        user.setWalletSecret(jsonObject.getString("eWalletSecret"));
         return user;
     }
 }

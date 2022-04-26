@@ -3,25 +3,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="1dp"
+    android:layout_marginBottom="2dp"
     android:paddingVertical="10dp"
-    android:paddingHorizontal="20dp"
+    android:paddingHorizontal="15dp"
     android:background="@color/white">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineOrderPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.65"/>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewProductImage"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="5dp"
+        android:backgroundTint="@color/gray_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            app:cardCornerRadius="5dp">
+
+            <ImageView
+                android:id="@+id/imgRecViewProduct"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/img_unavailable"/>
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintLeft_toRightOf="@id/cardViewProductImage"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/guidelineOrderPrice"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
@@ -36,51 +57,56 @@
             android:maxLines="1"
             android:ellipsize="end"/>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="3dp">
+            android:layout_marginTop="5dp">
 
             <TextView
+                android:id="@+id/lblQuantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="7dp"
                 android:fontFamily="@font/montserratr"
                 android:gravity="left"
-                android:textColor="@color/gray"
-                android:textSize="13sp"
-                android:textStyle="bold"
+                android:textColor="@color/gray_dark"
+                android:textSize="14sp"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:text="Quantity:"/>
+                android:text="Quantity:"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
                 android:id="@+id/txtQuantityCount"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
                 android:fontFamily="@font/montserratr"
                 android:gravity="left"
-                android:textColor="@color/gray"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end"/>
+                android:textColor="@color/gray_darker"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toRightOf="@id/lblQuantity"
+                app:layout_constraintRight_toLeftOf="@id/txtProductPrice"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/txtProductPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserratr"
+                android:text="000.000.000d"
+                android:textColor="@color/gray_dark"
+                android:textSize="17dp"
+                android:textStyle="bold"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/txtProductPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserratr"
-        android:text="000.000.000d"
-        android:textColor="@color/gray_dark"
-        android:textSize="17dp"
-        android:textStyle="bold"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".views.activities."
     android:orientation="vertical"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     android:padding="20dp">
 
     <androidx.cardview.widget.CardView

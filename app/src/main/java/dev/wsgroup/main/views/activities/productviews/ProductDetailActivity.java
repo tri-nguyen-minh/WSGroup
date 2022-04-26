@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +39,7 @@ import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.MainActivity;
@@ -51,19 +53,21 @@ public class ProductDetailActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabLayout.Tab tabCommon;
     private ImageView imgBackFromProductDetail, imgProductDetailHome;
-    private TextView  txtProductDetailCartCount;
+    private TextView  txtProductDetailCartCount, lblRetry;
     private CardView cardViewProductDetailCartCount;
-    private ConstraintLayout constraintLayoutShoppingCart, layoutLoading, layoutMainLayout,
-            constraintLayoutMessage;
+    private ConstraintLayout constraintLayoutShoppingCart, layoutLoading, layoutMainLayout;
+    private LinearLayout layoutFailed;
 
     private SharedPreferences sharedPreferences;
     private String userId, productId, token;
     private int cartCount;
     private Product product;
     private Supplier supplier;
-    private List<CartProduct> retailList, campaignList;
-    private boolean campaignListStatus, reviewListStatus, orderCountStatus,
-            reviewCountStatus, loyaltyCheckStatus;
+    private List<CartProduct> retailCartList, campaignCartList;
+    private List<Campaign> currentCampaignList;
+    private boolean activeCampaignStatus, readyCampaignStatus,
+                    reviewListStatus, orderCountStatus,
+                    reviewCountStatus, loyaltyCheckStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,23 +80,19 @@ public class ProductDetailActivity extends AppCompatActivity {
         imgBackFromProductDetail = findViewById(R.id.imgBackFromProductDetail);
         imgProductDetailHome = findViewById(R.id.imgProductDetailHome);
         txtProductDetailCartCount = findViewById(R.id.txtProductDetailCartCount);
+        lblRetry = findViewById(R.id.lblRetry);
         cardViewProductDetailCartCount = findViewById(R.id.cardViewProductDetailCartCount);
         constraintLayoutShoppingCart = findViewById(R.id.constraintLayoutShoppingCart);
         layoutLoading = findViewById(R.id.layoutLoading);
         layoutMainLayout = findViewById(R.id.layoutMainLayout);
+        layoutFailed = findViewById(R.id.layoutFailed);
 
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        userId = sharedPreferences.getString("USER_ID", "");
-        token = sharedPreferences.getString("TOKEN", "");
-        productId = getIntent().getStringExtra("PRODUCT_ID");
-
-        loadProduct();
-        editShoppingCart();
+        loadData();
 
         imgBackFromProductDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_OK);
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
@@ -116,42 +116,116 @@ public class ProductDetailActivity extends AppCompatActivity {
                 }
             }
         });
+
+        lblRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadData();
+            }
+        });
+    }
+
+    private void loadData() {
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        userId = sharedPreferences.getString("USER_ID", "");
+        token = sharedPreferences.getString("TOKEN", "");
+        productId = getIntent().getStringExtra("PRODUCT_ID");
+        loadProduct();
+        if (!userId.isEmpty()) {
+            setUpShoppingCart();
+        }
     }
 
     private void loadProduct() {
         layoutLoading.setVisibility(View.VISIBLE);
         layoutMainLayout.setVisibility(View.INVISIBLE);
-        campaignListStatus = false;
-        reviewListStatus = false;
-        orderCountStatus = false;
-        reviewCountStatus = false;
-        loyaltyCheckStatus = false;
-        APIProductCaller.getProductById(productId,
-                getApplication(), new APIListener() {
+        layoutFailed.setVisibility(View.INVISIBLE);
+        activeCampaignStatus = false; readyCampaignStatus = false;
+        reviewListStatus = false; orderCountStatus = false;
+        reviewCountStatus = false; loyaltyCheckStatus = false;
+        APIProductCaller.getProductById(productId, getApplication(), new APIListener() {
             @Override
             public void onProductFound(Product foundProduct) {
                 product = foundProduct;
+                product.setCampaign(null);
+
+                product.setReviewCount(30);
+                product.setRating(3.5);
+                reviewCountStatus = true;
+
                 APICampaignCaller.getCampaignListByProductId(productId, "active", null,
                         getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> campaignList) {
-                        product.setCampaign(null);
-                        product.setCampaignList(campaignList);
-                        campaignListStatus = true;
+                        System.out.println("good campaign active");
+                        if (product.getCampaignList() == null
+                                || product.getCampaignList().size() == 0) {
+                            product.setCampaignList(campaignList);
+                        } else if (campaignList.size() > 0){
+                            currentCampaignList = product.getCampaignList();
+                            for (Campaign campaign : campaignList) {
+                                currentCampaignList.add(campaign);
+                            }
+                            product.setCampaignList(currentCampaignList);
+                        }
+                        activeCampaignStatus = true;
                         finishSetup(product);
                     }
                     @Override
                     public void onNoJSONFound() {
-                        product.setCampaign(null);
-                        product.setCampaignList(new ArrayList<Campaign>());
-                        campaignListStatus = true;
+                        System.out.println("empty campaign active");
+                        if (product.getCampaignList() == null
+                                || product.getCampaignList().size() == 0) {
+                            product.setCampaignList(new ArrayList<>());
+                        }
+                        activeCampaignStatus = true;
                         finishSetup(product);
+                    }
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        System.out.println("failed active campaign");
+                        setupFailedState();
+                    }
+                });
+                APICampaignCaller.getCampaignListByProductId(productId, "ready", null,
+                        getApplication(), new APIListener() {
+                    @Override
+                    public void onCampaignListFound(List<Campaign> campaignList) {
+                        System.out.println("good campaign ready");
+                        if (product.getCampaignList() == null
+                                || product.getCampaignList().size() == 0) {
+                            product.setCampaignList(campaignList);
+                        } else if (campaignList.size() > 0){
+                            currentCampaignList = product.getCampaignList();
+                            for (Campaign campaign : campaignList) {
+                                currentCampaignList.add(campaign);
+                            }
+                            product.setCampaignList(currentCampaignList);
+                        }
+                        readyCampaignStatus = true;
+                        finishSetup(product);
+                    }
+                    @Override
+                    public void onNoJSONFound() {
+                        System.out.println("empty campaign ready");
+                        if (product.getCampaignList() == null
+                                || product.getCampaignList().size() == 0) {
+                            product.setCampaignList(new ArrayList<>());
+                        }
+                        readyCampaignStatus = true;
+                        finishSetup(product);
+                    }
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        System.out.println("failed ready campaign");
+                        setupFailedState();
                     }
                 });
                 APIReviewCaller.getReviewListByProductId(productId, null,
                         getApplication(), new APIListener() {
                     @Override
                     public void onReviewListFound(List<Review> reviewList) {
+                        System.out.println("good review list");
                         product.setReviewList(reviewList);
                         reviewListStatus = true;
                         finishSetup(product);
@@ -159,15 +233,15 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailedAPICall(int code) {
-                        product.setReviewList(new ArrayList<>());
-                        campaignListStatus = true;
-                        finishSetup(product);
+                        System.out.println("failed review list");
+                        setupFailedState();
                     }
                 });
                 APIReviewCaller.getReviewCountByProductId(productId,
                         getApplication(), new APIListener() {
                     @Override
                     public void onReviewCountFound(int count, double rating) {
+                        System.out.println("good review count");
                         product.setReviewCount(count);
                         product.setRating(rating);
                         reviewCountStatus = true;
@@ -176,19 +250,20 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailedAPICall(int code) {
-                        product.setReviewCount(0);
-                        product.setRating(0);
-                        reviewCountStatus = true;
-                        finishSetup(product);
+                        System.out.println("failed review count");
+                        setupFailedState();
                     }
                 });
                 if (!token.isEmpty()) {
                     APISupplierCaller.getCustomerLoyaltyStatus(token, product.getSupplier().getId(),
                             getApplication(), new APIListener() {
                         @Override
-                        public void onLoyaltyStatusFound(LoyaltyStatus status) {
+                        public void onLoyaltyStatusListFound(List<LoyaltyStatus> list) {
+                            System.out.println("good loyal");
                             supplier = product.getSupplier();
-                            supplier.setLoyaltyStatus(status);
+                            if (!list.isEmpty()) {
+                                supplier.setLoyaltyStatus(list.get(0));
+                            }
                             product.setSupplier(supplier);
                             loyaltyCheckStatus = true;
                             finishSetup(product);
@@ -196,8 +271,8 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailedAPICall(int code) {
-                            loyaltyCheckStatus = true;
-                            finishSetup(product);
+                            System.out.println("failed loyal");
+                            setupFailedState();
                         }
                     });
                 } else {
@@ -219,21 +294,33 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailedAPICall(int code) {
-                        product.setOrderCount(0);
-                        orderCountStatus = true;
-                        finishSetup(product);
+                        System.out.println("failed order count");
+                        setupFailedState();
                     }
                 });
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                System.out.println("failed product");
+                setupFailedState();
             }
         });
     }
 
     private void finishSetup(Product product) {
-        if (campaignListStatus && reviewListStatus && orderCountStatus
+        if (activeCampaignStatus && readyCampaignStatus
+                && reviewListStatus && orderCountStatus
                 && reviewCountStatus && loyaltyCheckStatus) {
             getIntent().putExtra("PRODUCT", product);
             setupTabLayout();
         }
+    }
+
+    private void setupFailedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutMainLayout.setVisibility(View.INVISIBLE);
+        layoutFailed.setVisibility(View.VISIBLE);
     }
 
     private void startDialogBoxProductDetail() {
@@ -251,6 +338,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void setupTabLayout() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutMainLayout.setVisibility(View.VISIBLE);
+        layoutFailed.setVisibility(View.INVISIBLE);
         tabLayout.removeAllTabs();
 
         tabCommon = tabLayout.newTab();
@@ -305,9 +393,10 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void getShoppingCart() {
         try {
-            retailList = (List<CartProduct>) ObjectSerializer
+            System.out.println("getShoppingCart");
+            retailCartList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-            campaignList = (List<CartProduct>) ObjectSerializer
+            campaignCartList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
         } catch (Exception e) {
             e.printStackTrace();
@@ -316,12 +405,12 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void editShoppingCart() {
         getShoppingCart();
-        if(retailList == null && campaignList == null) {
+        if(retailCartList == null && campaignCartList == null) {
             cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
         } else {
-            if (retailList.size() > 0 || campaignList.size() > 0) {
+            if (retailCartList.size() > 0 || campaignCartList.size() > 0) {
                 cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
-                cartCount = retailList.size() + campaignList.size();
+                cartCount = retailCartList.size() + campaignCartList.size();
                 txtProductDetailCartCount.setText(cartCount + "");
             } else {
                 cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
@@ -341,8 +430,13 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailedAPICall(int code) {
-                putSessionCart(new ArrayList<>(), new ArrayList<>());
-                editShoppingCart();
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            ProductDetailActivity.this);
+                } else {
+                    putSessionCart(new ArrayList<>(), new ArrayList<>());
+                    editShoppingCart();
+                }
             }
         });
     }
@@ -350,15 +444,21 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void putSessionCart(List<CartProduct> retailList,
                                 List<CartProduct> campaignList) {
         try {
+            System.out.println(retailList.size() + " - " + campaignList.size());
             sharedPreferences.edit()
                     .putString("RETAIL_CART",
                             ObjectSerializer.serialize((Serializable) retailList))
                     .putString("CAMPAIGN_CART",
                             ObjectSerializer.serialize((Serializable) campaignList))
-                    .apply();
+                    .commit();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromProductDetail.performClick();
     }
 
     @Override
@@ -367,7 +467,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
         loadProduct();
-        setUpShoppingCart();
+        if (!userId.isEmpty()) {
+            setUpShoppingCart();
+        }
         if (resultCode == RESULT_OK) {
             if (requestCode == IntegerUtils.REQUEST_LOGIN_FOR_CART) {
                 constraintLayoutShoppingCart.performClick();

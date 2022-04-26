@@ -22,17 +22,11 @@
             android:background="@color/blue_main">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left"
                 android:text="REVIEW"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/style_dialog_box_header"  />
 
             <ImageView
                 android:id="@+id/imgCloseDialogBox"
@@ -110,7 +104,7 @@
                     android:hint="0.0"
                     android:maxLength="3"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/gray"
+                    android:textColorHint="@color/gray_dark"
                     android:textSize="17sp"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/lblRating"
@@ -121,62 +115,84 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <EditText
-            android:id="@+id/editReview"
-            style="@style/style_otp_box"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="15dp"
-            android:fontFamily="@font/montserratr"
-            android:gravity="left|top"
-            android:hint="Write review here..."
-            android:inputType="textMultiLine"
-            android:maxLines="4"
-            android:padding="10dp"
-            android:text=""
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutReviewDate"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="10dp">
+            style="@style/style_otp_box"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="15dp" >
 
-            <TextView
+            <EditText
+                android:id="@+id/editReview"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@color/gray_background"
+                android:fontFamily="@font/montserratr"
+                android:textColor="@color/gray_darker"
+                android:textColorHint="@color/gray"
+                android:gravity="left|top"
+                android:hint="Write review here..."
+                android:inputType="textMultiLine"
+                android:maxLength="200"
+                android:padding="10dp"
+                android:text="The reason for my request is very simple. Your product sucks. Just that. I don't even know how it's even possib. in a world where Telsa exist, you managed to make the worst product ever produced"
+                android:textSize="14sp"/>
+
+            <LinearLayout
+                android:id="@+id/layoutLetterCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="7dp"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left"
-                android:text="Review written on"
-                android:textColor="@color/gray"
-                android:textSize="16sp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:paddingHorizontal="5dp"
+                android:paddingBottom="5dp">
 
+                <TextView
+                    android:id="@+id/txtLetterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="0"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <TextView
-                android:id="@+id/txtReviewDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left"
-                android:text="12:59 Jul 14, 20210"
-                android:textColor="@color/gray"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                    android:id="@+id/lblLetterSeparator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="/"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/lblLetterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="200"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnConfirmReview"

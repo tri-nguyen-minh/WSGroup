@@ -70,9 +70,7 @@
                 android:textSize="13sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@id/layoutStat"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteX="0dp"
-                tools:text="I'm testing this text fiew ridl now so dont ask me " />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutStat"
@@ -114,7 +112,6 @@
                         android:gravity="center"
                         android:textStyle="bold"
                         android:fontFamily="@font/montserratr"
-                        tools:text="0.0"
                         android:textSize="13sp"
                         android:textColor="@color/gray_dark"/>
 
@@ -137,7 +134,6 @@
                         android:gravity="center"
                         android:textStyle="bold"
                         android:fontFamily="@font/montserratr"
-                        tools:text="12.3K"
                         android:textSize="12sp"
                         android:textColor="@color/black"/>
 
@@ -148,7 +144,7 @@
                         android:gravity="center"
                         android:textStyle="bold"
                         android:fontFamily="@font/montserratr"
-                        tools:text=" orders"
+                        android:text=" orders"
                         android:textSize="12sp"
                         android:textColor="@color/gray_dark"/>
 
@@ -162,7 +158,6 @@
                     android:gravity="center"
                     android:textStyle="bold"
                     android:fontFamily="@font/montserratr"
-                    tools:text="1.100.000d"
                     android:textSize="18sp"
                     android:textColor="@color/red"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -184,7 +179,7 @@
         android:background="@color/red"
         android:textStyle="bold"
         android:fontFamily="@font/montserratr"
-        tools:text="Ongoing\nCampaign"
+        android:text="Ongoing\nCampaign"
         android:textSize="10sp"
         android:textColor="@color/white"
         app:layout_constraintTop_toTopOf="parent"

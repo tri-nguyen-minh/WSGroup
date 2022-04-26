@@ -137,9 +137,8 @@ public class Product implements Serializable {
         try {
             JSONArray jsonArray = new JSONArray(imageLink);
             if(jsonArray.length() > 0) {
-                JSONArray imageArray = jsonArray.getJSONObject(0).getJSONArray("response");
-                for (int i = 0; i < imageArray.length(); i++) {
-                    imageList.add(imageArray.getJSONObject(i).getString("url"));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    imageList.add(jsonArray.getJSONObject(i).getString("url"));
                 }
             }
         } catch (Exception e) {
@@ -170,6 +169,7 @@ public class Product implements Serializable {
         Product product = new Product();
         product.setProductId(jsonObject.getString("id"));
         product.setName(jsonObject.getString("name"));
+//        product.setCategoryId(jsonObject.getString("categoryId"));
         product.setCategoryId(jsonObject.getString("categoryid"));
         product.setDescription(jsonObject.getString("description"));
         product.setQuantity(jsonObject.getInt("quantity"));

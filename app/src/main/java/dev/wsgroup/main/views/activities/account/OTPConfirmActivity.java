@@ -86,7 +86,7 @@ public class OTPConfirmActivity extends AppCompatActivity {
                                                                 IntegerUtils.REQUEST_REGISTER);
                     Intent nextIntent = null;
                     if (requestCode == 1) {
-                        nextIntent = new Intent(getApplicationContext(), AccountDetailActivity.class);
+                        nextIntent = new Intent(getApplicationContext(), CompleteAccountActivity.class);
                     } else {
                         nextIntent = new Intent(getApplicationContext(), PasswordChangeActivity.class);
                     }

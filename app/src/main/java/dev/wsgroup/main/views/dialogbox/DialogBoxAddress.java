@@ -3,7 +3,6 @@ package dev.wsgroup.main.views.dialogbox;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,25 +11,27 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIAddressCaller;
 import dev.wsgroup.main.models.dtos.Address;
+import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 
 public class DialogBoxAddress extends Dialog {
 
     private CardView cardViewParent;
     private ImageView imgCloseDialogBox;
-    private EditText editStreet, editProvince;
+    private TextInputEditText editStreet, editProvince;
     private Button btnSave, btnDelete;
 
     private SharedPreferences sharedPreferences;
@@ -50,7 +51,6 @@ public class DialogBoxAddress extends Dialog {
         token = sharedPreferences.getString("TOKEN", "");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,17 +91,17 @@ public class DialogBoxAddress extends Dialog {
         });
         editStreet.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(v);
+                    MethodUtils.hideKeyboard(view, context);
                 }
             }
         });
         editProvince.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(v);
+                    MethodUtils.hideKeyboard(view, context);
                 }
             }
         });
@@ -146,11 +146,21 @@ public class DialogBoxAddress extends Dialog {
                 public void onClick(View v) {
                     address.setStreet(editStreet.getText().toString());
                     address.setProvince(editProvince.getText().toString());
-                    APIAddressCaller.UpdateAddress(token, address, activity.getApplication(), new APIListener() {
+                    APIAddressCaller.updateAddress(token, address,
+                            activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {
                             dismiss();
                             onAddressUpdate(address);
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            if (code == IntegerUtils.ERROR_NO_USER) {
+                                MethodUtils.displayErrorAccountMessage(context, activity);
+                            } else {
+                                onUpdateFailed();
+                            }
                         }
                     });
                 }
@@ -158,11 +168,21 @@ public class DialogBoxAddress extends Dialog {
             btnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    APIAddressCaller.DeleteAddress(token, address, activity.getApplication(), new APIListener() {
+                    APIAddressCaller.deleteAddress(token, address,
+                            activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {
                             dismiss();
                             onAddressDelete();
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            if (code == IntegerUtils.ERROR_NO_USER) {
+                                MethodUtils.displayErrorAccountMessage(context, activity);
+                            } else {
+                                onUpdateFailed();
+                            }
                         }
                     });
                 }
@@ -175,11 +195,22 @@ public class DialogBoxAddress extends Dialog {
                     address.setStreet(editStreet.getText().toString());
                     address.setProvince(editProvince.getText().toString());
                     address.setAddressStringAuto();
-                    APIAddressCaller.AddAddress(token, address, activity.getApplication(), new APIListener() {
+                    APIAddressCaller.addAddress(token, address,
+                            activity.getApplication(), new APIListener() {
                         @Override
                         public void onUpdateAddressSuccessful(Address address) {
                             dismiss();
                             onAddressAdd(address);
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            dismiss();
+                            if (code == IntegerUtils.ERROR_NO_USER) {
+                                MethodUtils.displayErrorAccountMessage(context, activity);
+                            } else {
+                                onUpdateFailed();
+                            }
                         }
                     });
                 }
@@ -198,14 +229,11 @@ public class DialogBoxAddress extends Dialog {
         }
     }
 
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
     public void onAddressAdd(Address address) {}
 
     public void onAddressUpdate(Address address) {}
 
     public void onAddressDelete() {}
+
+    public void onUpdateFailed() {}
 }

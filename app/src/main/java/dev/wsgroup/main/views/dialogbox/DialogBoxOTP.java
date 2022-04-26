@@ -3,7 +3,6 @@ package dev.wsgroup.main.views.dialogbox;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Editable;
@@ -14,6 +13,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,8 +25,6 @@ import dev.wsgroup.main.models.services.FirebasePhoneAuthService;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.account.AccountDetailActivity;
-import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
 
 public class DialogBoxOTP extends Dialog {
 
@@ -35,7 +33,8 @@ public class DialogBoxOTP extends Dialog {
     private Button btnConfirmOTP;
     private ProgressBar progressBarLoadOTP;
     private CardView cardViewParent;
-    private LinearLayout layoutResendOTP, layoutOTPCountdown;
+    private LinearLayout layoutOTPCountdown;
+    private ImageView imgCloseDialogBox;
 
     private Context context;
     private Activity activity;
@@ -55,7 +54,8 @@ public class DialogBoxOTP extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_otp);
         setCancelable(false);
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
 
         txtOTPHeader = findViewById(R.id.txtOTPHeader);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
@@ -65,22 +65,19 @@ public class DialogBoxOTP extends Dialog {
         btnConfirmOTP = findViewById(R.id.btnConfirmOTP);
         progressBarLoadOTP = findViewById(R.id.progressBarLoadOTP);
         cardViewParent = findViewById(R.id.cardViewParent);
-        layoutResendOTP = findViewById(R.id.layoutResendOTP);
         layoutOTPCountdown = findViewById(R.id.layoutOTPCountdown);
+        imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
 
         txtPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phoneNumber)));
         btnConfirmOTP.setEnabled(false);
         btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.gray_light));
 
-        setLabel(false);
-        layoutOTPCountdown.setVisibility(View.INVISIBLE);
-
-        service = new FirebasePhoneAuthService(activity, MethodUtils.formatPhoneNumberWithCountryCode(phoneNumber)) {
+        service = new FirebasePhoneAuthService(activity,
+                MethodUtils.formatPhoneNumberWithCountryCode(phoneNumber)) {
             @Override
             public void onOTPSent() {
                 super.onOTPSent();
                 setLabel(true);
-                layoutOTPCountdown.setVisibility(View.VISIBLE);
                 resetCountDown();
             }
 
@@ -90,7 +87,7 @@ public class DialogBoxOTP extends Dialog {
                 if(result) {
                     onVerificationSuccessful();
                 } else {
-                    displayError(StringUtils.MES_ERROR_INVALID_OTP);
+                    onVerificationFailed();
                 }
             }
         };
@@ -111,11 +108,19 @@ public class DialogBoxOTP extends Dialog {
             }
         });
 
+        imgCloseDialogBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+                onClosingDialogBox();
+            }
+        });
+
         editOTP.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(v);
+                    MethodUtils.hideKeyboard(view, context);
                 }
             }
         });
@@ -130,10 +135,12 @@ public class DialogBoxOTP extends Dialog {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (getOTPString().length() == 6) {
                     btnConfirmOTP.setEnabled(true);
-                    btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
+                    btnConfirmOTP.getBackground()
+                                 .setTint(context.getResources().getColor(R.color.blue_main));
                 } else {
                     btnConfirmOTP.setEnabled(false);
-                    btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.gray_light));
+                    btnConfirmOTP.getBackground()
+                                 .setTint(context.getResources().getColor(R.color.gray_light));
                 }
             }
 
@@ -147,7 +154,6 @@ public class DialogBoxOTP extends Dialog {
             @Override
             public void onClick(View v) {
                 setLabel(true);
-                layoutOTPCountdown.setVisibility(View.VISIBLE);
                 String OTPInput = getOTPString();
                 service.signInWithPhoneAuthCredential(OTPInput);
             }
@@ -155,15 +161,15 @@ public class DialogBoxOTP extends Dialog {
         generateOTP();
     }
 
-    public void onVerificationSuccessful() {
+    public void onVerificationFailed() {
+        DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(activity,
+                IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_INVALID_OTP);
+        dialogBoxAlert.show();
     }
 
-    private void displayError(String errorMessage) {
-        DialogBoxAlert dialogBox =
-                new DialogBoxAlert(activity,
-                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
-        dialogBox.show();
+    public void onVerificationSuccessful() {
     }
+    public void onClosingDialogBox() {}
 
     private String getOTPString() {
         return editOTP.getText().toString();
@@ -171,7 +177,8 @@ public class DialogBoxOTP extends Dialog {
 
     public void generateOTP() {
         setLabel(false);
-        layoutOTPCountdown.setVisibility(View.GONE);
+        txtResendOTP.setVisibility(View.INVISIBLE);
+        layoutOTPCountdown.setVisibility(View.INVISIBLE);
         service.sendOTP();
     }
 
@@ -187,8 +194,6 @@ public class DialogBoxOTP extends Dialog {
 
 
     public void resetCountDown() {
-        layoutOTPCountdown.setVisibility(View.VISIBLE);
-        layoutResendOTP.setVisibility(View.GONE);
         new CountDownTimer(60000, 1000) {
             @Override
             public void onTick(long l) {
@@ -199,14 +204,11 @@ public class DialogBoxOTP extends Dialog {
 
             @Override
             public void onFinish() {
-                layoutOTPCountdown.setVisibility(View.GONE);
-                layoutResendOTP.setVisibility(View.VISIBLE);
+                layoutOTPCountdown.setVisibility(View.INVISIBLE);
+                txtResendOTP.setVisibility(View.VISIBLE);
             }
         }.start();
-    }
-
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        layoutOTPCountdown.setVisibility(View.VISIBLE);
+        txtResendOTP.setVisibility(View.INVISIBLE);
     }
 }

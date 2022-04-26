@@ -40,7 +40,8 @@ public class HistoryTab extends Fragment {
         historyViewPager = view.findViewById(R.id.historyViewPager);
         historyTabLayout = view.findViewById(R.id.historyTabLayout);
 
-        tabPosition = getActivity().getIntent().getIntExtra("HISTORY_TAB_POSITION", 0);
+        tabPosition = getActivity().getIntent()
+                                   .getIntExtra("HISTORY_TAB_POSITION", 0);
 
         historyTabLayout.removeAllTabs();
         historyViewPager.setAdapter(null);
@@ -74,6 +75,10 @@ public class HistoryTab extends Fragment {
         historyTabLayout.addTab(tabCommon);
 
         tabCommon = historyTabLayout.newTab();
+        tabCommon.setText("Returning");
+        historyTabLayout.addTab(tabCommon);
+
+        tabCommon = historyTabLayout.newTab();
         tabCommon.setText("Returned");
         historyTabLayout.addTab(tabCommon);
 
@@ -81,7 +86,8 @@ public class HistoryTab extends Fragment {
         tabCommon.setText("Cancelled");
         historyTabLayout.addTab(tabCommon);
 
-        historyTabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
+        historyTabLayout.setTabTextColors(getResources().getColor(R.color.black),
+                                            getResources().getColor(R.color.black));
         NavigationAdapter adapter = new NavigationAdapter(getActivity().getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override

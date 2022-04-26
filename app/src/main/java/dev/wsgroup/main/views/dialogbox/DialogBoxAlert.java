@@ -29,6 +29,13 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
         this.description = description;
     }
 
+
+    public DialogBoxAlert(Activity activity, int requestCode, String message) {
+        super(activity);
+        this.requestCode = requestCode;
+        this.message = message;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,11 +71,11 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
         } else {
             lblConfirmText.setVisibility(View.GONE);
         }
-        if(!description.isEmpty()) {
+        if(description == null || description.isEmpty()) {
+            lblDescription.setVisibility(View.GONE);
+        } else {
             lblDescription.setVisibility(View.VISIBLE);
             lblDescription.setText(description);
-        } else {
-            lblDescription.setVisibility(View.GONE);
         }
     }
 

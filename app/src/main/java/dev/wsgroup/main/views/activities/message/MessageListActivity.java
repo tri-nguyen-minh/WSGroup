@@ -17,6 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,7 +35,10 @@ import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageListAdapter;
+import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -48,10 +55,11 @@ public class MessageListActivity extends AppCompatActivity {
     private List<Conversation> conversationList;
     private Conversation conversation;
     private User user;
-    private String token, accountId, foreignAccountId;
-    private final String CUSTOMER_SERVICE_ACCOUNT_ID = "SERVICE";
+    private String token, accountId, foreignAccountId, customerServiceId;
+    private boolean customerServiceMessaged, messageListLoading;
     private RecViewMessageListAdapter adapter;
     private DialogBoxLoading dialogBoxLoading;
+    private FirebaseDatabaseReferences databaseReferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +75,7 @@ public class MessageListActivity extends AppCompatActivity {
         lblRetryGetMessage = findViewById(R.id.lblRetryGetMessage);
         recViewMessageList = findViewById(R.id.recViewMessageList);
 
-        getMessageList();
+        setupFirebase();
 
         imgBackFromMessageList.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,27 +98,68 @@ public class MessageListActivity extends AppCompatActivity {
         });
     }
 
-    private void getMessageList() {
+    private void setupFirebase() {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
         accountId = sharedPreferences.getString("ACCOUNT_ID", "");
         user = new User();
         user.setAccountId(accountId);
+        customerServiceMessaged = false; messageListLoading = true;
         setLoadingState();
-        APIChatCaller.getCustomerChatMessages(token, messageList, getApplication(), new APIListener() {
+        if (databaseReferences == null) {
+            databaseReferences = new FirebaseDatabaseReferences();
+        }
+        databaseReferences.getUserNotifications(accountId).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onMessageListFound(List<Message> list) {
-                if (list.size() > 0) {
-                    messageList = list;
-                    findSuppliers();
-                } else {
-                    setNoMessageState();
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!messageListLoading) {
+                    setupFirebase();
                 }
             }
 
             @Override
+            public void onCancelled(DatabaseError error) { }
+        });
+        databaseReferences.getCustomerServiceId().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.getChildrenCount() > 0) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        customerServiceId = ds.getKey();
+                        getMessageList();
+                    }
+                } else {
+                    setFailedState();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getMessageList() {
+        APIChatCaller.getCustomerChatMessages(token, messageList,
+                getApplication(), new APIListener() {
+            @Override
+            public void onMessageListFound(List<Message> list) {
+                messageList = list;
+                if (messageList.isEmpty()) {
+                    messageList = new ArrayList<>();
+                }
+                findSuppliers();
+            }
+
+            @Override
             public void onFailedAPICall(int code) {
-                setFailedState();
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            MessageListActivity.this);
+                } else {
+                    setFailedState();
+                }
             }
         });
     }
@@ -123,17 +172,15 @@ public class MessageListActivity extends AppCompatActivity {
             } else {
                 foreignAccountId = message.getFromId();
             }
-            System.out.println("foreign " + foreignAccountId);
-            supplierAccountIdSet.add(foreignAccountId);
+            if (!foreignAccountId.equals(customerServiceId)) {
+                supplierAccountIdSet.add(foreignAccountId);
+            }
         }
-        System.out.println("set " + supplierAccountIdSet.size());
         List<Supplier> supplierList = new ArrayList<>();
         Supplier service = new Supplier();
-
-//        hard code customer service
-        service.setId(CUSTOMER_SERVICE_ACCOUNT_ID);
+        service.setId(customerServiceId);
         service.setName("Customer Service");
-        service.setAvatarLink("https://firebasestorage.googleapis.com/v0/b/wsg-authen-144ba.appspot.com/o/images%2FCustomer1_avatar?alt=media&token=57ae86ad-b6bc-42bc-92d1-5ab363555b44");
+
         supplierList.add(service);
 
         APISupplierCaller.getSupplierListByAccountId(supplierAccountIdSet, supplierList,
@@ -168,7 +215,7 @@ public class MessageListActivity extends AppCompatActivity {
                 dialogBoxLoading.show();
                 APIChatCaller.updateReadMessages(token, userId, supplierId, getApplication(), new APIListener() {
                     @Override
-                    public void onUpdateMessageSuccessful() {
+                    public void onUpdateSuccessful() {
                         if (dialogBoxLoading.isShowing()) {
                             dialogBoxLoading.dismiss();
                         }
@@ -177,6 +224,16 @@ public class MessageListActivity extends AppCompatActivity {
                         messageIntent.putExtra("SUPPLIER_ID", supplierId);
                         startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
                     }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                                    MessageListActivity.this);
+                        } else {
+                            MethodUtils.displayErrorAPIMessage(MessageListActivity.this);
+                        }
+                    }
                 });
             }
         };
@@ -184,6 +241,7 @@ public class MessageListActivity extends AppCompatActivity {
         recViewMessageList.setAdapter(adapter);
         recViewMessageList.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false));
+        messageListLoading = false;
         setListFoundState();
     }
 
@@ -224,6 +282,11 @@ public class MessageListActivity extends AppCompatActivity {
         layoutNoMessage.setVisibility(View.GONE);
         layoutFailedGettingMessage.setVisibility(View.GONE);
         recViewMessageList.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromMessageList.performClick();
     }
 
     @Override

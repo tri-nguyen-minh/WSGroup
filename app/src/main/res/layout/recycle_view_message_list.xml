@@ -46,7 +46,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toRightOf="@id/cardViewAvatar"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/imgStatusCheck">
+        app:layout_constraintRight_toRightOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutMessageDate"
@@ -70,6 +70,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
+            <ImageView
+                android:id="@+id/imgStatusCheck"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/img_circle"
+                android:layout_marginLeft="5dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
@@ -81,7 +91,7 @@
             android:gravity="left"
             android:text="Ngo Thuong Hoang Anh "
             android:textColor="@color/gray_darker"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:maxLines="1"
             android:ellipsize="end"/>
@@ -134,15 +144,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/imgStatusCheck"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:src="@drawable/img_circle"
-        android:layout_marginLeft="5dp"
-        app:layout_constraintLeft_toRightOf="@id/layoutMessageBody"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,9 @@ import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.LoyaltyStatus;
 import dev.wsgroup.main.models.dtos.Message;
+import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.dtos.Order;
+import dev.wsgroup.main.models.dtos.OrderHistory;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.dtos.Supplier;
@@ -22,13 +24,11 @@ public class APIListener {
 
     public void onNoJSONFound() {}
 
+    public void onUpdateSuccessful() {}
+
     public void onUserFound(User user, String message) { }
 
     public void onCompletingRegistrationRequest() {}
-
-    public void onUpdateProfileSuccessful() {}
-
-    public void onUpdateCartItemSuccessful() {}
 
     public void onAddCartItemSuccessful(CartProduct cartProduct) {}
 
@@ -51,8 +51,6 @@ public class APIListener {
 
     public void onOrderSuccessful(Order order) {}
 
-    public void onUpdateOrderSuccessful() {}
-
     public void onOrderFound(List<Order> orderList) {}
 
     public void onAddressListFound(List<Address> addressList) {}
@@ -69,7 +67,7 @@ public class APIListener {
 
     public void onReviewListFound(List<Review> reviewList) {}
 
-    public void onRatingListCount(Map<String, Double> ratingList) {}
+    public void onRatingListCount(Map<String, Double> ratingMap) {}
 
     public void onReviewCountFound(int count, double rating) {}
 
@@ -77,14 +75,14 @@ public class APIListener {
 
     public void onGettingPaymentURL(String url) {}
 
-    public void onLoyaltyStatusFound(LoyaltyStatus status) {}
+    public void onLoyaltyStatusListFound(List<LoyaltyStatus> loyaltyStatusList) {}
 
     public void onDiscountListFound(List<CustomerDiscount> discountList) {}
 
-    public void onUseDiscountSuccessful() {}
-
     public void onMessageListFound(List<Message> messageList) {}
 
-    public void onUpdateMessageSuccessful() {}
+    public void onOrderHistoryFound(List<OrderHistory> historyList) {}
+
+    public void onNotificationListFound(List<Notification> notificationList) {}
 
 }

@@ -1,19 +1,12 @@
 package dev.wsgroup.main.models.recycleViewAdapters;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,18 +16,15 @@ import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Conversation;
-import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.views.activities.account.PhoneInputActivity;
-import dev.wsgroup.main.views.activities.message.MessageActivity;
-import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
-public class RecViewMessageListAdapter extends RecyclerView.Adapter<RecViewMessageListAdapter.ViewHolder> {
+public class RecViewMessageListAdapter
+        extends RecyclerView.Adapter<RecViewMessageListAdapter.ViewHolder> {
 
     private Context context;
     private List<Conversation> conversationList;
     private Conversation conversation;
-    private String senderName;
+    private String senderName, lastMessage;
 
     public RecViewMessageListAdapter(Context context) {
         this.context = context;
@@ -69,7 +59,11 @@ public class RecViewMessageListAdapter extends RecyclerView.Adapter<RecViewMessa
                 senderName = conversationList.get(position).getSupplier().getName();
             }
             holder.lblSender.setText(senderName);
-            holder.txtMessage.setText(conversationList.get(position).getLastMessage().getMessage());
+            lastMessage = conversationList.get(position).getLastMessage().getMessage();
+            if (lastMessage.equals("null")) {
+                lastMessage = "sent an image";
+            }
+            holder.txtMessage.setText(lastMessage);
             if (!conversationList.get(position).getReadStatus()) {
                 holder.txtSupplierName.setTextColor(context.getResources().getColor(R.color.black));
                 holder.txtMessageDate.setTextColor(context.getResources().getColor(R.color.black));
@@ -93,7 +87,6 @@ public class RecViewMessageListAdapter extends RecyclerView.Adapter<RecViewMessa
                 conversation = conversationList.get(position);
                 onConversationSelected(conversation.getMainUser().getAccountId(),
                         conversation.getSupplier().getAccountId());
-
             }
         });
     }

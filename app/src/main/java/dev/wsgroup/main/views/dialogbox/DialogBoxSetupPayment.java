@@ -2,6 +2,7 @@ package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -22,19 +23,19 @@ public class DialogBoxSetupPayment extends Dialog {
     private Spinner spinnerBank;
     private Button btnConfirm;
 
-    private Activity activity;
+    private Context context;
     private double price;
     private String bankString;
-    private final String[] bankData = {"NCBank", "SCBank",
-                                        "Dong A Bank", "SacomBank",
-                                        "TPBank", "OceanBank",
-                                        "BIDV", "Techcombank",
-                                        "VPBank", "MBBank",
-                                        "ACBank", "OCBank"};
+    private final String[] bankData = {"NCBank ", "SCBank ",
+                                        "Dong A Bank ", "SacomBank ",
+                                        "TPBank ", "OceanBank ",
+                                        "BIDV ", "Techcombank ",
+                                        "VPBank ", "MBBank ",
+                                        "ACBank ", "OCBank "};
 
-    public DialogBoxSetupPayment(Activity activity, double price) {
+    public DialogBoxSetupPayment(Activity activity, Context context, double price) {
         super(activity);
-        this.activity = activity;
+        this.context = context;
         this.price = price;
     }
 
@@ -52,8 +53,8 @@ public class DialogBoxSetupPayment extends Dialog {
 
         txtPaymentPrice.setText(MethodUtils.formatPriceString(price));
         ArrayAdapter adapter =
-                new ArrayAdapter<String>(activity, R.layout.spinner_selected_item, (String[]) bankData);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                new ArrayAdapter<>(context, R.layout.spinner_selected_right, bankData);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_right);
 
         spinnerBank.setAdapter(adapter);
         spinnerBank.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

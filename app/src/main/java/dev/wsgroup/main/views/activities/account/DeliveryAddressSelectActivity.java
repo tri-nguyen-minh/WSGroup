@@ -25,6 +25,7 @@ import dev.wsgroup.main.models.apis.callers.APIAddressCaller;
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewAddressListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAddress;
 
 public class DeliveryAddressSelectActivity extends AppCompatActivity {
@@ -32,8 +33,8 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
     private ImageView imgBackFromDeliveryAddress, checkboxDefaultAddress;
     private RelativeLayout layoutLoading;
     private ConstraintLayout layoutNoDefaultAddress, layoutDefaultAddress, layoutAddAddress;
-    private LinearLayout LayoutOtherAddress, layoutScreen;
-    private TextView txtAddressStreet, txtAddressProvince;
+    private LinearLayout layoutOtherAddress, layoutScreen, layoutFailed;
+    private TextView txtAddressStreet, txtAddressProvince, lblRetry;
     private RecyclerView recViewAddress;
 
     private SharedPreferences sharedPreferences;
@@ -55,48 +56,15 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         layoutNoDefaultAddress = findViewById(R.id.layoutNoDefaultAddress);
         layoutDefaultAddress = findViewById(R.id.layoutDefaultAddress);
         layoutAddAddress = findViewById(R.id.layoutAddAddress);
-        LayoutOtherAddress = findViewById(R.id.LayoutOtherAddress);
+        layoutOtherAddress = findViewById(R.id.LayoutOtherAddress);
         layoutScreen = findViewById(R.id.layoutScreen);
+        layoutFailed = findViewById(R.id.layoutFailed);
         txtAddressStreet = findViewById(R.id.txtAddressStreet);
         txtAddressProvince = findViewById(R.id.txtAddressProvince);
+        lblRetry = findViewById(R.id.lblRetry);
         recViewAddress = findViewById(R.id.recViewAddress);
 
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("TOKEN", "");
-        currentAddress = (Address) getIntent().getSerializableExtra("ADDRESS");
-
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutScreen.setVisibility(View.INVISIBLE);
-
-        setupLayout();
-
-        if (currentAddress != null) {
-            APIAddressCaller.getAllAddress(token, null,
-                    getApplication(), new APIListener() {
-                @Override
-                public void onAddressListFound(List<Address> addressList) {
-                    super.onAddressListFound(addressList);
-                    customerAddressList = addressList;
-                    for (Address address : addressList) {
-                        if (address.getDefaultFlag()) {
-                            setupDefaultAddress(address);
-                        }
-                    }
-                    defaultAddress.setSelectedFlag(true);
-                    setupCheckBox(checkboxDefaultAddress, true);
-                    currentAddress = defaultAddress;
-                    customerAddressList.remove(defaultAddress);
-                    setupAddressList();
-                    layoutLoading.setVisibility(View.INVISIBLE);
-                    layoutScreen.setVisibility(View.VISIBLE);
-                }
-            });
-        } else {
-            customerAddressList = new ArrayList<>();
-            setupAddressList();
-            layoutLoading.setVisibility(View.INVISIBLE);
-            layoutScreen.setVisibility(View.VISIBLE);
-        }
+        getAddress();
 
         imgBackFromDeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +88,11 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         setupDefaultAddress(address);
                         defaultAddress.setSelectedFlag(true);
                         setupCheckBox(checkboxDefaultAddress, true);
+                    }
+
+                    @Override
+                    public void onUpdateFailed() {
+                        MethodUtils.displayErrorAPIMessage(DeliveryAddressSelectActivity.this);
                     }
                 };
                 dialogBoxAddress.getWindow()
@@ -149,6 +122,11 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         currentAddress = address;
                         setupDefaultAddress(address);
                     }
+
+                    @Override
+                    public void onUpdateFailed() {
+                        MethodUtils.displayErrorAPIMessage(DeliveryAddressSelectActivity.this);
+                    }
                 };
                 dialogBoxAddress.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -168,30 +146,66 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
                         customerAddressList.add(address);
                         setupAddressList();
                     }
+
+                    @Override
+                    public void onUpdateFailed() {
+                        MethodUtils.displayErrorAPIMessage(DeliveryAddressSelectActivity.this);
+                    }
                 };
                 dialogBoxAddress.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxAddress.show();
             }
         });
+
+        lblRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getAddress();
+            }
+        });
     }
 
-    private void setupLayout() {
-        if (currentAddress == null) {
-            layoutNoDefaultAddress.setVisibility(View.VISIBLE);
-            layoutDefaultAddress.setVisibility(View.GONE);
-            LayoutOtherAddress.setVisibility(View.GONE);
+    private void getAddress() {
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN", "");
+        currentAddress = (Address) getIntent().getSerializableExtra("ADDRESS");
+        setLoadingState();
+        setupLayout();
+        if (currentAddress != null) {
+            APIAddressCaller.getAllAddress(token, null, getApplication(), new APIListener() {
+                @Override
+                public void onAddressListFound(List<Address> addressList) {
+                    super.onAddressListFound(addressList);
+                    customerAddressList = addressList;
+                    for (Address address : addressList) {
+                        if (address.getDefaultFlag()) {
+                            setupDefaultAddress(address);
+                        }
+                    }
+                    defaultAddress.setSelectedFlag(true);
+                    setupCheckBox(checkboxDefaultAddress, true);
+                    currentAddress = defaultAddress;
+                    customerAddressList.remove(defaultAddress);
+                    setupAddressList();
+                    setViewState();
+                }
+
+                @Override
+                public void onFailedAPICall(int code) {
+                    if (code == IntegerUtils.ERROR_NO_USER) {
+                        MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                                DeliveryAddressSelectActivity.this);
+                    } else {
+                        setFailedState();
+                    }
+                }
+            });
         } else {
-            layoutNoDefaultAddress.setVisibility(View.GONE);
-            layoutDefaultAddress.setVisibility(View.VISIBLE);
-            LayoutOtherAddress.setVisibility(View.VISIBLE);
+            customerAddressList = new ArrayList<>();
+            setupAddressList();
+            setViewState();
         }
-    }
-
-    private void setupDefaultAddress(Address address) {
-        defaultAddress = address;
-        txtAddressStreet.setText(defaultAddress.getStreet());
-        txtAddressProvince.setText(defaultAddress.getProvince());
     }
 
     private void setupCheckBox(ImageView checkbox, boolean selected) {
@@ -254,5 +268,46 @@ public class DeliveryAddressSelectActivity extends AppCompatActivity {
         recViewAddress.setAdapter(adapter);
         recViewAddress.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false));
+    }
+
+    private void setupLayout() {
+        if (currentAddress == null) {
+            layoutNoDefaultAddress.setVisibility(View.VISIBLE);
+            layoutDefaultAddress.setVisibility(View.GONE);
+            layoutOtherAddress.setVisibility(View.GONE);
+        } else {
+            layoutNoDefaultAddress.setVisibility(View.GONE);
+            layoutDefaultAddress.setVisibility(View.VISIBLE);
+            layoutOtherAddress.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setupDefaultAddress(Address address) {
+        defaultAddress = address;
+        txtAddressStreet.setText(defaultAddress.getStreet());
+        txtAddressProvince.setText(defaultAddress.getProvince());
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutScreen.setVisibility(View.GONE);
+        layoutFailed.setVisibility(View.GONE);
+    }
+
+    private void setViewState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutScreen.setVisibility(View.VISIBLE);
+        layoutFailed.setVisibility(View.GONE);
+    }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutScreen.setVisibility(View.GONE);
+        layoutFailed.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromDeliveryAddress.performClick();
     }
 }

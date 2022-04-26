@@ -17,14 +17,20 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIDiscountCaller;
+import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
+import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewDiscountListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.views.activities.message.MessageListActivity;
 
 public class DiscountFragment extends Fragment {
 
@@ -36,6 +42,7 @@ public class DiscountFragment extends Fragment {
     private String status, token;
     private SharedPreferences sharedPreferences;
     private RecViewDiscountListAdapter adapter;
+    private List<CustomerDiscount> customerDiscountList;
 
     public DiscountFragment(String tabString) {
         if (tabString.toLowerCase().equals("applicable")) {
@@ -48,7 +55,8 @@ public class DiscountFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        sharedPreferences = getActivity()
+                            .getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
         return inflater.inflate(R.layout.fragment_discount, container, false);
     }
@@ -82,17 +90,45 @@ public class DiscountFragment extends Fragment {
             public void onDiscountListFound(List<CustomerDiscount> discountList) {
                 super.onDiscountListFound(discountList);
                 if (discountList.size() > 0) {
+                    Set<String> idSet = new LinkedHashSet<>();
+                    for (CustomerDiscount discount : discountList) {
+                        idSet.add(discount.getDiscount().getSupplier().getId());
+                    }
+                    customerDiscountList = discountList;
+                    APISupplierCaller.getSupplierByIdList(idSet,
+                            getActivity().getApplication(), new APIListener() {
+                        @Override
+                        public void onSupplierListFound(List<Supplier> supplierList) {
+                            for (Supplier supplier : supplierList) {
+                                for (CustomerDiscount discount : customerDiscountList) {
+                                    if (discount.getDiscount().getSupplier()
+                                                .getId().equals(supplier.getId())) {
+                                        discount.getDiscount().setSupplier(supplier);
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            setFailedState();
+                        }
+                    });
                     setupList(discountList);
                 } else {
                     setNoListState();
                 }
             }
 
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        setFailedState();
-                    }
-                });
+            @Override
+            public void onFailedAPICall(int code) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getContext(), getActivity());
+                } else {
+                    setFailedState();
+                }
+            }
+        });
     }
 
     private void setupList(List<CustomerDiscount> discountList) {

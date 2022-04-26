@@ -5,7 +5,7 @@
     android:id="@+id/layoutParent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     tools:context=".views.activities.message.MessageActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -72,18 +72,19 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
-            android:background="@color/gray_lighter">
+            android:background="@color/gray_background">
 
             <TextView
-                android:text="YOU HAVE NOT MESSAGED"
-                style="@style/style_empty_note" />
+                android:text="START MESSAGING"
+                style="@style/style_empty_note"
+                android:textSize="17sp"/>
 
             <TextView
                 android:id="@+id/txtNewMessageSupplierName"
                 android:layout_marginTop="10dp"
-                android:text="(K12 _ HCM) Dao Ngoc Tien"
+                android:text=""
                 android:textColor="@color/gray_darker"
-                style="@style/style_empty_note" />
+                style="@style/style_empty_note"/>
 
         </LinearLayout>
 
@@ -94,7 +95,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:visibility="gone"
-            android:background="@color/gray_lighter">
+            android:background="@color/gray_background">
 
             <TextView
                 android:text="AN ERROR HAS OCCURRED"
@@ -107,7 +108,7 @@
                 android:layout_marginTop="15dp"
                 android:fontFamily="@font/montserratr"
                 android:gravity="center"
-                android:text="CLICK HERE TO TRY AGAIN"
+                android:text="CLICK TO TRY AGAIN"
                 android:textColor="@color/blue_main"
                 android:textSize="17sp"
                 android:textStyle="bold"/>
@@ -118,7 +119,8 @@
             android:id="@+id/recViewMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="10dp"/>
+            android:paddingBottom="10dp"
+            android:nestedScrollingEnabled="true"/>
 
     </FrameLayout>
 
@@ -129,12 +131,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
 
+        <ImageView
+            android:id="@+id/imgMessageImage"
+            style="@style/style_icon"
+            android:src="@drawable/ic_camera"
+            android:tint="@color/gray_dark"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <EditText
             android:id="@+id/editWriteMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginVertical="5dp"
-            android:layout_marginRight="15dp"
+            android:layout_marginHorizontal="10dp"
             style="@style/style_otp_box"
             android:text=""
             android:hint="Write your message..."
@@ -144,7 +155,7 @@
             android:textSize="16sp"
             android:maxLines="4"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/imgMessageImage"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toLeftOf="@id/txtSend"/>
 

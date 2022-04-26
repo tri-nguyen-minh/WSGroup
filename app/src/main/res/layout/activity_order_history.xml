@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutParent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/gray_background"
+    tools:context=".views.activities.order.OrderHistoryActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutHeader"
+        style="@style/style_header_layout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <ImageView
+            android:id="@+id/imgBack"
+            style="@style/style_icon"
+            android:src="@drawable/ic_arrow_left"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/txtHeader"
+            style="@style/style_txt_header"
+            android:text="ORDER HISTORY"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/imgBack"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/imgHome"/>
+
+        <ImageView
+            android:id="@+id/imgHome"
+            style="@style/style_icon"
+            android:src="@drawable/ic_home"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="@color/white" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:background="@color/gray_background"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue_main"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutFailed"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:text="AN ERROR HAS OCCURRED"
+            style="@style/style_empty_note" />
+
+        <TextView
+            android:id="@+id/lblRetry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/montserratr"
+            android:gravity="center"
+            android:text="CLICK TO TRY AGAIN"
+            android:textColor="@color/blue_main"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutOrder"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/layoutHeader">
+
+            <TextView
+                android:text="Order's Status"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="7dp"
+                style="@style/style_background_header"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:background="@color/white"
+                android:layout_marginTop="2dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblCode"
+                    android:text="Order Code"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingHorizontal="10dp"
+                    android:gravity="left"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtOrderCode"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="10dp"
+                    app:layout_constraintLeft_toRightOf="@+id/lblCode"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/style_profile_tab"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:background="@color/white"
+                android:layout_marginTop="2dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layoutPhone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/lblStatus"
+                    android:text="Current Status"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_label_account_info"
+                    android:paddingHorizontal="10dp"
+                    android:gravity="left"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtStatus"
+                    android:gravity="center|right"
+                    android:textSize="16sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toRightOf="@+id/lblStatus"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/style_txt_account_info" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lblReason"
+            android:text="History"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="7dp"
+            style="@style/style_background_header"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recViewOrderHistory"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@ package dev.wsgroup.main.models.apis.callers;
 import android.app.Application;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -21,7 +22,9 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.OrderProduct;
+import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIDiscountCaller {
@@ -45,13 +48,14 @@ public class APIDiscountCaller {
                     try {
                         discountList = (list == null) ? new ArrayList<>() : list;
                         JSONArray data = response.getJSONArray("data");
-                        CustomerDiscount customerDiscount;
+                        CustomerDiscount discount;
                         if (data.length() > 0) {
                             for (int i = 0; i < data.length(); i++) {
-                                customerDiscount
-                                        = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
-                                if (!checkDuplicateCustomerDiscount(customerDiscount)) {
-                                    discountList.add(customerDiscount);
+                                discount = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
+                                discount.getDiscount()
+                                        .setSupplier(Supplier.getObjectFromDiscountJSON(data.getJSONObject(i)));
+                                if (!checkDuplicateCustomerDiscount(discount)) {
+                                    discountList.add(discount);
                                 }
                             }
                         }
@@ -64,11 +68,12 @@ public class APIDiscountCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if(error.toString().contains("NoConnectionError")) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                     } else {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                     }
@@ -84,6 +89,8 @@ public class APIDiscountCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,11 +154,12 @@ public class APIDiscountCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if(error.toString().contains("NoConnectionError")) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                     } else {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                     }
@@ -167,6 +175,8 @@ public class APIDiscountCaller {
                     return header;
                 }
             };
+            request1.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request1);
             if (jsonObject2 != null) {
                 JsonObjectRequest request2 = new JsonObjectRequest(Request.Method.POST, url,
@@ -179,6 +189,8 @@ public class APIDiscountCaller {
                         return header;
                     }
                 };
+                request2.setRetryPolicy(new DefaultRetryPolicy(7000,
+                        1, 2));
                 requestQueue.add(request2);
             }
         } catch (Exception e) {
@@ -243,11 +255,12 @@ public class APIDiscountCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if(error.toString().contains("NoConnectionError")) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                     } else {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                     }
@@ -263,6 +276,8 @@ public class APIDiscountCaller {
                     return header;
                 }
             };
+            request1.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request1);
             if (jsonObject2 != null) {
                 JsonObjectRequest request2 = new JsonObjectRequest(Request.Method.POST, url,
@@ -275,6 +290,8 @@ public class APIDiscountCaller {
                         return header;
                     }
                 };
+                request2.setRetryPolicy(new DefaultRetryPolicy(7000,
+                        1, 2));
                 requestQueue.add(request2);
             }
         } catch (Exception e) {
@@ -298,12 +315,13 @@ public class APIDiscountCaller {
                     try {
                         List<CustomerDiscount> discountList = new ArrayList<>();
                         JSONArray data = response.getJSONArray("data");
-                        CustomerDiscount customerDiscount;
+                        CustomerDiscount discount;
                         if (data.length() > 0) {
                             for (int i = 0; i < data.length(); i++) {
-                                customerDiscount
-                                        = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
-                                discountList.add(customerDiscount);
+                                discount = CustomerDiscount.getObjectFromJSON(data.getJSONObject(i));
+                                discount.getDiscount()
+                                        .setSupplier(Supplier.getObjectFromDiscountJSON(data.getJSONObject(i)));
+                                discountList.add(discount);
                             }
                         }
                         APIListener.onDiscountListFound(discountList);
@@ -315,11 +333,12 @@ public class APIDiscountCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if(error.toString().contains("NoConnectionError")) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                     } else {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                     }
@@ -335,6 +354,8 @@ public class APIDiscountCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -356,7 +377,7 @@ public class APIDiscountCaller {
                     try {
                         int data = response.getInt("data");
                         if (data == 1) {
-                            APIListener.onUseDiscountSuccessful();
+                            APIListener.onUpdateSuccessful();
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                         }
@@ -368,11 +389,12 @@ public class APIDiscountCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if(error.toString().contains("NoConnectionError")) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_CONNECTION);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                     } else {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                     }
@@ -388,6 +410,8 @@ public class APIDiscountCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

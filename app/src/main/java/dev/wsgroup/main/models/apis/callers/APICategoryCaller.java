@@ -2,6 +2,7 @@ package dev.wsgroup.main.models.apis.callers;
 
 import android.app.Application;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -18,6 +19,7 @@ import java.util.List;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Category;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APICategoryCaller {
@@ -50,15 +52,18 @@ public class APICategoryCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
                     jsonObject, listener, errorListener);
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,15 +100,18 @@ public class APICategoryCaller {
             };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                 }
             };
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
                     jsonObject, listener, errorListener);
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

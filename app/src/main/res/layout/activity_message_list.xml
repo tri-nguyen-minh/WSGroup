@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     tools:context=".views.activities.message.MessageListActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,7 +81,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@color/gray_lighter">
+            android:background="@color/gray_background">
 
             <TextView
                 android:text="AN ERROR HAS OCCURRED"
@@ -94,7 +94,7 @@
                 android:layout_marginTop="15dp"
                 android:fontFamily="@font/montserratr"
                 android:gravity="center"
-                android:text="CLICK HERE TO TRY AGAIN"
+                android:text="CLICK TO TRY AGAIN"
                 android:textColor="@color/blue_main"
                 android:textSize="17sp"
                 android:textStyle="bold"/>

@@ -11,13 +11,16 @@ public class Order implements Serializable {
 
     private List<OrderProduct> orderProductList;
     private String id, code, status, dateCreated, dateUpdated,
-            updateReason, paymentId, advanceId, paymentMethod;
+            updateReason, paymentId, advanceId, paymentMethod,
+            cancelReturnReason, imageProofString;
     private double discountPrice, shippingFee, totalPrice, advanceFee;
+    private int loyaltyDiscountPercent;
     private Supplier supplier;
     private Address address;
     private Campaign campaign;
     private CustomerDiscount customerDiscount;
     private boolean inCart;
+    private List<String> imageList;
 
     public Order() {
     }
@@ -174,15 +177,63 @@ public class Order implements Serializable {
         this.advanceFee = advanceFee;
     }
 
+    public int getLoyaltyDiscountPercent() {
+        return loyaltyDiscountPercent;
+    }
+
+    public void setLoyaltyDiscountPercent(int loyaltyDiscountPercent) {
+        this.loyaltyDiscountPercent = loyaltyDiscountPercent;
+    }
+
+    public String getCancelReturnReason() {
+        return cancelReturnReason;
+    }
+
+    public void setCancelReturnReason(String cancelReturnReason) {
+        this.cancelReturnReason = cancelReturnReason;
+    }
+
+    public String getImageProofString() {
+        return imageProofString;
+    }
+
+    public void setImageProofString(String imageProofString) {
+        this.imageProofString = imageProofString;
+        List<String> imageList = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(imageProofString);
+            if(jsonArray.length() > 0) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    imageList.add(jsonArray.getJSONObject(i).getString("url"));
+                }
+            }
+        } catch (Exception e) {
+            imageList = new ArrayList<>();
+        }
+        setImageList(imageList);
+    }
+
+    public List<String> getImageList() {
+        return imageList;
+    }
+
+    public void setImageList(List<String> imageList) {
+        this.imageList = imageList;
+    }
+
     public static Order getObjectFromJSON(JSONObject jsonObject) throws Exception {
+        String stringObject;
         Order order = new Order();
         order.setId(jsonObject.getString("id"));
-
-        String stringObject = jsonObject.getString("customerdiscountcodeid");
-        if (!stringObject.equals("null")) {
-            CustomerDiscount customerDiscount = new CustomerDiscount();
-            customerDiscount.setId(stringObject);
-            order.setCustomerDiscount(customerDiscount);
+        try {
+            stringObject = jsonObject.getString("customerdiscountcodeid");
+            if (!stringObject.equals("null")) {
+                CustomerDiscount customerDiscount = new CustomerDiscount();
+                customerDiscount.setId(stringObject);
+                order.setCustomerDiscount(customerDiscount);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         order.setStatus(jsonObject.getString("status"));
         stringObject = jsonObject.getString("campaignid");
@@ -192,7 +243,6 @@ public class Order implements Serializable {
             order.setCampaign(campaign);
         }
         Address address = new Address();
-        address.setId(jsonObject.getString("addressid"));
         address.setAddressString(jsonObject.getString("address"));
         order.setAddress(address);
 
@@ -206,10 +256,19 @@ public class Order implements Serializable {
         Supplier supplier = new Supplier();
         supplier.setId(jsonObject.getString("supplierid"));
         supplier.setName(jsonObject.getString("suppliername"));
+        supplier.setAvatarLink(jsonObject.getString("supplieravatar"));
+        supplier.setAddress(jsonObject.getString("supplieraddress"));
         order.setSupplier(supplier);
         order.setUpdateReason(jsonObject.getString("reasonforupdatestatus"));
         order.setPaymentMethod(jsonObject.getString("paymentmethod"));
         order.setAdvanceId(jsonObject.getString("advancedid"));
+        order.setCancelReturnReason(jsonObject.getString("reasonforcancel"));
+        order.setImageProofString(jsonObject.getString("imageproof"));
+        order.setLoyaltyDiscountPercent(0);
+        stringObject = jsonObject.getString("loyalcustomerdiscountpercent");
+        if (!stringObject.equals("null")) {
+            order.setLoyaltyDiscountPercent(Integer.parseInt(stringObject));
+        }
         stringObject = jsonObject.getString("advancefee");
         if (!stringObject.equals("null")) {
             order.setAdvanceFee(Double.parseDouble(stringObject));

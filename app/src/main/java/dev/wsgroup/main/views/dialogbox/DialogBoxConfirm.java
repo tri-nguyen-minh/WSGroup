@@ -59,9 +59,12 @@ public class DialogBoxConfirm extends Dialog {
             @Override
             public void onClick(View view) {
                 dismiss();
+                onNoClicked();
             }
         });
     }
 
     public void onYesClicked() {}
+
+    public void onNoClicked() {}
 }

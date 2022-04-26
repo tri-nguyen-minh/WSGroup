@@ -1,8 +1,10 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Supplier implements Serializable {
 
@@ -59,6 +61,18 @@ public class Supplier implements Serializable {
 
     public void setAvatarLink(String avatarLink) {
         this.avatarLink = avatarLink;
+        try {
+            System.out.println(avatarLink);
+            System.out.println(avatarLink.equals("null"));
+            if (!avatarLink.equals("null")) {
+                JSONArray jsonArray = new JSONArray(avatarLink);
+                if (jsonArray.length() > 0) {
+                    this.avatarLink = jsonArray.getJSONObject(0).getString("url");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean getStatus() {
@@ -86,6 +100,17 @@ public class Supplier implements Serializable {
         supplier.setAddress(data.getString("address"));
         supplier.setAvatarLink(data.getString("avt"));
         supplier.setStatus(data.getBoolean("isdeleted"));
+        return supplier;
+    }
+
+    public static Supplier getObjectFromDiscountJSON(JSONObject data) throws Exception{
+        Supplier supplier = new Supplier();
+        supplier.setId(data.getString("supplierid"));
+        supplier.setAccountId(data.getString("accountid"));
+        supplier.setName(data.getString("suppliername"));
+        supplier.setMail(data.getString("supplieremai"));
+        supplier.setAddress(data.getString("supplieraddress"));
+        supplier.setAvatarLink(data.getString("supplieravt"));
         return supplier;
     }
 }

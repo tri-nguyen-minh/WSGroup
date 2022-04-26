@@ -4,21 +4,14 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 
+import dev.wsgroup.main.models.utils.StringUtils;
+
 public class Review implements Serializable {
-    private String id, orderId, productId, description;
+    private String orderId, productId, review;
     private double rating;
     private User user;
-    private String createDate, updateDate;
 
     public Review() {
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getOrderId() {
@@ -37,12 +30,12 @@ public class Review implements Serializable {
         this.productId = productId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getReview() {
+        return review;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setReview(String review) {
+        this.review = review;
     }
 
     public double getRating() {
@@ -61,37 +54,25 @@ public class Review implements Serializable {
         this.user = user;
     }
 
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(String updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    public static Review getObjectFromJSON(JSONObject jsonObject) throws Exception {
-        Review review = new Review();
-        review.setId(jsonObject.getString("id"));
-        review.setProductId(jsonObject.getString("productid"));
-        review.setOrderId(jsonObject.getString("oderdetailid"));
-        review.setCreateDate(jsonObject.getString("createdat"));
-        review.setUpdateDate(jsonObject.getString("updatedat"));
-        review.setRating(jsonObject.getDouble("rating"));
-        review.setDescription(jsonObject.getString("comment"));
-        User user = new User();
-        user.setUserId(jsonObject.getString("customerid"));
-        user.setAvatarLink(jsonObject.getString("avt"));
-        user.setFirstName(jsonObject.getString("firstname"));
-        user.setLastName(jsonObject.getString("lastname"));
-        review.setUser(user);
+    public static Review getObjectFromJSON(JSONObject data) throws Exception {
+        Review review;
+        if (data.getString("rating").equals("null") || data.getDouble("rating") == 0) {
+            return null;
+        } else {
+            review = new Review();
+            if (data.getString("comment").equals("removed")) {
+                review.setReview(StringUtils.MES_ALERT_REVIEW_REMOVED);
+                review.setRating(0);
+            } else {
+                review.setReview(data.getString("comment"));
+                review.setRating(data.getDouble("rating"));
+            }
+            User user = new User();
+            user.setAvatarLink(data.getString("avt"));
+            user.setFirstName(data.getString("firstname"));
+            user.setLastName(data.getString("lastname"));
+            review.setUser(user);
+        }
         return review;
     }
 }

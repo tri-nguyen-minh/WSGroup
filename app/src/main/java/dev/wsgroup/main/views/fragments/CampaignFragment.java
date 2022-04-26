@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dev.wsgroup.main.R;
@@ -30,19 +31,15 @@ public class CampaignFragment extends Fragment {
     private RecyclerView recViewCampaignView;
 
     private String campaignStatus;
+    private boolean sharingStatus;
     private Product product;
     private String productId;
     private List<Campaign> campaignList;
     private RecViewCampaignListAdapter adapter;
 
-    public CampaignFragment(String campaignStatus) {
-        if (campaignStatus.toLowerCase().equals("ongoing")) {
-            this.campaignStatus = "active";
-        } else if (campaignStatus.toLowerCase().equals("finished")) {
-            this.campaignStatus = "done";
-        } else if (campaignStatus.toLowerCase().equals("upcoming")) {
-            this.campaignStatus = "upcoming";
-        }
+    public CampaignFragment(String campaignType) {
+        this.sharingStatus = campaignType.equals("SHARING");
+        this.campaignStatus = "active";
     }
 
     @Override
@@ -65,11 +62,9 @@ public class CampaignFragment extends Fragment {
 
         product = (Product) getActivity().getIntent().getSerializableExtra("PRODUCT");
         productId = product.getProductId();
-        APICampaignCaller.getCampaignListByProductId(productId, campaignStatus,
-                    campaignList, getActivity().getApplication(), new APIListener() {
+        APICampaignCaller.getCampaignListByProductId(productId, campaignStatus, campaignList, getActivity().getApplication(), new APIListener() {
                     @Override
                     public void onCampaignListFound(List<Campaign> foundCampaignList) {
-                        campaignList = foundCampaignList;
                         if (campaignList.size() > 0) {
                             layoutLoading.setVisibility(View.INVISIBLE);
                             layoutNoCampaign.setVisibility(View.INVISIBLE);
@@ -99,7 +94,7 @@ public class CampaignFragment extends Fragment {
     }
 
     private void setupCampaignList() {
-        adapter = new RecViewCampaignListAdapter(getContext()) {
+        adapter = new RecViewCampaignListAdapter(getContext(), product.getRetailPrice()) {
             @Override
             public void executeOnCampaignSelected(Campaign campaign) {
                 getActivity().getIntent().putExtra("CAMPAIGN_SELECTED", campaign);

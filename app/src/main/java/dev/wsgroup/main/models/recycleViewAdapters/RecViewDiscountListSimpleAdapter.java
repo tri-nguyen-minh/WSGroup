@@ -38,7 +38,11 @@ public class RecViewDiscountListSimpleAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtDiscountDescription.setText(discountList.get(position).getDescription());
+        if (!discountList.get(position).getDescription().equals("null")) {
+            holder.txtDiscountDescription.setText(discountList.get(position).getDescription());
+        } else {
+            holder.txtDiscountDescription.setVisibility(View.INVISIBLE);
+        }
         holder.txtSupplierName.setText(discountList.get(position).getSupplier().getName());
         holder.txtDiscountPrice
                 .setText(MethodUtils.formatPriceString(discountList.get(position).getDiscountPrice()));

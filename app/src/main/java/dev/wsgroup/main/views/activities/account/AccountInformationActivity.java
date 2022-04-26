@@ -13,17 +13,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
@@ -31,6 +34,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,6 +51,7 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
+import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 import dev.wsgroup.main.views.dialogbox.DialogBoxOTP;
 import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
@@ -55,17 +60,22 @@ public class AccountInformationActivity extends AppCompatActivity {
 
     private ImageView imgBackFromAccountInformation, imgAccountInfoHome, imgAccountInfoAvatar;
     private CardView cardViewEditProfileAvatar;
-    private EditText editAccountInfoUsername, editAccountInfoFirstName, editAccountInfoLastName,
-                     editAccountInfoPhone, editAccountInfoMail;
+    private TextInputEditText editAccountInfoUsername, editAccountInfoFirstName,
+            editAccountInfoLastName, editAccountInfoPhone, editAccountInfoMail,
+            editAccountInfoWalletCode, editAccountInfoWalletSecret;
     private Button btnSaveEdit;
-    private ConstraintLayout layoutParent, layoutProfileAvatar;
-    private ProgressBar progressBarLoading;
+    private ConstraintLayout layoutParent, layoutAvatar, layoutUsername;
+    private LinearLayout layoutFailed, layoutMain;
+    private TextView lblRetry, txtLoginMethod;
+    private RelativeLayout layoutLoading;
+    private ScrollView scrollViewMain;
 
     private SharedPreferences sharedPreferences;
-    private String token, username, phone, avatarLink;
+    private String token, username, phone, avatarLink, googleId;
     private User user;
     private DialogBoxLoading dialogBoxLoading;
     private DialogBoxAlert dialogBoxAlert;
+    private DialogBoxConfirm dialogBoxConfirm;
     private Uri uri;
     private String errorMessage;
     private boolean dataLoaded;
@@ -85,40 +95,22 @@ public class AccountInformationActivity extends AppCompatActivity {
         editAccountInfoLastName = findViewById(R.id.editAccountInfoLastName);
         editAccountInfoPhone = findViewById(R.id.editAccountInfoPhone);
         editAccountInfoMail = findViewById(R.id.editAccountInfoMail);
+        editAccountInfoWalletCode = findViewById(R.id.editAccountInfoWalletCode);
+        editAccountInfoWalletSecret = findViewById(R.id.editAccountInfoWalletSecret);
         btnSaveEdit = findViewById(R.id.btnSaveEdit);
         layoutParent = findViewById(R.id.layoutParent);
-        layoutProfileAvatar = findViewById(R.id.layoutProfileAvatar);
-        progressBarLoading = findViewById(R.id.progressBarLoading);
+        layoutAvatar = findViewById(R.id.layoutAvatar);
+        layoutUsername = findViewById(R.id.layoutUsername);
+        layoutFailed = findViewById(R.id.layoutFailed);
+        layoutMain = findViewById(R.id.layoutMain);
+        lblRetry = findViewById(R.id.lblRetry);
+        txtLoginMethod = findViewById(R.id.txtLoginMethod);
+        layoutLoading = findViewById(R.id.layoutLoading);
+        scrollViewMain = findViewById(R.id.scrollViewMain);
 
         dataLoaded = false;
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("TOKEN", "");
-        username = sharedPreferences.getString("USERNAME", "");
-        phone = sharedPreferences.getString("PHONE", "");
 
-        layoutProfileAvatar.setVisibility(View.INVISIBLE);
-        progressBarLoading.setVisibility(View.VISIBLE);
-
-        APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
-            @Override
-            public void onUserFound(User foundUser, String message) {
-                user = foundUser;
-                user.setToken(token);
-                user.setUsername(username);
-                user.setPhoneNumber(phone);
-                editAccountInfoUsername.setText(username);
-                editAccountInfoFirstName.setText(user.getFirstName());
-                editAccountInfoLastName.setText(user.getLastName());
-                editAccountInfoPhone.setText(user.getPhoneNumber());
-                editAccountInfoMail.setText(user.getMail());
-                avatarLink = user.getAvatarLink();
-                Glide.with(getApplicationContext()).load(avatarLink).into(imgAccountInfoAvatar);
-                layoutProfileAvatar.setVisibility(View.VISIBLE);
-                progressBarLoading.setVisibility(View.INVISIBLE);
-                dataLoaded = true;
-                enablingSaveButton();
-            }
-        });
+        getUserProfile();
 
         editAccountInfoUsername.setEnabled(false);
         editAccountInfoUsername.setTextColor(getResources().getColor(R.color.gray));
@@ -127,7 +119,7 @@ public class AccountInformationActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(view);
+                    MethodUtils.hideKeyboard(view, getApplicationContext());
                 }
             }
         };
@@ -173,7 +165,7 @@ public class AccountInformationActivity extends AppCompatActivity {
                     public void executeTakePhoto() {
                         if (checkSelfPermission(Manifest.permission.CAMERA)
                                 != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions(new String[] {Manifest.permission.CAMERA}, 100);
+                            requestPermissions(new String[] {Manifest.permission.CAMERA}, 101);
                         } else {
                             takeImage();
                         }
@@ -193,12 +185,36 @@ public class AccountInformationActivity extends AppCompatActivity {
         editAccountInfoLastName.setOnFocusChangeListener(listener);
         editAccountInfoMail.setOnFocusChangeListener(listener);
         editAccountInfoPhone.setOnFocusChangeListener(listener);
+        editAccountInfoWalletCode.setOnFocusChangeListener(listener);
+        editAccountInfoWalletSecret.setOnFocusChangeListener(listener);
         editAccountInfoFirstName.addTextChangedListener(textWatcher);
         editAccountInfoLastName.addTextChangedListener(textWatcher);
         editAccountInfoMail.addTextChangedListener(textWatcher);
-        editAccountInfoPhone.addTextChangedListener(textWatcher);
+        editAccountInfoWalletCode.addTextChangedListener(textWatcher);
+        editAccountInfoWalletSecret.addTextChangedListener(textWatcher);
+        editAccountInfoPhone.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-        layoutParent.setOnClickListener(new View.OnClickListener() {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                phone = editAccountInfoPhone.getText().toString();
+                if (phone.length() < 4 || !phone.startsWith(StringUtils.VIETNAM_COUNTRY_CODE)) {
+                    editAccountInfoPhone.setText(StringUtils.VIETNAM_COUNTRY_CODE);
+                    editAccountInfoPhone.setSelection(4);
+                }
+                enablingSaveButton();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        View.OnClickListener clearFocusListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (editAccountInfoFirstName.hasFocus()) {
@@ -213,6 +229,24 @@ public class AccountInformationActivity extends AppCompatActivity {
                 if (editAccountInfoPhone.hasFocus()) {
                     editAccountInfoPhone.clearFocus();
                 }
+                if (editAccountInfoWalletCode.hasFocus()) {
+                    editAccountInfoWalletCode.clearFocus();
+                }
+                if (editAccountInfoWalletSecret.hasFocus()) {
+                    editAccountInfoWalletSecret.clearFocus();
+                }
+            }
+        };
+
+        layoutParent.setOnClickListener(clearFocusListener);
+        layoutAvatar.setOnClickListener(clearFocusListener);
+        layoutMain.setOnClickListener(clearFocusListener);
+        txtLoginMethod.setOnClickListener(clearFocusListener);
+
+        lblRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getUserProfile();
             }
         });
 
@@ -223,59 +257,107 @@ public class AccountInformationActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow()
                         .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                if (!editAccountInfoPhone.getText().toString().equals(user.getPhoneNumber())) {
-                    phone = editAccountInfoPhone.getText().toString();
-                    APIUserCaller.findUserByPhoneNumber(phone,
-                            getApplication(), new APIListener() {
-                                @Override
-                                public void onUserFound(User user, String message) {
-                                    errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
-                                    displayError();
-                                }
-                                @Override
-                                public void onFailedAPICall(int errorCode) {
-                                    super.onFailedAPICall(errorCode);
-                                    switch (errorCode) {
-                                        case IntegerUtils.ERROR_API:
-                                        case IntegerUtils.ERROR_PARSING_JSON: {
-                                            errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
-                                            displayError();
-                                            break;
-                                        }
-                                        case IntegerUtils.ERROR_NO_USER: {
-                                            errorMessage = StringUtils.MES_ALERT_OTP_REQUIRE;
-                                            dialogBoxAlert = new DialogBoxAlert(AccountInformationActivity.this,
-                                                    IntegerUtils.CONFIRM_ACTION_CODE_ALERT, errorMessage,"") {
-                                                @Override
-                                                public void onClickAction() {
-                                                    sendOTP();
-                                                }
-                                            };
-                                            dialogBoxAlert.show();
-                                            break;
-                                        }
-                                    }
-                                }
-                            });
+                updateUser();
+            }
+        });
+    }
+
+    private void getUserProfile() {
+        setLoadingState();
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN", "");
+        APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
+            @Override
+            public void onUserFound(User foundUser, String message) {
+                user = foundUser;
+                user.setToken(token);
+                username = user.getUsername();
+                phone = user.getPhoneNumber();
+                googleId = user.getGoogleId();
+                if (googleId.isEmpty() || googleId.equals("null") ) {
+                    txtLoginMethod.setText("WSGroup's Account");
+                    editAccountInfoUsername.setText(username);
                 } else {
-                    if (!checkAvatarChanged()) {
-                        updateUser();
-                    } else {
-                        uploadImageToFirebase();
-                    }
+                    txtLoginMethod.setText("Linked Google's Account");
+                    layoutUsername.setVisibility(View.GONE);
+                }
+                editAccountInfoFirstName.setText(user.getFirstName());
+                editAccountInfoLastName.setText(user.getLastName());
+                phone = user.getPhoneNumber();
+                editAccountInfoPhone.setText(MethodUtils.formatPhoneNumberWithCountryCode(phone));
+                editAccountInfoMail.setText(user.getMail());
+                editAccountInfoWalletCode.setText(user.getWalletCode().equals("null")  ?
+                        "" : user.getWalletCode());
+                editAccountInfoWalletSecret.setText(user.getWalletSecret().equals("null") ?
+                        "" : user.getWalletSecret());
+                avatarLink = user.getAvatarLink();
+                if (!avatarLink.equals("null")) {
+                    Glide.with(getApplicationContext())
+                            .load(avatarLink)
+                            .into(imgAccountInfoAvatar);
+                }
+                dataLoaded = true;
+                setReadyState();
+                enablingSaveButton();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            AccountInformationActivity.this);
+                } else {
+                    setFailedState();
                 }
             }
         });
     }
 
+    private void updateUser() {
+        phone = MethodUtils.revertPhoneNumber(editAccountInfoPhone.getText().toString());
+        if (!phone.equals(user.getPhoneNumber())) {
+            APIUserCaller.findUserByPhoneNumber(phone, getApplication(), new APIListener() {
+                @Override
+                public void onUserFound(User user, String message) {
+                    errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
+                    displayError();
+                }
+                @Override
+                public void onFailedAPICall(int errorCode) {
+                    super.onFailedAPICall(errorCode);
+                    switch (errorCode) {
+                        case IntegerUtils.ERROR_API:
+                        case IntegerUtils.ERROR_PARSING_JSON: {
+                            errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                            displayError();
+                            break;
+                        }
+                        case IntegerUtils.ERROR_NO_USER: {
+                            sendOTP();
+                            break;
+                        }
+                    }
+                }
+            });
+        } else {
+            if (!checkAvatarChanged()) {
+                checkEmptyWallet();
+            } else {
+                uploadImageToFirebase();
+            }
+        }
+    }
+
     private void enablingSaveButton() {
         if (dataLoaded) {
             if (checkEmptyFields() || !checkInfoChanged() || checkInvalidInput()) {
+                System.out.println("in false");
                 btnSaveEdit.setEnabled(false);
                 btnSaveEdit.getBackground()
                            .setTint(getApplicationContext().getResources()
                                     .getColor(R.color.gray_light));
             } else {
+                System.out.println("in true");
                 btnSaveEdit.setEnabled(true);
                 btnSaveEdit.getBackground()
                            .setTint(getApplicationContext().getResources()
@@ -291,7 +373,7 @@ public class AccountInformationActivity extends AppCompatActivity {
         if (editAccountInfoLastName.getText().toString().isEmpty()) {
             return true;
         }
-        if (editAccountInfoPhone.getText().toString().isEmpty()) {
+        if (editAccountInfoPhone.getText().toString().equals(StringUtils.VIETNAM_COUNTRY_CODE)) {
             return true;
         }
         return false;
@@ -299,14 +381,14 @@ public class AccountInformationActivity extends AppCompatActivity {
 
     private boolean checkInvalidInput() {
         if(!editAccountInfoMail.getText().toString().isEmpty()) {
-            if (!editAccountInfoMail.getText().toString().matches(StringUtils.MAIL_REGEX)) {
+            if (!Patterns.EMAIL_ADDRESS.matcher(editAccountInfoMail.getText().toString()).matches()) {
                 return true;
             }
         }
-        if (!editAccountInfoPhone.getText().toString().isEmpty()) {
-            if (!editAccountInfoPhone.getText().toString().matches(StringUtils.PHONE_REGEX)) {
-                return true;
-            }
+        phone = MethodUtils.revertPhoneNumber(editAccountInfoPhone.getText().toString());
+        System.out.println(phone);
+        if (phone.isEmpty() || !phone.matches(StringUtils.PHONE_REGEX)) {
+            return true;
         }
         return false;
     }
@@ -315,7 +397,7 @@ public class AccountInformationActivity extends AppCompatActivity {
         String firstName = editAccountInfoFirstName.getText().toString();
         String lastname = editAccountInfoLastName.getText().toString();
         String mail = editAccountInfoMail.getText().toString();
-        String phone = editAccountInfoPhone.getText().toString();
+        String phone = MethodUtils.revertPhoneNumber(editAccountInfoPhone.getText().toString());
         if (!firstName.equals(user.getFirstName())) {
             return true;
         }
@@ -346,22 +428,6 @@ public class AccountInformationActivity extends AppCompatActivity {
         startActivityForResult(intent, IntegerUtils.REQUEST_SELECT_IMAGE);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                takeImage();
-            }
-        }
-    }
-
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
     private void uploadImageToFirebase() {
         avatarLink = "images/" + username + "_avatar";
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -378,8 +444,8 @@ public class AccountInformationActivity extends AppCompatActivity {
                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> urlTask
-                                = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot,
+                                Task<Uri>>() {
                             @Override
                             public Task<Uri> then(Task<UploadTask.TaskSnapshot> task) throws Exception {
                                 if (!task.isSuccessful()) {
@@ -395,7 +461,7 @@ public class AccountInformationActivity extends AppCompatActivity {
                             public void onComplete(Task<Uri> task) {
                                 if (task.isSuccessful()) {
                                     avatarLink = task.getResult().toString();
-                                    updateUser();
+                                    checkEmptyWallet();
                                 } else {
                                     errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
                                     displayError();
@@ -424,17 +490,45 @@ public class AccountInformationActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUser() {
+    private void checkEmptyWallet() {
+        String walletCode = editAccountInfoWalletCode.getText().toString();
+        String walletSecret = editAccountInfoWalletSecret.getText().toString();
+        if (walletCode.isEmpty() || walletSecret.isEmpty()) {
+            dialogBoxConfirm = new DialogBoxConfirm(AccountInformationActivity.this,
+                    StringUtils.MES_CONFIRM_NO_WALLET) {
+                @Override
+                public void onYesClicked() {
+                    performUpdate();
+                }
+
+                @Override
+                public void onNoClicked() {
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
+                    }
+                }
+            };
+            dialogBoxConfirm.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialogBoxConfirm.setDescription(StringUtils.MES_ALERT_INCOMPLETE_WALLET);
+            dialogBoxConfirm.show();
+        } else {
+            performUpdate();
+        }
+    }
+
+    private void performUpdate() {
         User updatedUser = new User();
         updatedUser.setToken(token);
         updatedUser.setFirstName(editAccountInfoFirstName.getText().toString());
         updatedUser.setLastName(editAccountInfoLastName.getText().toString());
         updatedUser.setMail(editAccountInfoMail.getText().toString());
+        updatedUser.setWalletCode(editAccountInfoWalletCode.getText().toString());
+        updatedUser.setWalletSecret(editAccountInfoWalletSecret.getText().toString());
         updatedUser.setPhoneNumber(phone);
         updatedUser.setAvatarLink(avatarLink);
         APIUserCaller.updateUserProfile(updatedUser, getApplication(), new APIListener() {
             @Override
-            public void onUpdateProfileSuccessful() {
+            public void onUpdateSuccessful() {
                 if (dialogBoxLoading.isShowing()) {
                     dialogBoxLoading.dismiss();
                 }
@@ -448,21 +542,20 @@ public class AccountInformationActivity extends AppCompatActivity {
                 }
                 DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
                         IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
-                        StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"");
+                        StringUtils.MES_SUCCESSFUL_UPDATE_PROFILE,"") {
+                    @Override
+                    public void onClickAction() {
+                        getUserProfile();
+                    }
+                };
                 dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBox.show();
             }
 
             @Override
             public void onFailedAPICall(int code) {
-                if (dialogBoxLoading.isShowing()) {
-                    dialogBoxLoading.dismiss();
-                }
-                DialogBoxAlert dialogBox = new DialogBoxAlert(AccountInformationActivity.this,
-                        IntegerUtils.CONFIRM_ACTION_CODE_FAILED,
-                        StringUtils.MES_ERROR_FAILED_API_CALL,"") {};
-                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialogBox.show();
+                errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                displayError();
             }
         });
     }
@@ -477,7 +570,11 @@ public class AccountInformationActivity extends AppCompatActivity {
                         StringUtils.MES_SUCCESSFUL_OTP,"") {
                     @Override
                     public void onClickAction() {
-                        updateUser();
+                        if (!checkAvatarChanged()) {
+                            checkEmptyWallet();
+                        } else {
+                            uploadImageToFirebase();
+                        }
                     }
                 };
                 dialogBox.show();
@@ -496,6 +593,39 @@ public class AccountInformationActivity extends AppCompatActivity {
         dialogBoxAlert = new DialogBoxAlert(AccountInformationActivity.this,
                         IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
         dialogBoxAlert.show();
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutFailed.setVisibility(View.GONE);
+        scrollViewMain.setVisibility(View.GONE);
+    }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutFailed.setVisibility(View.VISIBLE);
+        scrollViewMain.setVisibility(View.GONE);
+    }
+
+    private void setReadyState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutFailed.setVisibility(View.GONE);
+        scrollViewMain.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101
+                && grantResults.length != 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            takeImage();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromAccountInformation.performClick();
     }
 
     @Override

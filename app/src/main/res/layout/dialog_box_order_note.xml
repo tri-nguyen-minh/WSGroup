@@ -22,17 +22,11 @@
             android:background="@color/blue_main">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left"
                 android:text="NOTE"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/style_dialog_box_header"  />
 
             <ImageView
                 android:id="@+id/imgCloseDialogBox"
@@ -46,29 +40,89 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <EditText
-            android:id="@+id/editNote"
-            style="@style/style_otp_box"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
+            style="@style/style_otp_box"
+            android:orientation="vertical"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="15dp"
-            android:padding="10dp"
-            android:hint="Write note here..."
-            android:fontFamily="@font/montserratr"
-            android:inputType="textMultiLine"
-            android:textSize="14sp"
-            android:gravity="left|top"
-            android:maxLines="4"
-            android:text=""
-            android:textColor="@color/gray_dark"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:layout_marginTop="15dp" >
+
+            <EditText
+                android:id="@+id/editNote"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@color/gray_background"
+                android:fontFamily="@font/montserratr"
+                android:textColor="@color/gray_darker"
+                android:textColorHint="@color/gray"
+                android:gravity="left|top"
+                android:hint="Write note here..."
+                android:inputType="textMultiLine"
+                android:maxLength="200"
+                android:padding="10dp"
+                android:text="The reason for my request is very simple. Your product sucks. Just that. I don't even know how it's even possib. in a world where Telsa exist, you managed to make the worst product ever produced"
+                android:textSize="14sp"/>
+
+            <LinearLayout
+                android:id="@+id/layoutLetterCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:paddingHorizontal="5dp"
+                android:paddingBottom="5dp">
+
+                <TextView
+                    android:id="@+id/txtLetterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="0"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/lblLetterSeparator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="/"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/lblLetterCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="7dp"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left"
+                    android:text="200"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnConfirmNote"
             style="@style/style_button_dialog_box"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:text="OK"/>
 

@@ -32,19 +32,23 @@ import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewCategoryAdapter;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
+import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.activities.message.MessageActivity;
 
 public class SupplierActivity extends AppCompatActivity {
 
-    private ImageView imgBackFromSupplier, imgSupplierHome,
+    private ImageView imgBackFromSupplier, imgSupplierHome, imgSupplierChat,
             imgSupplierBackground, imgSupplierAvatar;
     private NestedScrollView scrollViewMain;
     private RelativeLayout layoutLoading, layoutLoadingCategory, layoutLoadingProduct;
     private RecyclerView recViewCategory, recViewProduct;
-    private TextView txtSupplierName, txtSupplierAddress, txtSupplierMail, lblRetryGetSupplier;
-    private ConstraintLayout constraintLayoutSupplierChat;
+    private TextView txtSupplierName, txtSupplierAddress, txtSupplierMail,
+            lblRetryGetSupplier, lblSupplierChat;
     private LinearLayout layoutCategory, layoutProduct, layoutFailedGettingSupplier;
 
 
+    private SharedPreferences sharedPreferences;
     private String supplierId;
     private Supplier supplier;
     private List<Category> categoryList;
@@ -61,6 +65,7 @@ public class SupplierActivity extends AppCompatActivity {
 
         imgBackFromSupplier = findViewById(R.id.imgBackFromSupplier);
         imgSupplierHome = findViewById(R.id.imgSupplierHome);
+        imgSupplierChat = findViewById(R.id.imgSupplierChat);
         imgSupplierBackground = findViewById(R.id.imgSupplierBackground);
         imgSupplierAvatar = findViewById(R.id.imgSupplierAvatar);
         scrollViewMain = findViewById(R.id.scrollViewMain);
@@ -75,17 +80,26 @@ public class SupplierActivity extends AppCompatActivity {
         txtSupplierAddress = findViewById(R.id.txtSupplierAddress);
         txtSupplierMail = findViewById(R.id.txtSupplierMail);
         lblRetryGetSupplier = findViewById(R.id.lblRetryGetSupplier);
-        constraintLayoutSupplierChat = findViewById(R.id.constraintLayoutSupplierChat);
+        lblSupplierChat = findViewById(R.id.lblSupplierChat);
         layoutFailedGettingSupplier = findViewById(R.id.layoutFailedGettingSupplier);
 
-        Glide.with(getApplicationContext()).load("https://firebasestorage.googleapis.com/v0/b/wsg-authen-144ba.appspot.com/o/images%2FCustomer1_avatar?alt=media&token=57ae86ad-b6bc-42bc-92d1-5ab363555b44")
-                .override(5, 5)
-                .into(imgSupplierBackground);
-
-        Glide.with(getApplicationContext()).load("https://firebasestorage.googleapis.com/v0/b/wsg-authen-144ba.appspot.com/o/images%2FCustomer1_avatar?alt=media&token=57ae86ad-b6bc-42bc-92d1-5ab363555b44")
-                .into(imgSupplierAvatar);
-
         supplierId = getIntent().getStringExtra("SUPPLIER_ID");
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+                String accountId = sharedPreferences.getString("ACCOUNT_ID", "");
+                if (accountId.isEmpty()) {
+                    Intent signInIntent = new Intent(getApplicationContext(), SignInActivity.class);
+                    startActivityForResult(signInIntent, IntegerUtils.REQUEST_COMMON);
+                } else {
+                    Intent messageIntent = new Intent(getApplicationContext(), MessageActivity.class);
+                    messageIntent.putExtra("USER_ID", accountId);
+                    messageIntent.putExtra("SUPPLIER_ID", supplier.getAccountId());
+                    startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
+                }
+            }
+        };
 
         getSupplier();
 
@@ -108,14 +122,13 @@ public class SupplierActivity extends AppCompatActivity {
                 getSupplier();
             }
         });
+        lblSupplierChat.setOnClickListener(listener);
+        imgSupplierChat.setOnClickListener(listener);
     }
 
     private void getSupplier() {
-        SharedPreferences sharedPreferences = getSharedPreferences("PREFERENCE",
-                                                                    Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN","");
         setLoadingState();
-        APISupplierCaller.getSupplierById(token, supplierId, getApplication(), new APIListener() {
+        APISupplierCaller.getSupplierById(supplierId, getApplication(), new APIListener() {
             @Override
             public void onSupplierFound(Supplier supplierFound) {
                 supplier = supplierFound;
@@ -129,6 +142,7 @@ public class SupplierActivity extends AppCompatActivity {
                         }
                         @Override
                         public void onProductListFound(List<Product> list) {
+
                             orderCountCheck = false; ratingCheck = false;
                             APIListener mostPopularListener = new APIListener() {
                                 @Override
@@ -164,10 +178,14 @@ public class SupplierActivity extends AppCompatActivity {
                             };
                             if (list.size() > 0) {
                                 productList = list;
-                                APIProductCaller.getOrderCountByProductList(productList,
-                                        getApplication(), mostPopularListener);
-                                APIProductCaller.getRatingByProductIdList(productList,
-                                        getApplication(), mostPopularListener);
+
+                                orderCountCheck = true; ratingCheck = true;
+                                setupProductList();
+
+//                                APIProductCaller.getOrderCountByProductList(productList,
+//                                        getApplication(), mostPopularListener);
+//                                APIProductCaller.getRatingByProductIdList(productList,
+//                                        getApplication(), mostPopularListener);
                             } else {
                                 layoutLoadingProduct.setVisibility(View.GONE);
                                 layoutProduct.setVisibility(View.GONE);
@@ -193,12 +211,19 @@ public class SupplierActivity extends AppCompatActivity {
         txtSupplierName.setText(supplier.getName());
         txtSupplierAddress.setText(supplier.getAddress());
         txtSupplierMail.setText(supplier.getMail());
-        constraintLayoutSupplierChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+        if (!supplier.getAvatarLink().equals("null")) {
+            Glide.with(getApplicationContext()).load(supplier.getAvatarLink())
+                    .override(5, 5)
+                    .into(imgSupplierBackground);
+            Glide.with(getApplicationContext()).load(supplier.getAvatarLink())
+                    .into(imgSupplierAvatar);
+        } else {
+            Glide.with(getApplicationContext()).load(R.drawable.ic_profile)
+                    .override(5, 5)
+                    .into(imgSupplierBackground);
+            Glide.with(getApplicationContext()).load(R.drawable.ic_profile)
+                    .into(imgSupplierAvatar);
+        }
         setSupplierLoadedState();
     }
 
@@ -237,6 +262,11 @@ public class SupplierActivity extends AppCompatActivity {
         } else {
             layoutCategory.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        imgBackFromSupplier.performClick();
     }
 
     private void setupProductList() {

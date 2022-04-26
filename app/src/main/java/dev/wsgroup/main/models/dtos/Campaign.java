@@ -1,14 +1,21 @@
 package dev.wsgroup.main.models.dtos;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class Campaign implements Serializable {
-    private String id, supplierId, productId, startDate, endDate, code, status, description;
+    private String id, supplierId, startDate, endDate, code, status, description;
     private int minQuantity, maxQuantity, orderCount, quantityCount, advancePercentage;
-    private double savingPrice;
+    private double price;
     private boolean shareFlag;
+    private Product product;
+    private List<CampaignMilestone> milestoneList;
 
     public Campaign() {
     }
@@ -27,14 +34,6 @@ public class Campaign implements Serializable {
 
     public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
     }
 
     public String getStartDate() {
@@ -89,12 +88,12 @@ public class Campaign implements Serializable {
         return orderCount;
     }
 
-    public double getSavingPrice() {
-        return savingPrice;
+    public double getPrice() {
+        return price;
     }
 
-    public void setSavingPrice(double savingPrice) {
-        this.savingPrice = savingPrice;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public void setOrderCount(int orderCount) {
@@ -133,23 +132,103 @@ public class Campaign implements Serializable {
         this.shareFlag = shareFlag;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public List<CampaignMilestone> getMilestoneList() {
+        return milestoneList;
+    }
+
+    public void setMilestoneList(List<CampaignMilestone> milestoneList) {
+        this.milestoneList = milestoneList;
+    }
+
     public static Campaign getObjectFromJSON(JSONObject data) throws Exception {
         Campaign campaign = new Campaign();
         campaign.setId(data.getString("id"));
-        campaign.setProductId(data.getString("productid"));
-        campaign.setSupplierId(data.getString("supplierid"));
+        Product product = new Product();
+        product.setProductId(data.getString("productid"));
+        campaign.setProduct(product);
         campaign.setCode(data.getString("code"));
         campaign.setStartDate(data.getString("fromdate"));
         campaign.setEndDate(data.getString("todate"));
         campaign.setMinQuantity(data.getInt("quantity"));
         campaign.setMaxQuantity(data.getInt("maxquantity"));
-        campaign.setSavingPrice(data.getDouble("price"));
+        campaign.setPrice(data.getDouble("price"));
         campaign.setStatus(data.getString("status"));
         campaign.setDescription(data.getString("description"));
         campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
         campaign.setOrderCount(data.getInt("numorderwaiting"));
         campaign.setShareFlag(data.getBoolean("isshare"));
         campaign.setAdvancePercentage(data.getInt("advancefee"));
+        if (campaign.getShareFlag()) {
+            List<CampaignMilestone> milestoneList = new ArrayList<>();
+            JSONArray rangeArray = new JSONArray(data.getString("range"));
+            if (rangeArray.length() > 0) {
+                CampaignMilestone milestone;
+                for (int i = 0; i < rangeArray.length(); i++) {
+                    milestone = CampaignMilestone.getObjectFromJSON(rangeArray.getJSONObject(i));
+                    milestoneList.add(milestone);
+                }
+                Collections.sort(milestoneList, new Comparator<CampaignMilestone>() {
+                    @Override
+                    public int compare(CampaignMilestone milestone1, CampaignMilestone milestone2) {
+                        return milestone1.getQuantity() - milestone2.getQuantity();
+                    }
+                });
+            }
+            campaign.setMilestoneList(milestoneList);
+        }
+        return campaign;
+    }
+
+    public static Campaign getSearchedObjectFromJSON(JSONObject data) throws Exception {
+        Campaign campaign = new Campaign();
+        campaign.setId(data.getString("id"));
+        Product product = new Product();
+        product.setProductId(data.getString("productid"));
+        product.setName(data.getString("productname"));
+        product.setRetailPrice(data.getDouble("productretailprice"));
+        product.setImageLink(data.getString("productimage"));
+        Supplier supplier = new Supplier();
+        supplier.setId(data.getString("supplierid"));
+        product.setSupplier(supplier);
+        campaign.setProduct(product);
+        campaign.setCode(data.getString("code"));
+        campaign.setStartDate(data.getString("fromdate"));
+        campaign.setEndDate(data.getString("todate"));
+        campaign.setMinQuantity(data.getInt("quantity"));
+        campaign.setMaxQuantity(data.getInt("maxquantity"));
+        campaign.setPrice(data.getDouble("price"));
+        campaign.setStatus(data.getString("status"));
+        campaign.setDescription(data.getString("description"));
+        campaign.setQuantityCount(data.getInt("quantityorderwaiting"));
+        campaign.setOrderCount(data.getInt("numorderwaiting"));
+        campaign.setShareFlag(data.getBoolean("isshare"));
+        campaign.setAdvancePercentage(data.getInt("advancefee"));
+        if (campaign.getShareFlag()) {
+            List<CampaignMilestone> milestoneList = new ArrayList<>();
+            JSONArray rangeArray = new JSONArray(data.getString("range"));
+            if (rangeArray.length() > 0) {
+                CampaignMilestone milestone;
+                for (int i = 0; i < rangeArray.length(); i++) {
+                    milestone = CampaignMilestone.getObjectFromJSON(rangeArray.getJSONObject(i));
+                    milestoneList.add(milestone);
+                }
+                Collections.sort(milestoneList, new Comparator<CampaignMilestone>() {
+                    @Override
+                    public int compare(CampaignMilestone milestone1, CampaignMilestone milestone2) {
+                        return milestone1.getQuantity() - milestone2.getQuantity();
+                    }
+                });
+            }
+            campaign.setMilestoneList(milestoneList);
+        }
         return campaign;
     }
 

@@ -3,6 +3,7 @@ package dev.wsgroup.main.models.apis.callers;
 import android.app.Application;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -21,6 +22,7 @@ import java.util.Map;
 import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.utils.IntegerUtils;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class APIAddressCaller {
@@ -61,10 +63,15 @@ public class APIAddressCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
@@ -77,6 +84,8 @@ public class APIAddressCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,10 +105,8 @@ public class APIAddressCaller {
                     try {
                         Address address = null;
                         JSONArray jsonArray = response.getJSONArray("data");
-                        if (jsonArray != null) {
-                            if (jsonArray.length() > 0) {
-                                address = Address.getObjectFromJSON(jsonArray.getJSONObject(0));
-                            }
+                        if (jsonArray != null && jsonArray.length() > 0) {
+                            address = Address.getObjectFromJSON(jsonArray.getJSONObject(0));
                         }
                         APIListener.onAddressFound(address);
                     } catch (Exception e) {
@@ -109,10 +116,15 @@ public class APIAddressCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
@@ -125,13 +137,15 @@ public class APIAddressCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void AddAddress(String token, Address address,
+    public static void addAddress(String token, Address address,
                                   Application application, APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -155,10 +169,15 @@ public class APIAddressCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request
@@ -172,13 +191,15 @@ public class APIAddressCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void UpdateAddress(String token, Address address,
+    public static void updateAddress(String token, Address address,
                                      Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + address.getId();
         if(requestQueue == null) {
@@ -205,10 +226,15 @@ public class APIAddressCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url,
@@ -221,13 +247,15 @@ public class APIAddressCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void DeleteAddress(String token, Address address,
+    public static void deleteAddress(String token, Address address,
                                      Application application, APIListener APIListener) {
         url = StringUtils.ADDRESS_API_URL + address.getId();
         if(requestQueue == null) {
@@ -251,10 +279,15 @@ public class APIAddressCaller {
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
-
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    System.out.println(error);
+                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
+                    } else {
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
+                    }
                 }
             };
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url,
@@ -267,6 +300,8 @@ public class APIAddressCaller {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(7000,
+                    1, 2));
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();

@@ -41,10 +41,8 @@ public class RecViewReviewAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtCustomerName.setText(reviewList.get(position).getUser().getDisplayName());
-        holder.txtDate
-                .setText(MethodUtils.formatDateWithTime(reviewList.get(position).getCreateDate()));
         holder.ratingProduct.setRating((float) reviewList.get(position).getRating());
-        holder.txtReview.setText(reviewList.get(position).getDescription());
+        holder.txtReview.setText(reviewList.get(position).getReview());
     }
 
     @Override

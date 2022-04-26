@@ -49,11 +49,9 @@ public class Conversation implements Serializable {
 
     public void setLastMessage(Message lastMessage) {
         this.lastMessage = lastMessage;
-        if (lastMessage != null) {
-            this.readStatus = lastMessage.getMessageRead();
-            if (this.mainUser != null) {
-                this.userMessageStatus = lastMessage.getFromId().equals(mainUser.getAccountId());
-            }
+        if (lastMessage != null && this.mainUser != null) {
+            this.userMessageStatus = lastMessage.getFromId().equals(mainUser.getAccountId());
+            this.readStatus = lastMessage.getMessageRead() || this.userMessageStatus;
         }
     }
 }

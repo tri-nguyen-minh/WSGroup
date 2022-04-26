@@ -13,7 +13,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,7 +23,6 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,13 +32,12 @@ import dev.wsgroup.main.models.apis.callers.APICartCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Order;
-import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.ordering.ConfirmActivity;
+import dev.wsgroup.main.views.activities.order.ConfirmOrderActivity;
 
 public class DialogBoxOrderDetail extends Dialog{
 
@@ -118,9 +115,9 @@ public class DialogBoxOrderDetail extends Dialog{
 
         editProductQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
-                    hideKeyboard(v);
+                    MethodUtils.hideKeyboard(view, context);
                 }
             }
         });
@@ -176,7 +173,7 @@ public class DialogBoxOrderDetail extends Dialog{
                     @Override
                     public void onYesClicked() {
                         dismiss();
-                        Intent checkoutActivity = new Intent(context, ConfirmActivity.class);
+                        Intent checkoutActivity = new Intent(context, ConfirmOrderActivity.class);
                         checkoutActivity.putExtra("ORDER", (Serializable) order);
                         checkoutActivity.putExtra("PROCESS", IntegerUtils.REQUEST_INSTANT_CHECKOUT);
                         activity.startActivityForResult(checkoutActivity, IntegerUtils.REQUEST_COMMON);
@@ -264,7 +261,7 @@ public class DialogBoxOrderDetail extends Dialog{
                 setBasePriceSelected(true);
             }
             layoutCampaign.setVisibility(View.VISIBLE);
-            double price = product.getRetailPrice() - campaign.getSavingPrice();
+            double price = product.getRetailPrice() - campaign.getPrice();
             txtCampaignPrice.setText(MethodUtils.formatPriceString(price));
             layoutBasePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -365,7 +362,7 @@ public class DialogBoxOrderDetail extends Dialog{
         if(campaignId.isEmpty()) {
             totalPrice *= product.getRetailPrice();
         } else {
-            double price = product.getRetailPrice() - campaign.getSavingPrice();
+            double price = product.getRetailPrice() - campaign.getPrice();
             totalPrice *= price;
         }
         txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
@@ -401,8 +398,10 @@ public class DialogBoxOrderDetail extends Dialog{
         APICartCaller.updateCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
                 activity.getApplication(), new APIListener() {
                     @Override
-                    public void onUpdateCartItemSuccessful() {
-                        dialogBoxLoading.dismiss();
+                    public void onUpdateSuccessful() {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
                         onCartProductAdded(cartProduct);
                         dismiss();
                     }
@@ -416,20 +415,25 @@ public class DialogBoxOrderDetail extends Dialog{
     private void addCartProduct(CartProduct cartProduct) {
         APICartCaller.addCartItem(sharedPreferences.getString("TOKEN", ""),
                 cartProduct, activity.getApplication(), new APIListener() {
-                    @Override
-                    public void onAddCartItemSuccessful(CartProduct cartProduct) {
-                        super.onAddCartItemSuccessful(cartProduct);
-                        dialogBoxLoading.dismiss();
-                        onCartProductAdded(cartProduct);
-                        dismiss();
-                    }
-                });
-    }
+            @Override
+            public void onAddCartItemSuccessful(CartProduct cartProduct) {
+                super.onAddCartItemSuccessful(cartProduct);
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                onCartProductAdded(cartProduct);
+                dismiss();
+            }
 
-    private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            @Override
+            public void onFailedAPICall(int code) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(context, activity);
+                } else {
+
+                }
+            }
+        });
     }
 
     public void onCartProductAdded(CartProduct cartProduct) {}

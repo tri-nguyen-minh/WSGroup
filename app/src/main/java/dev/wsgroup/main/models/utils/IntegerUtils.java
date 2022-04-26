@@ -11,11 +11,13 @@ public class IntegerUtils {
     public static final int REQUEST_SELECT_CAMPAIGN = 8;
     public static final int REQUEST_MAKE_PURCHASE = 9;
     public static final int REQUEST_REGISTER = 10;
-    public static final int REQUEST_CHANGE_PASSWORD = 11;
-    public static final int REQUEST_SELECT_IMAGE = 12;
-    public static final int REQUEST_TAKE_IMAGE = 13;
-    public static final int REQUEST_ORDER_RETAIL = 14;
-    public static final int REQUEST_ORDER_CAMPAIGN = 15;
+    public static final int REQUEST_SELECT_IMAGE = 11;
+    public static final int REQUEST_TAKE_IMAGE = 12;
+    public static final int REQUEST_ORDER_RETAIL = 13;
+    public static final int REQUEST_ORDER_CAMPAIGN = 14;
+    public static final int REQUEST_PASSWORD_FORGET = 15;
+    public static final int REQUEST_PASSWORD_UPDATE = 16;
+    public static final int REQUEST_RETURN_ORDER = 17;
 
     public static final int ERROR_API = 1;
     public static final int ERROR_PARSING_JSON = 2;
@@ -40,5 +42,12 @@ public class IntegerUtils {
     public static final int IDENTIFIER_SEARCH_BAR = 1;
     public static final int IDENTIFIER_SEARCH_SUPPLIER = 2;
     public static final int IDENTIFIER_SEARCH_CATEGORY = 3;
+
+    public static final int ERROR_CHECKOUT_ORDER = 1;
+    public static final int ERROR_CHECKOUT_ORDER_REMOVAL_SINGLE = 2;
+    public static final int ERROR_CHECKOUT_ORDER_REMOVAL_MULTIPLE = 3;
+
+    public static final int IDENTIFIER_FIREBASE_MESSAGES = 1;
+    public static final int IDENTIFIER_FIREBASE_NOTIFICATIONS = 2;
 
 }

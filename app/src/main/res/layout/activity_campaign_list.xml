@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_lighter"
+    android:background="@color/gray_background"
     tools:context=".views.activities.productviews.CampaignListActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,7 +23,7 @@
             app:tint="@color/white" />
 
         <TextView
-            android:text="CAMPAIGNS"
+            android:text="PURCHASE OFFERS"
             style="@style/style_txt_header"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/imgBackFromCampaignList"
@@ -42,87 +42,595 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/layoutBasePrice"
+        android:id="@+id/layoutFailed"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutCampaignListHeader">
 
         <TextView
-            android:text="Retail Pricing"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="7dp"
-            style="@style/style_background_header"/>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginBottom="2dp"
-            android:background="@color/white">
-
-            <TextView
-                android:id="@+id/txtProductRetailPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
-                android:gravity="left|center"
-                android:text="0.000d"
-                android:textColor="@color/red"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <Button
-                android:id="@+id/btnSelectBasePrice"
-                style="@style/style_button_dialog_box"
-                android:layout_width="wrap_content"
-                android:text="Select"
-                android:textSize="14dp"
-                android:paddingVertical="0dp"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/frameLayoutCampaignListLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutBasePrice">
+            android:text="AN ERROR HAS OCCURRED"
+            style="@style/style_empty_note" />
 
         <TextView
-            android:text="Product's Campaigns"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="7dp"
-            style="@style/style_background_header"/>
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/CampaignListLayout"
+            android:id="@+id/lblRetry"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:tabIndicatorColor="@color/blue_main"
-            app:tabBackground="@drawable/background_nav_tab"
-            app:tabIndicatorGravity="bottom"
-            app:tabTextAppearance="@style/style_main_tab_text"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/montserratr"
+            android:gravity="center"
+            android:text="CLICK TO TRY AGAIN"
+            android:textColor="@color/blue_main"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
 
     </LinearLayout>
 
-    <dev.wsgroup.main.views.customviews.CustomViewPager
-        android:id="@+id/CampaignListViewPager"
+    <RelativeLayout
+        android:id="@+id/layoutLoading"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/frameLayoutCampaignListLayout"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutCampaignListHeader">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue_main"/>
+
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutMain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutCampaignListHeader">
+
+        <LinearLayout
+            android:id="@+id/layoutBasePrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:text="Retail Pricing"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="7dp"
+                style="@style/style_background_header"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_marginBottom="2dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/txtProductRetailPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserratr"
+                    android:gravity="left|center"
+                    android:text="0.000d"
+                    android:textColor="@color/red"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <Button
+                    android:id="@+id/btnSelectBasePrice"
+                    style="@style/style_button_dialog_box"
+                    android:layout_width="wrap_content"
+                    android:text="Select"
+                    android:textSize="14dp"
+                    android:paddingVertical="0dp"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollViewMain"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutBasePrice"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:id="@+id/frameLayoutCampaignListLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/layoutSharingCampaign"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:text="Sharing Campaign"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="7dp"
+                        style="@style/style_background_header"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="2dp"
+                        android:background="@color/white">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutCampaignNote"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="10dp"
+                            android:paddingHorizontal="10dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginRight="10dp"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintRight_toLeftOf="@id/btnSelectCampaign">
+
+                                <LinearLayout
+                                    android:id="@+id/layoutCampaignDate"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:orientation="horizontal"
+                                    android:layout_marginBottom="5dp">
+
+                                    <TextView
+                                        android:id="@+id/txtDiscountStartDate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="right"
+                                        android:text="Jul 12, 2021"
+                                        android:textColor="@color/blue_dark"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold"/>
+
+                                    <TextView
+                                        android:id="@+id/lblCampaignDate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginHorizontal="7dp"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="left"
+                                        android:text="to"
+                                        android:textColor="@color/gray_dark"
+                                        android:textSize="14sp"/>
+
+                                    <TextView
+                                        android:id="@+id/txtDiscountEndDate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="right"
+                                        android:text="Jul 12, 2021"
+                                        android:textColor="@color/blue_dark"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold"/>
+
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/txtCampaignNote"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left|center"
+                                    android:maxLines="2"
+                                    android:ellipsize="end"
+                                    android:text="Giỗ tỏ Hùng vương"
+                                    android:textColor="@color/gray_darker"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"/>
+
+                            </LinearLayout>
+
+                            <Button
+                                android:id="@+id/btnSelectCampaign"
+                                style="@style/style_button_dialog_box"
+                                android:layout_width="wrap_content"
+                                android:text="SELECT"
+                                android:textSize="14dp"
+                                android:paddingVertical="0dp"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="right"
+                            android:paddingHorizontal="10dp"
+                            android:layout_marginTop="10dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                app:layout_constraintRight_toRightOf="parent">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="Maximum:"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="14sp"/>
+
+                                <TextView
+                                    android:id="@+id/txtCampaignMaxQuantity"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="7dp"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="00"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="7dp"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="Remaining"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="14sp"
+                                    android:visibility="gone"/>
+
+                            </LinearLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutShareCampaignInfo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="7dp">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintTop_toTopOf="parent"
+                                android:paddingHorizontal="10dp">
+
+                                <TextView
+                                    android:id="@+id/txtMilestonePrice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserratr"
+                                    android:text="000.000.000d"
+                                    android:textColor="@color/red"
+                                    android:textSize="17dp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                <LinearLayout
+                                    android:id="@+id/layoutNextMilestone"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent">
+
+                                    <TextView
+                                        android:id="@+id/lblCampaignMilestone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="7dp"
+                                        android:fontFamily="@font/montserratr"
+                                        android:textColor="@color/gray_darker"
+                                        android:textSize="15sp"
+                                        android:text="Current price point: "/>
+
+                                    <TextView
+                                        android:id="@+id/txtCampaignNextMilestone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="7dp"
+                                        android:fontFamily="@font/montserratr"
+                                        android:textColor="@color/gray_darker"
+                                        android:textSize="14sp"
+                                        app:layout_constraintLeft_toLeftOf="parent"
+                                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:gravity="right"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal"
+                                        android:layout_marginBottom="5dp"
+                                        android:visibility="gone">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/montserratr"
+                                            android:gravity="left"
+                                            android:text="Goal:"
+                                            android:textColor="@color/gray_dark"
+                                            android:textSize="14sp"/>
+
+                                        <TextView
+                                            android:id="@+id/txtMilestoneQuantity"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginHorizontal="5dp"
+                                            android:fontFamily="@font/montserratr"
+                                            android:gravity="left"
+                                            android:text="00"
+                                            android:textColor="@color/gray_dark"
+                                            android:textSize="14sp"
+                                            android:textStyle="bold"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/montserratr"
+                                            android:gravity="left"
+                                            android:text="Units"
+                                            android:textColor="@color/gray_dark"
+                                            android:textSize="14sp"/>
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <ProgressBar
+                                android:id="@+id/progressBarQuantityCount"
+                                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="10dp"
+                                android:layout_marginTop="7dp"
+                                android:max="100"
+                                android:progress="50"
+                                android:progressTint="@color/blue_main"
+                                android:scaleY="2.5" />
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="10dp"
+                                android:layout_marginTop="5dp">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="right"
+                                    android:orientation="horizontal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <TextView
+                                        android:id="@+id/txtCampaignOrderCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="center|top"
+                                        android:textColor="@color/gray_dark"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintLeft_toLeftOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"/>
+
+                                    <TextView
+                                        android:id="@+id/lblProductOrderCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="center|top"
+                                        android:paddingLeft="5dp"
+                                        android:textColor="@color/gray_dark"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintLeft_toLeftOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        android:text="orders" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="right"
+                                    android:orientation="horizontal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <TextView
+                                        android:id="@+id/txtCampaignQuantityCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="center|top"
+                                        android:textColor="@color/gray_dark"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"/>
+
+                                    <TextView
+                                        android:id="@+id/lblQuantityCountSeparator"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="center|top"
+                                        android:paddingHorizontal="5dp"
+                                        android:textColor="@color/gray_dark"
+                                        android:textSize="16sp"
+                                        android:textStyle="bold"
+                                        android:text="/" />
+
+                                    <TextView
+                                        android:id="@+id/txtCampaignQuantityBar"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/montserratr"
+                                        android:gravity="center|top"
+                                        android:textColor="@color/gray_dark"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/gray_background"
+                                android:paddingTop="1dp"
+                                android:layout_marginTop="10dp">
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/layoutCampaignMilestone"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/white"
+                                    android:layout_marginTop="1dp">
+
+                                    <TextView
+                                        android:text="View campaign's milestones"
+                                        style="@style/style_label_account_info"
+                                        android:paddingVertical="10dp"
+                                        android:paddingHorizontal="10dp"
+                                        android:textSize="15sp"
+                                        android:gravity="left"
+                                        app:layout_constraintLeft_toLeftOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                    <ImageView
+                                        android:id="@+id/imgExpand"
+                                        android:layout_width="40dp"
+                                        android:layout_height="0dp"
+                                        android:src="@drawable/ic_direction_down"
+                                        android:tint="@color/gray"
+                                        android:layout_marginRight="10dp"
+                                        app:layout_constraintRight_toRightOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/gray"
+                                android:paddingBottom="2dp">
+
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/recViewCampaignMilestone"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/gray"
+                                    android:nestedScrollingEnabled="false"/>
+
+                            </RelativeLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutSingleCampaign"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:text="One-time Campaigns"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="7dp"
+                        style="@style/style_background_header"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recViewCampaignView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:nestedScrollingEnabled="false"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <RelativeLayout
+            android:id="@+id/layoutNoCampaign"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:text="THIS PRODUCT IS NOT IN\nANY CAMPAIGN"
+                style="@style/style_empty_note" />
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

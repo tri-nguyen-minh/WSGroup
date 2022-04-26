@@ -11,7 +11,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -38,6 +41,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.activities.order.RequestActivity;
 import dev.wsgroup.main.views.fragments.tabs.main.HistoryTab;
 import dev.wsgroup.main.views.fragments.tabs.main.HomeTab;
 import dev.wsgroup.main.views.fragments.tabs.main.ProfileTab;
@@ -48,13 +52,13 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private View viewCommon;
     private ConstraintLayout layoutMainPage, layoutLoading;
+    private LinearLayout layoutFailed;
+    private TextView lblRetry;
 
     private SharedPreferences sharedPreferences;
     private List<CartProduct> retailCartProductList, campaignCartProductList;
-    private List<Message> messageList;
     private String userId, token;
     private int tabPosition;
-    private boolean cartCheck, messageCheck, notificationCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +66,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.getSupportActionBar().hide();
 
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        int height = displayMetrics.heightPixels;
+//        int width = displayMetrics.widthPixels;
+//        System.out.println("width: " + width);
+//        System.out.println("height: " + height);
+
         tabLayout = findViewById(R.id.mainTabLayout);
         viewPager = findViewById(R.id.mainViewPager);
         layoutMainPage = findViewById(R.id.layoutMainPage);
         layoutLoading = findViewById(R.id.layoutLoading);
+        layoutFailed = findViewById(R.id.layoutFailed);
+        lblRetry = findViewById(R.id.lblRetry);
+
+        setupLayout();
+
+        lblRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setupLayout();
+            }
+        });
+    }
+
+    private void setupLayout() {
 
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
@@ -73,108 +98,79 @@ public class MainActivity extends AppCompatActivity {
 
         layoutMainPage.setVisibility(View.INVISIBLE);
         layoutLoading.setVisibility(View.VISIBLE);
+        layoutFailed.setVisibility(View.INVISIBLE);
 
         if(userId.isEmpty()) {
             setupTabLayout(0);
         } else {
             token = sharedPreferences.getString("TOKEN", "");
+            System.out.println(token);
             APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
                 @Override
                 public void onUserFound(User user, String message) {
                     user.setToken(token);
-
-//                    remove when apply notif
-                    notificationCheck = true;
-
-                    sharedPreferences.edit().putString("TOKEN", user.getToken()).apply();
                     setUpShoppingCart(tabPosition);
-                    setUpMessageList(tabPosition);
                 }
 
                 @Override
-                public void onFailedAPICall(int errorCode) {
-                    sharedPreferences.edit().clear().apply();
-                    userId = "";
-                    setUpShoppingCart(tabPosition);
-                    setUpMessageList(tabPosition);
+                public void onFailedAPICall(int code) {
+                    if (code == IntegerUtils.ERROR_NO_USER) {
+                        MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                                MainActivity.this);
+                    } else {
+                        layoutMainPage.setVisibility(View.INVISIBLE);
+                        layoutLoading.setVisibility(View.INVISIBLE);
+                        layoutFailed.setVisibility(View.VISIBLE);
+                    }
                 }
             });
         }
     }
 
     private void setUpShoppingCart(int tabPosition) {
-        cartCheck = false;
+        System.out.println("get cart");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
             public void onCartListFound(List<CartProduct> retailList,
                                         List<CartProduct> campaignList) {
                 retailCartProductList = retailList;
                 campaignCartProductList = campaignList;
-                cartCheck = true;
                 putSessionCart(tabPosition);
             }
             @Override
             public void onFailedAPICall(int code) {
-                retailCartProductList = new ArrayList<>();
-                campaignCartProductList = new ArrayList<>();
-                cartCheck = true;
-                putSessionCart(tabPosition);
-            }
-        });
-    }
-
-    private void setUpMessageList(int tabPosition) {
-        messageCheck = false;
-        APIChatCaller.getCustomerChatMessages(token, null, getApplication(), new APIListener() {
-            @Override
-            public void onMessageListFound(List<Message> list) {
-                messageList = list;
-                messageCheck = true;
-                storeMessageList(tabPosition);
-            }
-
-            @Override
-            public void onFailedAPICall(int code) {
-                messageList = new ArrayList<>();
-                messageCheck = true;
-                storeMessageList(tabPosition);
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            MainActivity.this);
+                } else {
+                    retailCartProductList = new ArrayList<>();
+                    campaignCartProductList = new ArrayList<>();
+                    putSessionCart(tabPosition);
+                }
             }
         });
     }
 
     private void putSessionCart(int tabPosition) {
         try {
+            System.out.println("session cart");
             sharedPreferences.edit()
                     .putString("RETAIL_CART",
                             ObjectSerializer.serialize((Serializable) retailCartProductList))
                     .putString("CAMPAIGN_CART",
                             ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .apply();
+                    .commit();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (cartCheck && messageCheck && notificationCheck) {
-            setupTabLayout(tabPosition);
-        }
-    }
-
-    private void storeMessageList(int tabPosition) {
-        try {
-            sharedPreferences.edit()
-                    .putString("MESSAGE_LIST",
-                            ObjectSerializer.serialize((Serializable) messageList))
-                    .apply();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (cartCheck && messageCheck && notificationCheck) {
-            setupTabLayout(tabPosition);
-        }
+        setupTabLayout(tabPosition);
     }
 
     private void setupTabLayout(int tabPosition) {
+        System.out.println("start layout");
         layoutMainPage.setVisibility(View.VISIBLE);
         layoutLoading.setVisibility(View.INVISIBLE);
+        layoutFailed.setVisibility(View.INVISIBLE);
         tabLayout.removeAllTabs();
         viewPager.setAdapter(null);
 
@@ -270,25 +266,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() { }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        System.out.println("return to main");
         if(resultCode == RESULT_CANCELED) {
             tabLayout.selectTab(tabLayout.getTabAt(0));
         } else if (resultCode == RESULT_OK) {
-            layoutMainPage.setVisibility(View.INVISIBLE);
-            layoutLoading.setVisibility(View.VISIBLE);
-            sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-            token = sharedPreferences.getString("TOKEN", "");
-            userId = sharedPreferences.getString("USER_ID", "");
             tabPosition = 0;
             if(data != null) {
-                tabPosition = data.getIntExtra("MAIN_TAB_POSITION",0);
+                getIntent().putExtra("MAIN_TAB_POSITION",
+                        data.getIntExtra("MAIN_TAB_POSITION",0));
+                getIntent().putExtra("HISTORY_TAB_POSITION",
+                        data.getIntExtra("HISTORY_TAB_POSITION", 0));
             }
-//            remove when apply notif
-            notificationCheck = true;
-
-            setUpShoppingCart(tabPosition);
-            setUpMessageList(tabPosition);
+            setupLayout();
+            if (!userId.isEmpty()) {
+                setUpShoppingCart(tabPosition);
+            }
         }
     }
 }
