@@ -40,7 +40,6 @@ public class APISupplierCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         url = StringUtils.USER_API_URL + "supplier/" + supplierId;
-        System.out.println(url);
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 
@@ -48,8 +47,12 @@ public class APISupplierCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONObject data = response.getJSONObject("data");
-                        Supplier supplier = Supplier.getObjectFromJSON(data);
-                        APIListener.onSupplierFound(supplier);
+                        supplierList = new ArrayList<>();
+                        if (data != null) {
+                            Supplier supplier = Supplier.getObjectFromJSON(data);
+                            supplierList.add(supplier);
+                        }
+                        APIListener.onSupplierListFound(supplierList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -73,6 +76,7 @@ public class APISupplierCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -88,7 +92,6 @@ public class APISupplierCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        System.out.println(response);
                         List<LoyaltyStatus> list = new ArrayList<>();
                         LoyaltyStatus status;
                         JSONArray data = response.getJSONArray("data");
@@ -107,7 +110,6 @@ public class APISupplierCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("error");
                     System.out.println(error);
                     System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
@@ -138,69 +140,7 @@ public class APISupplierCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void getCustomerLoyaltyList(String token,
-                                              Application application, APIListener APIListener) {
-        url = StringUtils.BASE_URL + "api/loyalcustomer/getLoyalCustomerByLoginCustomer";
-        if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(application);
-        }
-        try {
-            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        List<LoyaltyStatus> list = new ArrayList<>();
-                        LoyaltyStatus status;
-                        JSONArray data = response.getJSONArray("data");
-                        if (data.length() > 0) {
-                            status = LoyaltyStatus.getObjectFromJSON(data.getJSONObject(0));
-                            list.add(status);
-                        }
-                        APIListener.onLoyaltyStatusListFound(list);
-                    } catch (Exception e) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
-                        e.printStackTrace();
-                    }
-                }
-            };
-
-            Response.ErrorListener errorListener = new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
-                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
-                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
-                    } else {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
-                    }
-                }
-            };
-
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
-                    new JSONObject(), listener, errorListener) {
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> header = new HashMap<>();
-                    header.put("cookie", token);
-                    return header;
-                }
-
-                @Override
-                public String getBodyContentType() {
-                    return StringUtils.APPLICATION_JSON;
-                }
-            };
-            request.setRetryPolicy(new DefaultRetryPolicy(7000,
-                    1, 2));
-            requestQueue.add(request);
-        } catch (Exception e) {
-            e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -222,7 +162,7 @@ public class APISupplierCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        supplierList = (list == null) ? new ArrayList<>() : list;
+                        supplierList = list == null ? new ArrayList<>() : list;
                         JSONArray data = response.getJSONArray("data");
                         if (data.length() > 0) {
                             Supplier supplier;
@@ -255,6 +195,7 @@ public class APISupplierCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -309,6 +250,7 @@ public class APISupplierCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

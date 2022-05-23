@@ -84,8 +84,7 @@ public class DiscountActivity extends AppCompatActivity {
 
         discountTabLayout.setTabTextColors(getResources().getColor(R.color.black),
                                             getResources().getColor(R.color.black));
-        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
-                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 Fragment fragment

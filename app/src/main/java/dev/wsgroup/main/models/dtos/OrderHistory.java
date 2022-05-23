@@ -48,10 +48,6 @@ public class OrderHistory implements Serializable {
         this.description = description;
     }
 
-    public String getImageLink() {
-        return imageLink;
-    }
-
     public void setImageLink(String imageLink) {
         this.imageLink = imageLink;
         List<String> imageList = new ArrayList<>();
@@ -112,9 +108,8 @@ public class OrderHistory implements Serializable {
             order.setId(data.getString("campaignorderid"));
         }
         order.setCode(data.getString("ordercode"));
-        order.setStatus(data.getString("statushistory"));
         orderHistory.setOrder(order);
-        orderHistory.setStatus(data.getString("statushistory"));
+        orderHistory.setStatus(data.getString("orderstatus"));
         orderHistory.setImageLink(data.getString("image"));
         orderHistory.setDescription(data.getString("description"));
         orderHistory.setCreateDate(data.getString("createdat"));

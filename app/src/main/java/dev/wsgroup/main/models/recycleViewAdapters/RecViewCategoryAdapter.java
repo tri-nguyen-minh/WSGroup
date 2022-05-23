@@ -38,8 +38,7 @@ public class RecViewCategoryAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_category, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -48,12 +47,10 @@ public class RecViewCategoryAdapter
         holder.cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent searchIntent
-                        = new Intent(context, SearchProductActivity.class);
-                searchIntent.putExtra("IDENTIFIER",
-                        IntegerUtils.IDENTIFIER_SEARCH_CATEGORY);
-                searchIntent.putExtra("SEARCH_STRING", categoryList.get(position)
-                                                                         .getCategoryId());
+                String categoryId = categoryList.get(position).getCategoryId();
+                Intent searchIntent = new Intent(context, SearchProductActivity.class);
+                searchIntent.putExtra("IDENTIFIER", IntegerUtils.IDENTIFIER_SEARCH_CATEGORY);
+                searchIntent.putExtra("SEARCH_STRING", categoryId);
                 activity.startActivityForResult(searchIntent, IntegerUtils.REQUEST_COMMON);
             }
         });
@@ -64,9 +61,9 @@ public class RecViewCategoryAdapter
         return categoryList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtCategory;
-        private CardView cardViewParent;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView txtCategory;
+        private final CardView cardViewParent;
 
 
         public ViewHolder(View view) {

@@ -4,17 +4,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.MessageFirebase;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 
-public class FirebaseDatabaseReferences {
+public class FirebaseReferences {
 
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
 
-    public FirebaseDatabaseReferences() {
+    public FirebaseReferences() {
         database = FirebaseDatabase.getInstance();
     }
 
@@ -47,9 +49,9 @@ public class FirebaseDatabaseReferences {
         return databaseReference.orderByKey();
     }
 
-    public Query getCustomerServiceId() {
+    public DatabaseReference getCustomerServiceId() {
         databaseReference = database.getReference().child("customer-service");
-        return databaseReference.orderByKey();
+        return databaseReference;
     }
 
     public Query getUserNotifications(String accountId) {

@@ -88,8 +88,7 @@ public class HistoryTab extends Fragment {
 
         historyTabLayout.setTabTextColors(getResources().getColor(R.color.black),
                                             getResources().getColor(R.color.black));
-        NavigationAdapter adapter = new NavigationAdapter(getActivity().getSupportFragmentManager(),
-                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        NavigationAdapter adapter = new NavigationAdapter(getActivity().getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 return  new OrderFragment(historyTabLayout.getTabAt(position).getText().toString());

@@ -9,13 +9,12 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
@@ -23,43 +22,33 @@ import com.google.android.material.tabs.TabLayout;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
 import dev.wsgroup.main.models.apis.callers.APICartCaller;
-import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
-import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.fragments.tabs.cart.CampaignTab;
 import dev.wsgroup.main.views.fragments.tabs.cart.RetailTab;
 
 public class CartActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCart, imgCartHome;
-    private LinearLayout layoutFailedGettingCart, layoutNoShoppingCart;
+    private LinearLayout layoutFailedGettingCart;
+    private RelativeLayout layoutNoShoppingCart;
     private ConstraintLayout layoutCart, layoutLoading;
     private TabLayout cartTabLayout;
     private ViewPager cartViewPager;
     private TextView lblRetryGetCart;
     private TabLayout.Tab tabCommon;
 
-    private boolean retailCartCheck, campaignCartCheck,
-            retailCartRemovalCheck, campaignCartRemovalCheck;
     private String token;
-    private int campaignCount, retailCount;
     private SharedPreferences sharedPreferences;
-    private List<CartProduct> tempRetailCartList, tempCampaignCartList,
-            retailCartProductList, campaignCartProductList;
-    private List<Campaign> campaignList;
+    private List<CartProduct> retailCartProductList, campaignCartProductList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +66,6 @@ public class CartActivity extends AppCompatActivity {
         cartViewPager = findViewById(R.id.cartViewPager);
         lblRetryGetCart = findViewById(R.id.lblRetryGetCart);
 
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
-        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
-        layoutCart.setVisibility(View.INVISIBLE);
         setUpShoppingCart();
 
         imgBackFromCart.setOnClickListener(new View.OnClickListener() {
@@ -101,16 +86,14 @@ public class CartActivity extends AppCompatActivity {
         lblRetryGetCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                layoutLoading.setVisibility(View.VISIBLE);
-                layoutFailedGettingCart.setVisibility(View.INVISIBLE);
-                layoutNoShoppingCart.setVisibility(View.INVISIBLE);
-                layoutCart.setVisibility(View.INVISIBLE);
+                setLoadingState();
                 setUpShoppingCart();
             }
         });
     }
 
     private void setUpShoppingCart() {
+        setLoadingState();
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
         if (!token.isEmpty()) {
@@ -118,14 +101,10 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onCartListFound(List<CartProduct> retailList,
                                         List<CartProduct> campaignList) {
-                retailCartCheck = false; campaignCartCheck = false;
-                retailCartRemovalCheck = false; campaignCartRemovalCheck = false;
                 retailCartProductList = retailList;
                 campaignCartProductList = campaignList;
-//                checkValidCart(tempRetailCartList, false);
-//                checkValidCart(tempCampaignCartList, true);
                 putCartToSession();
-                setupCustomerCart();
+                setLoadedState();
             }
             @Override
             public void onFailedAPICall(int code) {
@@ -133,104 +112,15 @@ public class CartActivity extends AppCompatActivity {
                     MethodUtils.displayErrorAccountMessage(getApplicationContext(),
                             CartActivity.this);
                 } else if (code == IntegerUtils.ERROR_API) {
-                    setupFailedCustomerCart();
+                    setFailedState();
                 } else {
                     retailCartProductList = new ArrayList<>();
                     campaignCartProductList = new ArrayList<>();
                     putCartToSession();
-                    setupEmptyCustomerCart();
+                    setupEmptyState();
                 }
             }
         });
-        }
-    }
-
-    private void checkValidCart(List<CartProduct> cartProductList, boolean isCampaign) {
-        if (isCampaign) {
-            campaignCount = cartProductList.size();
-            for (CartProduct cartProduct : cartProductList) {
-                APICampaignCaller.getCampaignById(cartProduct.getCampaign().getId(),
-                        getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignFound(Campaign campaign) {
-                        if (!campaign.getStatus().equals("active")) {
-                            APICartCaller.deleteCartItem(token, cartProduct.getId(),
-                                    getApplication(), new APIListener() {
-                                @Override
-                                public void onUpdateSuccessful() {
-                                    cartProductList.remove(cartProduct);
-                                    campaignCartRemovalCheck = true;
-                                    campaignCount--;
-                                    if (campaignCount == 0) {
-                                        campaignCartProductList = cartProductList;
-                                        campaignCartCheck = true;
-                                        finishShoppingCart();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailedAPICall(int code) {
-                                    if (code == IntegerUtils.ERROR_NO_USER) {
-                                        MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-                                                CartActivity.this);
-                                    } else {
-                                        setupFailedCustomerCart();
-                                    }
-                                }
-                            });
-                        } else {
-                            campaignCount--;
-                            if (campaignCount == 0) {
-                                campaignCartProductList = cartProductList;
-                                campaignCartCheck = true;
-                                finishShoppingCart();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onNoJSONFound() {
-                        cartProductList.remove(cartProduct);
-                        campaignCartRemovalCheck = true;
-                        campaignCount--;
-                        if (campaignCount == 0) {
-                            campaignCartProductList = cartProductList;
-                            campaignCartCheck = true;
-                            finishShoppingCart();
-                        }
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        setupFailedCustomerCart();
-                    }
-                });
-            }
-        } else {
-            retailCartProductList = cartProductList;
-            retailCartCheck = true;
-            finishShoppingCart();
-        }
-    }
-
-    private void finishShoppingCart() {
-        if (retailCartRemovalCheck || campaignCartRemovalCheck) {
-            DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(CartActivity.this,
-                    IntegerUtils.CONFIRM_ACTION_CODE_ALERT, StringUtils.MES_ALERT_INVALID_ORDER);
-            dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialogBoxAlert.show();
-        }
-        if (retailCartCheck && campaignCartCheck) {
-            Comparator<CartProduct> comparator = new Comparator<CartProduct>() {
-                @Override
-                public int compare(CartProduct cart1, CartProduct cart2) {
-                    return cart1.getProduct().getName().compareTo(cart2.getProduct().getName());
-                }
-            };
-            Collections.sort(retailCartProductList, comparator);
-            Collections.sort(campaignCartProductList, comparator);
-            putCartToSession();
-            setupCustomerCart();
         }
     }
 
@@ -241,32 +131,10 @@ public class CartActivity extends AppCompatActivity {
                             ObjectSerializer.serialize((Serializable) retailCartProductList))
                     .putString("CAMPAIGN_CART",
                             ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .commit();
-        } catch (IOException e) {
+                    .apply();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void setupCustomerCart() {
-        layoutLoading.setVisibility(View.INVISIBLE);
-        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
-        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
-        layoutCart.setVisibility(View.VISIBLE);
-        setupTabLayout();
-    }
-
-    private void setupEmptyCustomerCart() {
-        layoutLoading.setVisibility(View.INVISIBLE);
-        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
-        layoutNoShoppingCart.setVisibility(View.VISIBLE);
-        layoutCart.setVisibility(View.INVISIBLE);
-    }
-
-    private void setupFailedCustomerCart() {
-        layoutLoading.setVisibility(View.INVISIBLE);
-        layoutFailedGettingCart.setVisibility(View.VISIBLE);
-        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
-        layoutCart.setVisibility(View.INVISIBLE);
     }
 
     private void setupTabLayout() {
@@ -281,9 +149,9 @@ public class CartActivity extends AppCompatActivity {
         tabCommon.setText("CAMPAIGN");
         cartTabLayout.addTab(tabCommon);
 
-        cartTabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
-        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
-                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        cartTabLayout.setTabTextColors(getResources()
+                     .getColor(R.color.black), getResources().getColor(R.color.black));
+        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
@@ -323,6 +191,35 @@ public class CartActivity extends AppCompatActivity {
         });
         cartTabLayout.selectTab(cartTabLayout.getTabAt(0));
         cartViewPager.setCurrentItem(cartTabLayout.getSelectedTabPosition());
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
+        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
+        layoutCart.setVisibility(View.INVISIBLE);
+    }
+
+    private void setLoadedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
+        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
+        layoutCart.setVisibility(View.VISIBLE);
+        setupTabLayout();
+    }
+
+    private void setupEmptyState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
+        layoutNoShoppingCart.setVisibility(View.VISIBLE);
+        layoutCart.setVisibility(View.INVISIBLE);
+    }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutFailedGettingCart.setVisibility(View.VISIBLE);
+        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
+        layoutCart.setVisibility(View.INVISIBLE);
     }
 
     @Override

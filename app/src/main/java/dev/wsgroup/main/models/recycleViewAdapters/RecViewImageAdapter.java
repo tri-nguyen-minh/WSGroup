@@ -42,8 +42,7 @@ public class RecViewImageAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(layoutId, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -67,8 +66,7 @@ public class RecViewImageAdapter
             holder.cardViewParent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    dialogBoxImage
-                            = new DialogBoxImage(activity, context, imageList.get(position));
+                    dialogBoxImage = new DialogBoxImage(activity, context, imageList.get(position));
                     dialogBoxImage.getWindow()
                                   .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBoxImage.show();
@@ -89,9 +87,9 @@ public class RecViewImageAdapter
 
     public void selectImage() {}
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imgProof;
-        private CardView cardViewParent;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView imgProof;
+        private final CardView cardViewParent;
 
 
         public ViewHolder(View view) {

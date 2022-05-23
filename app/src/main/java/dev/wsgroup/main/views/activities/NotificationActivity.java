@@ -30,10 +30,11 @@ import dev.wsgroup.main.models.apis.callers.APINotificationCaller;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewNotificationAdapter;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
+import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
 import dev.wsgroup.main.views.activities.order.OrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxDiscountList;
@@ -49,7 +50,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private String token, accountId;
-    private FirebaseDatabaseReferences databaseReferences;
+    private FirebaseReferences databaseReferences;
     private boolean notificationLoading;
     private RecViewNotificationAdapter adapter;
     private List<Notification> notificationList;
@@ -84,6 +85,11 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void onDiscountNotificationClicked(Notification notification) {
                 selectDiscountNotification(notification);
+            }
+
+            @Override
+            public void onEWalletNotificationClicked(Notification notification) {
+                selectEWalletNotification(notification);
             }
         };
         recViewNotificationList.setAdapter(adapter);
@@ -133,7 +139,7 @@ public class NotificationActivity extends AppCompatActivity {
     private void setupFirebase() {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         accountId = sharedPreferences.getString("ACCOUNT_ID", "");
-        databaseReferences = new FirebaseDatabaseReferences();
+        databaseReferences = new FirebaseReferences();
         databaseReferences.getUserNotifications(accountId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -304,8 +310,48 @@ public class NotificationActivity extends AppCompatActivity {
         }
     }
 
+    private void selectEWalletNotification(Notification notification) {
+        dialogBoxLoading = new DialogBoxLoading(NotificationActivity.this);
+        dialogBoxLoading.getWindow()
+                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBoxLoading.show();
+        if (!notification.getNotificationRead()) {
+            notificationList = new ArrayList<>();
+            notificationList.add(notification);
+            APINotificationCaller.updateReadNotification(token, notificationList,
+                    getApplication(), new APIListener() {
+                        @Override
+                        public void onUpdateSuccessful() {
+                            Intent accountInfoIntent = new Intent(getApplicationContext(),
+                                    AccountInformationActivity.class);
+                            accountInfoIntent.putExtra("REQUEST_CODE",
+                                    IntegerUtils.REQUEST_UPDATE_E_WALLET);
+                            startActivityForResult(accountInfoIntent, IntegerUtils.REQUEST_COMMON);
+                        }
+
+                        @Override
+                        public void onFailedAPICall(int code) {
+                            if (dialogBoxLoading.isShowing()) {
+                                dialogBoxLoading.dismiss();
+                            }
+                            if (code == IntegerUtils.ERROR_NO_USER) {
+                                MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                                        NotificationActivity.this);
+                            } else {
+                                MethodUtils.displayErrorAPIMessage(NotificationActivity.this);
+                            }
+                        }
+                    });
+        } else {
+            Intent accountInfoIntent = new Intent(getApplicationContext(), AccountInformationActivity.class);
+            accountInfoIntent.putExtra("MAIN_TAB_POSITION", 2);
+            startActivityForResult(accountInfoIntent, IntegerUtils.REQUEST_COMMON);
+        }
+    }
+
     private void getDiscount(String code, String supplierId) {
-        APIDiscountCaller.getCustomerDiscountByDiscountCode(token, supplierId, code, getApplication(), new APIListener() {
+        APIDiscountCaller.getDiscountByDiscountCode(token, supplierId, code,
+                getApplication(), new APIListener() {
             @Override
             public void onDiscountListFound(List<CustomerDiscount> discountList) {
                 if (dialogBoxLoading.isShowing()) {

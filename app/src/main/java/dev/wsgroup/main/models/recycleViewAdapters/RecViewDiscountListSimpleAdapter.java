@@ -18,6 +18,7 @@ public class RecViewDiscountListSimpleAdapter
         extends RecyclerView.Adapter<RecViewDiscountListSimpleAdapter.ViewHolder> {
 
     private List<Discount> discountList;
+    private Discount discount;
     private Context context;
 
     public RecViewDiscountListSimpleAdapter(Context context) {
@@ -32,20 +33,19 @@ public class RecViewDiscountListSimpleAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_discount_list_simple, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (!discountList.get(position).getDescription().equals("null")) {
-            holder.txtDiscountDescription.setText(discountList.get(position).getDescription());
+        discount = discountList.get(position);
+        if (!discount.getDescription().equals("null")) {
+            holder.txtDiscountDescription.setText(discount.getDescription());
         } else {
             holder.txtDiscountDescription.setVisibility(View.INVISIBLE);
         }
-        holder.txtSupplierName.setText(discountList.get(position).getSupplier().getName());
-        holder.txtDiscountPrice
-                .setText(MethodUtils.formatPriceString(discountList.get(position).getDiscountPrice()));
+        holder.txtSupplierName.setText(discount.getSupplier().getName());
+        holder.txtDiscountPrice.setText(MethodUtils.formatPriceString(discount.getDiscountPrice()));
     }
 
     @Override
@@ -53,8 +53,8 @@ public class RecViewDiscountListSimpleAdapter
         return discountList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtDiscountDescription, txtSupplierName, txtDiscountPrice;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView txtDiscountDescription, txtSupplierName, txtDiscountPrice;
 
 
         public ViewHolder(View view) {

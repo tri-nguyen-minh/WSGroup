@@ -28,26 +28,16 @@ public class APIListener {
 
     public void onUserFound(User user, String message) { }
 
-    public void onCompletingRegistrationRequest() {}
-
     public void onAddCartItemSuccessful(CartProduct cartProduct) {}
-
-    public void onProductListFound(List<Product> productList) {}
 
     public void onCartListFound(List<CartProduct> retailCartProductList,
                                 List<CartProduct> campaignCartProductList) {}
 
-    public void onProductFound(Product product) {}
-
-    public void onCategoryFound(Category category) {}
+    public void onProductListFound(List<Product> productList) {}
 
     public void onCategoryListFound(List<Category> categoryList) {}
 
-    public void onCampaignFound(Campaign campaign) {}
-
     public void onCampaignListFound(List<Campaign> campaignList) {}
-
-    public void onCampaignMapFound(Map<String, List<Campaign>> campaignMap) {}
 
     public void onOrderSuccessful(Order order) {}
 
@@ -55,15 +45,11 @@ public class APIListener {
 
     public void onAddressListFound(List<Address> addressList) {}
 
-    public void onAddressFound(Address address) {}
-
-    public void onUpdateAddressSuccessful(Address address) {}
-
-    public void onSupplierFound(Supplier supplier) {}
+    public void onAddressAPICompleted(Address address) {}
 
     public void onSupplierListFound(List<Supplier> supplierList) {}
 
-    public void onReviewFound(Review review) {}
+    public void onReviewAdded(Review review) {}
 
     public void onReviewListFound(List<Review> reviewList) {}
 
@@ -73,7 +59,7 @@ public class APIListener {
 
     public void onProductOrderCountFound(Map<String, Integer> countList) {}
 
-    public void onGettingPaymentURL(String url) {}
+    public void onResultStringFound(String result) {}
 
     public void onLoyaltyStatusListFound(List<LoyaltyStatus> loyaltyStatusList) {}
 
@@ -84,5 +70,7 @@ public class APIListener {
     public void onOrderHistoryFound(List<OrderHistory> historyList) {}
 
     public void onNotificationListFound(List<Notification> notificationList) {}
+
+    public void onShippingFeeFound(int shippingFee) {}
 
 }

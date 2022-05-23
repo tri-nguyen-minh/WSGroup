@@ -16,28 +16,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.apis.callers.APICampaignCaller;
-import dev.wsgroup.main.models.apis.callers.APIProductCaller;
-import dev.wsgroup.main.models.apis.callers.APIReviewCaller;
-import dev.wsgroup.main.models.apis.callers.APISupplierCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
-import dev.wsgroup.main.models.dtos.LoyaltyStatus;
-import dev.wsgroup.main.models.dtos.Product;
-import dev.wsgroup.main.models.dtos.Review;
+import dev.wsgroup.main.models.dtos.CampaignMilestone;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.views.activities.productviews.PrepareProductActivity;
 import dev.wsgroup.main.views.activities.productviews.ProductDetailActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -47,10 +37,9 @@ public class RecViewCampaignSearchAdapter
     private Context context;
     private Activity activity;
     private List<Campaign> campaignList;
+    private Campaign campaign;
     private double productPrice;
     private int quantity;
-    private String headerString;
-    private DialogBoxLoading dialogBoxLoading;
 
     public RecViewCampaignSearchAdapter(Context context, Activity activity) {
         this.context = context;
@@ -73,117 +62,87 @@ public class RecViewCampaignSearchAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtHeader.setText("");
-        try {
-            if (MethodUtils.checkCampaignEndDate(campaignList.get(position))) {
-                holder.txtHeader.setText("Less than 3 days remaining");
-            } else if (MethodUtils.checkCampaignQuantity(campaignList.get(position)) > 0) {
-                headerString = MethodUtils.checkCampaignQuantity(campaignList.get(position)) + " ";
-                headerString +=  "more to complete";
-                holder.txtHeader.setText(headerString);
+        campaign = campaignList.get(position);
+        holder.btnSelect.setVisibility(View.VISIBLE);
+        holder.btnSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onCampaignSelected(campaignList.get(position));
             }
-        } catch (Exception e) {
-            holder.txtHeader.setText("");
-            e.printStackTrace();
-        }
-        if (!campaignList.get(position).getStatus().equals("active")) {
-            holder.btnSelect.setVisibility(View.GONE);
-            if (holder.txtHeader.getText().toString().isEmpty()) {
-                holder.txtHeader.setText("UPCOMING CAMPAIGN");
-            }
-        } else {
-            holder.btnSelect.setVisibility(View.VISIBLE);
-            holder.btnSelect.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    executeOnCampaignSelected(campaignList.get(position));
-                }
-            });
-            if (holder.txtHeader.getText().toString().isEmpty()) {
-                holder.txtHeader.setText("ONGOING CAMPAIGN");
-            }
-        }
-        holder.txtCampaignNote.setText(campaignList.get(position).getDescription());
-        holder.txtCampaignMaxQuantity.setText(campaignList.get(position).getMaxQuantity() + "");
+        });
+        holder.txtCampaignNote.setText(campaign.getDescription());
+        holder.txtCampaignCode.setText(campaign.getCode());
+        holder.txtCampaignMaxQuantity.setText(campaign.getMaxQuantity() + "");
         holder.txtDiscountStartDate
-                .setText(MethodUtils.formatDate(campaignList.get(position).getStartDate()));
+              .setText(MethodUtils.formatDate(campaign.getStartDate(), false));
         holder.txtDiscountEndDate
-                .setText(MethodUtils.formatDate(campaignList.get(position).getEndDate()));
-        if(campaignList.get(position).getProduct().getImageList().size() > 0) {
-            Glide.with(context)
-                    .load(campaignList.get(position).getProduct().getImageList().get(0))
-                    .into(holder.imgRecViewProduct);
+              .setText(MethodUtils.formatDate(campaign.getEndDate(), false));
+        if(campaign.getProduct().getImageList().size() > 0) {
+            Glide.with(context).load(campaign.getProduct().getImageList().get(0))
+                               .into(holder.imgRecViewProduct);
         }
-        holder.txtProductName.setText(campaignList.get(position).getProduct().getName());
-        holder.txtSupplier.setText(campaignList.get(position).getProduct().getSupplier().getId());
-        if (campaignList.get(position).getShareFlag()) {
+        holder.txtProductName.setText(campaign.getProduct().getName());
+        holder.txtSupplier.setText(campaign.getProduct().getSupplier().getId());
+        if (campaign.getShareFlag()) {
             holder.txtProductPrice.setText("DOWN TO");
+            CampaignMilestone milestone
+                    = MethodUtils.getLastCampaignMilestone(campaign.getMilestoneList());
             holder.txtCampaignPrice
-                    .setText(MethodUtils.formatPriceString(campaignList.get(position).getPrice()));
-            quantity = campaignList.get(position).getMaxQuantity()
-                    - campaignList.get(position).getQuantityCount();
+                  .setText(MethodUtils.formatPriceString(milestone.getPrice()));
+            quantity = campaign.getMaxQuantity() - campaign.getQuantityCount();
             holder.lblQuantityCount.setText("Remaining:");
             holder.txtCampaignQuantity.setText(quantity + "");
             holder.layoutCampaignInfo.setVisibility(View.VISIBLE);
-            holder.txtCampaignOrderCount.setText(campaignList.get(position).getOrderCount() + "");
-            holder.txtCampaignQuantityCount.setText(campaignList.get(position).getQuantityCount() + "");
-            holder.txtCampaignQuantityBar.setText(campaignList.get(position).getMaxQuantity() + "");
-            holder.lblProductOrderCount
-                    .setText((campaignList.get(position).getOrderCount() == 1) ? "order" : "orders");
+            holder.txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
+            holder.txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
+            holder.txtCampaignQuantityBar.setText(campaign.getMaxQuantity() + "");
+            holder.lblProductOrderCount.setText((campaign.getOrderCount() == 1) ? "order" : "orders");
             holder.lblQuantityCountSeparator.setText("/");
-            holder.progressBarQuantityCount.setMax(campaignList.get(position).getMaxQuantity());
-            holder.progressBarQuantityCount.setProgress(campaignList.get(position).getQuantityCount());
-            holder.progressBarQuantityCount.getProgressDrawable().setColorFilter(
-                    context.getResources().getColor(R.color.blue_main),
-                    android.graphics.PorterDuff.Mode.SRC_IN);
+            holder.progressBarQuantityCount.setMax(campaign.getMaxQuantity());
+            holder.progressBarQuantityCount.setProgress(campaign.getQuantityCount());
+            holder.progressBarQuantityCount
+                  .getProgressDrawable()
+                  .setColorFilter(context.getResources().getColor(R.color.blue_main),
+                                  android.graphics.PorterDuff.Mode.SRC_IN);
         } else {
-            productPrice = campaignList.get(position).getProduct().getRetailPrice();
+            productPrice = campaign.getProduct().getRetailPrice();
             holder.txtProductPrice.setText(MethodUtils.formatPriceString(productPrice));
             holder.txtProductPrice.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             holder.txtCampaignPrice
-                    .setText(MethodUtils.formatPriceString(campaignList.get(position).getPrice()));
+                  .setText(MethodUtils.formatPriceString(campaign.getPrice()));
             holder.lblQuantityCount.setText("Minimum:");
-            holder.txtCampaignQuantity.setText(campaignList.get(position).getMinQuantity() + "");
+            holder.txtCampaignQuantity.setText(campaign.getMinQuantity() + "");
             holder.layoutCampaignInfo.setVisibility(View.GONE);
         }
         holder.cardViewParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogBoxLoading = new DialogBoxLoading(activity);
-                dialogBoxLoading.getWindow()
-                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialogBoxLoading.show();
                 String productId = campaignList.get(position).getProduct().getProductId();
-                Intent intent = new Intent(activity.getApplicationContext(),
-                        ProductDetailActivity.class);
+                Intent intent = new Intent(context, ProductDetailActivity.class);
                 intent.putExtra("PRODUCT_ID", productId);
-                if (dialogBoxLoading.isShowing()) {
-                    dialogBoxLoading.dismiss();
-                }
                 activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
             }
         });
     }
 
-    public void executeOnCampaignSelected(Campaign campaign) { }
+    public void onCampaignSelected(Campaign campaign) { }
 
     @Override
     public int getItemCount() {
         return campaignList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView cardViewParent;
-        private TextView txtCampaignNote, txtProductPrice, txtCampaignPrice, txtCampaignTag,
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final CardView cardViewParent;
+        private final TextView txtCampaignNote, txtProductPrice, txtCampaignPrice,
                 txtDiscountStartDate, txtDiscountEndDate, lblQuantityCount, txtCampaignQuantity,
                 txtCampaignMaxQuantity, txtCampaignOrderCount, txtCampaignQuantityCount,
                 txtCampaignQuantityBar, lblProductOrderCount, lblQuantityCountSeparator,
-                txtHeader, txtProductName, txtSupplier;
-        private ConstraintLayout layoutHeader;
-        private LinearLayout layoutCampaignInfo;
-        private ProgressBar progressBarQuantityCount;
-        private Button btnSelect;
-        private ImageView imgRecViewProduct;
+                txtProductName, txtSupplier, txtCampaignCode;
+        private final LinearLayout layoutCampaignInfo;
+        private final ProgressBar progressBarQuantityCount;
+        private final Button btnSelect;
+        private final ImageView imgRecViewProduct;
 
 
         public ViewHolder(View view) {
@@ -192,21 +151,19 @@ public class RecViewCampaignSearchAdapter
             txtCampaignNote = view.findViewById(R.id.txtCampaignNote);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
             txtCampaignPrice = view.findViewById(R.id.txtCampaignPrice);
-            txtCampaignTag = view.findViewById(R.id.txtCampaignTag);
+            txtDiscountStartDate = view.findViewById(R.id.txtDiscountStartDate);
+            txtDiscountEndDate = view.findViewById(R.id.txtDiscountEndDate);
             lblQuantityCount = view.findViewById(R.id.lblQuantityCount);
             txtCampaignQuantity = view.findViewById(R.id.txtCampaignQuantity);
             txtCampaignMaxQuantity = view.findViewById(R.id.txtCampaignMaxQuantity);
-            txtDiscountStartDate = view.findViewById(R.id.txtDiscountStartDate);
-            txtDiscountEndDate = view.findViewById(R.id.txtDiscountEndDate);
             txtCampaignOrderCount = view.findViewById(R.id.txtCampaignOrderCount);
             txtCampaignQuantityCount = view.findViewById(R.id.txtCampaignQuantityCount);
             txtCampaignQuantityBar = view.findViewById(R.id.txtCampaignQuantityBar);
             lblProductOrderCount = view.findViewById(R.id.lblProductOrderCount);
             lblQuantityCountSeparator = view.findViewById(R.id.lblQuantityCountSeparator);
-            txtHeader = view.findViewById(R.id.txtHeader);
             txtProductName = view.findViewById(R.id.txtProductName);
             txtSupplier = view.findViewById(R.id.txtSupplier);
-            layoutHeader = view.findViewById(R.id.layoutHeader);
+            txtCampaignCode = view.findViewById(R.id.txtCampaignCode);
             layoutCampaignInfo = view.findViewById(R.id.layoutCampaignInfo);
             progressBarQuantityCount = view.findViewById(R.id.progressBarQuantityCount);
             btnSelect = view.findViewById(R.id.btnSelect);

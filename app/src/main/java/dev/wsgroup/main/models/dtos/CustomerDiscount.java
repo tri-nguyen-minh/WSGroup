@@ -9,8 +9,7 @@ public class CustomerDiscount implements Serializable {
     private String id, customerId, status;
     private Discount discount;
 
-    public CustomerDiscount() {
-    }
+    public CustomerDiscount() { }
 
     public String getId() {
         return id;

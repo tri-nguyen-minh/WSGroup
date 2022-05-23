@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,10 +45,12 @@ public class RecViewOrderSupplierListAdapter
     private String token;
     private int requestState;
     private List<Order> orderList;
+    private Order order;
     private List<OrderProduct> orderProductList;
     private List<CustomerDiscount> markedForDeleteList, customerDiscountList;
     private double price;
     private DialogBoxLoading dialogBoxLoading;
+    private RecViewOrderProductListAdapter adapter;
 
     public RecViewOrderSupplierListAdapter(Context context, Activity activity, int requestState) {
         this.context = context;
@@ -67,21 +68,20 @@ public class RecViewOrderSupplierListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_order_supplier_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtRecViewOrderSupplierName.setText(orderList.get(position).getSupplier().getName());
+        order = orderList.get(position);
+        holder.txtRecViewOrderSupplierName.setText(order.getSupplier().getName());
         holder.lblTotalPrice.setText("Total Order Price");
         holder.lblNoDiscount.setText("No Discount");
         setupDiscountLayout(holder, position);
         price = getTotalPrice(position);
         holder.txtTotalPrice.setText(MethodUtils.formatPriceString(price));
-        RecViewOrderProductListAdapter adapter
-                = new RecViewOrderProductListAdapter(context, activity, requestState);
-        adapter.setOrder(orderList.get(position));
+        adapter = new RecViewOrderProductListAdapter(context, activity, requestState);
+        adapter.setOrder(order);
         holder.recViewOrderProductList.setAdapter(adapter);
         holder.recViewOrderProductList.setLayoutManager(new LinearLayoutManager(context,
                 LinearLayoutManager.VERTICAL, false));
@@ -111,8 +111,8 @@ public class RecViewOrderSupplierListAdapter
             });
             holder.editDiscount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
-                public void onFocusChange(View view, boolean focus) {
-                    if (!focus) {
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (!hasFocus) {
                         MethodUtils.hideKeyboard(view, context);
                         String code = holder.editDiscount.getText().toString();
                         if (code.isEmpty()) {
@@ -122,7 +122,7 @@ public class RecViewOrderSupplierListAdapter
                             setCustomerDiscount(position, null);
                         } else {
                             setupLoadDiscountState(holder);
-                            APIDiscountCaller.getCustomerDiscountByDiscountCode(token,
+                            APIDiscountCaller.getDiscountByDiscountCode(token,
                                     orderList.get(position).getSupplier().getId(), code,
                                     activity.getApplication(), new APIListener() {
                                 @Override
@@ -164,16 +164,8 @@ public class RecViewOrderSupplierListAdapter
             holder.layoutDiscount.setVisibility(View.GONE);
             holder.lblTotalPrice.setVisibility(View.VISIBLE);
             OrderProduct orderProduct = orderProductList.get(0);
-            Campaign campaign = orderProduct.getCampaign();
             price = orderProduct.getProduct().getRetailPrice();
-            double totalPrice = orderProduct.getCampaign().getPrice();
-            if (campaign.getShareFlag()) {
-                CampaignMilestone milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
-                        orderProduct.getQuantity() + campaign.getQuantityCount());
-                if (milestone != null) {
-                    totalPrice = milestone.getPrice();
-                }
-            }
+            double totalPrice = getShareCampaignPrice(orderProduct);
             price -= totalPrice;
             price *= orderProduct.getQuantity();
             holder.txtDiscountPrice.setVisibility(View.VISIBLE);
@@ -181,60 +173,13 @@ public class RecViewOrderSupplierListAdapter
         }
     }
 
-    private double getTotalPrice(int position) {
-        double totalPrice = 0;
-        orderProductList = orderList.get(position).getOrderProductList();
-        if (requestState == IntegerUtils.REQUEST_ORDER_RETAIL) {
-            for (OrderProduct orderProduct : orderProductList) {
-                totalPrice += (orderProduct.getProduct().getRetailPrice() * orderProduct.getQuantity());
-            }
-        } else {
-            OrderProduct orderProduct = orderProductList.get(0);
-            Campaign campaign = orderProduct.getCampaign();
-            totalPrice = orderProduct.getCampaign().getPrice();
-            if (campaign.getShareFlag()) {
-                CampaignMilestone milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
-                        orderProduct.getQuantity() + campaign.getQuantityCount());
-                if (milestone != null) {
-                    totalPrice = milestone.getPrice();
-                }
-            }
-            totalPrice *= orderProduct.getQuantity();
-        }
-        return totalPrice;
-    }
-
-    private void setupLoadDiscountState(ViewHolder holder) {
-        holder.progressBarLoading.setVisibility(View.VISIBLE);
-        holder.cardViewMoreDiscount.setVisibility(View.INVISIBLE);
-        holder.layoutDiscountPrice.setVisibility(View.INVISIBLE);
-        holder.lblNoDiscount.setVisibility(View.INVISIBLE);
-    }
-
-    private void setupDiscountFoundState(ViewHolder holder) {
-        holder.progressBarLoading.setVisibility(View.INVISIBLE);
-        holder.cardViewMoreDiscount.setVisibility(View.VISIBLE);
-        holder.layoutDiscountPrice.setVisibility(View.VISIBLE);
-        holder.lblNoDiscount.setText("Discount Found!");
-        holder.lblNoDiscount.setVisibility(View.VISIBLE);
-    }
-
-    private void setupNoDiscountState(ViewHolder holder) {
-        holder.progressBarLoading.setVisibility(View.INVISIBLE);
-        holder.cardViewMoreDiscount.setVisibility(View.VISIBLE);
-        holder.layoutDiscountPrice.setVisibility(View.INVISIBLE);
-        holder.lblNoDiscount.setText("No Applicable Discount!");
-        holder.lblNoDiscount.setVisibility(View.VISIBLE);
-    }
-
     private void loadDiscountList(int position, ViewHolder holder) {
         dialogBoxLoading = new DialogBoxLoading(activity);
         dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxLoading.show();
         Order order = orderList.get(position);
-        APIDiscountCaller.getCustomerDiscountByCondition(token, order.getOrderProductList(),
-                order.getTotalPrice(), order.getSupplier().getId(), null,
-                activity.getApplication(), new APIListener() {
+        APIDiscountCaller.searchDiscount(token, order.getTotalPrice(),
+                order.getSupplier().getId(), activity.getApplication(), new APIListener() {
                     @Override
                     public void onDiscountListFound(List<CustomerDiscount> discountList) {
                         if (dialogBoxLoading.isShowing()) {
@@ -258,7 +203,7 @@ public class RecViewOrderSupplierListAdapter
                                 }
                             };
                             dialogBox.getWindow()
-                                     .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                             dialogBox.show();
                         }
                     }
@@ -275,6 +220,37 @@ public class RecViewOrderSupplierListAdapter
                         }
                     }
                 });
+    }
+
+    private double getTotalPrice(int position) {
+        double totalPrice = 0;
+        order = orderList.get(position);
+        orderProductList = order.getOrderProductList();
+        if (requestState == IntegerUtils.REQUEST_ORDER_RETAIL) {
+            for (OrderProduct orderProduct : orderProductList) {
+                totalPrice += (orderProduct.getProduct().getRetailPrice() * orderProduct.getQuantity());
+            }
+        } else {
+            OrderProduct orderProduct = orderProductList.get(0);
+            totalPrice = getShareCampaignPrice(orderProduct);
+            totalPrice *= orderProduct.getQuantity();
+        }
+        return totalPrice;
+    }
+
+    private double getShareCampaignPrice(OrderProduct orderProduct) {
+        Campaign campaign = orderProduct.getCampaign();
+        if (campaign.getShareFlag()) {
+            CampaignMilestone milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
+                    orderProduct.getQuantity() + campaign.getQuantityCount());
+            if (milestone != null) {
+                return milestone.getPrice();
+            } else {
+                return campaign.getPrice();
+            }
+        } else {
+            return campaign.getPrice();
+        }
     }
 
     private void checkUnwantedDiscount(Order order, List<CustomerDiscount> discountList) {
@@ -332,6 +308,29 @@ public class RecViewOrderSupplierListAdapter
         dialogBoxAlert.show();
     }
 
+    private void setupLoadDiscountState(ViewHolder holder) {
+        holder.progressBarLoading.setVisibility(View.VISIBLE);
+        holder.cardViewMoreDiscount.setVisibility(View.INVISIBLE);
+        holder.layoutDiscountPrice.setVisibility(View.INVISIBLE);
+        holder.lblNoDiscount.setVisibility(View.INVISIBLE);
+    }
+
+    private void setupDiscountFoundState(ViewHolder holder) {
+        holder.progressBarLoading.setVisibility(View.INVISIBLE);
+        holder.cardViewMoreDiscount.setVisibility(View.VISIBLE);
+        holder.layoutDiscountPrice.setVisibility(View.VISIBLE);
+        holder.lblNoDiscount.setText("Discount Found!");
+        holder.lblNoDiscount.setVisibility(View.VISIBLE);
+    }
+
+    private void setupNoDiscountState(ViewHolder holder) {
+        holder.progressBarLoading.setVisibility(View.INVISIBLE);
+        holder.cardViewMoreDiscount.setVisibility(View.VISIBLE);
+        holder.layoutDiscountPrice.setVisibility(View.INVISIBLE);
+        holder.lblNoDiscount.setText("No Applicable Discount!");
+        holder.lblNoDiscount.setVisibility(View.VISIBLE);
+    }
+
     public void setCustomerDiscount(int position, CustomerDiscount customerDiscount) {}
 
     @Override
@@ -339,15 +338,15 @@ public class RecViewOrderSupplierListAdapter
         return orderList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView txtRecViewOrderSupplierName, txtTotalPrice,
+        private final TextView txtRecViewOrderSupplierName, txtTotalPrice,
                         txtDiscountPrice, lblNoDiscount, lblTotalPrice;
-        private RecyclerView recViewOrderProductList;
-        private LinearLayout layoutDiscount, layoutDiscountPrice, layoutParent;
-        private EditText editDiscount;
-        private ProgressBar progressBarLoading;
-        private CardView cardViewMoreDiscount;
+        private final RecyclerView recViewOrderProductList;
+        private final LinearLayout layoutDiscount, layoutDiscountPrice, layoutParent;
+        private final EditText editDiscount;
+        private final ProgressBar progressBarLoading;
+        private final CardView cardViewMoreDiscount;
 
         public ViewHolder(View view) {
             super(view);

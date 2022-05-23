@@ -132,6 +132,7 @@
                 <TextView
                     android:id="@+id/txtOrderCode"
                     android:textSize="16sp"
+                    android:gravity="center|right"
                     android:layout_marginLeft="10dp"
                     app:layout_constraintLeft_toRightOf="@+id/lblCode"
                     app:layout_constraintTop_toTopOf="parent"
@@ -182,8 +183,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/lblReason"
-            android:text="History"
+            android:text="Order History"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="7dp"
             style="@style/style_background_header"/>

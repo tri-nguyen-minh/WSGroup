@@ -9,10 +9,13 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Review;
+import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
@@ -21,6 +24,8 @@ public class RecViewReviewAdapter
 
     private Context context;
     private List<Review> reviewList;
+    private Review review;
+    private User user;
 
     public RecViewReviewAdapter(Context context) {
         this.context = context;
@@ -40,9 +45,17 @@ public class RecViewReviewAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtCustomerName.setText(reviewList.get(position).getUser().getDisplayName());
-        holder.ratingProduct.setRating((float) reviewList.get(position).getRating());
-        holder.txtReview.setText(reviewList.get(position).getReview());
+        review = reviewList.get(position);
+        if (!review.isRemoved()) {
+            user = review.getUser();
+            if (user.getAvatarLink().equals("null")) {
+                Glide.with(context).load(user.getAvatarLink()).into(holder.imgAccountAvatar);
+            }
+            holder.txtDate.setText(MethodUtils.formatDate(review.getDate(), true));
+            holder.txtCustomerName.setText(user.getDisplayName());
+            holder.ratingProduct.setRating((float) review.getRating());
+            holder.txtReview.setText(review.getReview());
+        }
     }
 
     @Override
@@ -50,10 +63,10 @@ public class RecViewReviewAdapter
         return reviewList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imgAccountAvatar;
-        private TextView txtCustomerName, txtDate, txtReview;
-        private MaterialRatingBar ratingProduct;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView imgAccountAvatar;
+        private final TextView txtCustomerName, txtDate, txtReview;
+        private final MaterialRatingBar ratingProduct;
 
         public ViewHolder(View view) {
             super(view);

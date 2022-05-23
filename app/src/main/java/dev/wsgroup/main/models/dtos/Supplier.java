@@ -8,7 +8,8 @@ import java.util.ArrayList;
 
 public class Supplier implements Serializable {
 
-    private String id, accountId, name, address, mail, avatarLink;
+    private String id, accountId, name, mail, avatarLink;
+    private Address address;
     private boolean status;
     private LoyaltyStatus loyaltyStatus;
 
@@ -39,14 +40,6 @@ public class Supplier implements Serializable {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getMail() {
         return mail;
     }
@@ -62,8 +55,6 @@ public class Supplier implements Serializable {
     public void setAvatarLink(String avatarLink) {
         this.avatarLink = avatarLink;
         try {
-            System.out.println(avatarLink);
-            System.out.println(avatarLink.equals("null"));
             if (!avatarLink.equals("null")) {
                 JSONArray jsonArray = new JSONArray(avatarLink);
                 if (jsonArray.length() > 0) {
@@ -73,6 +64,26 @@ public class Supplier implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setAddressString(String addressString) {
+        try {
+            address = new Address();
+            JSONObject jsonObject = new JSONObject(addressString);
+            address.setProvinceId(jsonObject.getJSONObject("province").getString("provinceId"));
+            address.setProvince(jsonObject.getJSONObject("province").getString("provinceName"));
+            address.setDistrictId(jsonObject.getJSONObject("district").getString("districtId"));
+            address.setDistrict(jsonObject.getJSONObject("district").getString("districtName"));
+            address.setWardId(jsonObject.getJSONObject("ward").getString("wardId"));
+            address.setWard(jsonObject.getJSONObject("ward").getString("wardName"));
+            address.setStreet(jsonObject.getJSONObject("street").getString("streetName"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Address getAddress() {
+        return address;
     }
 
     public boolean getStatus() {
@@ -97,7 +108,7 @@ public class Supplier implements Serializable {
         supplier.setAccountId(data.getString("accountid"));
         supplier.setName(data.getString("name"));
         supplier.setMail(data.getString("email"));
-        supplier.setAddress(data.getString("address"));
+        supplier.setAddressString(data.getString("address"));
         supplier.setAvatarLink(data.getString("avt"));
         supplier.setStatus(data.getBoolean("isdeleted"));
         return supplier;
@@ -108,8 +119,8 @@ public class Supplier implements Serializable {
         supplier.setId(data.getString("supplierid"));
         supplier.setAccountId(data.getString("accountid"));
         supplier.setName(data.getString("suppliername"));
-        supplier.setMail(data.getString("supplieremai"));
-        supplier.setAddress(data.getString("supplieraddress"));
+        supplier.setMail(data.getString("supplieremail"));
+        supplier.setAddressString(data.getString("supplieraddress"));
         supplier.setAvatarLink(data.getString("supplieravt"));
         return supplier;
     }

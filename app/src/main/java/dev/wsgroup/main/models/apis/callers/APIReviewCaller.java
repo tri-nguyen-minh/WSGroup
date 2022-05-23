@@ -48,7 +48,7 @@ public class APIReviewCaller {
                     try {
                         String message = response.getString("message");
                         if (message.equals("successful")) {
-                            APIListener.onReviewFound(review);
+                            APIListener.onReviewAdded(review);
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         }
@@ -81,54 +81,12 @@ public class APIReviewCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
-//
-//    public static void getReviewId(String reviewId,
-//                                   Application application, APIListener APIListener) {
-//        url = StringUtils.REVIEW_API_URL + reviewId;
-//        if(requestQueue == null) {
-//            requestQueue = Volley.newRequestQueue(application);
-//        }
-//        try {
-//            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-//                @Override
-//                public void onResponse(JSONObject response) {
-//                    try {
-//                        Review review = null;
-//                        JSONArray jsonArray = response.getJSONArray("data");
-//                        if (jsonArray != null) {
-//                            if (jsonArray.length() > 0) {
-//                                review = Review.getObjectFromJSON(jsonArray.getJSONObject(0));
-//                            }
-//                        }
-//                        APIListener.onReviewFound(review);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
-//                    }
-//                }
-//            };
-//            Response.ErrorListener errorListener = new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    System.out.println(error);
-//                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
-//                    APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
-//                }
-//            };
-//            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
-//                    new JSONObject(), listener, errorListener);
-//            request.setRetryPolicy(new DefaultRetryPolicy(7000,
-//                    1, 2));
-//            requestQueue.add(request);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
-    public static void getReviewByOrderProductId(String orderId, boolean isCampaign,
-                                                 Application application, APIListener APIListener) {
+    public static void getReviewByOrderId(String orderId, boolean isCampaign,
+                                          Application application, APIListener APIListener) {
         url = StringUtils.REVIEW_API_URL + "comment/id";
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -141,14 +99,14 @@ public class APIReviewCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        Review review = null;
+                        Review review;
                         JSONArray jsonArray = response.getJSONArray("data");
-                        if (jsonArray != null) {
-                            if (jsonArray.length() > 0) {
-                                review = Review.getObjectFromJSON(jsonArray.getJSONObject(0));
-                            }
+                        reviewList = new ArrayList<>();
+                        if (jsonArray != null && jsonArray.length() > 0) {
+                            review = Review.getObjectFromJSON(jsonArray.getJSONObject(0));
+                            reviewList.add(review);
                         }
-                        APIListener.onReviewFound(review);
+                        APIListener.onReviewListFound(reviewList);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
@@ -174,11 +132,12 @@ public class APIReviewCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void getReviewListByProductId(String productId, List<Review> list,
-                                                Application application, APIListener APIListener) {
+    public static void getReviewListByProductId(String productId, Application application,
+                                                APIListener APIListener) {
         url = StringUtils.REVIEW_API_URL + "product/" + productId;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -189,14 +148,17 @@ public class APIReviewCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         Review review;
+                        System.out.println(response);
                         JSONArray jsonArray = response.getJSONArray("data");
-                        reviewList = (list == null) ? new ArrayList<>() : list;
+                        reviewList = new ArrayList<>();
                         if (jsonArray != null) {
                             if (jsonArray.length() > 0) {
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     review = Review.getObjectFromJSON(jsonArray.getJSONObject(i));
-                                    review.setProductId(productId);
-                                    reviewList.add(review);
+                                    if (review != null && !review.isRemoved()) {
+                                        review.setProductId(productId);
+                                        reviewList.add(review);
+                                    }
                                 }
                             }
                         }
@@ -226,61 +188,7 @@ public class APIReviewCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void getReviewCountByProductId(String productId,
-                                                Application application, APIListener APIListener) {
-        url = StringUtils.REVIEW_API_URL + "countComments";
-        if(requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(application);
-        }
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("productId", productId);
-            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        int count = 0;
-                        double rating = 0;
-                        String responseString = response.getString("message");
-                        if (responseString.equals("successful")) {
-                            JSONObject data = response.getJSONObject("data");
-                            count = data.getInt("totalNumOfComment");
-                            rating = data.getDouble("averageRating");
-                        }
-                        APIListener.onReviewCountFound(count, rating);
-                    } catch (Exception e) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
-                        e.printStackTrace();
-                    }
-                }
-            };
-            Response.ErrorListener errorListener = new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
-                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
-                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
-                    } else {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
-                    }
-                }
-            };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,
-                    jsonObject, listener, errorListener) {
-                @Override
-                public String getBodyContentType() {
-                    return StringUtils.APPLICATION_JSON;
-                }
-            };
-            request.setRetryPolicy(new DefaultRetryPolicy(7000,
-                    1, 2));
-            requestQueue.add(request);
-        } catch (Exception e) {
-            e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

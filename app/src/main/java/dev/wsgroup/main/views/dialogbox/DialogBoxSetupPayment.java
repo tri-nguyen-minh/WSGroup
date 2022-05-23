@@ -59,7 +59,8 @@ public class DialogBoxSetupPayment extends Dialog {
         spinnerBank.setAdapter(adapter);
         spinnerBank.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int positionInt, long positionLong) {
+            public void onItemSelected(AdapterView<?> adapterView, View view,
+                                       int positionInt, long positionLong) {
                 if (positionInt == 0) {
                     bankString = "NCB";
                 } else {

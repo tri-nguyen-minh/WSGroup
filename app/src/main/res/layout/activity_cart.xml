@@ -93,14 +93,13 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/layoutNoShoppingCart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:gravity="center"
         android:background="@color/white"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/layoutCartHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -108,7 +107,7 @@
             android:text="YOUR SHOPPING CART\nIS CURRENTLY EMPTY"
             style="@style/style_empty_note" />
 
-    </LinearLayout>
+    </RelativeLayout>
     
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutCart"

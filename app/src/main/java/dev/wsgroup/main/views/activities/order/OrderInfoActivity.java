@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -56,7 +54,7 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.activities.account.DeliveryAddressSelectActivity;
+import dev.wsgroup.main.views.activities.address.AddressListSelectActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
@@ -66,35 +64,33 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxSetupPayment;
 public class OrderInfoActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
-    private ConstraintLayout layoutAddress, layoutCampaignSaving;
-    private EditText editPhoneNumber;
-    private TextView txtDeliveryAddress, txtTotalPrice,
-            txtCampaignSaving, txtFinalPrice, txtDeliveryPrice, lblDiscountPrice;
+    private ConstraintLayout layoutMain, layoutAddress, layoutCampaignSaving;
+    private TextView txtPhoneNumber, txtAddressStreet, txtAddressDistrict,
+            txtAddressProvince, lblDeliveryAddress, txtTotalPrice, txtCampaignSaving,
+            txtFinalPrice, lblShipping, txtDeliveryPrice, lblDiscountPrice;
     private RecyclerView recViewOrderProductPrice, recViewLoyalStatusList, recViewDiscountList;
     private Button btnConfirmOrder;
     private Spinner spinnerPayment;
     private RelativeLayout layoutLoading;
-    private LinearLayout layoutReceipt;
 
+    private SharedPreferences sharedPreferences;
     private DialogBoxLoading dialogBoxLoading;
     private DialogBoxConfirm dialogBoxConfirm;
     private DialogBoxAlert dialogBoxAlert;
-    private int orderCount, orderProductCount;
+    private int orderCount, deliveryCount, orderProductCount, requestCode;
     private String token, phone, description;
     private double totalPrice, discountPrice, finalPrice, deliveryPrice,
-            loyaltyDiscountPrice, advancePrice;
-    private SharedPreferences sharedPreferences;
+            loyaltyDiscountPrice, advancePrice, totalWeight;
+    private boolean advancePaymentCancelled, addressLoaded, loyaltyStatusLoaded, shippingFeeFailed;
     private Order order;
     private OrderProduct orderProduct;
     private CustomerDiscount customerDiscount;
     private Address currentAddress;
-    private boolean advancePaymentCancelled, addressLoaded, receiptLoaded;
     private List<LoyaltyStatus> loyaltyStatusList;
     private List<Discount> discountList;
     private ArrayList<Order> orderList;
     private List<OrderProduct> orderProductList, tempList;
     private Map<Order, String> invalidOrderMap;
-    private int requestCode;
     private Campaign campaign;
     private CampaignMilestone milestone;
     private final String[] paymentData = {"Payment on Delivery", "Payment via VNPAY"};
@@ -108,13 +104,18 @@ public class OrderInfoActivity extends AppCompatActivity {
 
         imgBackFromCheckout = findViewById(R.id.imgBackFromCheckout);
         imgCheckoutHome = findViewById(R.id.imgCheckoutHome);
+        layoutMain = findViewById(R.id.layoutMain);
         layoutAddress = findViewById(R.id.layoutAddress);
         layoutCampaignSaving = findViewById(R.id.layoutCampaignSaving);
-        editPhoneNumber = findViewById(R.id.editPhoneNumber);
-        txtDeliveryAddress = findViewById(R.id.txtDeliveryAddress);
+        txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
+        txtAddressStreet = findViewById(R.id.txtAddressStreet);
+        txtAddressDistrict = findViewById(R.id.txtAddressDistrict);
+        txtAddressProvince = findViewById(R.id.txtAddressProvince);
+        lblDeliveryAddress = findViewById(R.id.lblDeliveryAddress);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
         txtCampaignSaving = findViewById(R.id.txtCampaignSaving);
         txtFinalPrice = findViewById(R.id.txtFinalPrice);
+        lblShipping = findViewById(R.id.lblShipping);
         txtDeliveryPrice = findViewById(R.id.txtDeliveryPrice);
         lblDiscountPrice = findViewById(R.id.lblDiscountPrice);
         recViewOrderProductPrice = findViewById(R.id.recViewOrderProductPrice);
@@ -123,50 +124,9 @@ public class OrderInfoActivity extends AppCompatActivity {
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
         spinnerPayment = findViewById(R.id.spinnerPayment);
         layoutLoading = findViewById(R.id.layoutLoading);
-        layoutReceipt = findViewById(R.id.layoutReceipt);
-
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        phone = sharedPreferences.getString("PHONE", "");
-        token = sharedPreferences.getString("TOKEN", "");
-        advancePaymentCancelled = false;
-        addressLoaded = false;
-        receiptLoaded = false;
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutReceipt.setVisibility(View.GONE);
-        orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
-        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         setupSpinner();
 
-        APIAddressCaller.getDefaultAddress(token, getApplication(), new APIListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onAddressFound(Address address) {
-                super.onAddressFound(address);
-                currentAddress = address;
-                setupConfirmAddress();
-            }
-
-            @Override
-            public void onFailedAPICall(int code) {
-                if (code == IntegerUtils.ERROR_NO_USER) {
-                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-                            OrderInfoActivity.this);
-                } else {
-                    setupConfirmAddress();
-                }
-            }
-        });
-
-        orderProductList = new ArrayList<>();
-        orderCount = orderList.size();
-
         loadData();
-
-        btnConfirmOrder.setEnabled(false);
-        btnConfirmOrder.getBackground().setTint(getResources().getColor(R.color.gray_light));
-        editPhoneNumber.setText(MethodUtils
-                .formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phone)));
-        editPhoneNumber.setEnabled(false);
 
         imgBackFromCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,7 +161,7 @@ public class OrderInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent addressIntent = new Intent(getApplicationContext(),
-                                                    DeliveryAddressSelectActivity.class);
+                                                    AddressListSelectActivity.class);
                 addressIntent.putExtra("ADDRESS", currentAddress);
                 startActivityForResult(addressIntent, IntegerUtils.REQUEST_COMMON);
             }
@@ -214,7 +174,6 @@ public class OrderInfoActivity extends AppCompatActivity {
                                                         StringUtils.MES_CONFIRM_ORDER_METHOD) {
                     @Override
                     public void onYesClicked() {
-                        super.onYesClicked();
                         processOrder();
                     }
                 };
@@ -226,11 +185,45 @@ public class OrderInfoActivity extends AppCompatActivity {
     }
 
     private void loadData() {
+        setLoadingState();
+        dialogBoxLoading = new DialogBoxLoading(OrderInfoActivity.this);
+        dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        phone = sharedPreferences.getString("PHONE", "");
+        token = sharedPreferences.getString("TOKEN", "");
+        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
+        orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
+        orderCount = orderList.size();
+        orderProductList = new ArrayList<>();
         for (Order order : orderList) {
             tempList = order.getOrderProductList();
-            for (OrderProduct oProduct : tempList) {
-                orderProductList.add(oProduct);
+            for (OrderProduct orderProduct : tempList) {
+                orderProductList.add(orderProduct);
             }
+        }
+        advancePaymentCancelled = false;
+        addressLoaded = false; loyaltyStatusLoaded = false;
+        txtPhoneNumber.setText(MethodUtils.formatPhoneNumber(phone));
+
+        APIAddressCaller.getDefaultAddress(token, getApplication(), new APIListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onAddressAPICompleted(Address address) {
+                currentAddress = address;
+                setupConfirmAddress();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            OrderInfoActivity.this);
+                } else {
+                    setupConfirmAddress();
+                }
+            }
+        });
+        for (Order order : orderList) {
             APISupplierCaller.getCustomerLoyaltyStatus(token, order.getSupplier().getId(),
                     getApplication(), new APIListener() {
                 @Override
@@ -265,15 +258,69 @@ public class OrderInfoActivity extends AppCompatActivity {
 
     private void setupConfirmAddress() {
         if (currentAddress != null) {
-            addressLoaded = true;
-            txtDeliveryAddress.setText(currentAddress.getAddressString());
-            txtDeliveryAddress.setTextColor(getResources().getColor(R.color.gray_dark));
+            lblDeliveryAddress.setVisibility(View.INVISIBLE);
+            layoutAddress.setVisibility(View.VISIBLE);
+            txtAddressStreet.setText(currentAddress.getStreet());
+            txtAddressDistrict.setText(currentAddress.getDistrictString());
+            txtAddressProvince.setText(currentAddress.getProvince());
+            shippingFeeFailed = false;
+            deliveryCount = orderList.size();
+            for (Order order : orderList) {
+                Address supplierAddress = order.getSupplier().getAddress();
+                APIPaymentCaller.getShippingService(supplierAddress.getDistrictId(),
+                        currentAddress.getDistrictId(), getApplication(), new APIListener() {
+                            @Override
+                            public void onResultStringFound(String serviceId) {
+                                getShippingFee(order, supplierAddress, serviceId);
+                            }
+
+                            @Override
+                            public void onFailedAPICall(int code) {
+                                shippingFeeFailed = true;
+                                deliveryCount--;
+                                if (deliveryCount == 0) {
+                                    addressLoaded = true;
+                                    loadReceipt();
+                                }
+                            }
+                        });
+            }
         } else {
-            addressLoaded = false;
-            txtDeliveryAddress.setText("No Delivery Address");
-            txtDeliveryAddress.setTextColor(getResources().getColor(R.color.gray));
+            addressLoaded = true;
+            lblDeliveryAddress.setVisibility(View.VISIBLE);
+            layoutAddress.setVisibility(View.INVISIBLE);
+            loadReceipt();
         }
-        checkValidConfirmButton();
+    }
+
+    private void getShippingFee(Order order, Address address, String deliveryServiceId) {
+        tempList = order.getOrderProductList();
+        totalWeight = 0;
+        for (OrderProduct orderProduct : tempList) {
+            totalWeight += (orderProduct.getQuantity() * orderProduct.getProduct().getWeight());
+        }
+        APIPaymentCaller.getShippingFee(deliveryServiceId, address, currentAddress,
+                totalWeight, getApplication(), new APIListener() {
+                    @Override
+                    public void onShippingFeeFound(int shippingFee) {
+                        order.setShippingFee(shippingFee);
+                        deliveryCount--;
+                        if (deliveryCount == 0) {
+                            addressLoaded = true;
+                            loadReceipt();
+                        }
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        shippingFeeFailed = true;
+                        deliveryCount--;
+                        if (deliveryCount == 0) {
+                            addressLoaded = true;
+                            loadReceipt();
+                        }
+                    }
+                });
     }
 
     private void checkLoyaltyStatusList() {
@@ -283,22 +330,14 @@ public class OrderInfoActivity extends AppCompatActivity {
                     for (Order order : orderList) {
                         if (order.getSupplier().getId().equals(status.getSupplier().getId())) {
                             totalPrice = order.getTotalPrice();
-                            if (order.getCustomerDiscount() != null) {
-                                totalPrice -= order.getCustomerDiscount()
-                                                   .getDiscount()
-                                                   .getDiscountPrice();
-                            } else if (order.getCampaign() != null) {
-                                campaign = order.getCampaign();
+                            customerDiscount = order.getCustomerDiscount();
+                            campaign = order.getCampaign();
+                            if (customerDiscount != null) {
+                                totalPrice -= customerDiscount.getDiscount().getDiscountPrice();
+                            } else if (campaign != null) {
                                 orderProduct = order.getOrderProductList().get(0);
-                                totalPrice -= (campaign.getPrice() * orderProduct.getQuantity());
-                                if (campaign.getShareFlag()) {
-                                     milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
-                                            orderProduct.getQuantity() + campaign.getQuantityCount());
-                                    if (milestone != null) {
-                                        discountPrice = (orderProduct.getQuantity() * milestone.getPrice());
-                                        totalPrice -= discountPrice;
-                                    }
-                                }
+                                totalPrice = orderProduct.getQuantity();
+                                totalPrice *= getCampaignPrice();
                             }
                             status.setDiscountPriceFromTotal(totalPrice);
                             status.setSupplier(order.getSupplier());
@@ -313,97 +352,99 @@ public class OrderInfoActivity extends AppCompatActivity {
         } else {
             recViewLoyalStatusList.setVisibility(View.GONE);
         }
+        loyaltyStatusLoaded = true;
         loadReceipt();
-        receiptLoaded = true;
-        layoutLoading.setVisibility(View.GONE);
-        layoutReceipt.setVisibility(View.VISIBLE);
-        checkValidConfirmButton();
     }
 
     private void loadReceipt() {
-        if (requestCode == IntegerUtils.REQUEST_ORDER_CAMPAIGN) {
-            campaign = orderList.get(0).getCampaign();
-        }
-        if (orderProductList.size() > 0) {
+        if (addressLoaded && loyaltyStatusLoaded) {
             totalPrice = 0; discountPrice = 0; finalPrice = 0;
-            deliveryPrice = 0; loyaltyDiscountPrice = 0;
-            for (OrderProduct orderProduct : orderProductList) {
-                totalPrice += orderProduct.getProduct().getRetailPrice() * orderProduct.getQuantity();
+            loyaltyDiscountPrice = 0; deliveryPrice = 0;
+            if (requestCode == IntegerUtils.REQUEST_ORDER_CAMPAIGN) {
+                campaign = orderList.get(0).getCampaign();
             }
-            txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
-            deliveryPrice = 5000;
-            txtDeliveryPrice.setText(MethodUtils.formatPriceString(deliveryPrice));
-            if (campaign == null) {
-                layoutCampaignSaving.setVisibility(View.GONE);
-                discountList = new ArrayList<>();
-                for (int i = 0; i < orderList.size(); i++) {
-                    customerDiscount = orderList.get(i).getCustomerDiscount();
-                    if (customerDiscount != null) {
-                        discountList.add(customerDiscount.getDiscount());
-                        discountPrice += customerDiscount.getDiscount().getDiscountPrice();
+            if (orderProductList.size() > 0) {
+                if (!shippingFeeFailed) {
+                    for (OrderProduct orderProduct : orderProductList) {
+                        totalPrice += orderProduct.getProduct().getRetailPrice()
+                                      * orderProduct.getQuantity();
                     }
+                    for (Order order : orderList) {
+                        deliveryPrice += order.getShippingFee();
+                    }
+                    txtDeliveryPrice.setText(MethodUtils.formatPriceString(deliveryPrice));
+                } else {
+                    lblShipping.setVisibility(View.GONE);
+                    txtDeliveryPrice.setText("Un-calculated");
                 }
-                if (discountList.size() > 0) {
-                    RecViewDiscountListSimpleAdapter discountAdapter
-                            = new RecViewDiscountListSimpleAdapter(getApplicationContext());
-                    discountAdapter.setDiscountList(discountList);
-                    recViewDiscountList.setAdapter(discountAdapter);
-                    recViewDiscountList.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                            LinearLayoutManager.VERTICAL, false));
-                }
-            } else {
-                layoutCampaignSaving.setVisibility(View.VISIBLE);
-                lblDiscountPrice.setText("Campaign Saving");
-                order = orderList.get(0);
-                orderProduct = order.getOrderProductList().get(0);
-                discountPrice = orderProduct.getProduct().getRetailPrice();
-                if (campaign.getShareFlag()) {
-                    milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
-                            orderProduct.getQuantity() + campaign.getQuantityCount());
-                    if (milestone != null) {
-                        discountPrice -= milestone.getPrice();
-                    } else {
-                        discountPrice -= campaign.getPrice();
+                txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
+                if (campaign == null) {
+                    layoutCampaignSaving.setVisibility(View.GONE);
+                    discountList = new ArrayList<>();
+                    for (int i = 0; i < orderList.size(); i++) {
+                        customerDiscount = orderList.get(i).getCustomerDiscount();
+                        if (customerDiscount != null) {
+                            discountList.add(customerDiscount.getDiscount());
+                            discountPrice += customerDiscount.getDiscount().getDiscountPrice();
+                        }
+                    }
+                    if (discountList.size() > 0) {
+                        RecViewDiscountListSimpleAdapter discountAdapter
+                                = new RecViewDiscountListSimpleAdapter(getApplicationContext());
+                        discountAdapter.setDiscountList(discountList);
+                        recViewDiscountList.setAdapter(discountAdapter);
+                        recViewDiscountList.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                                LinearLayoutManager.VERTICAL, false));
                     }
                 } else {
-                    discountPrice -= campaign.getPrice();
+                    layoutCampaignSaving.setVisibility(View.VISIBLE);
+                    lblDiscountPrice.setText("Campaign Saving");
+                    order = orderList.get(0);
+                    orderProduct = order.getOrderProductList().get(0);
+                    discountPrice = orderProduct.getProduct().getRetailPrice();
+                    discountPrice -= getCampaignPrice();
+                    discountPrice *= orderProductList.get(0).getQuantity();
                 }
-                discountPrice *= orderProductList.get(0).getQuantity();
-            }
-            if (loyaltyStatusList != null) {
-                if (loyaltyStatusList.size() > 0) {
-                    for (LoyaltyStatus status : loyaltyStatusList) {
-                        loyaltyDiscountPrice += status.getDiscountPrice();
+                if (loyaltyStatusList != null) {
+                    if (loyaltyStatusList.size() > 0) {
+                        for (LoyaltyStatus status : loyaltyStatusList) {
+                            loyaltyDiscountPrice += status.getDiscountPrice();
+                        }
                     }
                 }
+                txtCampaignSaving.setText(MethodUtils.formatPriceString(discountPrice));
+                finalPrice = totalPrice - discountPrice + deliveryPrice - loyaltyDiscountPrice;
+                txtFinalPrice.setText(MethodUtils.formatPriceString(finalPrice));
+
+                RecViewOrderingProductPriceAdapter productAdapter
+                        = new RecViewOrderingProductPriceAdapter(getApplicationContext());
+                productAdapter.setOrderProductList(orderProductList);
+                recViewOrderProductPrice.setAdapter(productAdapter);
+                recViewOrderProductPrice.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                        LinearLayoutManager.VERTICAL, false));
+
+                RecViewLoyaltyDiscountListAdapter loyaltyAdapter
+                        = new RecViewLoyaltyDiscountListAdapter(getApplicationContext());
+                loyaltyAdapter.setLoyaltyStatusList(loyaltyStatusList);
+                recViewLoyalStatusList.setAdapter(loyaltyAdapter);
+                recViewLoyalStatusList.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                        LinearLayoutManager.VERTICAL, false));
             }
-            txtCampaignSaving.setText(MethodUtils.formatPriceString(discountPrice));
-            finalPrice = totalPrice - discountPrice + deliveryPrice - loyaltyDiscountPrice;
-            txtFinalPrice.setText(MethodUtils.formatPriceString(finalPrice));
-
-            RecViewOrderingProductPriceAdapter productAdapter
-                    = new RecViewOrderingProductPriceAdapter(getApplicationContext());
-            productAdapter.setOrderProductList(orderProductList);
-            recViewOrderProductPrice.setAdapter(productAdapter);
-            recViewOrderProductPrice.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                    LinearLayoutManager.VERTICAL, false));
-
-            RecViewLoyaltyDiscountListAdapter loyaltyAdapter
-                    = new RecViewLoyaltyDiscountListAdapter(getApplicationContext());
-            loyaltyAdapter.setLoyaltyStatusList(loyaltyStatusList);
-            recViewLoyalStatusList.setAdapter(loyaltyAdapter);
-            recViewLoyalStatusList.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                    LinearLayoutManager.VERTICAL, false));
+            checkCheckoutButton();
+            setLoadedState();
         }
     }
 
-    private void checkValidConfirmButton() {
-        if (addressLoaded && receiptLoaded) {
+    private void checkCheckoutButton() {
+        if (!shippingFeeFailed) {
             btnConfirmOrder.setEnabled(true);
             btnConfirmOrder.getBackground().setTint(getResources().getColor(R.color.blue_main));
         } else {
             btnConfirmOrder.setEnabled(false);
             btnConfirmOrder.getBackground().setTint(getResources().getColor(R.color.gray_light));
+            displayFailedAlert(StringUtils.MES_ERROR_UNAVAILABLE_ADDRESS,
+                    StringUtils.DESC_UNAVAILABLE_ADDRESS,
+                    IntegerUtils.ERROR_CHECKOUT_ORDER);
         }
     }
 
@@ -416,24 +457,12 @@ public class OrderInfoActivity extends AppCompatActivity {
     }
 
     private void processOrder() {
-            dialogBoxLoading = new DialogBoxLoading(OrderInfoActivity.this);
-            dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxLoading.show();
             if (requestCode == IntegerUtils.REQUEST_ORDER_CAMPAIGN) {
                 order = orderList.get(0);
                 orderProduct = order.getOrderProductList().get(0);
                 discountPrice = orderProduct.getProduct().getRetailPrice();
-                if (campaign.getShareFlag()) {
-                    milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
-                            orderProduct.getQuantity() + campaign.getQuantityCount());
-                    if (milestone != null) {
-                        discountPrice -= milestone.getPrice();
-                    } else {
-                        discountPrice -= campaign.getPrice();
-                    }
-                } else {
-                    discountPrice -= campaign.getPrice();
-                }
+                discountPrice -= getCampaignPrice();
                 discountPrice *= orderProductList.get(0).getQuantity();
                 discountPrice += loyaltyDiscountPrice;
                 order.setDiscountPrice(discountPrice);
@@ -448,7 +477,6 @@ public class OrderInfoActivity extends AppCompatActivity {
                 tempList = new ArrayList<>();
                 invalidOrderMap = new HashMap<>();
                 orderProductCount = orderProductList.size();
-                System.out.println("start: " + orderProductCount);
                 for (OrderProduct orderProduct : orderProductList) {
                     checkSupplierRetail(orderProduct);
                 }
@@ -501,11 +529,10 @@ public class OrderInfoActivity extends AppCompatActivity {
     private void finishRetailOrder() {
         orderCount = orderList.size();
         for (Order currentOrder : orderList) {
+            customerDiscount = currentOrder.getCustomerDiscount();
             discountPrice = 0;
-            if (currentOrder.getCustomerDiscount() != null) {
-                discountPrice += currentOrder.getCustomerDiscount()
-                        .getDiscount()
-                        .getDiscountPrice();
+            if (customerDiscount != null) {
+                discountPrice += customerDiscount.getDiscount().getDiscountPrice();
             }
             LoyaltyStatus status = findLoyaltyStatus(currentOrder);
             if (status != null) {
@@ -572,8 +599,8 @@ public class OrderInfoActivity extends AppCompatActivity {
         APISupplierCaller.getSupplierById(order.getSupplier().getId(),
                 getApplication(), new APIListener() {
             @Override
-            public void onSupplierFound(Supplier supplier) {
-                if (supplier.getStatus()) {
+            public void onSupplierListFound(List<Supplier> supplierList) {
+                if (supplierList.size() == 0  || supplierList.get(0).getStatus()) {
                     description = "Supplier " + order.getSupplier().getName();
                     description += StringUtils.DESC_INVALID_ORDER_SUPPLIER_SUSPENDED;
                     removeOrderForCampaign(order, description);
@@ -600,8 +627,8 @@ public class OrderInfoActivity extends AppCompatActivity {
         APISupplierCaller.getSupplierById(orderProduct.getProduct().getSupplier().getId(),
                 getApplication(), new APIListener() {
             @Override
-            public void onSupplierFound(Supplier supplier) {
-                if (supplier.getStatus()) {
+            public void onSupplierListFound(List<Supplier> supplierList) {
+                if (supplierList.size() == 0 || supplierList.get(0).getStatus()) {
                     order = findOrderByOrderProduct(orderProduct);
                     if (invalidOrderMap.get(order) == null) {
                         invalidOrderMap.put(order, StringUtils.DESC_INVALID_ORDER_SUPPLIER_SUSPENDED);
@@ -633,24 +660,26 @@ public class OrderInfoActivity extends AppCompatActivity {
     }
 
     private void checkCampaign(Order order) {
-        APICampaignCaller.getCampaignById(order.getCampaign().getId(), getApplication(), new APIListener() {
+        APICampaignCaller.getCampaignById(order.getCampaign().getId(),
+                getApplication(), new APIListener() {
             @Override
-            public void onCampaignFound(Campaign campaign) {
-                if (!campaign.getStatus().equals("active")) {
-                    removeOrderForCampaign(order, StringUtils.DESC_INVALID_ORDER_CAMPAIGN_COMPLETED);
-                } else {
-                    int amount = campaign.getMaxQuantity() - campaign.getQuantityCount();
-                    if (order.getOrderProductList().get(0).getQuantity() > amount) {
-                        removeOrderForCampaign(order, StringUtils.DESC_INVALID_ORDER_QUANTITY);
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (campaignList.size() > 0) {
+                    if (!campaign.getStatus().equals("active")) {
+                        removeOrderForCampaign(order,
+                                StringUtils.DESC_INVALID_ORDER_CAMPAIGN_COMPLETED);
                     } else {
-                        finishCampaignOrder(order);
+                        int amount = campaign.getMaxQuantity() - campaign.getQuantityCount();
+                        if (order.getOrderProductList().get(0).getQuantity() > amount) {
+                            removeOrderForCampaign(order, StringUtils.DESC_INVALID_ORDER_QUANTITY);
+                        } else {
+                            finishCampaignOrder(order);
+                        }
                     }
+                } else {
+                    removeOrderForCampaign(order,
+                            StringUtils.DESC_INVALID_ORDER_CAMPAIGN_COMPLETED);
                 }
-            }
-
-            @Override
-            public void onNoJSONFound() {
-                removeOrderForCampaign(order, StringUtils.DESC_INVALID_ORDER_CAMPAIGN_COMPLETED);
             }
 
             @Override
@@ -665,20 +694,25 @@ public class OrderInfoActivity extends AppCompatActivity {
         APIProductCaller.getProductById(orderProduct.getProduct().getProductId(),
                 getApplication(), new APIListener() {
             @Override
-            public void onProductFound(Product product) {
-                if (product.getStatus().equals("deactivated")) {
-                    order = findOrderByOrderProduct(orderProduct);
-                    if (invalidOrderMap.get(order) == null) {
-                        invalidOrderMap.put(order, StringUtils.DESC_INVALID_ORDER_PRODUCT);
+            public void onProductListFound(List<Product> productList) {
+                if (productList.size() > 0) {
+                    if (productList.get(0).getStatus().equals("deactivated")) {
+                        order = findOrderByOrderProduct(orderProduct);
+                        if (invalidOrderMap.get(order) == null) {
+                            invalidOrderMap.put(order, StringUtils.DESC_INVALID_ORDER_PRODUCT);
+                        }
+                        tempList.add(orderProduct);
+                        orderProductCount--;
+                        finishCheckingInvalidRetailOrder();
+                    } else if (productList.get(0).getStatus().equals("active")) {
+                        orderProductCount--;
+                        finishCheckingInvalidRetailOrder();
+                    } else {
+                        checkQuantityWithCampaign(orderProduct);
                     }
-                    tempList.add(orderProduct);
-                    orderProductCount--;
-                    finishCheckingInvalidRetailOrder();
-                } else if (product.getStatus().equals("active")) {
-                    orderProductCount--;
-                    finishCheckingInvalidRetailOrder();
                 } else {
-                    checkCampaignList(orderProduct);
+                    displayFailedAlert(StringUtils.MES_ERROR_FAILED_API_CALL,
+                            "", IntegerUtils.ERROR_CHECKOUT_ORDER);
                 }
             }
 
@@ -690,9 +724,9 @@ public class OrderInfoActivity extends AppCompatActivity {
         });
     }
 
-    private void checkCampaignList(OrderProduct orderProduct) {
+    private void checkQuantityWithCampaign(OrderProduct orderProduct) {
         APICampaignCaller.getCampaignListByProductId(orderProduct.getProduct().getProductId(),
-                "active", null, getApplication(), new APIListener() {
+                "active", getApplication(), new APIListener() {
             @Override
             public void onCampaignListFound(List<Campaign> campaignList) {
                 if (campaignList.size() > 0) {
@@ -840,7 +874,6 @@ public class OrderInfoActivity extends AppCompatActivity {
                     StringUtils.MES_ALERT_ADVANCE_REQUIRE, description) {
                 @Override
                 public void onClickAction() {
-                    super.onClickAction();
                     performAdvancePayment();
                 }
             };
@@ -860,19 +893,13 @@ public class OrderInfoActivity extends AppCompatActivity {
                         "online payment", "online payment",
                         getApplication(), new APIListener() {
                     @Override
-                    public void onGettingPaymentURL(String url) {
-                        super.onGettingPaymentURL(url);
+                    public void onResultStringFound(String url) {
                         DialogBoxPayment dialogBox
                                 = new DialogBoxPayment(OrderInfoActivity.this, url) {
                             @Override
                             public void onCompletedPayment(String vnpRef) {
-                                if (milestone != null) {
-                                    discountPrice = milestone.getPrice();
-                                } else {
-                                    discountPrice = campaign.getPrice();
-                                }
                                 APIOrderCaller.updateOrderPaymentStatus(token, order,
-                                        "advanced", true, advancePrice, discountPrice,
+                                        "advanced", true, advancePrice,
                                         vnpRef, getApplication(), new APIListener() {
                                     @Override
                                     public void onUpdateSuccessful() {
@@ -950,7 +977,7 @@ public class OrderInfoActivity extends AppCompatActivity {
                 }
             };
             dialogBoxAlert.getWindow()
-                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                          .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxAlert.show();
         }
     }
@@ -976,7 +1003,6 @@ public class OrderInfoActivity extends AppCompatActivity {
                     StringUtils.MES_SUCCESSFUL_ORDER, "") {
                 @Override
                 public void onClickAction() {
-                    super.onClickAction();
                     Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
                     mainIntent.putExtra("MAIN_TAB_POSITION", 1);
                     if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
@@ -989,14 +1015,16 @@ public class OrderInfoActivity extends AppCompatActivity {
                         APICampaignCaller.getCampaignById(campaign.getId(),
                                 getApplication(), new APIListener() {
                             @Override
-                            public void onCampaignFound(Campaign campaign) {
+                            public void onCampaignListFound(List<Campaign> campaignList) {
                                 if (dialogBoxLoading.isShowing()) {
                                     dialogBoxLoading.dismiss();
                                 }
-                                if (campaign.getStatus().equals("active")) {
-                                    mainIntent.putExtra("HISTORY_TAB_POSITION", 1);
-                                } else {
-                                    mainIntent.putExtra("HISTORY_TAB_POSITION", 2);
+                                if (campaignList.size() > 0) {
+                                    if (campaignList.get(0).getStatus().equals("active")) {
+                                        mainIntent.putExtra("HISTORY_TAB_POSITION", 1);
+                                    } else {
+                                        mainIntent.putExtra("HISTORY_TAB_POSITION", 2);
+                                    }
                                 }
                                 startActivity(mainIntent);
                             }
@@ -1011,7 +1039,6 @@ public class OrderInfoActivity extends AppCompatActivity {
                     StringUtils.MES_ALERt_REQUIRE_PAYMENT) {
                 @Override
                 public void onClickAction() {
-                    super.onClickAction();
                     Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
                     mainIntent.putExtra("MAIN_TAB_POSITION", 1);
                     if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
@@ -1021,16 +1048,23 @@ public class OrderInfoActivity extends AppCompatActivity {
                         APICampaignCaller.getCampaignById(campaign.getId(),
                                 getApplication(), new APIListener() {
                             @Override
-                            public void onCampaignFound(Campaign campaign) {
+                            public void onCampaignListFound(List<Campaign> campaignList) {
                                 if (dialogBoxLoading.isShowing()) {
                                     dialogBoxLoading.dismiss();
                                 }
-                                if (campaign.getStatus().equals("active")) {
-                                    mainIntent.putExtra("HISTORY_TAB_POSITION", 1);
-                                } else {
-                                    mainIntent.putExtra("HISTORY_TAB_POSITION", 0);
+                                if (campaignList.size() > 0) {
+                                    if (campaignList.get(0).getStatus().equals("active")) {
+                                        mainIntent.putExtra("HISTORY_TAB_POSITION", 1);
+                                    } else {
+                                        mainIntent.putExtra("HISTORY_TAB_POSITION", 0);
+                                    }
                                 }
                                 startActivity(mainIntent);
+                            }
+
+                            @Override
+                            public void onFailedAPICall(int code) {
+                                MethodUtils.displayErrorAPIMessage(OrderInfoActivity.this);
                             }
                         });
                     }
@@ -1040,6 +1074,29 @@ public class OrderInfoActivity extends AppCompatActivity {
         dialogBoxAlert.getWindow()
                       .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxAlert.show();
+    }
+
+    private double getCampaignPrice() {
+        milestone = null;
+        if (campaign.getShareFlag()) {
+            milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
+                    orderProduct.getQuantity() + campaign.getQuantityCount());
+        }
+        if (milestone != null) {
+            return milestone.getPrice();
+        } else {
+            return campaign.getPrice();
+        }
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutMain.setVisibility(View.GONE);
+    }
+
+    private void setLoadedState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutMain.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -1053,6 +1110,8 @@ public class OrderInfoActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (data != null) {
                 currentAddress = (Address) data.getSerializableExtra("ADDRESS");
+                addressLoaded = false;
+                setLoadingState();
                 setupConfirmAddress();
             }
         }

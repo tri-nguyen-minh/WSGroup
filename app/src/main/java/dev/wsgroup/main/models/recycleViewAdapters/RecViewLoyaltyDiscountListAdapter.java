@@ -19,6 +19,7 @@ public class RecViewLoyaltyDiscountListAdapter
 
     private Context context;
     private List<LoyaltyStatus> loyaltyStatusList;
+    private LoyaltyStatus loyaltyStatus;
 
     public RecViewLoyaltyDiscountListAdapter(Context context) {
         this.context = context;
@@ -32,15 +33,15 @@ public class RecViewLoyaltyDiscountListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_loyalty_discount_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecViewLoyaltyDiscountListAdapter.ViewHolder holder, int position) {
-        holder.txtSupplierName.setText(loyaltyStatusList.get(position).getSupplier().getName());
+        loyaltyStatus = loyaltyStatusList.get(position);
+        holder.txtSupplierName.setText(loyaltyStatus.getSupplier().getName());
         holder.txtDiscountPrice
-                .setText(MethodUtils.formatPriceString(loyaltyStatusList.get(position).getDiscountPrice()));
+              .setText(MethodUtils.formatPriceString(loyaltyStatus.getDiscountPrice()));
     }
 
     @Override
@@ -48,9 +49,9 @@ public class RecViewLoyaltyDiscountListAdapter
         return loyaltyStatusList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView txtSupplierName, txtDiscountPrice;
+        private final TextView txtSupplierName, txtDiscountPrice;
 
         public ViewHolder(View view) {
             super(view);

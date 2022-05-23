@@ -19,6 +19,7 @@ import android.widget.TextView;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Review;
+import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
@@ -28,8 +29,8 @@ public class DialogBoxReview extends Dialog {
     private MaterialRatingBar ratingReview;
     private Button btnConfirmReview;
     private ImageView imgCloseDialogBox;
-    private TextView txtLetterCount, lblLetterSeparator, lblLetterCount;
-    private LinearLayout layoutLetterCount;
+    private TextView txtLetterCount, lblLetterSeparator, lblLetterCount, txtDate;
+    private LinearLayout layoutLetterCount, layoutDate;
 
     private OrderProduct orderProduct;
     private Review review;
@@ -62,7 +63,9 @@ public class DialogBoxReview extends Dialog {
         txtLetterCount = findViewById(R.id.txtLetterCount);
         lblLetterSeparator = findViewById(R.id.lblLetterSeparator);
         lblLetterCount = findViewById(R.id.lblLetterCount);
+        txtDate = findViewById(R.id.txtDate);
         layoutLetterCount = findViewById(R.id.layoutLetterCount);
+        layoutDate = findViewById(R.id.layoutDate);
 
         editReviewRating.setEnabled(false);
 
@@ -76,6 +79,7 @@ public class DialogBoxReview extends Dialog {
         if (review == null) {
             letterCount = 0;
             layoutLetterCount.setVisibility(View.VISIBLE);
+            layoutDate.setVisibility(View.GONE);
             editReview.setEnabled(true);
             editReview.setText("");
             ratingReview.setIsIndicator(false);
@@ -129,6 +133,7 @@ public class DialogBoxReview extends Dialog {
             });
         } else {
             layoutLetterCount.setVisibility(View.GONE);
+            layoutDate.setVisibility(View.VISIBLE);
             editReview.setEnabled(false);
             ratingReview.setIsIndicator(true);
             btnConfirmReview.setText("CLOSE");
@@ -136,6 +141,7 @@ public class DialogBoxReview extends Dialog {
             ratingReview.setRating(((float) review.getRating()));
             editReviewRating.setText(((float) review.getRating()) + "");
             editReview.setText(review.getReview());
+            txtDate.setText(MethodUtils.formatDate(review.getDate(), true));
         }
         imgCloseDialogBox.setOnClickListener(closeListener);
     }

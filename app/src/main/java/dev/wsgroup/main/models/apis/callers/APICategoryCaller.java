@@ -39,11 +39,12 @@ public class APICategoryCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONObject jsonObject = response.getJSONObject("data");
-                        Category category = null;
+                        List<Category> list = new ArrayList<>();
                         if(jsonObject != null) {
-                            category = Category.getCategoryFromJSON(jsonObject);
+                            Category category = Category.getCategoryFromJSON(jsonObject);
+                            list.add(category);
                         }
-                        APIListener.onCategoryFound(category);
+                        APIListener.onCategoryListFound(list);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
@@ -67,12 +68,13 @@ public class APICategoryCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
     public static void getCategoryListBySupplierId(String supplierId,
                                        Application application, APIListener APIListener) {
-        String url = StringUtils.CATEGORY_API_URL + "?userId=" + supplierId;
+        String url = StringUtils.CATEGORY_API_URL + "?supplierId=" + supplierId;
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -115,6 +117,7 @@ public class APICategoryCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

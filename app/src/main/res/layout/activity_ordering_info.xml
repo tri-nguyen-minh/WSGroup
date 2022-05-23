@@ -42,31 +42,30 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutMain"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:scrollIndicators="none"
         app:layout_constraintTop_toBottomOf="@id/layoutCheckoutHeader"
-        app:layout_constraintBottom_toTopOf="@id/layoutCheckout">
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="0dp"
+            android:scrollIndicators="none"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/layoutCheckout">
 
-            <TextView
-                android:text="Delivery Information"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="7dp"
-                style="@style/style_background_header"/>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutDeliveryInfo"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:paddingBottom="5dp">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="Contact Number"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="7dp"
+                    style="@style/style_background_header"/>
 
                 <RelativeLayout
                     android:id="@+id/layoutPhone"
@@ -91,12 +90,12 @@
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             style="@style/style_label_account_info"
-                            android:paddingHorizontal="10dp"
+                            android:paddingRight="0dp"
                             android:textSize="15sp"
                             android:gravity="left|center"/>
 
-                        <EditText
-                            android:id="@+id/editPhoneNumber"
+                        <TextView
+                            android:id="@+id/txtPhoneNumber"
                             android:textSize="15sp"
                             android:gravity="center|right"
                             android:layout_marginLeft="10dp"
@@ -112,39 +111,95 @@
 
                 </RelativeLayout>
 
+                <TextView
+                    android:text="Delivery Address"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="7dp"
+                    style="@style/style_background_header"/>
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     style="@style/style_profile_tab"
-                    android:id="@+id/layoutAddress"
-                    android:paddingVertical="0dp"
                     android:background="@color/white"
-                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="0dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/layoutPhone"
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <TextView
-                        android:id="@+id/lblAddress"
-                        android:text="Address"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        style="@style/style_label_account_info"
-                        android:paddingHorizontal="10dp"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/txtDeliveryAddress"
-                        android:gravity="center|right"
-                        android:textSize="15sp"
+                        android:id="@+id/lblDeliveryAddress"
+                        android:gravity="center|left"
+                        android:textSize="17sp"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:singleLine="true"
+                        android:text="No Delivery Address"
                         android:layout_marginLeft="10dp"
-                        app:layout_constraintLeft_toRightOf="@+id/lblAddress"
+                        app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/imgEditAddress"
                         app:layout_constraintBottom_toBottomOf="parent"
                         style="@style/style_txt_account_info" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutAddress"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/imgEditAddress"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/txtAddressStreet"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:text="tese"
+                            android:textColor="@color/gray_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/txtAddressDistrict"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:text="tese"
+                            android:textColor="@color/gray"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            app:layout_constraintTop_toBottomOf="@id/txtAddressStreet"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toTopOf="@id/txtAddressProvince"/>
+
+                        <TextView
+                            android:id="@+id/txtAddressProvince"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:text="tese"
+                            android:textColor="@color/gray"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            app:layout_constraintTop_toBottomOf="@id/txtAddressDistrict"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <ImageView
                         android:id="@+id/imgEditAddress"
@@ -159,125 +214,102 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:text="Payment Method"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="7dp"
-                    style="@style/style_background_header"/>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:layout_marginBottom="2dp"
                     android:orientation="vertical">
 
-                    <Spinner
-                        android:id="@+id/spinnerPayment"
-                        style="@style/Widget.AppCompat.Spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/spinner_background"
-                        android:dropDownWidth="match_parent"
-                        android:dropDownVerticalOffset="40dp"
-                        android:popupBackground="@android:color/white"
-                        android:popupElevation="10dp"
-                        android:stateListAnimator="@drawable/spinner_anim"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutPayment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:layout_marginBottom="2dp"
-                    android:orientation="vertical"
-                    android:padding="10dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:id="@+id/imgEditPayment"
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:scaleY="1.2"
-                        android:scaleX="1.2"
-                        android:src="@drawable/ic_direction_right"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
                     <TextView
-                        android:id="@+id/lblPaymentMethod"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="left"
                         android:text="Payment Method"
-                        android:textColor="@color/black"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toTopOf="@id/txtPaymentDescription"
-                        android:visibility="gone"/>
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="7dp"
+                        style="@style/style_background_header"/>
 
-                    <TextView
-                        android:id="@+id/txtPaymentDescription"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="left"
-                        android:text="Payment on Delivery"
-                        android:textColor="@color/gray_darker"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toBottomOf="@id/lblPaymentMethod"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toLeftOf="@id/imgEditPayment"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <TextView
-                    android:text="Receipt"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="7dp"
-                    style="@style/style_background_header"/>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp">
-
-                    <RelativeLayout
-                        android:id="@+id/layoutLoading"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingTop="50dp">
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:layout_marginBottom="2dp"
+                        android:orientation="vertical">
 
-                        <ProgressBar
+                        <Spinner
+                            android:id="@+id/spinnerPayment"
+                            style="@style/Widget.AppCompat.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/spinner_background"
+                            android:dropDownWidth="match_parent"
+                            android:dropDownVerticalOffset="50dp"
+                            android:popupBackground="@android:color/white"
+                            android:popupElevation="10dp"
+                            android:stateListAnimator="@drawable/spinner_anim"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutPayment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:layout_marginBottom="2dp"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/imgEditPayment"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:scaleY="1.2"
+                            android:scaleX="1.2"
+                            android:src="@drawable/ic_direction_right"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/lblPaymentMethod"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:indeterminate="true"
-                            android:indeterminateTint="@color/blue_main"/>
+                            android:layout_marginBottom="10dp"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:text="Payment Method"
+                            android:textColor="@color/black"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintBottom_toTopOf="@id/txtPaymentDescription"
+                            android:visibility="gone"/>
 
-                    </RelativeLayout>
+                        <TextView
+                            android:id="@+id/txtPaymentDescription"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserratr"
+                            android:gravity="left"
+                            android:text="Payment on Delivery"
+                            android:textColor="@color/gray_darker"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toBottomOf="@id/lblPaymentMethod"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/imgEditPayment"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <TextView
+                        android:text="Receipt"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="7dp"
+                        style="@style/style_background_header"/>
 
                     <LinearLayout
-                        android:id="@+id/layoutReceipt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -493,28 +525,45 @@
 
                     </LinearLayout>
 
-                </FrameLayout>
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-    </androidx.core.widget.NestedScrollView>
+        <RelativeLayout
+            android:id="@+id/layoutCheckout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:id="@+id/btnConfirmOrder"
+                android:text="CONFIRM ORDER"
+                style="@style/style_button_account"
+                android:textSize="16sp"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="5dp"/>
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <RelativeLayout
-        android:id="@+id/layoutCheckout"
+        android:id="@+id/layoutLoading"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:paddingVertical="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutCheckoutHeader">
 
-        <Button
-            android:id="@+id/btnConfirmOrder"
-            android:text="CONFIRM ORDER"
-            style="@style/style_button_account"
-            android:textSize="16sp"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="5dp"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue_main" />
 
     </RelativeLayout>
 

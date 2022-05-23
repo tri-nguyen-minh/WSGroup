@@ -94,7 +94,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:visibility="gone"
             android:background="@color/gray_background">
 
             <TextView

@@ -67,7 +67,7 @@ public class RequestActivity extends AppCompatActivity {
     private ConstraintLayout layoutParent;
     private RelativeLayout layoutLoading;
     private TextView txtOrderCode, txtLetterCount, lblLetterSeparator, lblLetterCount,
-            lblRetry, lblSelectImage, lblReason, txtSupplier, txtPrice, txtRecipient;
+            lblRetry, lblSelectImage, txtSupplier, txtPrice, txtRecipient;
     private RecyclerView recViewImage;
     private Button btnSubmitRequest;
 
@@ -84,7 +84,6 @@ public class RequestActivity extends AppCompatActivity {
     private DialogBoxLoading dialogBoxLoading;
     private DialogBoxConfirm dialogBoxConfirm;
     private DialogBoxAlert dialogBoxAlert;
-    private View.OnClickListener listener;
     private UploadTask uploadTask;
     private StorageReference reference;
 
@@ -107,16 +106,16 @@ public class RequestActivity extends AppCompatActivity {
         lblLetterCount = findViewById(R.id.lblLetterCount);
         lblRetry = findViewById(R.id.lblRetry);
         lblSelectImage = findViewById(R.id.lblSelectImage);
-        lblReason = findViewById(R.id.lblReason);
         txtSupplier = findViewById(R.id.txtSupplier);
         txtPrice = findViewById(R.id.txtPrice);
         txtRecipient = findViewById(R.id.txtRecipient);
         recViewImage = findViewById(R.id.recViewImage);
         btnSubmitRequest = findViewById(R.id.btnSubmitRequest);
 
-        setupRequest();
         imageList = new ArrayList<>();
         imageList.add(null);
+        setupRequest();
+
         adapter = new RecViewImageAdapter(getApplicationContext(),
                 RequestActivity.this, R.layout.recycle_view_image_large) {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -184,12 +183,14 @@ public class RequestActivity extends AppCompatActivity {
 
             }
         });
+
         lblRetry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setupRequest();
             }
         });
+
         lblSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -220,7 +221,7 @@ public class RequestActivity extends AppCompatActivity {
                     }
                 };
                 if (requestCount == 1) {
-                    description = "This is your last request";
+                    description = "This is your final request.";
                     dialogBoxConfirm.setDescription(description);
                 }
                 dialogBoxConfirm.getWindow()
@@ -326,29 +327,6 @@ public class RequestActivity extends AppCompatActivity {
     private void getDescription() {
         description = "is requested for return by Customer " + user.getDisplayName();
         description += " for: " + reasonString;
-    }
-
-    private void sendRequest() {
-        getDescription();
-        APIOrderCaller.updateOrderStatus(token, order, description, imageLinkList,
-                "returning", getApplication(), new APIListener() {
-            @Override
-            public void onUpdateSuccessful() {
-                displayFinalMessage(StringUtils.MES_SUCCESSFUL_UPDATE_ORDER);
-            }
-
-            @Override
-            public void onFailedAPICall(int code) {
-                if (dialogBoxLoading.isShowing()) {
-                    dialogBoxLoading.dismiss();
-                }if (code == IntegerUtils.ERROR_NO_USER) {
-                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-                            RequestActivity.this);
-                } else {
-                    MethodUtils.displayErrorAPIMessage(RequestActivity.this);
-                }
-            }
-        });
     }
 
     private void uploadImageList() {
@@ -460,22 +438,27 @@ public class RequestActivity extends AppCompatActivity {
         }
     }
 
-    private void setLoadingState() {
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutFailedGettingRequest.setVisibility(View.GONE);
-        layoutRequest.setVisibility(View.GONE);
-    }
+    private void sendRequest() {
+        getDescription();
+        APIOrderCaller.updateOrderStatus(token, order, description, imageLinkList,
+                "returning", getApplication(), new APIListener() {
+                    @Override
+                    public void onUpdateSuccessful() {
+                        displayFinalMessage(StringUtils.MES_SUCCESSFUL_UPDATE_ORDER);
+                    }
 
-    private void setFailedState() {
-        layoutLoading.setVisibility(View.GONE);
-        layoutFailedGettingRequest.setVisibility(View.VISIBLE);
-        layoutRequest.setVisibility(View.GONE);
-    }
-
-    private void setReadyState() {
-        layoutLoading.setVisibility(View.GONE);
-        layoutFailedGettingRequest.setVisibility(View.GONE);
-        layoutRequest.setVisibility(View.VISIBLE);
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }if (code == IntegerUtils.ERROR_NO_USER) {
+                            MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                                    RequestActivity.this);
+                        } else {
+                            MethodUtils.displayErrorAPIMessage(RequestActivity.this);
+                        }
+                    }
+                });
     }
 
     private void displayFinalMessage(String message) {
@@ -493,6 +476,24 @@ public class RequestActivity extends AppCompatActivity {
         dialogBoxAlert.getWindow()
                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxAlert.show();
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutFailedGettingRequest.setVisibility(View.GONE);
+        layoutRequest.setVisibility(View.GONE);
+    }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutFailedGettingRequest.setVisibility(View.VISIBLE);
+        layoutRequest.setVisibility(View.GONE);
+    }
+
+    private void setReadyState() {
+        layoutLoading.setVisibility(View.GONE);
+        layoutFailedGettingRequest.setVisibility(View.GONE);
+        layoutRequest.setVisibility(View.VISIBLE);
     }
 
     @Override

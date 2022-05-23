@@ -36,9 +36,9 @@ public class RecViewProductListAdapter
         extends RecyclerView.Adapter<RecViewProductListAdapter.ViewHolder> {
 
     private List<Product> productsList;
+    private Product product;
     private Context context;
     private Activity activity;
-    private DialogBoxLoading dialogBoxLoading;
 
     public void setProductsList(List<Product> productsList) {
         this.productsList = productsList;
@@ -53,53 +53,38 @@ public class RecViewProductListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_product_list, parent, false);
-
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
         view.setLayoutParams(new ViewGroup.LayoutParams(width / 2,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecViewProductListAdapter.ViewHolder holder, int position) {
+        product = productsList.get(position);
         holder.txtCampaign.setVisibility(View.GONE);
-        if (productsList.get(position).getStatus().equals("incampaign")) {
+        if (product.getStatus().equals("incampaign")) {
+            holder.txtCampaign.bringToFront();
             holder.txtCampaign.setVisibility(View.VISIBLE);
             holder.txtCampaign.setText("Ongoing Campaign");
         }
-        holder.txtProductName.setText(productsList.get(position).getName());
-
-        holder.txtProductOrderCount
-                .setText(MethodUtils.formatOrderOrReviewCount(productsList.get(position).getOrderCount()));
-        holder.lblProductOrderCount
-                .setText((productsList.get(position).getOrderCount() > 0) ? "orders" : "order");
-
-        String productId = productsList.get(position).getProductId();
-        if(productsList.get(position).getImageList().size() > 0) {
-            Glide.with(context)
-                 .load(productsList.get(position).getImageList().get(0))
-                 .into(holder.imgProduct);
+        holder.txtProductName.setText(product.getName());
+        holder.txtProductOrderCount.setText(MethodUtils.formatOrderOrReviewCount(product.getOrderCount()));
+        holder.lblProductOrderCount.setText((product.getOrderCount() > 0) ? "orders" : "order");
+        if(product.getImageList().size() > 0) {
+            Glide.with(context).load(product.getImageList().get(0)).into(holder.imgProduct);
         }
-        holder.txtCampaign.bringToFront();
-        holder.txtRetailPrice
-                .setText(MethodUtils.formatPriceString(productsList.get(position).getRetailPrice()));
+        holder.txtRetailPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         holder.ratingProduct.setIsIndicator(true);
-        holder.ratingProduct.setRating( (float) productsList.get(position).getRating());
+        holder.ratingProduct.setRating( (float) product.getRating());
         holder.productCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogBoxLoading = new DialogBoxLoading(activity);
-                dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialogBoxLoading.show();
+                String productId = productsList.get(position).getProductId();
                 Intent intent = new Intent(context, ProductDetailActivity.class);
                 intent.putExtra("PRODUCT_ID", productId);
-                intent.putExtra("MAIN_TAB_POSITION", 0);
-                if (dialogBoxLoading.isShowing()) {
-                    dialogBoxLoading.dismiss();
-                }
                 activity.startActivityForResult(intent, IntegerUtils.REQUEST_COMMON);
             }
         });
@@ -110,12 +95,12 @@ public class RecViewProductListAdapter
         return productsList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView productCard;
-        private ImageView imgProduct;
-        private TextView txtCampaign, txtProductName, txtProductOrderCount, txtRetailPrice;
-        private TextView lblProductOrderCount;
-        private MaterialRatingBar ratingProduct;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final CardView productCard;
+        private final ImageView imgProduct;
+        private final TextView txtCampaign, txtProductName, txtProductOrderCount,
+                txtRetailPrice, lblProductOrderCount;
+        private final MaterialRatingBar ratingProduct;
 
         public ViewHolder(View view) {
             super(view);

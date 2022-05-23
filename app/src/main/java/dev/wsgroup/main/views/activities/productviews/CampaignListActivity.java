@@ -35,9 +35,10 @@ import dev.wsgroup.main.views.activities.MainActivity;
 public class CampaignListActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCampaignList, imgCampaignListHome, imgExpand;
-    private TextView txtProductRetailPrice, txtDiscountStartDate, txtDiscountEndDate,
-            txtCampaignMaxQuantity, txtMilestonePrice, txtCampaignOrderCount,
-            txtCampaignQuantityCount, txtCampaignQuantityBar, txtCampaignNote, lblProductOrderCount;
+    private TextView txtProductRetailPrice, lblRetailQuantity, txtRetailQuantity,
+            txtDiscountStartDate, txtDiscountEndDate, txtCampaignMaxQuantity, txtMilestonePrice,
+            txtCampaignOrderCount, txtCampaignCode, txtCampaignQuantityCount,
+            txtCampaignQuantityBar, txtCampaignNote, lblProductOrderCount;
     private Button btnSelectBasePrice, btnSelectCampaign;
     private LinearLayout layoutFailed, layoutSharingCampaign, layoutSingleCampaign;
     private ConstraintLayout layoutMain, layoutCampaignMilestone;
@@ -48,6 +49,7 @@ public class CampaignListActivity extends AppCompatActivity {
 
     private Product product;
     private String productId;
+    private int retailQuantity;
     private List<Campaign> campaignList;
     private Campaign sharingCampaign;
     private CampaignMilestone milestone;
@@ -64,11 +66,14 @@ public class CampaignListActivity extends AppCompatActivity {
         imgCampaignListHome = findViewById(R.id.imgCampaignListHome);
         imgExpand = findViewById(R.id.imgExpand);
         txtProductRetailPrice = findViewById(R.id.txtProductRetailPrice);
+        lblRetailQuantity = findViewById(R.id.lblRetailQuantity);
+        txtRetailQuantity = findViewById(R.id.txtRetailQuantity);
         txtDiscountStartDate = findViewById(R.id.txtDiscountStartDate);
         txtDiscountEndDate = findViewById(R.id.txtDiscountEndDate);
         txtCampaignMaxQuantity = findViewById(R.id.txtCampaignMaxQuantity);
         txtMilestonePrice = findViewById(R.id.txtMilestonePrice);
         txtCampaignOrderCount = findViewById(R.id.txtCampaignOrderCount);
+        txtCampaignCode = findViewById(R.id.txtCampaignCode);
         txtCampaignQuantityCount = findViewById(R.id.txtCampaignQuantityCount);
         txtCampaignQuantityBar = findViewById(R.id.txtCampaignQuantityBar);
         txtCampaignNote = findViewById(R.id.txtCampaignNote);
@@ -120,25 +125,31 @@ public class CampaignListActivity extends AppCompatActivity {
                     finish();
                 }
             });
-            if (getAvailableQuantity() == 0) {
-                System.out.println("test quantity");
+            retailQuantity = getAvailableQuantity();
+            if (retailQuantity == 0) {
                 btnSelectBasePrice.setEnabled(false);
                 btnSelectBasePrice.getBackground().setTint(getApplicationContext().getResources()
-                        .getColor(R.color.gray_light));
+                                  .getColor(R.color.gray_light));
+                lblRetailQuantity.setVisibility(View.GONE);
+                txtRetailQuantity.setText("Not Available");
             } else {
                 btnSelectBasePrice.setEnabled(true);
                 btnSelectBasePrice.getBackground().setTint(getApplicationContext().getResources()
-                        .getColor(R.color.blue_main));
+                                  .getColor(R.color.blue_main));
+                lblRetailQuantity.setVisibility(View.VISIBLE);
+                txtRetailQuantity.setText(retailQuantity + "");
             }
+            getCampaignList();
+        } else {
+            setFailedState();
         }
-        getCampaignList();
     }
 
     private void getCampaignList() {
         layoutSharingCampaign.setVisibility(View.GONE);
         layoutSingleCampaign.setVisibility(View.GONE);
         APICampaignCaller.getCampaignListByProductId(productId, "active",
-                campaignList, getApplication(), new APIListener() {
+                getApplication(), new APIListener() {
             @Override
             public void onCampaignListFound(List<Campaign> foundCampaignList) {
                 if (foundCampaignList.size() > 0) {
@@ -180,10 +191,9 @@ public class CampaignListActivity extends AppCompatActivity {
             layoutSharingCampaign.setVisibility(View.VISIBLE);
             recViewCampaignMilestone.setVisibility(View.GONE);
             txtCampaignNote.setText(sharingCampaign.getDescription());
-            txtDiscountStartDate
-                    .setText(MethodUtils.formatDate(sharingCampaign.getStartDate()));
-            txtDiscountEndDate
-                    .setText(MethodUtils.formatDate(sharingCampaign.getEndDate()));
+            txtCampaignCode.setText(sharingCampaign.getCode());
+            txtDiscountStartDate.setText(MethodUtils.formatDate(sharingCampaign.getStartDate(), false));
+            txtDiscountEndDate.setText(MethodUtils.formatDate(sharingCampaign.getEndDate(), false));
             txtCampaignMaxQuantity.setText(sharingCampaign.getMaxQuantity() + "");
             imgExpand.setImageResource(R.drawable.ic_direction_down);
             milestone = MethodUtils.getReachedCampaignMilestone(
@@ -209,8 +219,6 @@ public class CampaignListActivity extends AppCompatActivity {
             layoutCampaignMilestone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    System.out.println("VISIBLE: " + (recViewCampaignMilestone.getVisibility() == View.VISIBLE));
-                    System.out.println(recViewCampaignMilestone.getAdapter().getItemCount());
                     if (recViewCampaignMilestone.getVisibility() == View.GONE) {
                         recViewCampaignMilestone.setVisibility(View.VISIBLE);
                         imgExpand.setImageResource(R.drawable.ic_direction_up);

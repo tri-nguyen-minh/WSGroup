@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,8 +57,8 @@ public class RetailTab extends Fragment {
     private List<Supplier> supplierRetailList;
     private HashMap<String, List<CartProduct>> retailCart;
     private HashMap<String, List<Campaign>> activeCampaignMap, readyCampaignMap;
-    private List<CartProduct> cartList, cartProductList;
-    private List<Campaign> campaignList, tempList;
+    private List<CartProduct> cartList, tempCartList;
+    private List<Campaign> campaignList, tempCampaignList;
     private DialogBoxLoading dialogBoxLoading;
     private int activeCampaignCount, readyCampaignCount;
     private Supplier supplier;
@@ -99,8 +98,8 @@ public class RetailTab extends Fragment {
                 for (Supplier supplier : supplierRetailList) {
                     orderTotalPrice = 0;
                     List<OrderProduct> selectedProductList = new ArrayList<>();
-                    cartProductList = retailCart.get(supplier.getId());
-                    for (CartProduct cartProduct : cartProductList) {
+                    tempCartList = retailCart.get(supplier.getId());
+                    for (CartProduct cartProduct : tempCartList) {
                         if (cartProduct.getSelectedFlag()) {
                             orderProduct = new OrderProduct();
                             orderProduct.setProduct(cartProduct.getProduct());
@@ -173,7 +172,7 @@ public class RetailTab extends Fragment {
         readyCampaignCount = cartList.size();
         for (CartProduct cartProduct : cartList) {
             APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
-                    "active", null, getActivity().getApplication(), new APIListener() {
+                    "active", getActivity().getApplication(), new APIListener() {
                 @Override
                 public void onCampaignListFound(List<Campaign> campaignList) {
                     activeCampaignCount--;
@@ -193,7 +192,7 @@ public class RetailTab extends Fragment {
                 }
             });
             APICampaignCaller.getCampaignListByProductId(cartProduct.getProduct().getProductId(),
-                    "ready", null, getActivity().getApplication(), new APIListener() {
+                    "ready", getActivity().getApplication(), new APIListener() {
                 @Override
                 public void onCampaignListFound(List<Campaign> campaignList) {
                     readyCampaignCount--;
@@ -244,8 +243,8 @@ public class RetailTab extends Fragment {
                             sharedPreferences.edit()
                                     .putString("RETAIL_CART",
                                             ObjectSerializer.serialize((Serializable) cartList))
-                                    .commit();
-                        } catch (IOException e) {
+                                    .apply();
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         if (dialogBoxLoading.isShowing()) {
@@ -323,13 +322,13 @@ public class RetailTab extends Fragment {
         retailCart = new HashMap<>();
         for (CartProduct cartProduct : cartList) {
             supplier = cartProduct.getProduct().getSupplier();
-            cartProductList = retailCart.get(supplier.getId());
-            if(cartProductList == null) {
+            tempCartList = retailCart.get(supplier.getId());
+            if(tempCartList == null) {
                 supplierRetailList.add(supplier);
-                cartProductList = new ArrayList<>();
+                tempCartList = new ArrayList<>();
             }
-            cartProductList.add(cartProduct);
-            retailCart.put(supplier.getId(), cartProductList);
+            tempCartList.add(cartProduct);
+            retailCart.put(supplier.getId(), tempCartList);
         }
     }
 
@@ -341,9 +340,9 @@ public class RetailTab extends Fragment {
                 if (campaignList == null) {
                     campaignList = new ArrayList<>();
                 }
-                tempList = readyCampaignMap.get(cartList.get(i).getId());
-                if (tempList != null && tempList.size() > 0) {
-                    for (Campaign campaign : tempList) {
+                tempCampaignList = readyCampaignMap.get(cartList.get(i).getId());
+                if (tempCampaignList != null && tempCampaignList.size() > 0) {
+                    for (Campaign campaign : tempCampaignList) {
                         campaignList.add(campaign);
                     }
                 }

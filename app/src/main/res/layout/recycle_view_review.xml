@@ -20,7 +20,6 @@
             android:layout_height="60dp"
             android:backgroundTint="@color/gray"
             app:cardCornerRadius="180dp"
-            android:visibility="gone"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -37,7 +36,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleY="1.35"
-                    android:scaleX="1.35" />
+                    android:scaleX="1.35"
+                    android:src="@drawable/ic_profile_circle" />
 
             </androidx.cardview.widget.CardView>
 
@@ -45,7 +45,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="vertical"
             app:layout_constraintLeft_toRightOf="@id/imgCustomerAvatar"
             app:layout_constraintTop_toTopOf="parent"
@@ -54,7 +54,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:layout_marginHorizontal="5dp"
                 app:layout_constraintTop_toTopOf="parent"
@@ -62,12 +62,11 @@
                 app:layout_constraintLeft_toLeftOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutUserDescription"
+                    android:id="@+id/layoutUserName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="5dp"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/ratingProduct">
+                    app:layout_constraintBottom_toTopOf="@id/layoutDescription">
 
                     <TextView
                         android:id="@+id/txtCustomerName"
@@ -85,20 +84,45 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <me.zhanghai.android.materialratingbar.MaterialRatingBar
-                    android:id="@+id/ratingProduct"
-                    android:layout_width="wrap_content"
-                    android:layout_height="25dp"
-                    android:progressTint="@color/gold"
-                    android:secondaryProgressTint="@color/gray"
-                    android:progressBackgroundTint="@color/gray"
-                    android:numStars="5"
-                    android:stepSize="0.5"
-                    android:theme="@style/ratingBar"
-                    android:isIndicator="true"
-                    app:layout_constraintTop_toBottomOf="@id/layoutUserDescription"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintTop_toBottomOf="@id/layoutUserName"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+
+                    <me.zhanghai.android.materialratingbar.MaterialRatingBar
+                        android:id="@+id/ratingProduct"
+                        android:layout_width="wrap_content"
+                        android:layout_height="25dp"
+                        android:progressTint="@color/gold"
+                        android:secondaryProgressTint="@color/gray"
+                        android:progressBackgroundTint="@color/gray"
+                        android:numStars="5"
+                        android:stepSize="0.5"
+                        android:theme="@style/ratingBar"
+                        android:isIndicator="true"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/txtDate"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="right|center"
+                        android:fontFamily="@font/montserratr"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_darker"
+                        android:text="15:59 Jun 15, 2022"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/ratingProduct"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

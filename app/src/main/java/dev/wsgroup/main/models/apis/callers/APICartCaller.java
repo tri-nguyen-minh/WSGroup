@@ -30,7 +30,6 @@ import dev.wsgroup.main.models.utils.StringUtils;
 public class APICartCaller {
 
     private static RequestQueue requestQueue;
-    private static List<CartProduct> cartProductList;
 
     public static void getCartList(String token, Application application, APIListener APIListener) {
         if(requestQueue == null) {
@@ -41,7 +40,6 @@ public class APICartCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     CartProduct cartProduct;
-                    cartProductList = new ArrayList<>();
                     List<CartProduct> retailList = new ArrayList<>();
                     List<CartProduct> campaignList = new ArrayList<>();
                     try {
@@ -88,6 +86,7 @@ public class APICartCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -107,7 +106,7 @@ public class APICartCaller {
             } else {
                 jsonObject.put("campaignId", JSONObject.NULL);
             }
-//            jsonObject.put("supplierId", cartProduct.getProduct().getSupplier().getId());
+            jsonObject.put("supplierId", cartProduct.getProduct().getSupplier().getId());
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -117,6 +116,7 @@ public class APICartCaller {
                         APIListener.onAddCartItemSuccessful(cartProduct);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
                     }
                 }
             };
@@ -151,6 +151,7 @@ public class APICartCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -161,15 +162,12 @@ public class APICartCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
-            System.out.println(url);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("productId", cartProduct.getProduct().getProductId());
             jsonObject.put("quantity", cartProduct.getQuantity());
-            System.out.println(jsonObject);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    System.out.println(response);
                     APIListener.onUpdateSuccessful();
                 }
             };
@@ -204,6 +202,7 @@ public class APICartCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -215,11 +214,9 @@ public class APICartCaller {
         }
         try {
             JSONObject jsonObject = new JSONObject();
-            System.out.println("url" + url);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    System.out.println(response);
                     APIListener.onUpdateSuccessful();
                 }
             };
@@ -254,6 +251,7 @@ public class APICartCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

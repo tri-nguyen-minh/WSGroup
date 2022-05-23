@@ -1,10 +1,5 @@
 package dev.wsgroup.main.views.activities.message;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -35,10 +36,9 @@ import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageListAdapter;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -56,10 +56,10 @@ public class MessageListActivity extends AppCompatActivity {
     private Conversation conversation;
     private User user;
     private String token, accountId, foreignAccountId, customerServiceId;
-    private boolean customerServiceMessaged, messageListLoading;
+    private boolean messageListLoading;
     private RecViewMessageListAdapter adapter;
     private DialogBoxLoading dialogBoxLoading;
-    private FirebaseDatabaseReferences databaseReferences;
+    private FirebaseReferences databaseReferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class MessageListActivity extends AppCompatActivity {
         lblRetryGetMessage = findViewById(R.id.lblRetryGetMessage);
         recViewMessageList = findViewById(R.id.recViewMessageList);
 
-        setupFirebase();
+        setupData();
 
         imgBackFromMessageList.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,12 +84,14 @@ public class MessageListActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         imgMessageListHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         });
+
         lblRetryGetMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,51 +100,45 @@ public class MessageListActivity extends AppCompatActivity {
         });
     }
 
-    private void setupFirebase() {
+    private void setupData() {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
         accountId = sharedPreferences.getString("ACCOUNT_ID", "");
         user = new User();
         user.setAccountId(accountId);
-        customerServiceMessaged = false; messageListLoading = true;
+        messageListLoading = true;
         setLoadingState();
         if (databaseReferences == null) {
-            databaseReferences = new FirebaseDatabaseReferences();
-        }
-        databaseReferences.getUserNotifications(accountId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!messageListLoading) {
-                    setupFirebase();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) { }
-        });
-        databaseReferences.getCustomerServiceId().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.getChildrenCount() > 0) {
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        customerServiceId = ds.getKey();
-                        getMessageList();
+            databaseReferences = new FirebaseReferences();
+            databaseReferences.getUserNotifications(accountId)
+                              .addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (!messageListLoading) {
+                        setupData();
                     }
-                } else {
-                    setFailedState();
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError error) { }
+            });
+            databaseReferences.getCustomerServiceId()
+                              .get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(Task<DataSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        customerServiceId = String.valueOf(task.getResult().getValue());
+                        getMessageList();
+                    } else {
+                        setFailedState();
+                    }
+                }
+            });
+        }
     }
 
     private void getMessageList() {
-        APIChatCaller.getCustomerChatMessages(token, messageList,
-                getApplication(), new APIListener() {
+        APIChatCaller.getCustomerChatMessages(token, getApplication(), new APIListener() {
             @Override
             public void onMessageListFound(List<Message> list) {
                 messageList = list;
@@ -178,9 +174,8 @@ public class MessageListActivity extends AppCompatActivity {
         }
         List<Supplier> supplierList = new ArrayList<>();
         Supplier service = new Supplier();
-        service.setId(customerServiceId);
+        service.setAccountId(customerServiceId);
         service.setName("Customer Service");
-
         supplierList.add(service);
 
         APISupplierCaller.getSupplierListByAccountId(supplierAccountIdSet, supplierList,
@@ -213,20 +208,25 @@ public class MessageListActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow()
                         .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                APIChatCaller.updateReadMessages(token, userId, supplierId, getApplication(), new APIListener() {
+                APIChatCaller.updateReadMessages(token, userId, supplierId,
+                        getApplication(), new APIListener() {
                     @Override
                     public void onUpdateSuccessful() {
                         if (dialogBoxLoading.isShowing()) {
                             dialogBoxLoading.dismiss();
                         }
-                        Intent messageIntent = new Intent(getApplicationContext(), MessageActivity.class);
+                        Intent messageIntent = new Intent(getApplicationContext(),MessageActivity.class);
                         messageIntent.putExtra("USER_ID", userId);
                         messageIntent.putExtra("SUPPLIER_ID", supplierId);
+                        messageIntent.putExtra("RECIPIENT_CHECK", !supplierId.equals(customerServiceId));
                         startActivityForResult(messageIntent, IntegerUtils.REQUEST_COMMON);
                     }
 
                     @Override
                     public void onFailedAPICall(int code) {
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
+                        }
                         if (code == IntegerUtils.ERROR_NO_USER) {
                             MethodUtils.displayErrorAccountMessage(getApplicationContext(),
                                     MessageListActivity.this);
@@ -260,14 +260,6 @@ public class MessageListActivity extends AppCompatActivity {
         layoutNoMessage.setVisibility(View.GONE);
         layoutFailedGettingMessage.setVisibility(View.GONE);
         recViewMessageList.setVisibility(View.GONE);
-    }
-
-    private void setNoMessageState() {
-        layoutLoading.setVisibility(View.GONE);
-        layoutNoMessage.setVisibility(View.VISIBLE);
-        layoutFailedGettingMessage.setVisibility(View.GONE);
-        recViewMessageList.setVisibility(View.GONE);
-
     }
 
     private void setFailedState() {

@@ -1,10 +1,5 @@
 package dev.wsgroup.main.views.activities.productviews;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,12 +7,18 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.activities.order.PrepareOrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
 public class SearchProductActivity extends AppCompatActivity {
@@ -173,7 +175,6 @@ public class SearchProductActivity extends AppCompatActivity {
         layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("click no parent");
                 if (editSearchProduct.hasFocus()) {
                     editSearchProduct.clearFocus();
                 }
@@ -183,7 +184,6 @@ public class SearchProductActivity extends AppCompatActivity {
         layoutNoProductFound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("click no product");
                 if (editSearchProduct.hasFocus()) {
                     editSearchProduct.clearFocus();
                 }
@@ -204,12 +204,31 @@ public class SearchProductActivity extends AppCompatActivity {
                 }
             }
         });
+
+        editSearchProduct.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    searchString = editSearchProduct.getText().toString();
+                    if (searchString.isEmpty()) {
+                        setNoProductState();
+                    } else {
+                        runSearch();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
         lblRetryGetProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 runSearchCategory();
             }
         });
+
         imgSearchInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -226,19 +245,99 @@ public class SearchProductActivity extends AppCompatActivity {
         });
     }
 
+    private void runSearch() {
+        orderCountCheck = false; ratingCheck = false; campaignCheck = false;
+        setLoadingState();
+        APIProductCaller.searchProductByNameOrSupplier(searchString, getApplication(),
+                new APIListener() {
+                    @Override
+                    public void onProductListFound(List<Product> list) {
+                        if (list.size() == 0) {
+                            orderCountCheck = true; ratingCheck = true;
+                            checkAllDisplayedList();
+                        } else {
+                            productList = list;
+                            APIProductCaller.getOrderCountByProductList(productList,
+                                    getApplication(), listener);
+                            APIProductCaller.getRatingByProductIdList(productList,
+                                    getApplication(), listener);
+                            setupListView(productList);
+                        }
+                    }
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        setNoProductState();
+                    }
+                });
+        APICampaignCaller.searchCampaign(searchString, getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (campaignList.size() > 0) {
+                    sharingCampaignList = new ArrayList<>();
+                    singleCampaignList = new ArrayList<>();
+                    for (Campaign campaign : campaignList) {
+                        if (campaign.getShareFlag()) {
+                            sharingCampaignList.add(campaign);
+                        } else {
+                            singleCampaignList.add(campaign);
+                        }
+                    }
+                    if (sharingCampaignList.size() > 0) {
+                        MethodUtils.sortSharingCampaign(sharingCampaignList);
+                        campaignAdapter = new RecViewCampaignSearchAdapter(getApplicationContext(),
+                                SearchProductActivity.this) {
+                            @Override
+                            public void onCampaignSelected(Campaign campaign) {
+                                checkLoginStatus(campaign);
+                            }
+                        };
+                        campaignAdapter.setCampaignList(sharingCampaignList);
+                        recViewSharingCampaign.setAdapter(campaignAdapter);
+                        layoutSharingCampaign.setVisibility(View.VISIBLE);
+                    }
+                    if (singleCampaignList.size() > 0) {
+                        MethodUtils.sortSingleCampaign(singleCampaignList);
+                        campaignAdapter = new RecViewCampaignSearchAdapter(getApplicationContext(),
+                                SearchProductActivity.this) {
+                            @Override
+                            public void onCampaignSelected(Campaign campaign) {
+                                checkLoginStatus(campaign);
+                            }
+                        };
+                        campaignAdapter.setCampaignList(singleCampaignList);
+                        recViewSingleCampaign.setAdapter(campaignAdapter);
+                        layoutSingleCampaign.setVisibility(View.VISIBLE);
+                    }
+                }
+                recViewSharingCampaign.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                        LinearLayoutManager.HORIZONTAL,false));
+                recViewSingleCampaign.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                        LinearLayoutManager.HORIZONTAL,false));
+                campaignCheck = true;
+                checkAllDisplayedList();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                campaignCheck = true;
+                checkAllDisplayedList();
+            }
+        });
+    }
+
 
     private void runSearchCategory() {
         orderCountCheck = false; ratingCheck = false;
         setLoadingState();
         APICategoryCaller.getCategoryById(searchString, getApplication(), new APIListener() {
             @Override
-            public void onCategoryFound(Category foundCategory) {
-                if (foundCategory != null) {
-                    category = foundCategory;
+            public void onCategoryListFound(List<Category> categoryList) {
+                if (categoryList.size() > 0) {
+                    category = categoryList.get(0);
                     List<Category> list = new ArrayList<>();
                     list.add(category);
-                    APIProductCaller.getProductByCategoryList(list, null,
-                            getApplication(), new APIListener() {
+                    APIProductCaller.getProductByCategoryList(list, getApplication(),
+                            new APIListener() {
                         @Override
                         public void onProductListFound(List<Product> list) {
                             if (list.size() == 0) {
@@ -270,87 +369,6 @@ public class SearchProductActivity extends AppCompatActivity {
         });
     }
 
-    private void runSearch() {
-        orderCountCheck = false; ratingCheck = false; campaignCheck = false;
-        setLoadingState();
-        APIProductCaller.searchProductByNameOrSupplier(searchString, null,
-                getApplication(), new APIListener() {
-            @Override
-            public void onProductListFound(List<Product> list) {
-                if (list.size() == 0) {
-                    orderCountCheck = true; ratingCheck = true;
-                    checkAllDisplayedList();
-                } else {
-                    productList = list;
-                    APIProductCaller.getOrderCountByProductList(productList,
-                            getApplication(), listener);
-                    APIProductCaller.getRatingByProductIdList(productList,
-                            getApplication(), listener);
-                    setupListView(productList);
-                }
-            }
-            @Override
-            public void onFailedAPICall(int code) {
-                setNoProductState();
-            }
-        });
-        APICampaignCaller.searchCampaign(null, searchString,
-                getApplication(), new APIListener() {
-            @Override
-            public void onCampaignListFound(List<Campaign> campaignList) {
-                if (campaignList.size() > 0) {
-                    sharingCampaignList = new ArrayList<>();
-                    singleCampaignList = new ArrayList<>();
-                    for (Campaign campaign : campaignList) {
-                        if (campaign.getShareFlag()) {
-                            sharingCampaignList.add(campaign);
-                        } else {
-                            singleCampaignList.add(campaign);
-                        }
-                    }
-                    if (sharingCampaignList.size() > 0) {
-                        MethodUtils.sortSharingCampaign(sharingCampaignList);
-                        campaignAdapter = new RecViewCampaignSearchAdapter(getApplicationContext(),
-                                SearchProductActivity.this) {
-                            @Override
-                            public void executeOnCampaignSelected(Campaign campaign) {
-                                checkLoginStatus(campaign);
-                            }
-                        };
-                        campaignAdapter.setCampaignList(sharingCampaignList);
-                        recViewSharingCampaign.setAdapter(campaignAdapter);
-                        layoutSharingCampaign.setVisibility(View.VISIBLE);
-                    }
-                    if (singleCampaignList.size() > 0) {
-                        MethodUtils.sortSingleCampaign(singleCampaignList);
-                        campaignAdapter = new RecViewCampaignSearchAdapter(getApplicationContext(),
-                                SearchProductActivity.this) {
-                            @Override
-                            public void executeOnCampaignSelected(Campaign campaign) {
-                                checkLoginStatus(campaign);
-                            }
-                        };
-                        campaignAdapter.setCampaignList(singleCampaignList);
-                        recViewSingleCampaign.setAdapter(campaignAdapter);
-                        layoutSingleCampaign.setVisibility(View.VISIBLE);
-                    }
-                }
-                recViewSharingCampaign.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                        LinearLayoutManager.HORIZONTAL,false));
-                recViewSingleCampaign.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                        LinearLayoutManager.HORIZONTAL,false));
-                campaignCheck = true;
-                checkAllDisplayedList();
-            }
-
-            @Override
-            public void onFailedAPICall(int code) {
-                campaignCheck = true;
-                checkAllDisplayedList();
-            }
-        });
-    }
-
     private void checkLoginStatus(Campaign campaign) {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("USER_ID", "");
@@ -370,80 +388,92 @@ public class SearchProductActivity extends AppCompatActivity {
         String productId = campaign.getProduct().getProductId();
         APIProductCaller.getProductById(productId, getApplication(), new APIListener() {
             @Override
-            public void onProductFound(Product product) {
-                product.setCampaign(campaign);
-                APICampaignCaller.getCampaignListByProductId(productId, "active",
-                        null, getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(campaignList);
-                        } else if (campaignList.size() > 0) {
-                            tempList = product.getCampaignList();
-                            for (Campaign campaign : campaignList) {
-                                tempList.add(campaign);
-                            }
-                            product.setCampaignList(tempList);
-                        }
-                        activeCampaignStatus = true;
-                        finishSetup(product);
+            public void onProductListFound(List<Product> productList) {
+                if (productList.size() > 0) {
+                    Product product = productList.get(0);
+                    product.setCampaign(campaign);;
+                    getExtraCampaignData(product);
+                } else {
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
                     }
+                    MethodUtils.displayErrorAPIMessage(SearchProductActivity.this);
+                }
+            }
 
-                    @Override
-                    public void onNoJSONFound() {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(new ArrayList<>());
-                        }
-                        activeCampaignStatus = true;
-                        finishSetup(product);
-                    }
+            @Override
+            public void onFailedAPICall(int code) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                MethodUtils.displayErrorAPIMessage(SearchProductActivity.this);
+            }
+        });
+    }
 
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
-                        MethodUtils.displayErrorAPIMessage(SearchProductActivity.this);
+    private void getExtraCampaignData(Product product) {
+        APICampaignCaller.getCampaignListByProductId(product.getProductId(),"active",
+                getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(campaignList);
+                } else if (campaignList.size() > 0) {
+                    tempList = product.getCampaignList();
+                    for (Campaign campaign : campaignList) {
+                        tempList.add(campaign);
                     }
-                });
-                APICampaignCaller.getCampaignListByProductId(productId, "ready",
-                        null, getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(campaignList);
-                        } else if (campaignList.size() > 0) {
-                            tempList = product.getCampaignList();
-                            for (Campaign campaign : campaignList) {
-                                tempList.add(campaign);
-                            }
-                            product.setCampaignList(tempList);
-                        }
-                        readyCampaignStatus = true;
-                        finishSetup(product);
-                    }
+                    product.setCampaignList(tempList);
+                }
+                activeCampaignStatus = true;
+                finishSetup(product);
+            }
 
-                    @Override
-                    public void onNoJSONFound() {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(new ArrayList<>());
-                        }
-                        readyCampaignStatus = true;
-                        finishSetup(product);
-                    }
+            @Override
+            public void onNoJSONFound() {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(new ArrayList<>());
+                }
+                activeCampaignStatus = true;
+                finishSetup(product);
+            }
 
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
-                        MethodUtils.displayErrorAPIMessage(SearchProductActivity.this);
+            @Override
+            public void onFailedAPICall(int code) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                MethodUtils.displayErrorAPIMessage(SearchProductActivity.this);
+            }
+        });
+        APICampaignCaller.getCampaignListByProductId(product.getProductId(),"ready",
+                getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(campaignList);
+                } else if (campaignList.size() > 0) {
+                    tempList = product.getCampaignList();
+                    for (Campaign campaign : campaignList) {
+                        tempList.add(campaign);
                     }
-                });
+                    product.setCampaignList(tempList);
+                }
+                readyCampaignStatus = true;
+                finishSetup(product);
+            }
+
+            @Override
+            public void onNoJSONFound() {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(new ArrayList<>());
+                }
+                readyCampaignStatus = true;
+                finishSetup(product);
             }
 
             @Override
@@ -459,7 +489,7 @@ public class SearchProductActivity extends AppCompatActivity {
     private void finishSetup(Product product) {
         if (activeCampaignStatus && readyCampaignStatus) {
             Intent campaignSelectIntent
-                    = new Intent(getApplicationContext(), PrepareProductActivity.class);
+                    = new Intent(getApplicationContext(), PrepareOrderActivity.class);
             campaignSelectIntent.putExtra("PRODUCT", product);
             if (dialogBoxLoading.isShowing()) {
                 dialogBoxLoading.dismiss();
@@ -469,10 +499,7 @@ public class SearchProductActivity extends AppCompatActivity {
     }
 
     private void setupListView(List<Product> productList) {
-        System.out.println(orderCountCheck);
-        System.out.println(ratingCheck);
         if (orderCountCheck && ratingCheck) {
-            System.out.println(productList.size());
             if (identifier == IntegerUtils.IDENTIFIER_SEARCH_CATEGORY) {
                 txtCategory.setText(category.getName());
                 txtProductCategoryCount.setText(productList.size() + "");
@@ -495,13 +522,10 @@ public class SearchProductActivity extends AppCompatActivity {
     }
 
     private void checkAllDisplayedList() {
-        System.out.println(orderCountCheck);
-        System.out.println(ratingCheck);
-        System.out.println(campaignCheck);
         if (identifier == IntegerUtils.IDENTIFIER_SEARCH_CATEGORY) {
             if (orderCountCheck && ratingCheck) {
                 if (layoutListProduct.getVisibility() == View.VISIBLE) {
-                    setProductFoundState();
+                    setLoadedState();
                 } else {
                     setNoProductState();
                 }
@@ -511,7 +535,7 @@ public class SearchProductActivity extends AppCompatActivity {
                 if (layoutListProduct.getVisibility() == View.VISIBLE
                         || layoutSharingCampaign.getVisibility() == View.VISIBLE
                         || layoutSingleCampaign.getVisibility() == View.VISIBLE) {
-                    setProductFoundState();
+                    setLoadedState();
                 } else {
                     setNoProductState();
                 }
@@ -536,7 +560,7 @@ public class SearchProductActivity extends AppCompatActivity {
         layoutFailedGettingProduct.setVisibility(View.INVISIBLE);
     }
 
-    private void setProductFoundState() {
+    private void setLoadedState() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutNoProductFound.setVisibility(View.INVISIBLE);
         layoutList.setVisibility(View.VISIBLE);

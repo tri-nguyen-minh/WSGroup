@@ -13,12 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +42,7 @@ import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
+import dev.wsgroup.main.views.activities.order.PrepareOrderActivity;
 import dev.wsgroup.main.views.fragments.tabs.product.DetailTab;
 import dev.wsgroup.main.views.fragments.tabs.product.ReviewTab;
 
@@ -51,11 +50,11 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private TabLayout.Tab tabCommon;
     private ImageView imgBackFromProductDetail, imgProductDetailHome;
     private TextView  txtProductDetailCartCount, lblRetry;
     private CardView cardViewProductDetailCartCount;
-    private ConstraintLayout constraintLayoutShoppingCart, layoutLoading, layoutMainLayout;
+    private ConstraintLayout constraintLayoutShoppingCart,
+            layoutLoading, layoutMainLayout;
     private LinearLayout layoutFailed;
 
     private SharedPreferences sharedPreferences;
@@ -65,9 +64,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Supplier supplier;
     private List<CartProduct> retailCartList, campaignCartList;
     private List<Campaign> currentCampaignList;
-    private boolean activeCampaignStatus, readyCampaignStatus,
-                    reviewListStatus, orderCountStatus,
-                    reviewCountStatus, loyaltyCheckStatus;
+    private boolean activeCampaignCheck, readyCampaignCheck,
+            reviewListCheck, orderCountCheck, loyaltyStatusCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,222 +124,181 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void loadData() {
+        setLoadingState();
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("USER_ID", "");
         token = sharedPreferences.getString("TOKEN", "");
         productId = getIntent().getStringExtra("PRODUCT_ID");
-        loadProduct();
+        activeCampaignCheck = false; readyCampaignCheck = false;
+        reviewListCheck = true; orderCountCheck = false; loyaltyStatusCheck = false;
+        APIProductCaller.getProductById(productId, getApplication(), new APIListener() {
+            @Override
+            public void onProductListFound(List<Product> productList) {
+                if (productList.size() > 0) {
+                    product = productList.get(0);
+                    product.setCampaign(null);
+                    findProductData();
+                } else {
+                    setFailedState();
+                }
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                setFailedState();
+            }
+        });
         if (!userId.isEmpty()) {
             setUpShoppingCart();
         }
     }
 
-    private void loadProduct() {
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutMainLayout.setVisibility(View.INVISIBLE);
-        layoutFailed.setVisibility(View.INVISIBLE);
-        activeCampaignStatus = false; readyCampaignStatus = false;
-        reviewListStatus = false; orderCountStatus = false;
-        reviewCountStatus = false; loyaltyCheckStatus = false;
-        APIProductCaller.getProductById(productId, getApplication(), new APIListener() {
+    private void findProductData() {
+        APICampaignCaller.getCampaignListByProductId(productId, "active",
+                getApplication(), new APIListener() {
             @Override
-            public void onProductFound(Product foundProduct) {
-                product = foundProduct;
-                product.setCampaign(null);
-
-                product.setReviewCount(30);
-                product.setRating(3.5);
-                reviewCountStatus = true;
-
-                APICampaignCaller.getCampaignListByProductId(productId, "active", null,
-                        getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        System.out.println("good campaign active");
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(campaignList);
-                        } else if (campaignList.size() > 0){
-                            currentCampaignList = product.getCampaignList();
-                            for (Campaign campaign : campaignList) {
-                                currentCampaignList.add(campaign);
-                            }
-                            product.setCampaignList(currentCampaignList);
-                        }
-                        activeCampaignStatus = true;
-                        finishSetup(product);
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (product.getCampaignList() == null || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(campaignList);
+                } else if (campaignList.size() > 0){
+                    currentCampaignList = product.getCampaignList();
+                    for (Campaign campaign : campaignList) {
+                        currentCampaignList.add(campaign);
                     }
-                    @Override
-                    public void onNoJSONFound() {
-                        System.out.println("empty campaign active");
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(new ArrayList<>());
-                        }
-                        activeCampaignStatus = true;
-                        finishSetup(product);
-                    }
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        System.out.println("failed active campaign");
-                        setupFailedState();
-                    }
-                });
-                APICampaignCaller.getCampaignListByProductId(productId, "ready", null,
-                        getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        System.out.println("good campaign ready");
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(campaignList);
-                        } else if (campaignList.size() > 0){
-                            currentCampaignList = product.getCampaignList();
-                            for (Campaign campaign : campaignList) {
-                                currentCampaignList.add(campaign);
-                            }
-                            product.setCampaignList(currentCampaignList);
-                        }
-                        readyCampaignStatus = true;
-                        finishSetup(product);
-                    }
-                    @Override
-                    public void onNoJSONFound() {
-                        System.out.println("empty campaign ready");
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(new ArrayList<>());
-                        }
-                        readyCampaignStatus = true;
-                        finishSetup(product);
-                    }
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        System.out.println("failed ready campaign");
-                        setupFailedState();
-                    }
-                });
-                APIReviewCaller.getReviewListByProductId(productId, null,
-                        getApplication(), new APIListener() {
-                    @Override
-                    public void onReviewListFound(List<Review> reviewList) {
-                        System.out.println("good review list");
-                        product.setReviewList(reviewList);
-                        reviewListStatus = true;
-                        finishSetup(product);
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        System.out.println("failed review list");
-                        setupFailedState();
-                    }
-                });
-                APIReviewCaller.getReviewCountByProductId(productId,
-                        getApplication(), new APIListener() {
-                    @Override
-                    public void onReviewCountFound(int count, double rating) {
-                        System.out.println("good review count");
-                        product.setReviewCount(count);
-                        product.setRating(rating);
-                        reviewCountStatus = true;
-                        finishSetup(product);
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        System.out.println("failed review count");
-                        setupFailedState();
-                    }
-                });
-                if (!token.isEmpty()) {
-                    APISupplierCaller.getCustomerLoyaltyStatus(token, product.getSupplier().getId(),
-                            getApplication(), new APIListener() {
-                        @Override
-                        public void onLoyaltyStatusListFound(List<LoyaltyStatus> list) {
-                            System.out.println("good loyal");
-                            supplier = product.getSupplier();
-                            if (!list.isEmpty()) {
-                                supplier.setLoyaltyStatus(list.get(0));
-                            }
-                            product.setSupplier(supplier);
-                            loyaltyCheckStatus = true;
-                            finishSetup(product);
-                        }
-
-                        @Override
-                        public void onFailedAPICall(int code) {
-                            System.out.println("failed loyal");
-                            setupFailedState();
-                        }
-                    });
-                } else {
-                    loyaltyCheckStatus = true;
-                    finishSetup(product);
+                    product.setCampaignList(currentCampaignList);
                 }
-                List<String> list = new ArrayList<>();
-                list.add(productId);
-                APIProductCaller.getOrderCountByProductIdList(list,
-                        getApplication(), new APIListener() {
-                    @Override
-                    public void onProductOrderCountFound(Map<String, Integer> countList) {
-                        if (countList.size() > 0) {
-                            product.setOrderCount(countList.get(productId));
-                        }
-                        orderCountStatus = true;
-                        finishSetup(product);
+                activeCampaignCheck = true;
+                finishSetup(product);
+            }
+            @Override
+            public void onNoJSONFound() {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(new ArrayList<>());
+                }
+                activeCampaignCheck = true;
+                finishSetup(product);
+            }
+            @Override
+            public void onFailedAPICall(int code) {
+                setFailedState();
+            }
+        });
+        APICampaignCaller.getCampaignListByProductId(productId, "ready",
+                getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (product.getCampaignList() == null || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(campaignList);
+                } else if (campaignList.size() > 0){
+                    currentCampaignList = product.getCampaignList();
+                    for (Campaign campaign : campaignList) {
+                        currentCampaignList.add(campaign);
                     }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        System.out.println("failed order count");
-                        setupFailedState();
-                    }
-                });
+                    product.setCampaignList(currentCampaignList);
+                }
+                readyCampaignCheck = true;
+                finishSetup(product);
+            }
+            @Override
+            public void onNoJSONFound() {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(new ArrayList<>());
+                }
+                readyCampaignCheck = true;
+                finishSetup(product);
+            }
+            @Override
+            public void onFailedAPICall(int code) {
+                setFailedState();
+            }
+        });
+        APIReviewCaller.getReviewListByProductId(productId, getApplication(), new APIListener() {
+            @Override
+            public void onReviewListFound(List<Review> reviewList) {
+                product.setReviewList(reviewList);
+                product.setReviewCount(reviewList.size());
+                double rating = 0;
+                for (Review review : reviewList) {
+                    rating += review.getRating();
+                }
+                product.setRating(rating);
+                reviewListCheck = true;
+                finishSetup(product);
             }
 
             @Override
             public void onFailedAPICall(int code) {
-                System.out.println("failed product");
-                setupFailedState();
+                setFailedState();
+            }
+        });
+        if (!token.isEmpty()) {
+            APISupplierCaller.getCustomerLoyaltyStatus(token, product.getSupplier().getId(),
+                    getApplication(), new APIListener() {
+                @Override
+                public void onLoyaltyStatusListFound(List<LoyaltyStatus> list) {
+                    supplier = product.getSupplier();
+                    if (!list.isEmpty()) {
+                        supplier.setLoyaltyStatus(list.get(0));
+                    }
+                    product.setSupplier(supplier);
+                    loyaltyStatusCheck = true;
+                    finishSetup(product);
+                }
+
+                @Override
+                public void onFailedAPICall(int code) {
+                    setFailedState();
+                }
+            });
+        } else {
+            loyaltyStatusCheck = true;
+            finishSetup(product);
+        }
+        List<String> list = new ArrayList<>();
+        list.add(productId);
+        APIProductCaller.getOrderCountByProductIdList(list, getApplication(), new APIListener() {
+            @Override
+            public void onProductOrderCountFound(Map<String, Integer> countList) {
+                if (countList.size() > 0) {
+                    product.setOrderCount(countList.get(productId));
+                }
+                orderCountCheck = true;
+                finishSetup(product);
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                setFailedState();
             }
         });
     }
 
     private void finishSetup(Product product) {
-        if (activeCampaignStatus && readyCampaignStatus
-                && reviewListStatus && orderCountStatus
-                && reviewCountStatus && loyaltyCheckStatus) {
+        if (activeCampaignCheck && readyCampaignCheck && reviewListCheck
+                && orderCountCheck && loyaltyStatusCheck) {
             getIntent().putExtra("PRODUCT", product);
             setupTabLayout();
         }
     }
 
-    private void setupFailedState() {
-        layoutLoading.setVisibility(View.INVISIBLE);
-        layoutMainLayout.setVisibility(View.INVISIBLE);
-        layoutFailed.setVisibility(View.VISIBLE);
-    }
-
-    private void startDialogBoxProductDetail() {
+    private void prepareOrder() {
         if (userId.isEmpty()) {
             Intent SignInIntent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivityForResult(SignInIntent, IntegerUtils.REQUEST_LOGIN);
         } else {
             Intent campaignSelectIntent
-                    = new Intent(getApplicationContext(), PrepareProductActivity.class);
+                    = new Intent(getApplicationContext(), PrepareOrderActivity.class);
             campaignSelectIntent.putExtra("PRODUCT", product);
             startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_MAKE_PURCHASE);
         }
     }
 
     private void setupTabLayout() {
-        layoutLoading.setVisibility(View.INVISIBLE);
-        layoutMainLayout.setVisibility(View.VISIBLE);
-        layoutFailed.setVisibility(View.INVISIBLE);
         tabLayout.removeAllTabs();
 
-        tabCommon = tabLayout.newTab();
+        TabLayout.Tab tabCommon = tabLayout.newTab();
         tabCommon.setText("About");
         tabLayout.addTab(tabCommon);
 
@@ -353,8 +310,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         tabLayout.setTabTextColors(getResources().getColor(R.color.black),
                                     getResources().getColor(R.color.black));
 
-        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
-                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
@@ -389,11 +345,11 @@ public class ProductDetailActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+        setLoadedState();
     }
 
     private void getShoppingCart() {
         try {
-            System.out.println("getShoppingCart");
             retailCartList = (List<CartProduct>) ObjectSerializer
                     .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
             campaignCartList = (List<CartProduct>) ObjectSerializer
@@ -444,16 +400,33 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void putSessionCart(List<CartProduct> retailList,
                                 List<CartProduct> campaignList) {
         try {
-            System.out.println(retailList.size() + " - " + campaignList.size());
             sharedPreferences.edit()
                     .putString("RETAIL_CART",
                             ObjectSerializer.serialize((Serializable) retailList))
                     .putString("CAMPAIGN_CART",
                             ObjectSerializer.serialize((Serializable) campaignList))
-                    .commit();
-        } catch (IOException e) {
+                    .apply();
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutMainLayout.setVisibility(View.INVISIBLE);
+        layoutFailed.setVisibility(View.INVISIBLE);
+    }
+
+    private void setLoadedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutMainLayout.setVisibility(View.VISIBLE);
+        layoutFailed.setVisibility(View.INVISIBLE);
+    }
+
+    private void setFailedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutMainLayout.setVisibility(View.INVISIBLE);
+        layoutFailed.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -464,23 +437,18 @@ public class ProductDetailActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        userId = sharedPreferences.getString("USER_ID", "");
-        loadProduct();
-        if (!userId.isEmpty()) {
-            setUpShoppingCart();
-        }
+        loadData();
         if (resultCode == RESULT_OK) {
             if (requestCode == IntegerUtils.REQUEST_LOGIN_FOR_CART) {
                 constraintLayoutShoppingCart.performClick();
             } else if (requestCode == IntegerUtils.REQUEST_LOGIN) {
-                startDialogBoxProductDetail();
+                prepareOrder();
             } else if (data != null) {
                 if (data.getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON)
                         == IntegerUtils.REQUEST_SELECT_CAMPAIGN) {
                     Campaign campaign = (Campaign) data.getSerializableExtra("CAMPAIGN_SELECTED");
                     product.setCampaign(campaign);
-                    startDialogBoxProductDetail();
+                    prepareOrder();
                 }
             }
         }

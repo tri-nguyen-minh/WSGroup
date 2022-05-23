@@ -52,7 +52,7 @@ public class CampaignTab extends Fragment {
     private RecViewCartSupplierListAdapter adapter;
     private List<Supplier> supplierCampaignList;
     private HashMap<String, List<CartProduct>> campaignCart;
-    private List<CartProduct> cartList, cartProductList;
+    private List<CartProduct> cartList, tempCartList;
     private List<Campaign> campaignList;
     private DialogBoxLoading dialogBoxLoading;
     private int campaignCount;
@@ -111,21 +111,13 @@ public class CampaignTab extends Fragment {
             APICampaignCaller.getCampaignById(cartProduct.getCampaign().getId(),
                     getActivity().getApplication(), new APIListener() {
                         @Override
-                        public void onCampaignFound(Campaign campaign) {
-                            campaignList.add(campaign);
-                            campaignCount--;
-                            if (campaignCount == 0) {
-                                addCampaignToCart();
-                                setupAdapter();
+                        public void onCampaignListFound(List<Campaign> list) {
+                            if (list.size() > 0) {
+                                campaignList.add(list.get(0));
                             }
-                        }
-
-                        @Override
-                        public void onNoJSONFound() {
                             campaignCount--;
                             if (campaignCount == 0) {
-                                addCampaignToCart();
-                                setupAdapter();
+                                editCampaignCart();
                             }
                         }
 
@@ -133,17 +125,28 @@ public class CampaignTab extends Fragment {
                         public void onFailedAPICall(int code) {
                             campaignCount--;
                             if (campaignCount == 0) {
-                                addCampaignToCart();
-                                setupAdapter();
+                                editCampaignCart();
                             }
                         }
                     });
         }
     }
 
-    private void setupAdapter() {
-        layoutLoading.setVisibility(View.INVISIBLE);
+    private void editCampaignCart() {
+        if (campaignList.size() > 0) {
+            for (int i = 0; i < cartList.size(); i++) {
+                cartProduct = cartList.get(i);
+                int index = findCampaignIndexById(cartProduct.getCampaign().getId());
+                if (index >= 0) {
+                    cartProduct.setCampaign(campaignList.get(index));
+                }
+                cartList.set(i, cartProduct);
+            }
+        }
         adaptList();
+    }
+
+    private void setupAdapter() {
         adapter = new RecViewCartSupplierListAdapter(getContext(), getActivity(),
                 IntegerUtils.IDENTIFIER_CAMPAIGN_CART) {
             @Override
@@ -152,8 +155,8 @@ public class CampaignTab extends Fragment {
                 dialogBoxLoading.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 String token = sharedPreferences.getString("TOKEN", "" );
-                APICartCaller.deleteCartItem(token, cartProductId,
-                        getActivity().getApplication(), new APIListener() {
+                APICartCaller.deleteCartItem(token, cartProductId, getActivity().getApplication(),
+                        new APIListener() {
                     @Override
                     public void onUpdateSuccessful() {
                         if (dialogBoxLoading.isShowing()) {
@@ -169,8 +172,8 @@ public class CampaignTab extends Fragment {
                             sharedPreferences.edit()
                                     .putString("CAMPAIGN_CART",
                                             ObjectSerializer.serialize((Serializable) cartList))
-                                    .commit();
-                        } catch (IOException e) {
+                                    .apply();
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -232,6 +235,7 @@ public class CampaignTab extends Fragment {
         recViewCartSupplier.setAdapter(adapter);
         recViewCartSupplier.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL,false));
+        layoutLoading.setVisibility(View.INVISIBLE);
     }
 
     private void adaptList() {
@@ -239,27 +243,15 @@ public class CampaignTab extends Fragment {
         campaignCart = new HashMap<>();
         for (CartProduct cartProduct : cartList) {
             supplier = cartProduct.getProduct().getSupplier();
-            cartProductList = campaignCart.get(supplier.getId());
-            if(cartProductList == null) {
+            tempCartList = campaignCart.get(supplier.getId());
+            if(tempCartList == null) {
                 supplierCampaignList.add(supplier);
-                cartProductList = new ArrayList<>();
+                tempCartList = new ArrayList<>();
             }
-            cartProductList.add(cartProduct);
-            campaignCart.put(supplier.getId(), cartProductList);
+            tempCartList.add(cartProduct);
+            campaignCart.put(supplier.getId(), tempCartList);
         }
-    }
-
-    private void addCampaignToCart() {
-        if (campaignList.size() > 0) {
-            for (int i = 0; i < cartList.size(); i++) {
-                cartProduct = cartList.get(i);
-                int index = findCampaignIndexById(cartProduct.getCampaign().getId());
-                if (index >= 0) {
-                    cartProduct.setCampaign(campaignList.get(index));
-                }
-                cartList.set(i, cartProduct);
-            }
-        }
+        setupAdapter();
     }
 
     private int findCartProductIndexById(String id) {

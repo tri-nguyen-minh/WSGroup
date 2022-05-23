@@ -35,8 +35,8 @@ public class APIChatCaller {
     private static List<Message> messageList;
     private static int count;
 
-    public static void getCustomerChatMessages(String token, List<Message> list,
-                                                Application application, APIListener APIListener) {
+    public static void getCustomerChatMessages(String token, Application application,
+                                               APIListener APIListener) {
         url = StringUtils.CHAT_API_URL + "chatMessage/customerId";
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -46,7 +46,7 @@ public class APIChatCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        messageList = (list == null) ? new ArrayList<>() : list;
+                        messageList = new ArrayList<>();
                         JSONArray data = response.getJSONArray("data");
                         Message message;
                         if (data.length() > 0) {
@@ -108,6 +108,7 @@ public class APIChatCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -212,6 +213,7 @@ public class APIChatCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -222,14 +224,10 @@ public class APIChatCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
-            count = 2;
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    count--;
-                    if (count == 0) {
                         APIListener.onUpdateSuccessful();
-                    }
                 }
             };
             Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -263,28 +261,9 @@ public class APIChatCaller {
             request.setRetryPolicy(new DefaultRetryPolicy(7000,
                     1, 2));
             requestQueue.add(request);
-            jsonObject = new JSONObject();
-            jsonObject.put("from", supplierId);
-            jsonObject.put("to", userId);
-            request = new JsonObjectRequest(Request.Method.POST, url,
-                    jsonObject, listener, errorListener) {
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> header = new HashMap<>();
-                    header.put("cookie", token);
-                    return header;
-                }
-                @Override
-                public String getBodyContentType() {
-                    return StringUtils.APPLICATION_JSON;
-                }
-            };
-            request.setRetryPolicy(new DefaultRetryPolicy(7000,
-                    1, 2));
-            requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

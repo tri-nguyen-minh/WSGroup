@@ -8,19 +8,7 @@ public class Category implements Serializable {
     private String categoryId, supplierId, name;
     private boolean isDeleted;
 
-    public Category() {
-    }
-
-    public Category(String categoryId, String name) {
-        this.categoryId = categoryId;
-        this.name = name;
-    }
-
-    public Category(String categoryId, String supplierId, String name) {
-        this.categoryId = categoryId;
-        this.supplierId = supplierId;
-        this.name = name;
-    }
+    public Category() { }
 
     public String getCategoryId() {
         return categoryId;

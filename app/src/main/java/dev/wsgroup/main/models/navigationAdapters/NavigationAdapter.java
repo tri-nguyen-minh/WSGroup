@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 
 public class NavigationAdapter extends FragmentStatePagerAdapter {
 
-    public NavigationAdapter(FragmentManager fragmentManager, int behavior) {
+    public NavigationAdapter(FragmentManager fragmentManager) {
         super(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
     }
 

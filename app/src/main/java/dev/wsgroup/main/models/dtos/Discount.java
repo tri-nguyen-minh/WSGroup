@@ -6,14 +6,13 @@ import java.io.Serializable;
 
 public class Discount implements Serializable {
 
-    private String id, code, description, starDate, endDate, productId;
+    private String id, code, description, endDate, productId;
     private Supplier supplier;
     private boolean status;
     private double discountPrice, minPrice;
     private int quantity;
 
-    public Discount() {
-    }
+    public Discount() { }
 
     public String getId() {
         return id;
@@ -45,14 +44,6 @@ public class Discount implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getStarDate() {
-        return starDate;
-    }
-
-    public void setStarDate(String starDate) {
-        this.starDate = starDate;
     }
 
     public String getEndDate() {
@@ -119,7 +110,6 @@ public class Discount implements Serializable {
         discount.setSupplier(supplier);
         discount.setCode(data.getString("code"));
         discount.setDescription(data.getString("description"));
-        discount.setStarDate(data.getString("startdate"));
         discount.setEndDate(data.getString("enddate"));
         discount.setProductId(data.getString("productId"));
         discount.setStatusByString(data.getString("status"));

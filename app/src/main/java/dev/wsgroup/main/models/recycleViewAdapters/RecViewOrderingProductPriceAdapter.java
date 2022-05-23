@@ -25,6 +25,7 @@ public class RecViewOrderingProductPriceAdapter
     private List<OrderProduct> orderProductList;
     private OrderProduct orderProduct;
     private Product product;
+    private double price;
 
     public RecViewOrderingProductPriceAdapter(Context context) {
         this.context = context;
@@ -38,8 +39,7 @@ public class RecViewOrderingProductPriceAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_ordering_product_price, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class RecViewOrderingProductPriceAdapter
                  .into(holder.imgRecViewProduct);
         }
         holder.txtProductName.setText(product.getName());
-        double price = orderProduct.getQuantity();
+        price = orderProduct.getQuantity();
         price *= orderProduct.getPrice();
         holder.txtProductPrice.setText(MethodUtils.formatPriceString(price));
         holder.txtQuantityCount.setText(orderProduct.getQuantity() + "");
@@ -63,9 +63,9 @@ public class RecViewOrderingProductPriceAdapter
         return orderProductList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imgRecViewProduct;
-        private TextView txtProductName, txtProductPrice, txtQuantityCount;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView imgRecViewProduct;
+        private final TextView txtProductName, txtProductPrice, txtQuantityCount;
 
         public ViewHolder(View view) {
             super(view);

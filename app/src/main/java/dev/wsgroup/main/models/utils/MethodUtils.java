@@ -10,30 +10,29 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.annotation.NonNull;
-
 import com.android.volley.VolleyError;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLOutput;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.CampaignMilestone;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 
@@ -41,6 +40,22 @@ public class MethodUtils {
 
     private static SharedPreferences sharedPreferences;
     private static GoogleSignInOptions options;
+    private static final SimpleDateFormat dateParse
+            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+    public static String formatDecimalString(double weight) {
+        NumberFormat format = new DecimalFormat("#.#");
+        return format.format(weight);
+    }
+
+    public static String formatWeightString(double weight) {
+        if (weight < 1) {
+            weight *= 1000;
+            return ((int) weight) + "g per unit";
+        } else {
+            return formatDecimalString(weight) + "kg per unit";
+        }
+    }
 
     public static String formatPriceString(double price) {
         NumberFormat format = new DecimalFormat("#,###");
@@ -56,61 +71,37 @@ public class MethodUtils {
     }
 
     public static String formatPhoneNumber(String phone) {
-        return phone.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "$1 $2 $3");
+        return phone.replaceFirst("(\\d{2})(\\d{3})(\\d{3})(\\d+)", "$1 $2 $3 $4");
     }
 
-    public static String formatPhoneNumberWithCountryCode(String phone) {
-        return "+84 " + phone.substring(1);
-    }
 
-    public static String revertPhoneNumber(String phone) {
-        phone = phone.replaceAll("\\s", "");
-        if (phone.contains("+84")) {
+    public static String formatPhoneWithCountryCode(String phone) {
+        if (phone.startsWith(StringUtils.VIETNAM_COUNTRY_CODE)) {
             phone = phone.substring(3);
         }
-        return "0" + phone;
+        if (phone.startsWith("0")) {
+            phone = phone.substring(1);
+        }
+        return StringUtils.VIETNAM_COUNTRY_CODE + phone.replaceAll("\\s", "");
     }
 
-    public static String formatDate(String dateString) {
-        String returnedDate;
-        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
-        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static String formatDate(String dateString, boolean withTime) {
         try {
-            returnedDate = format.format(dateParse.parse(dateString));
+            SimpleDateFormat format;
+            if (withTime) {
+                format = new SimpleDateFormat("HH:mm MMM dd, yyyy");
+            } else {
+                format = new SimpleDateFormat("MMM dd, yyyy");
+            }
+            return format.format(dateParse.parse(dateString));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        return returnedDate;
-    }
-
-    public static String formatDateWithTime(String dateString){
-        String returnedDate;
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm MMM dd, yyyy");
-        try {
-            returnedDate = format.format(convertToDate(dateString));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return returnedDate;
     }
 
     public static Date convertToDate(String dateString) throws Exception {
-        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         return dateParse.parse(dateString);
-    }
-
-    public static boolean checkDeliveredOrder(String status) {
-        return (status.equals("delivered") || status.equals("completed"));
-    }
-
-    public static boolean checkReturnedOrder(String status) {
-        return status.equals("returned");
-    }
-
-    public static boolean checkCancelledOrder(String status) {
-        return status.equals("cancelled");
     }
 
     public static String displayStatus(String status) {
@@ -161,11 +152,6 @@ public class MethodUtils {
         return responseCode;
     }
 
-    public static String getFormattedCurrentDate() {
-        SimpleDateFormat dateParse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        return dateParse.format(new Date());
-    }
-
     public static void displayErrorAPIMessage(Activity activity) {
         DialogBoxAlert dialogBoxAlert = new DialogBoxAlert(activity,
                 IntegerUtils.CONFIRM_ACTION_CODE_FAILED, StringUtils.MES_ERROR_FAILED_API_CALL);
@@ -177,7 +163,6 @@ public class MethodUtils {
                 IntegerUtils.CONFIRM_ACTION_CODE_ALERT, StringUtils.MES_ERROR_UNAVAILABLE_ACCOUNT) {
             @Override
             public void onClickAction() {
-                super.onClickAction();
                 logoutAction(context, activity);
             }
         };
@@ -186,13 +171,10 @@ public class MethodUtils {
 
     public static void logoutAction(Context context, Activity activity) {
         sharedPreferences = activity.getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        System.out.println("id: " + sharedPreferences.getString("USER_ID", ""));
-        sharedPreferences.edit().clear().commit();
-        System.out.println("clear: " + sharedPreferences.getString("USER_ID", ""));
-        options = new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
+        sharedPreferences.edit().clear().apply();
+        options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                         .requestEmail()
+                                         .build();
         GoogleSignIn.getClient(context, options).signOut();
         activity.startActivity(new Intent(context, MainActivity.class));
     }
@@ -211,22 +193,19 @@ public class MethodUtils {
         return dateParse.parse(campaign.getEndDate()).before(currentDate);
     }
 
-    public static int checkCampaignQuantity(Campaign campaign) {
-        int orderedQuantity = (int)(campaign.getMinQuantity() * 0.8);
-        return campaign.getQuantityCount() - orderedQuantity;
-    }
-
-    public static CampaignMilestone getReachedCampaignMilestone(List<CampaignMilestone> milestoneList, int quantity) {
+    public static CampaignMilestone getReachedCampaignMilestone(List<CampaignMilestone> milestoneList,
+                                                                int quantity) {
         int count = -1;
         for (CampaignMilestone milestone : milestoneList) {
             if (quantity >= milestone.getQuantity()) {
                 count = milestoneList.indexOf(milestone);
             }
         }
-        if (count < 0) {
-            return null;
-        }
-        return milestoneList.get(count);
+        return (count < 0) ? null : milestoneList.get(count);
+    }
+
+    public static CampaignMilestone getLastCampaignMilestone(List<CampaignMilestone> milestoneList) {
+        return milestoneList.get(milestoneList.size() - 1);
     }
 
     public static void sortSharingCampaign(List<Campaign> list) {
@@ -283,44 +262,31 @@ public class MethodUtils {
         });
     }
 
+    public static List<Address> filterDistrictList(List<Address> addressList) {
+        List<Address> resultList = new ArrayList<>();
+        for (Address address : addressList) {
+            if (!address.getDistrict().contains("Vật Tư")
+                    && !address.getDistrict().contains("Đặc Biệt")) {
+                resultList.add(address);
+            }
+        }
+        return resultList;
+    }
+
     public static String getVolleyErrorMessage(VolleyError error) {
         String body = "";
         if (error == null) {
-            return   "No error ";
+            return "No error ";
         }
         if (error.networkResponse == null) {
-            return  "no response ";
+            return "no response ";
         }
-        final String statusCode = String.valueOf(error.networkResponse.statusCode);
+        String statusCode = String.valueOf(error.networkResponse.statusCode);
         try {
             body += statusCode + " - " + new String(error.networkResponse.data,"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return body;
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        String phone = "new code: SALEOFF";
-        FirebaseDatabaseReferences references = new FirebaseDatabaseReferences();
-        references.getCustomerServiceId().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    String key = ds.getKey();
-                    System.out.println(key);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-
-            }
-        });
-
-
-        System.out.println("test"+phone.substring(phone.indexOf(":") + 1));
-//        System.out.println(EmailValidator.getInstance().isValid(phone));
     }
 }

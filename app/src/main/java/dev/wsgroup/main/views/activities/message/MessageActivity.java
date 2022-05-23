@@ -1,14 +1,5 @@
 package dev.wsgroup.main.views.activities.message;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -22,13 +13,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -59,15 +55,10 @@ import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.MessageFirebase;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageAdapter;
-import dev.wsgroup.main.models.recycleViewAdapters.RecViewMessageListAdapter;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
-import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
-import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
 
 public class MessageActivity extends AppCompatActivity {
@@ -82,17 +73,13 @@ public class MessageActivity extends AppCompatActivity {
     private FrameLayout layoutBody;
 
     private SharedPreferences sharedPreferences;
-    private FirebaseDatabaseReferences references;
+    private FirebaseReferences references;
     private List<Message> messageList;
     private String token, userAccountId, supplierAccountId;
-    private DialogBoxAlert dialogBoxAlert;
     private Supplier supplier;
     private Message newMessage;
-    private boolean messageCheck, profileCheck;
+    private boolean messageLoading, profileLoading, supplierCheck, firstLoadCheck;
     private RecViewMessageAdapter adapter;
-    private LinearLayoutManager linearLayoutManager;
-    private View.OnClickListener listener;
-    private final String CUSTOMER_SERVICE_ACCOUNT_ID = "SERVICE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +103,10 @@ public class MessageActivity extends AppCompatActivity {
 
         recViewMessage.setItemViewCacheSize(10);
 
-        references = new FirebaseDatabaseReferences();
+        references = new FirebaseReferences();
         getConversation();
 
-        listener = new View.OnClickListener() {
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (editWriteMessage.hasFocus()) {
@@ -207,80 +194,78 @@ public class MessageActivity extends AppCompatActivity {
         token = sharedPreferences.getString("TOKEN", "");
         userAccountId = getIntent().getStringExtra("USER_ID");
         supplierAccountId = getIntent().getStringExtra("SUPPLIER_ID");
-        System.out.println(userAccountId);
-        System.out.println(supplierAccountId);
-        setLoadingState();
+        supplierCheck = getIntent().getBooleanExtra("RECIPIENT_CHECK", true);
         messageList = new ArrayList<>();
-        messageCheck = false; profileCheck = false;
-        getMessageList();
+        messageLoading = false; profileLoading = false; firstLoadCheck = true;
+        startFirebase();
         getProfile();
     }
 
-    private void getMessageList() {
-//        APIChatCaller.getConversation(token, userAccountId, supplierAccountId, getApplication(), new APIListener() {
-//            @Override
-//            public void onMessageListFound(List<Message> list) {
-//                messageList = list;
-//                messageCheck = true;
-//                setConversation();
-//            }
-//
-//            @Override
-//            public void onFailedAPICall(int code) {
-//                if (code == IntegerUtils.ERROR_NO_USER) {
-//                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-//                            MessageActivity.this);
-//                } else {
-//                    setFailedState();
-//                }
-//            }
-//        });
-        references.getConversation(userAccountId, supplierAccountId).addValueEventListener(new ValueEventListener() {
+    private void startFirebase() {
+        references.getConversation(userAccountId, supplierAccountId)
+                  .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println("start checking: " + snapshot.getChildrenCount());
-                MessageFirebase message;
-                messageList = new ArrayList<>();
-                for (DataSnapshot data : snapshot.getChildren()) {
-                    message = data.getValue(MessageFirebase.class);
-                    newMessage = new Message();
-                    newMessage.setCreateDate(MethodUtils.getFormattedCurrentDate());
-                    newMessage.setMessageRead(false);
-                    newMessage.setMessage(message.getMessage());
-                    newMessage.setFromId(message.getFrom());
-                    newMessage.setToId(message.getTo());
-                    newMessage.setLink(message.getFile());
-                    messageList.add(0, newMessage);
+                MessageFirebase messageFirebase = null;
+                if (snapshot.getChildrenCount() > 0) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        messageFirebase = dataSnapshot.getValue(MessageFirebase.class);
+
+                    }
                 }
-                messageCheck = true;
-                setConversation();
+                if (firstLoadCheck || messageFirebase.getFrom().equals(supplierAccountId)) {
+                    messageLoading = true; firstLoadCheck = false;
+                    getMessage();
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
-                System.out.println("failed");
-                System.out.println(error);
+            }
+        });
+    }
+
+    private void getMessage() {
+        setLoadingState();
+        APIChatCaller.getConversation(token, userAccountId, supplierAccountId,
+                getApplication(), new APIListener() {
+            @Override
+            public void onMessageListFound(List<Message> list) {
+                messageList = list;
+                messageLoading = false;
+                setConversation();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            MessageActivity.this);
+                } else {
+                    setFailedState();
+                }
             }
         });
     }
 
     private void getProfile() {
-        if (supplierAccountId.equals(CUSTOMER_SERVICE_ACCOUNT_ID)) {
+        if (!supplierCheck) {
+            profileLoading = false;
             supplier = new Supplier();
-            supplier.setAccountId(CUSTOMER_SERVICE_ACCOUNT_ID);
+            supplier.setAccountId(supplierAccountId);
             supplier.setName("Customer Service");
-            profileCheck = true;
             setConversation();
         } else {
+            profileLoading = true;
             Set<String> idSet = new LinkedHashSet<>();
             idSet.add(supplierAccountId);
-            APISupplierCaller.getSupplierListByAccountId(idSet, null, getApplication(), new APIListener() {
+            APISupplierCaller.getSupplierListByAccountId(idSet, null,
+                    getApplication(), new APIListener() {
                 @Override
                 public void onSupplierListFound(List<Supplier> supplierList) {
                     if (supplierList.size() > 0) {
                         supplier = supplierList.get(0);
-                        txtNewMessageSupplierName.setText(supplier.getName());
-                        profileCheck = true;
+                        profileLoading = false;
                         setConversation();
                     } else {
                         setFailedState();
@@ -296,7 +281,8 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setConversation() {
-        if (messageCheck && profileCheck) {
+        if (!messageLoading && !profileLoading) {
+            txtNewMessageSupplierName.setText(supplier.getName());
             adapter = new RecViewMessageAdapter(getApplicationContext(),
                     MessageActivity.this, userAccountId) {
                 @Override
@@ -307,13 +293,11 @@ public class MessageActivity extends AppCompatActivity {
                 }
             };
             recViewMessage.setAdapter(adapter);
-            linearLayoutManager = new LinearLayoutManager(getApplicationContext(),
-                    LinearLayoutManager.VERTICAL, true);
-            recViewMessage.setLayoutManager(linearLayoutManager);
+            recViewMessage.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                    LinearLayoutManager.VERTICAL, true));
             if (messageList.isEmpty()) {
                 setNoMessageState();
             } else {
-                System.out.println("message count: " + messageList.size());
                 adapter.setMessageList(messageList);
                 setListFoundState();
             }
@@ -350,6 +334,7 @@ public class MessageActivity extends AppCompatActivity {
                 imgMessageImage.setEnabled(true);
                 editWriteMessage.setEnabled(true);
                 txtSend.setEnabled(true);
+                adapter.updateMessage(newMessage);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

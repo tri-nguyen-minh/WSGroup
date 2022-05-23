@@ -40,7 +40,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     private ImageView imgBackFromCheckout, imgCheckoutHome;
     private TextView txtCampaignNote, txtProductPrice, txtCampaignPrice, txtCampaignOrderCount,
             lblProductOrderCount, lblQuantityCountSeparator, txtCampaignOrderQuantityCount,
-            txtCampaignQuantityCount, txtCampaignTag;
+            txtCampaignQuantityCount, txtCampaignTag, txtCampaignCode, txtCampaignEndDate;
     private ProgressBar progressBarQuantityCount;
     private RecyclerView recViewOrderProduct;
     private Button btnConfirmOrder;
@@ -48,7 +48,6 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     private RelativeLayout layoutLoading;
     private ConstraintLayout layoutCampaignCount;
 
-    private SharedPreferences sharedPreferences;
     private ArrayList<Order> orderList;
     private Order order;
     private OrderProduct orderProduct;
@@ -74,6 +73,8 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         txtCampaignOrderQuantityCount = findViewById(R.id.txtCampaignOrderQuantityCount);
         txtCampaignQuantityCount = findViewById(R.id.txtCampaignQuantityCount);
         txtCampaignTag = findViewById(R.id.txtCampaignTag);
+        txtCampaignCode = findViewById(R.id.txtCampaignCode);
+        txtCampaignEndDate = findViewById(R.id.txtCampaignEndDate);
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
         recViewOrderProduct = findViewById(R.id.recViewCheckoutOrderProduct);
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
@@ -82,49 +83,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         layoutLoading = findViewById(R.id.layoutLoading);
         layoutCampaignCount = findViewById(R.id.layoutCampaignCount);
 
-
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
-        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
-        layoutOrderList.setVisibility(View.INVISIBLE);
-        layoutLoading.setVisibility(View.VISIBLE);
-
-        if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
-            layoutCampaign.setVisibility(View.GONE);
-        } else {
-            order = orderList.get(0);
-            orderProduct = order.getOrderProductList().get(0);
-            campaign = order.getCampaign();
-            layoutCampaign.setVisibility(View.VISIBLE);
-            txtCampaignNote.setText(campaign.getDescription());
-            if (campaign.getShareFlag()) {
-                txtCampaignTag.setText("Sharing Campaign");
-                currentDetail = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
-                        orderProduct.getQuantity() + campaign.getQuantityCount());
-                if (currentDetail == null) {
-                    txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
-                } else {
-                    txtCampaignPrice.setText(MethodUtils.formatPriceString(currentDetail.getPrice()));
-                }
-                layoutCampaignCount.setVisibility(View.VISIBLE);
-                progressBarQuantityCount.setVisibility(View.VISIBLE);
-                txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
-                txtCampaignOrderQuantityCount.setText(campaign.getQuantityCount() + "");
-                txtCampaignQuantityCount.setText(campaign.getMaxQuantity() + "");
-                progressBarQuantityCount.setMax(campaign.getMaxQuantity());
-                progressBarQuantityCount.setProgress(campaign.getQuantityCount());
-                lblProductOrderCount.setText((campaign.getOrderCount() == 1) ? "order" : "orders");
-                lblQuantityCountSeparator.setText("/");
-            } else {
-                txtCampaignTag.setText("One-time Campaign");
-                txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
-                layoutCampaignCount.setVisibility(View.GONE);
-                progressBarQuantityCount.setVisibility(View.GONE);
-            }
-            txtProductPrice.setText(MethodUtils.formatPriceString(orderProduct.getPrice()));
-            txtProductPrice.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-        }
-        setupRecViewOrderList();
+        setData();
 
         imgBackFromCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +122,51 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         });
     }
 
+    private void setData() {
+        orderList = (ArrayList<Order>) getIntent().getSerializableExtra("ORDER_LIST");
+        requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutOrderList.setVisibility(View.INVISIBLE);
+        if (requestCode == IntegerUtils.REQUEST_ORDER_RETAIL) {
+            layoutCampaign.setVisibility(View.GONE);
+        } else {
+            order = orderList.get(0);
+            orderProduct = order.getOrderProductList().get(0);
+            campaign = order.getCampaign();
+            layoutCampaign.setVisibility(View.VISIBLE);
+            txtCampaignNote.setText(campaign.getDescription());
+            if (campaign.getShareFlag()) {
+                txtCampaignTag.setText("Sharing Campaign");
+                currentDetail = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
+                        orderProduct.getQuantity() + campaign.getQuantityCount());
+                if (currentDetail == null) {
+                    txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
+                } else {
+                    txtCampaignPrice.setText(MethodUtils.formatPriceString(currentDetail.getPrice()));
+                }
+                layoutCampaignCount.setVisibility(View.VISIBLE);
+                progressBarQuantityCount.setVisibility(View.VISIBLE);
+                txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
+                txtCampaignOrderQuantityCount.setText(campaign.getQuantityCount() + "");
+                txtCampaignQuantityCount.setText(campaign.getMaxQuantity() + "");
+                progressBarQuantityCount.setMax(campaign.getMaxQuantity());
+                progressBarQuantityCount.setProgress(campaign.getQuantityCount());
+                lblProductOrderCount.setText((campaign.getOrderCount() == 1) ? "order" : "orders");
+                lblQuantityCountSeparator.setText("/");
+            } else {
+                txtCampaignTag.setText("One-time Campaign");
+                txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
+                layoutCampaignCount.setVisibility(View.GONE);
+                progressBarQuantityCount.setVisibility(View.GONE);
+            }
+            txtCampaignCode.setText(campaign.getCode());
+            txtCampaignEndDate.setText(MethodUtils.formatDate(campaign.getEndDate(), false));
+            txtProductPrice.setText(MethodUtils.formatPriceString(orderProduct.getPrice()));
+            txtProductPrice.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+        setupRecViewOrderList();
+    }
+
     private void setupRecViewOrderList() {
         adapter = new RecViewOrderSupplierListAdapter(getApplicationContext(),
                 ConfirmOrderActivity.this, requestCode) {
@@ -180,7 +184,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         recViewOrderProduct.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false));
         recViewOrderProduct.setNestedScrollingEnabled(false);
-        layoutLoading.setVisibility(View.GONE);
+        layoutLoading.setVisibility(View.INVISIBLE);
         layoutOrderList.setVisibility(View.VISIBLE);
     }
 

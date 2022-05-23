@@ -8,12 +8,9 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -53,7 +50,6 @@ public class SignInActivity extends AppCompatActivity {
     private DialogBoxAlert dialogBoxAlert;
     private GoogleSignInOptions options;
     private GoogleSignInClient client;
-    private final int REQUEST_GOOGLE_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +150,6 @@ public class SignInActivity extends AppCompatActivity {
             public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
                     MethodUtils.hideKeyboard(view, getApplicationContext());
-                } else {
                 }
             }
         });
@@ -163,7 +158,6 @@ public class SignInActivity extends AppCompatActivity {
             public void onFocusChange(View view, boolean hasFocus) {
                 if (!hasFocus) {
                     MethodUtils.hideKeyboard(view, getApplicationContext());
-                } else {
                 }
             }
         });
@@ -209,7 +203,7 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent signInIntent = client.getSignInIntent();
-                startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+                startActivityForResult(signInIntent, IntegerUtils.REQUEST_GOOGLE_SIGN_IN);
             }
         });
     }
@@ -249,7 +243,7 @@ public class SignInActivity extends AppCompatActivity {
                 .putString("PHONE", user.getPhoneNumber())
                 .putString("PASSWORD", editPassword.getText().toString())
                 .putString("TOKEN", user.getToken())
-                .commit();
+                .apply();
         setResult(Activity.RESULT_OK, getIntent());
         finish();
     }
@@ -311,11 +305,11 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_GOOGLE_SIGN_IN) {
+        if (requestCode == IntegerUtils.REQUEST_GOOGLE_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 dialogBoxLoading = new DialogBoxLoading(SignInActivity.this);
                 dialogBoxLoading.getWindow()
-                        .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
                 Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                 try {

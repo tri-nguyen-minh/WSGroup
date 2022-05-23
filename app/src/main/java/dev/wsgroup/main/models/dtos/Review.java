@@ -7,9 +7,10 @@ import java.io.Serializable;
 import dev.wsgroup.main.models.utils.StringUtils;
 
 public class Review implements Serializable {
-    private String orderId, productId, review;
+    private String orderId, productId, review, date;
     private double rating;
     private User user;
+    private boolean isRemoved;
 
     public Review() {
     }
@@ -38,6 +39,14 @@ public class Review implements Serializable {
         this.review = review;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public double getRating() {
         return rating;
     }
@@ -54,23 +63,34 @@ public class Review implements Serializable {
         this.user = user;
     }
 
+    public boolean isRemoved() {
+        return isRemoved;
+    }
+
+    public void setRemoved(boolean removed) {
+        isRemoved = removed;
+    }
+
     public static Review getObjectFromJSON(JSONObject data) throws Exception {
         Review review;
         if (data.getString("rating").equals("null") || data.getDouble("rating") == 0) {
             return null;
         } else {
             review = new Review();
+            review.setRemoved(false);
             if (data.getString("comment").equals("removed")) {
                 review.setReview(StringUtils.MES_ALERT_REVIEW_REMOVED);
                 review.setRating(0);
+                review.setRemoved(true);
             } else {
                 review.setReview(data.getString("comment"));
                 review.setRating(data.getDouble("rating"));
             }
+            review.setDate(data.getString("updatedat"));
             User user = new User();
             user.setAvatarLink(data.getString("avt"));
-            user.setFirstName(data.getString("firstname"));
-            user.setLastName(data.getString("lastname"));
+            user.setFirstName(data.getString("firstName"));
+            user.setLastName(data.getString("lastName"));
             review.setUser(user);
         }
         return review;

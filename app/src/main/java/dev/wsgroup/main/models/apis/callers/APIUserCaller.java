@@ -47,7 +47,7 @@ public class APIUserCaller {
                         String message = response.getString("status");
                         JSONObject data = response.getJSONObject("data");
                         User user = User.getAccountFromJSON(data.getJSONObject("user"),
-                                data.getJSONObject("info"));
+                                                            data.getJSONObject("info"));
                         user.setToken(data.getString("token"));
                         APIListener.onUserFound(user, message);
                     } catch (Exception e) {
@@ -79,10 +79,12 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void loginWithGoogle(User user, Application application, APIListener APIListener) {
+    public static void loginWithGoogle(User user, Application application,
+                                       APIListener APIListener) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -98,11 +100,10 @@ public class APIUserCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        System.out.println(response);
                         String message = response.getString("status");
                         JSONObject data = response.getJSONObject("data");
                         User user = User.getAccountFromJSON(data.getJSONObject("user"),
-                                data.getJSONObject("info"));
+                                                            data.getJSONObject("info"));
                         user.setToken(data.getString("token"));
                         APIListener.onUserFound(user, message);
                     } catch (Exception e) {
@@ -132,10 +133,12 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void registerNewUser(User user, Application application, APIListener APIListener) {
+    public static void registerNewUser(User user, Application application,
+                                       APIListener APIListener) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -156,7 +159,7 @@ public class APIUserCaller {
                         try {
                             JSONObject data = response.getJSONObject("data");
                             if (data != null) {
-                                APIListener.onCompletingRegistrationRequest();
+                                APIListener.onUpdateSuccessful();
                             }
                         } catch (JSONException e) {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -186,11 +189,12 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void findUserByPhoneNumber(String phoneNumber,
-                                             Application application, APIListener APIListener) {
+    public static void findUserByPhoneNumber(String phoneNumber, Application application,
+                                             APIListener APIListener) {
         String url = StringUtils.USER_API_URL + phoneNumber;
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
@@ -204,9 +208,9 @@ public class APIUserCaller {
                         String message = response.getString("message");
                         JSONArray jsonArray = response.getJSONArray("data");
                         if (jsonArray.length() > 0) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(0);
                             User user = new User();
-                            user.setAccountId(jsonObject.getString("id"));
+                            user.setAccountId(jsonArray.getJSONObject(0)
+                                                       .getString("id"));
                             APIListener.onUserFound(user, message);
                         } else {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
@@ -234,17 +238,17 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void findUserByMail(String mail,
-                                      Application application, APIListener APIListener) {
+    public static void findUserByMail(String mail, Application application,
+                                      APIListener APIListener) {
         String url = StringUtils.BASE_URL + "api/supplier/existEmail?email=" + mail;
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
         try {
-            System.out.println(url);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 
                 @Override
@@ -261,11 +265,9 @@ public class APIUserCaller {
                             user.setPhoneNumber(jsonObject.getString("phone"));
                             APIListener.onUserFound(user, message);
                         } else {
-                            System.out.println("error no user");
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
                         }
                     } catch (Exception e) {
-                        System.out.println("error parse");
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                     }
@@ -288,11 +290,12 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void findUserByToken(String token,
-                                       Application application, APIListener APIListener) {
+    public static void findUserByToken(String token, Application application,
+                                       APIListener APIListener) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -317,24 +320,6 @@ public class APIUserCaller {
                     }
                 }
             };
-//            Response.Listener<String> listener = new Response.Listener<String>() {
-//
-//                @Override
-//                public void onResponse(String responseString) {
-//                    try {
-//                        System.out.println("response");
-//                        System.out.println(responseString);
-//                        JSONObject response = new JSONObject(responseString);
-//                        System.out.println(response);
-//                        String message = response.getString("message");
-//                        User user = User.getObjectFromJSON(response.getJSONObject("data"));
-//                        APIListener.onUserFound(user, message);
-//                    } catch (Exception e) {
-//                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
-//                        e.printStackTrace();
-//                    }
-//                }
-//            };
 
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
@@ -348,15 +333,6 @@ public class APIUserCaller {
                     }
                 }
             };
-//            StringRequest request = new StringRequest(Request.Method.GET,
-//                    StringUtils.GET_PROFILE_URL, listener, errorListener) {
-//                @Override
-//                public Map<String, String> getHeaders() throws AuthFailureError {
-//                    Map<String, String> header = new HashMap<>();
-//                    header.put("cookie", token);
-//                    return header;
-//                }
-//            };
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                     StringUtils.GET_PROFILE_URL, new JSONObject(), listener, errorListener) {
@@ -372,11 +348,12 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void updateUserProfile(User user,
-                                         Application application, APIListener APIListener) {
+    public static void updateUserProfile(User user, Application application,
+                                         APIListener APIListener) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -441,6 +418,7 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -499,6 +477,7 @@ public class APIUserCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

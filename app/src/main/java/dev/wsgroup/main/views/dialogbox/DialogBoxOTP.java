@@ -68,17 +68,22 @@ public class DialogBoxOTP extends Dialog {
         layoutOTPCountdown = findViewById(R.id.layoutOTPCountdown);
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
 
-        txtPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(MethodUtils.formatPhoneNumber(phoneNumber)));
+        txtPhoneNumber.setText(MethodUtils.formatPhoneNumber(phoneNumber));
         btnConfirmOTP.setEnabled(false);
         btnConfirmOTP.getBackground().setTint(context.getResources().getColor(R.color.gray_light));
 
-        service = new FirebasePhoneAuthService(activity,
-                MethodUtils.formatPhoneNumberWithCountryCode(phoneNumber)) {
+        service = new FirebasePhoneAuthService(activity, phoneNumber) {
             @Override
             public void onOTPSent() {
                 super.onOTPSent();
                 setLabel(true);
                 resetCountDown();
+            }
+
+            @Override
+            public void onOTPSentFailed(int errorCode) {
+                dismiss();
+                onSendOTPFailed();
             }
 
             @Override
@@ -170,6 +175,9 @@ public class DialogBoxOTP extends Dialog {
     public void onVerificationSuccessful() {
     }
     public void onClosingDialogBox() {}
+
+    public void onSendOTPFailed() {
+    }
 
     private String getOTPString() {
         return editOTP.getText().toString();

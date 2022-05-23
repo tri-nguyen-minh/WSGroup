@@ -43,8 +43,7 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                     .inflate(R.layout.recycle_view_cart_supplier_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -53,12 +52,6 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         holder.checkboxCartSupplier.setVisibility(View.GONE);
         setupCartProductList(holder.recViewCartProducts, position,
                 shoppingCart.get(supplierList.get(position).getId()));
-        holder.checkboxCartSupplier.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
     }
 
     private void setupCartProductList(RecyclerView recyclerView,
@@ -111,16 +104,15 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         return supplierList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView checkboxCartSupplier;
-        private TextView txtRecViewCartSupplierName, txtTotalCartPrice;
-        private RecyclerView recViewCartProducts;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView checkboxCartSupplier;
+        private final TextView txtRecViewCartSupplierName;
+        private final RecyclerView recViewCartProducts;
 
         public ViewHolder(View view) {
             super(view);
             checkboxCartSupplier = view.findViewById(R.id.checkboxCartSupplier);
             txtRecViewCartSupplierName = view.findViewById(R.id.txtRecViewCartSupplierName);
-            txtTotalCartPrice = view.findViewById(R.id.txtTotalCartPrice);
             recViewCartProducts = view.findViewById(R.id.recViewCartProducts);
         }
     }

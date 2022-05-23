@@ -72,122 +72,144 @@
                         android:textStyle="bold"
                         android:text=""/>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="10dp"
-                        android:layout_marginVertical="2dp"
-                        android:background="@color/white">
-
-                        <androidx.constraintlayout.widget.Guideline
-                            android:id="@+id/guidelineProductUserFeedback"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            app:layout_constraintGuide_percent="0.37"/>
-
-                        <me.zhanghai.android.materialratingbar.MaterialRatingBar
-                            android:id="@+id/ratingProduct"
-                            android:layout_width="wrap_content"
-                            android:layout_height="30dp"
-                            android:progressTint="@color/gold"
-                            android:secondaryProgressTint="@color/gray"
-                            android:progressBackgroundTint="@color/gray"
-                            android:numStars="5"
-                            android:rating="4.5"
-                            android:theme="@style/ratingBar"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
-
-                        <TextView
-                            android:id="@+id/txtRatingProduct"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/montserratr"
-                            android:text="0.0"
-                            android:textColor="@color/gray_dark"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/ratingProduct"/>
+                        android:background="@color/white"
+                        android:paddingVertical="5dp"
+                        android:paddingHorizontal="10dp">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="left|center"
-                            android:paddingRight="15dp"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/guidelineProductUserFeedback">
+                            android:layout_marginVertical="2dp"
+                            android:background="@color/gray_background">
 
-                            <TextView
-                                android:id="@+id/lblProductOrderCount"
+                            <androidx.constraintlayout.widget.Guideline
+                                android:id="@+id/guidelineProductUserFeedback"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left"
-                                android:text="Orders:"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="15sp"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintBottom_toTopOf="@+id/lblProductReviewCount"/>
+                                android:orientation="vertical"
+                                app:layout_constraintGuide_percent="0.43"/>
 
-                            <TextView
-                                android:id="@+id/txtProductOrderCount"
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:paddingLeft="7dp"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="right|center"
-                                android:text="0K"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
+                                android:background="@color/white"
+                                android:gravity="left|center"
+                                android:layout_marginRight="1dp"
+                                android:paddingRight="15dp"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintLeft_toRightOf="@id/lblProductOrderCount"
-                                app:layout_constraintRight_toRightOf="parent"
-                                app:layout_constraintBottom_toTopOf="@+id/txtProductReviewCount"/>
-
-                            <TextView
-                                android:id="@+id/lblProductReviewCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left"
-                                android:text="Reviews:"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="15sp"
-                                app:layout_constraintTop_toBottomOf="@id/lblProductOrderCount"
                                 app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintRight_toLeftOf="@id/guidelineProductUserFeedback">
 
-                            <TextView
-                                android:id="@+id/txtProductReviewCount"
+                                <TextView
+                                    android:id="@+id/lblProductOrderCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="Orders:"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="15sp"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toTopOf="@+id/lblProductReviewCount"/>
+
+                                <TextView
+                                    android:id="@+id/txtProductOrderCount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:paddingLeft="7dp"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="right|center"
+                                    android:text="0K"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toRightOf="@id/lblProductOrderCount"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintBottom_toTopOf="@+id/txtProductReviewCount"/>
+
+                                <TextView
+                                    android:id="@+id/lblProductReviewCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="left"
+                                    android:text="Reviews:"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="15sp"
+                                    app:layout_constraintTop_toBottomOf="@id/lblProductOrderCount"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/txtProductReviewCount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:paddingLeft="7dp"
+                                    android:layout_marginTop="3dp"
+                                    android:fontFamily="@font/montserratr"
+                                    android:gravity="right|center"
+                                    android:text="0K"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toBottomOf="@id/txtProductOrderCount"
+                                    app:layout_constraintLeft_toRightOf="@id/lblProductReviewCount"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:paddingLeft="7dp"
-                                android:layout_marginTop="3dp"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="right|center"
-                                android:text="0K"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                app:layout_constraintTop_toBottomOf="@id/txtProductOrderCount"
-                                app:layout_constraintLeft_toRightOf="@id/lblProductReviewCount"
-                                app:layout_constraintRight_toRightOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
+                                android:layout_height="0dp"
+                                android:background="@color/white"
+                                android:layout_marginLeft="1dp"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintLeft_toRightOf="@id/guidelineProductUserFeedback"
+                                app:layout_constraintRight_toRightOf="parent">
+
+                                <me.zhanghai.android.materialratingbar.MaterialRatingBar
+                                    android:id="@+id/ratingProduct"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="30dp"
+                                    android:progressTint="@color/gold"
+                                    android:secondaryProgressTint="@color/gray"
+                                    android:progressBackgroundTint="@color/gray"
+                                    android:numStars="5"
+                                    android:rating="4.5"
+                                    android:theme="@style/ratingBar"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                <TextView
+                                    android:id="@+id/txtRatingProduct"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:gravity="center"
+                                    android:fontFamily="@font/montserratr"
+                                    android:text="0.0"
+                                    android:textColor="@color/gray_dark"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintRight_toLeftOf="@id/ratingProduct"/>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </RelativeLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -608,7 +630,7 @@
                         app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantity"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <RelativeLayout
                         android:id="@+id/layoutRetailQuantity"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -622,16 +644,9 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent">
 
-<!--                        <androidx.constraintlayout.widget.Guideline-->
-<!--                            android:id="@+id/guidelineProductQuantityRetailOnly"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="match_parent"-->
-<!--                            android:orientation="vertical"-->
-<!--                            app:layout_constraintGuide_percent="0.65"/>-->
-
                         <TextView
                             android:id="@+id/txtProductQuantity"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
@@ -639,182 +654,70 @@
                             android:textSize="14sp"
                             android:text="5000"
                             android:background="@color/white"
-                            android:layout_marginLeft="10dp"
-                            app:layout_constraintLeft_toLeftOf="parent"/>
+                            android:layout_marginLeft="10dp"/>
 
-<!--                        <TextView-->
-<!--                            android:layout_width="0dp"-->
-<!--                            android:layout_height="match_parent"-->
-<!--                            android:layout_marginHorizontal="7dp"-->
-<!--                            android:fontFamily="@font/montserratr"-->
-<!--                            android:gravity="left"-->
-<!--                            android:textColor="@color/gray_dark"-->
-<!--                            android:textSize="14sp"-->
-<!--                            android:text="Retail purchase:"-->
-<!--                            android:visibility="gone"-->
-<!--                            app:layout_constraintLeft_toLeftOf="parent"-->
-<!--                            app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityRetailOnly" />-->
+                    </RelativeLayout>
 
-<!--                        <androidx.constraintlayout.widget.Guideline-->
-<!--                            android:id="@+id/guidelineProductQuantityRetailOnly"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="match_parent"-->
-<!--                            android:orientation="vertical"-->
-<!--                            app:layout_constraintGuide_percent="0.16"/>-->
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--                        <TextView-->
-<!--                            android:id="@+id/txtProductQuantity"-->
-<!--                            android:layout_width="0dp"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:paddingLeft="10dp"-->
-<!--                            android:fontFamily="@font/montserratr"-->
-<!--                            android:gravity="right"-->
-<!--                            android:textColor="@color/gray_darker"-->
-<!--                            android:textSize="14sp"-->
-<!--                            android:text="0000"-->
-<!--                            android:background="@color/white"-->
-<!--                            app:layout_constraintLeft_toLeftOf="parent"-->
-<!--                            app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityRetailOnly"-->
-<!--                            app:layout_constraintTop_toTopOf="parent"-->
-<!--                            app:layout_constraintBottom_toBottomOf="parent"/>-->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayoutProductWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp">
 
-<!--                        <TextView-->
-<!--                            android:layout_width="0dp"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:layout_marginHorizontal="7dp"-->
-<!--                            android:fontFamily="@font/montserratr"-->
-<!--                            android:gravity="left"-->
-<!--                            android:textColor="@color/gray_dark"-->
-<!--                            android:textSize="14sp"-->
-<!--                            android:text="for retail purchase"-->
-<!--                            app:layout_constraintRight_toRightOf="parent"-->
-<!--                            app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantityRetailOnly"-->
-<!--                            app:layout_constraintTop_toTopOf="parent"-->
-<!--                            app:layout_constraintBottom_toBottomOf="parent"/>-->
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineProductWeight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.3"/>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/lblProductWeight"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:paddingVertical="10dp"
+                        android:paddingHorizontal="10dp"
+                        android:fontFamily="@font/montserratr"
+                        android:gravity="left"
+                        android:text="Weight"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="1dp"
+                        android:background="@color/white"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/guidelineProductWeight"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <LinearLayout
-                        android:id="@+id/layoutProductQuantityWithCampaign"
+                    <RelativeLayout
+                        android:id="@+id/layoutWeight"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
+                        android:gravity="left"
+                        android:background="@color/white"
+                        android:paddingVertical="10dp"
                         android:layout_marginLeft="1dp"
-                        android:visibility="gone"
-                        app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
+                        app:layout_constraintLeft_toRightOf="@id/guidelineProductWeight"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <TextView
+                            android:id="@+id/txtProductWeight"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/montserratr"
                             android:gravity="left"
+                            android:textColor="@color/gray_darker"
+                            android:textSize="14sp"
+                            android:text="5000"
                             android:background="@color/white"
-                            android:paddingVertical="10dp"
-                            android:layout_marginBottom="1dp"
-                            app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/txtProductQuantity"
-                            app:layout_constraintBottom_toBottomOf="parent">
+                            android:layout_marginLeft="10dp"/>
 
-                            <androidx.constraintlayout.widget.Guideline
-                                android:id="@+id/guidelineProductQuantityRetail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                app:layout_constraintGuide_percent="0.65"/>
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginHorizontal="7dp"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="14sp"
-                                android:text="Retail purchase:"
-                                app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityRetail" />
-
-                            <TextView
-                                android:id="@+id/txtProductQuantityWithCampaign"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left"
-                                android:textColor="@color/gray_darker"
-                                android:textSize="14sp"
-                                android:text="5000"
-                                android:background="@color/white"
-                                app:layout_constraintRight_toRightOf="parent"
-                                app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantityRetail" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/layoutCampaignQuantity"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="left"
-                            android:paddingVertical="4dp"
-                            android:background="@color/white"
-                            app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantity"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/txtProductQuantity"
-                            app:layout_constraintBottom_toBottomOf="parent">
-
-                            <androidx.constraintlayout.widget.Guideline
-                                android:id="@+id/guidelineProductQuantityCampaign"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                app:layout_constraintGuide_percent="0.65"/>
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="7dp"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left|center"
-                                android:textColor="@color/gray_dark"
-                                android:textSize="14sp"
-                                android:text="Campaign Purchase:"
-                                app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintRight_toLeftOf="@id/guidelineProductQuantityCampaign"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
-
-                            <TextView
-                                android:id="@+id/txtProductQuantityTotalWithCampaign"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/montserratr"
-                                android:gravity="left|center"
-                                android:textColor="@color/gray_darker"
-                                android:textSize="14sp"
-                                android:text="1000"
-                                app:layout_constraintLeft_toRightOf="@id/guidelineProductQuantityCampaign"
-                                app:layout_constraintRight_toLeftOf="@id/imgSelectCampaign"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
-
-                            <ImageView
-                                android:id="@+id/imgSelectCampaign"
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:scaleY="1.2"
-                                android:scaleX="1.2"
-                                android:src="@drawable/ic_direction_right"
-                                app:layout_constraintRight_toRightOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

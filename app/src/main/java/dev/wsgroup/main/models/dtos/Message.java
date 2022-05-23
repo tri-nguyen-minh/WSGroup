@@ -8,10 +8,8 @@ public class Message implements Serializable {
 
     private String id, fromId, toId, message, createDate, link;
     private boolean messageRead;
-    private Supplier supplier;
 
-    public Message() {
-    }
+    public Message() { }
 
     public String getId() {
         return id;

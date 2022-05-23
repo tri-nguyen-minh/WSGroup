@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,7 +28,6 @@ import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewDiscountListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.views.activities.message.MessageListActivity;
 
 public class DiscountFragment extends Fragment {
 
@@ -84,11 +81,10 @@ public class DiscountFragment extends Fragment {
 
     private void getDiscountList() {
         setLoadingState();
-        APIDiscountCaller.getCustomerDiscountByStatus(token, status, null,
+        APIDiscountCaller.getDiscountByStatus(token, status,
                 getActivity().getApplication(), new APIListener() {
             @Override
             public void onDiscountListFound(List<CustomerDiscount> discountList) {
-                super.onDiscountListFound(discountList);
                 if (discountList.size() > 0) {
                     Set<String> idSet = new LinkedHashSet<>();
                     for (CustomerDiscount discount : discountList) {

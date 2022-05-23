@@ -149,7 +149,8 @@
                     android:id="@+id/constraintLayoutSupplierAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp">
+                    android:layout_marginBottom="2dp"
+                    android:background="@color/white">
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guidelineSupplierAddress"
@@ -161,7 +162,7 @@
                     <TextView
                         android:id="@+id/lblSupplierAddress"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="match_parent"
                         android:padding="10dp"
                         android:fontFamily="@font/montserratr"
                         android:gravity="left"
@@ -174,22 +175,58 @@
                         app:layout_constraintRight_toLeftOf="@id/guidelineSupplierAddress"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
+
                     <TextView
-                        android:id="@+id/txtSupplierAddress"
-                        android:layout_width="0dp"
+                        android:id="@+id/txtStreet"
                         android:layout_height="wrap_content"
-                        android:padding="10dp"
-                        android:fontFamily="@font/montserratr"
-                        android:gravity="right"
-                        android:textColor="@color/gray_dark"
-                        android:textSize="16sp"
+                        android:gravity="center|right"
+                        android:textSize="15sp"
                         android:ellipsize="end"
-                        android:text=""
-                        android:background="@color/white"
-                        app:layout_constraintRight_toRightOf="parent"
+                        android:maxLines="1"
+                        android:layout_marginVertical="5dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:textColor="@color/gray_darker"
+                        android:textStyle="bold"
+                        android:text="13 Nguyễn Văn Cừ"
+                        app:layout_constraintLeft_toRightOf="@id/lblSupplierAddress"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toRightOf="@id/guidelineSupplierAddress"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/txtDistrict"
+                        style="@style/style_txt_account_info" />
+
+                    <TextView
+                        android:id="@+id/txtDistrict"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|right"
+                        android:textSize="15sp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:textColor="@color/gray_darker"
+                        android:text="Xã Nghĩa Bình, Huyện Bù Đăng"
+                        app:layout_constraintLeft_toRightOf="@id/lblSupplierAddress"
+                        app:layout_constraintTop_toBottomOf="@id/txtStreet"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/txtProvince"
+                        style="@style/style_txt_account_info" />
+
+                    <TextView
+                        android:id="@+id/txtProvince"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|right"
+                        android:textSize="15sp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:textColor="@color/gray_darker"
+                        android:text="Bình Phước"
+                        app:layout_constraintLeft_toRightOf="@id/lblSupplierAddress"
+                        app:layout_constraintTop_toBottomOf="@id/txtDistrict"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        style="@style/style_txt_account_info" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

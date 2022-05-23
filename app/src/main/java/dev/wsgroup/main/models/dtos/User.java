@@ -8,17 +8,11 @@ public class User implements Serializable {
 
     private String userId, googleId, accountId, username, phoneNumber, password,
             firstName, lastName, mail, avatarLink, walletCode, walletSecret, token;
-
     private boolean status;
 
     public User() {
     }
-
-    public User(String phoneNumber, String password) {
-        this.phoneNumber = phoneNumber;
-        this.password = password;
-    }
-
+    
     public String getUserId() {
         return userId;
     }
@@ -154,8 +148,8 @@ public class User implements Serializable {
         user.setMail(profile.getString("email"));
         user.setAvatarLink(profile.getString("avt"));
         user.setStatus(profile.getBoolean("isdeleted"));
-        user.setWalletCode(profile.getString("eWalletCode"));
-        user.setWalletSecret(profile.getString("eWalletSecret"));
+        user.setWalletCode(profile.getString("ewalletcode"));
+        user.setWalletSecret(profile.getString("ewalletsecret"));
         return user;
     }
 
@@ -171,8 +165,8 @@ public class User implements Serializable {
         user.setGoogleId(jsonObject.getString("googleid"));
         user.setUsername(jsonObject.getString("username"));
         user.setPhoneNumber(jsonObject.getString("phone"));
-        user.setWalletCode(jsonObject.getString("eWalletCode"));
-        user.setWalletSecret(jsonObject.getString("eWalletSecret"));
+        user.setWalletCode(jsonObject.getString("ewalletcode"));
+        user.setWalletSecret(jsonObject.getString("ewalletsecret"));
         return user;
     }
 }

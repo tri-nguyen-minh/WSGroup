@@ -3,8 +3,6 @@ package dev.wsgroup.main.views.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dev.wsgroup.main.R;
@@ -62,35 +59,36 @@ public class CampaignFragment extends Fragment {
 
         product = (Product) getActivity().getIntent().getSerializableExtra("PRODUCT");
         productId = product.getProductId();
-        APICampaignCaller.getCampaignListByProductId(productId, campaignStatus, campaignList, getActivity().getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> foundCampaignList) {
-                        if (campaignList.size() > 0) {
-                            layoutLoading.setVisibility(View.INVISIBLE);
-                            layoutNoCampaign.setVisibility(View.INVISIBLE);
-                            recViewCampaignView.setVisibility(View.VISIBLE);
-                            setupCampaignList();
-                        } else {
-                            layoutLoading.setVisibility(View.INVISIBLE);
-                            layoutNoCampaign.setVisibility(View.VISIBLE);
-                            recViewCampaignView.setVisibility(View.INVISIBLE);
-                        }
-                    }
+        APICampaignCaller.getCampaignListByProductId(productId, campaignStatus,
+                getActivity().getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> foundCampaignList) {
+                if (campaignList.size() > 0) {
+                    layoutLoading.setVisibility(View.INVISIBLE);
+                    layoutNoCampaign.setVisibility(View.INVISIBLE);
+                    recViewCampaignView.setVisibility(View.VISIBLE);
+                    setupCampaignList();
+                } else {
+                    layoutLoading.setVisibility(View.INVISIBLE);
+                    layoutNoCampaign.setVisibility(View.VISIBLE);
+                    recViewCampaignView.setVisibility(View.INVISIBLE);
+                }
+            }
 
-                    @Override
-                    public void onNoJSONFound() {
-                        layoutLoading.setVisibility(View.INVISIBLE);
-                        layoutNoCampaign.setVisibility(View.VISIBLE);
-                        recViewCampaignView.setVisibility(View.INVISIBLE);
-                    }
+            @Override
+            public void onNoJSONFound() {
+                layoutLoading.setVisibility(View.INVISIBLE);
+                layoutNoCampaign.setVisibility(View.VISIBLE);
+                recViewCampaignView.setVisibility(View.INVISIBLE);
+            }
 
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        layoutLoading.setVisibility(View.INVISIBLE);
-                        layoutNoCampaign.setVisibility(View.VISIBLE);
-                        recViewCampaignView.setVisibility(View.INVISIBLE);
-                    }
-                });
+            @Override
+            public void onFailedAPICall(int code) {
+                layoutLoading.setVisibility(View.INVISIBLE);
+                layoutNoCampaign.setVisibility(View.VISIBLE);
+                recViewCampaignView.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void setupCampaignList() {

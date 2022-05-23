@@ -57,7 +57,7 @@ public class DialogBoxCampaign extends Dialog {
 
         campaign = product.getCampaign();
         txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
-        txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate()));
+        txtDiscountEndDate.setText(MethodUtils.formatDate(campaign.getEndDate(), false));
         txtCampaignNote.setText(campaign.getDescription());
         txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
         txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");

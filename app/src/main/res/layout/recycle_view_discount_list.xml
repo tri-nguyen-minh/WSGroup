@@ -93,7 +93,6 @@
                     android:id="@+id/txtDiscountCode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="7dp"
                     android:fontFamily="@font/montserratr"
                     android:gravity="left"
                     android:text="KHAIMOS199"

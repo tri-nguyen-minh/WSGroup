@@ -5,8 +5,7 @@ import java.io.Serializable;
 public class MessageFirebase implements Serializable {
     private String id, from, message, status, to, file;
 
-    public MessageFirebase() {
-    }
+    public MessageFirebase() { }
 
     public String getId() {
         return id;
@@ -54,5 +53,17 @@ public class MessageFirebase implements Serializable {
 
     public void setFile(String file) {
         this.file = file;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageFirebase{" +
+                "id='" + id + '\'' +
+                ", from='" + from + '\'' +
+                ", message='" + message + '\'' +
+                ", status='" + status + '\'' +
+                ", to='" + to + '\'' +
+                ", file='" + file + '\'' +
+                '}';
     }
 }

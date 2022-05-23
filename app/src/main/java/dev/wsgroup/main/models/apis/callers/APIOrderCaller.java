@@ -29,6 +29,7 @@ import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderHistory;
 import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
+import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
@@ -70,13 +71,11 @@ public class APIOrderCaller {
             }
             jsonObjectOrder.put("paymentMethod", order.getPaymentMethod());
             jsonObjectOrder.put("campaignId", (campaign == null)
-                                                        ? JSONObject.NULL: campaign.getId());
-            jsonObjectOrder.put("isWholesale", (campaign == null) ? false : true);
+                                                        ? JSONObject.NULL : campaign.getId());
             jsonObjectOrder.put("addressId", order.getAddress().getId());
             jsonObjectOrder.put("discountPrice", order.getDiscountPrice());
             jsonObjectOrder.put("shippingFee", order.getShippingFee());
             jsonObjectOrder.put("supplierId", order.getSupplier().getId());
-            jsonObjectOrder.put("inCart", false);
             if (order.getCustomerDiscount() != null) {
                 jsonObjectOrder.put("customerDiscountCodeId", order.getCustomerDiscount().getId());
             } else {
@@ -91,10 +90,8 @@ public class APIOrderCaller {
                         JSONObject data = response.getJSONObject("data");
                         order.setId(data.getString("id"));
                         order.setStatus(data.getString("status"));
-//                        order.setTotalPrice(data.getDouble("totalPrice"));
-//                        order.setCode(data.getString("orderCode"));
-                        order.setTotalPrice(data.getDouble("totalprice"));
-                        order.setCode(data.getString("ordercode"));
+                        order.setTotalPrice(data.getDouble("totalPrice"));
+                        order.setCode(data.getString("orderCode"));
                         APIListener.onOrderSuccessful(order);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -131,11 +128,12 @@ public class APIOrderCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
 
-    public static void getOrderByStatus(String token, String status, List<Order> list,
+    public static void getOrderByStatus(String token, String status,
                                         Application application, APIListener APIListener) {
         String url = StringUtils.ORDER_API_URL + "customer?status=" + status;
         if(requestQueue == null) {
@@ -147,11 +145,13 @@ public class APIOrderCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
-                        orderList = (list == null) ? new ArrayList<>() : list;
+                        orderList = new ArrayList<>();
                         if (jsonArray.length() > 0) {
-                            Order order;
+                            Order order; Supplier supplier;
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 order = Order.getObjectFromJSON(jsonArray.getJSONObject(i));
+                                supplier = Supplier.getObjectFromJSON(jsonArray.getJSONObject(i));
+                                order.setSupplier(supplier);
                                 if (order.getStatus().equals(status)) {
                                     orderList.add(order);
                                 }
@@ -193,12 +193,12 @@ public class APIOrderCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
     public  static void updateOrderPaymentStatus(String token, Order order, String status,
-                                                 boolean advanceFlag, double price,
-                                                 double currentPrice, String vnpRef,
+                                                 boolean advanceFlag, double price, String vnpRef,
                                                  Application application, APIListener APIListener) {
         String url = StringUtils.ORDER_API_URL + "payment";
         if(requestQueue == null) {
@@ -215,7 +215,6 @@ public class APIOrderCaller {
             jsonObject.put("vnp_TxnRef", vnpRef);
             if (order.getCampaign() != null) {
                 jsonObject.put("isShare", order.getCampaign().getShareFlag());
-                jsonObject.put("currentPrice", currentPrice);
             }
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
@@ -264,6 +263,7 @@ public class APIOrderCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -278,16 +278,15 @@ public class APIOrderCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        JSONObject jsonObject = response.getJSONObject("data")
-                                                        .getJSONObject("order");
+                        JSONObject data = response.getJSONObject("data");
+                        JSONObject orderJSON = data.getJSONObject("order");
+                        JSONObject supplierJSON = data.getJSONObject("supplierId");
+                        Supplier supplier = Supplier.getObjectFromJSON(supplierJSON);
                         orderList = new ArrayList<>();
-                        if (jsonObject != null) {
-                            Order order = Order.getObjectFromJSON(jsonObject);
-                            orderList.add(order);
-                            APIListener.onOrderFound(orderList);
-                        } else {
-                            APIListener.onOrderFound(new ArrayList<>());
-                        }
+                        Order order = Order.getObjectFromJSON(orderJSON);
+                        order.setSupplier(supplier);
+                        orderList.add(order);
+                        APIListener.onOrderFound(orderList);
                     } catch (Exception e) {
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                         e.printStackTrace();
@@ -313,6 +312,7 @@ public class APIOrderCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -384,57 +384,7 @@ public class APIOrderCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void getOrderHistoryById(String id,
-                                                 Application application, APIListener APIListener) {
-        String url = StringUtils.ORDER_HISTORY_API_URL + "?id=" + id;
-        if(requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(application);
-        }
-        try {
-            Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        List<OrderHistory> list = new ArrayList<>();
-                        OrderHistory orderHistory;
-                        JSONArray array = response.getJSONArray("data");
-                        if (array.length() > 0) {
-                            orderHistory = OrderHistory.getObjectFromJSON(array.getJSONObject(0));
-                            list.add(orderHistory);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
-                    }
-                }
-            };
-            Response.ErrorListener errorListener = new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    System.out.println(error);
-                    System.out.println(MethodUtils.getVolleyErrorMessage(error));
-                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_NO_USER);
-                    } else {
-                        APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
-                    }
-                }
-            };
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,
-                    new JSONObject(), listener, errorListener) {
-                @Override
-                public String getBodyContentType() {
-                    return StringUtils.APPLICATION_JSON;
-                }
-            };
-            request.setRetryPolicy(new DefaultRetryPolicy(7000,
-                    1, 2));
-            requestQueue.add(request);
-        } catch (Exception e) {
-            e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
@@ -507,6 +457,7 @@ public class APIOrderCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

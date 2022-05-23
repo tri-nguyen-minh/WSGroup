@@ -417,7 +417,6 @@ public class DialogBoxOrderDetail extends Dialog{
                 cartProduct, activity.getApplication(), new APIListener() {
             @Override
             public void onAddCartItemSuccessful(CartProduct cartProduct) {
-                super.onAddCartItemSuccessful(cartProduct);
                 if (dialogBoxLoading.isShowing()) {
                     dialogBoxLoading.dismiss();
                 }

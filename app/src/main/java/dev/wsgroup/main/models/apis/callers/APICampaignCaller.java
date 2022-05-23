@@ -28,10 +28,10 @@ public class APICampaignCaller {
 
     private static RequestQueue requestQueue;
     private static List<Campaign> campaignList;
-    private static Map<String, List<Campaign>> campaignMap;
 
-    public static void getCampaignListByProductId(String productId, String status, List<Campaign> list,
-                                                  Application application, APIListener APIListener) {
+    public static void getCampaignListByProductId(String productId, String status,
+                                                  Application application,
+                                                  APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -46,14 +46,17 @@ public class APICampaignCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        System.out.println(response);
                         JSONArray data = response.getJSONArray("data");
-                        campaignList = (list == null) ? new ArrayList<>() : list;
+                        campaignList = new ArrayList<>();
                         if(data.length() > 0) {
                             Campaign campaign;
                             for (int i = 0; i < data.length(); i++) {
-                                campaign = Campaign.getObjectFromJSON(data.getJSONObject(i));
-                                campaignList.add(campaign);
+                                try {
+                                    campaign = Campaign.getObjectFromJSON(data.getJSONObject(i));
+                                    campaignList.add(campaign);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                         APIListener.onCampaignListFound(campaignList);
@@ -84,11 +87,12 @@ public class APICampaignCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void searchCampaign(List<Campaign> list, String value,
-                                                      Application application, APIListener APIListener) {
+    public static void searchCampaign(String value, Application application,
+                                      APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -96,21 +100,23 @@ public class APICampaignCaller {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("value", value);
-            System.out.println(url);
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        System.out.println("camapign: " + response);
                         JSONArray data = response.getJSONObject("data")
                                                  .getJSONArray("campaign");
-                        campaignList = (list == null) ? new ArrayList<>() : list;
+                        campaignList = new ArrayList<>();
                         if(data.length() > 0) {
                             Campaign campaign;
                             for (int i = 0; i < data.length(); i++) {
-                                campaign = Campaign.getSearchedObjectFromJSON(data.getJSONObject(i));
-                                if (campaign.getStatus().equals("active")) {
-                                    campaignList.add(campaign);
+                                try {
+                                    campaign = Campaign.getSearchedObjectFromJSON(data.getJSONObject(i));
+                                    if (campaign.getStatus().equals("active")) {
+                                        campaignList.add(campaign);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
@@ -142,11 +148,12 @@ public class APICampaignCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 
-    public static void getCampaignById(String campaignId,
-                                       Application application, APIListener APIListener) {
+    public static void getCampaignById(String campaignId, Application application,
+                                       APIListener APIListener) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(application);
         }
@@ -157,13 +164,13 @@ public class APICampaignCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        JSONArray data = response.getJSONArray("data");
-                        if(data.length() > 0) {
-                            Campaign campaign = Campaign.getObjectFromJSON(data.getJSONObject(0));
-                            APIListener.onCampaignFound(campaign);
-                        } else {
-                            APIListener.onNoJSONFound();
+                        JSONObject data = response.getJSONObject("data");
+                        campaignList = new ArrayList<>();
+                        if(data != null) {
+                            Campaign campaign = Campaign.getObjectFromJSON(data.getJSONObject("campaign"));
+                            campaignList.add(campaign);
                         }
+                        APIListener.onCampaignListFound(campaignList);
                     } catch (Exception e) {
                         e.printStackTrace();
                         APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
@@ -191,6 +198,7 @@ public class APICampaignCaller {
             requestQueue.add(request);
         } catch (Exception e) {
             e.printStackTrace();
+            APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
         }
     }
 }

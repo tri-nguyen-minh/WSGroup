@@ -33,11 +33,9 @@ import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIOrderCaller;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewOrderListAdapter;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.StringUtils;
-import dev.wsgroup.main.views.activities.order.OrderInfoActivity;
 
 public class OrderFragment extends Fragment {
 
@@ -51,10 +49,11 @@ public class OrderFragment extends Fragment {
     private String orderStatus, token, accountId;
     private RecViewOrderListAdapter adapter;
     private List<Order> currentOrderList;
-    private FirebaseDatabaseReferences firebaseReferences;
+    private FirebaseReferences firebaseReferences;
     private boolean notificationLoading;
+    private final List<String> sortData;
 
-    private final String[] sortData = {"Last Ordered", "Last Updated"};
+//    private final String[] sortData = {"Last Ordered", "Last Updated"};
 
     public OrderFragment(String orderStatus) {
         if (orderStatus.toLowerCase().equals("ordered")) {
@@ -64,6 +63,9 @@ public class OrderFragment extends Fragment {
         } else {
             this.orderStatus = orderStatus.toLowerCase();
         }
+        sortData = new ArrayList<>();
+        sortData.add("Last Ordered");
+        sortData.add("Last Updated");
     }
 
     @Override
@@ -105,7 +107,7 @@ public class OrderFragment extends Fragment {
             setupSpinner();
             if (!token.isEmpty()) {
                 currentOrderList = new ArrayList<>();
-                APIOrderCaller.getOrderByStatus(token, orderStatus, currentOrderList,
+                APIOrderCaller.getOrderByStatus(token, orderStatus,
                         getActivity().getApplication(), new APIListener() {
                     @Override
                     public void onOrderFound(List<Order> orderList) {
@@ -113,7 +115,6 @@ public class OrderFragment extends Fragment {
                             currentOrderList = orderList;
                             sortByCreate(false);
                             setupOrderList();
-                            setReadyState();
                         } else {
                             setFailedState();
                         }
@@ -141,8 +142,7 @@ public class OrderFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view,
                                        int positionInt, long positionLong) {
-                layoutLoading.setVisibility(View.VISIBLE);
-                recViewOrderView.setVisibility(View.GONE);
+                setLoadingState();
                 switch (positionInt) {
                     case 1: {
                         if (currentOrderList != null) {
@@ -218,11 +218,11 @@ public class OrderFragment extends Fragment {
         recViewOrderView.setAdapter(adapter);
         recViewOrderView.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
-        recViewOrderView.setVisibility(View.VISIBLE);
+        setReadyState();
     }
 
     private void setRealtimeFirebase() {
-        firebaseReferences = new FirebaseDatabaseReferences();
+        firebaseReferences = new FirebaseReferences();
         firebaseReferences.getUserNotifications(accountId)
                           .addValueEventListener(new ValueEventListener() {
             @Override

@@ -21,6 +21,7 @@ public class RecViewCampaignListAdapter
 
     private Context context;
     private List<Campaign> campaignList;
+    private Campaign campaign;
     private double productPrice;
 
     public RecViewCampaignListAdapter(Context context, double productPrice) {
@@ -36,23 +37,24 @@ public class RecViewCampaignListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_campaign_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtCampaignNote.setText(campaignList.get(position).getDescription());
+        campaign = campaignList.get(position);
+        holder.txtCampaignNote.setText(campaign.getDescription());
+        holder.txtCampaignCode.setText(campaign.getCode());
         holder.txtDiscountStartDate
-                .setText(MethodUtils.formatDate(campaignList.get(position).getStartDate()));
+              .setText(MethodUtils.formatDate(campaign.getStartDate(), false));
         holder.txtDiscountEndDate
-                .setText(MethodUtils.formatDate(campaignList.get(position).getEndDate()));
-        holder.txtCampaignMaxQuantity.setText(campaignList.get(position).getMaxQuantity() + "");
-        holder.txtCampaignQuantity.setText(campaignList.get(position).getMinQuantity() + "");
+              .setText(MethodUtils.formatDate(campaign.getEndDate(), false));
+        holder.txtCampaignMaxQuantity.setText(campaign.getMaxQuantity() + "");
+        holder.txtCampaignQuantity.setText(campaign.getMinQuantity() + "");
         holder.txtProductPrice.setText(MethodUtils.formatPriceString(productPrice));
         holder.txtProductPrice.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
         holder.txtCampaignPrice
-                .setText(MethodUtils.formatPriceString(campaignList.get(position).getPrice()));
+              .setText(MethodUtils.formatPriceString(campaign.getPrice()));
         holder.btnSelect.setVisibility(View.VISIBLE);
         holder.btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,10 +71,11 @@ public class RecViewCampaignListAdapter
 
     public void executeOnCampaignSelected(Campaign campaign) {}
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtCampaignNote, txtProductPrice, txtCampaignPrice, txtDiscountStartDate,
-                txtDiscountEndDate, txtCampaignQuantity, txtCampaignMaxQuantity;
-        private Button btnSelect;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView txtCampaignNote, txtProductPrice, txtCampaignPrice,
+                txtDiscountStartDate, txtDiscountEndDate, txtCampaignQuantity,
+                txtCampaignMaxQuantity, txtCampaignCode;
+        private final Button btnSelect;
 
 
         public ViewHolder(View view) {
@@ -82,6 +85,7 @@ public class RecViewCampaignListAdapter
             txtCampaignPrice = view.findViewById(R.id.txtCampaignPrice);
             txtCampaignQuantity = view.findViewById(R.id.txtCampaignQuantity);
             txtCampaignMaxQuantity = view.findViewById(R.id.txtCampaignMaxQuantity);
+            txtCampaignCode = view.findViewById(R.id.txtCampaignCode);
             txtDiscountStartDate = view.findViewById(R.id.txtDiscountStartDate);
             txtDiscountEndDate = view.findViewById(R.id.txtDiscountEndDate);
             btnSelect = view.findViewById(R.id.btnSelect);

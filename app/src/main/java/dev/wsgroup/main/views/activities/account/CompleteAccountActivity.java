@@ -1,14 +1,9 @@
 package dev.wsgroup.main.views.activities.account;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,25 +14,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.util.UUID;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -50,7 +30,6 @@ import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 import dev.wsgroup.main.views.dialogbox.DialogBoxOTP;
-import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
 
 public class CompleteAccountActivity extends AppCompatActivity {
 
@@ -90,10 +69,10 @@ public class CompleteAccountActivity extends AppCompatActivity {
         layoutPassword = findViewById(R.id.layoutPassword);
 
         activity = this;
-        user = (User)getIntent().getSerializableExtra("USER");
+        user = (User) getIntent().getSerializableExtra("USER");
         if(user.getGoogleId() == null || user.getGoogleId().equals("null")) {
             txtLoginMethod.setText("WSGroup's Account");
-            editPhoneNumber.setText(MethodUtils.formatPhoneNumberWithCountryCode(user.getPhoneNumber()));
+            editPhoneNumber.setText(user.getPhoneNumber());
             editPhoneNumber.setEnabled(false);
             layoutUsername.setVisibility(View.VISIBLE);
             layoutPassword.setVisibility(View.VISIBLE);
@@ -136,8 +115,10 @@ public class CompleteAccountActivity extends AppCompatActivity {
                 }
             }
         };
+
         layoutParent.setOnClickListener(clearFocusListener);
         txtLoginMethod.setOnClickListener(clearFocusListener);
+
         View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -146,6 +127,7 @@ public class CompleteAccountActivity extends AppCompatActivity {
                 }
             }
         };
+
         editUsername.setOnFocusChangeListener(focusChangeListener);
         editPassword.setOnFocusChangeListener(focusChangeListener);
         editPasswordConfirm.setOnFocusChangeListener(focusChangeListener);
@@ -187,6 +169,7 @@ public class CompleteAccountActivity extends AppCompatActivity {
         editLastName.addTextChangedListener(textWatcher);
         editPassword.addTextChangedListener(textWatcher);
         editPasswordConfirm.addTextChangedListener(textWatcher);
+
         editPhoneNumber.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -196,9 +179,9 @@ public class CompleteAccountActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 phone = editPhoneNumber.getText().toString();
-                if (phone.length() < 4 || !phone.startsWith(StringUtils.VIETNAM_COUNTRY_CODE)) {
+                if (phone.length() < 3 || !phone.startsWith(StringUtils.VIETNAM_COUNTRY_CODE)) {
                     editPhoneNumber.setText(StringUtils.VIETNAM_COUNTRY_CODE);
-                    editPhoneNumber.setSelection(4);
+                    editPhoneNumber.setSelection(3);
                 }
                 enableButtonConfirm();
 
@@ -227,8 +210,7 @@ public class CompleteAccountActivity extends AppCompatActivity {
                     User newUser = new User();
                     newUser.setUsername(editUsername.getText().toString());
                     newUser.setPassword(editPassword.getText().toString());
-                    phone = MethodUtils.revertPhoneNumber(editPhoneNumber.getText().toString());
-                    newUser.setPhoneNumber(phone);
+                    newUser.setPhoneNumber(user.getPhoneNumber());
                     newUser.setFirstName(editFirstName.getText().toString());
                     newUser.setLastName(editLastName.getText().toString());
                     newUser.setMail(editMail.getText().toString());
@@ -242,7 +224,7 @@ public class CompleteAccountActivity extends AppCompatActivity {
     }
 
     private void checkDuplicatePhone() {
-        phone = MethodUtils.revertPhoneNumber(editPhoneNumber.getText().toString());
+        phone = MethodUtils.formatPhoneWithCountryCode(editPhoneNumber.getText().toString());
         APIUserCaller.findUserByPhoneNumber(phone, getApplication(), new APIListener() {
             @Override
             public void onUserFound(User user, String message) {
@@ -299,6 +281,21 @@ public class CompleteAccountActivity extends AppCompatActivity {
                 errorMessage = StringUtils.MES_ERROR_INVALID_OTP;
                 displayErrorMessage();
             }
+
+            @Override
+            public void onClosingDialogBox() {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+            }
+
+            @Override
+            public void onSendOTPFailed() {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                MethodUtils.displayErrorAPIMessage(CompleteAccountActivity.this);
+            }
         };
         dialogBoxOTP.getWindow()
                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -326,7 +323,7 @@ public class CompleteAccountActivity extends AppCompatActivity {
     private void registerUser(User newUser) {
         APIUserCaller.registerNewUser(newUser, getApplication(), new APIListener() {
             @Override
-            public void onCompletingRegistrationRequest() {
+            public void onUpdateSuccessful() {
                 APIUserCaller.logInWithUsernameAndPassword(newUser.getUsername(),
                         newUser.getPassword(), getApplication(), new APIListener() {
                             @Override
@@ -376,9 +373,8 @@ public class CompleteAccountActivity extends AppCompatActivity {
         dialogBoxAlert = new DialogBoxAlert(activity,
                 IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
         dialogBoxAlert.getWindow()
-                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                      .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxAlert.show();
-
     }
 
     private void enableButtonConfirm() {
@@ -428,7 +424,7 @@ public class CompleteAccountActivity extends AppCompatActivity {
                 return StringUtils.MES_ERROR_INCORRECT_CONFIRM_PASSWORD;
             }
         }
-        phone = MethodUtils.revertPhoneNumber(editPhoneNumber.getText().toString());
+        phone = MethodUtils.formatPhoneWithCountryCode(editPhoneNumber.getText().toString());
         if (!phone.matches(StringUtils.PHONE_REGEX)) {
             return StringUtils.MES_ERROR_INVALID_NUMBER;
         }

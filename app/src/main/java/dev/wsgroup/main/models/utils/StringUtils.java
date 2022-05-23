@@ -1,11 +1,7 @@
 package dev.wsgroup.main.models.utils;
 
 public class StringUtils {
-//    public static final String BASE_URL = "https://server-wsg.herokuapp.com/";
-//    public static final String BASE_URL = "http://52.74.6.90:3000/";
     public static final String BASE_URL = "http://13.215.133.39:3000/";
-//    public static final String BASE_URL = "http://daca-58-186-26-169.ngrok.io/";
-//    public static final String BASE_URL = "http://5e7b-123-21-128-188.ngrok.io/";
     public static final String USER_API_URL = BASE_URL + "api/users/";
     public static final String LOGIN_URL = USER_API_URL + "login";
     public static final String REGISTER_URL = USER_API_URL + "register";
@@ -23,15 +19,17 @@ public class StringUtils {
     public static final String DISCOUNT_API_URL = BASE_URL + "api/customerdiscountcode/";
     public static final String CHAT_API_URL = BASE_URL + "api/chat/";
     public static final String NOTIFICATION_API_URL = BASE_URL + "api/notif/";
+    public static final String DELIVERY_API_URL = "https://online-gateway.ghn.vn/shiip/public-api/";
 
     public static final String APPLICATION_JSON = "application/json";
-    public static final String VIETNAM_COUNTRY_CODE = "+84 ";
-    public static final String CUSTOMER_SERVICE_ACCOUNT_ID = "f3f57546-32d4-43d9-9717-001db80f51c7";
+    public static final String VIETNAM_COUNTRY_CODE = "+84";
+    public static final String DELIVERY_API_TOKEN = "73457c0b-d0f5-11ec-ac32-0e0f5adc015a";
+    public static final String DELIVERY_API_SHOP_ID = "2761103";
+    public static final String EXCEPTION_API_NULL_ARRAY = "Value null at data of type org.json.JSONObject$1 cannot be converted to JSONArray";
 
-    public static final String PHONE_REGEX = "0[1-9][0-9]{7,8}";
+    public static final String PHONE_REGEX = "\\+84[1-9][0-9]{7,9}";
     public static final String USERNAME_REGEX = "[a-zA-z0-9_]{6,20}";
     public static final String PASSWORD_REGEX = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,20}$";
-    public static final String MAIL_REGEX = "/^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
 
     public static final String MES_CONFIRM_LOG_OUT = "Log out?";
     public static final String MES_CONFIRM_DELETE_CART = "Remove this product from\nyour shopping cart?";
@@ -68,6 +66,7 @@ public class StringUtils {
     public static final String MES_ERROR_DUPLICATE_OLD_PASSWORD = "Your new password cannot be the same as your old password.";
     public static final String MES_ERROR_NO_DISCOUNT = "There is no applicable discount for this order.";
     public static final String MES_ERROR_PAYMENT_FAILED = "The payment has not been completed.";
+    public static final String MES_ERROR_UNAVAILABLE_ADDRESS = "Your delivery address is currently unavailable.";
 
     public static final String MES_ALERT_ADVANCE_REQUIRE = "You must complete a required advanced payment before your order can be finalized.";
     public static final String MES_ALERT_OTP_REQUIRE = "We will send you an OTP to confirm your new phone number.";
@@ -77,9 +76,10 @@ public class StringUtils {
     public static final String MES_ALERT_INCOMPLETE_ACCOUNT = "Your account is not ready.";
     public static final String MES_ALERT_INCOMPLETE_WALLET = "We need your E-Wallet information in order to process your refund.";
     public static final String MES_ALERT_ADD_REVIEW_DESCRIPTION = "Your review cannot be changed or removed later.";
+    public static final String MES_ALERT_PHONE_LINKED_GOOGLE = "This number is linked to a Google Account.";
 
+    public static final String DESC_PHONE_LINKED_GOOGLE = "Please login using your Google Account.";
     public static final String DESC_IRREVERSIBLE_ACTION = "This action cannot be undone.";
-    public static final String DESC_INVALID_USERNAME = "Your Username should be:\n";
     public static final String DESC_ABANDON_ORDER = "Your current order will be lost!";
     public static final String DESC_INVALID_ORDER_SUPPLIER_SUSPENDED = "'s account has been suspended.";
     public static final String DESC_INVALID_ORDER_CAMPAIGN_COMPLETED = "The campaign you're joining is already over.";
@@ -87,7 +87,7 @@ public class StringUtils {
     public static final String DESC_INVALID_ORDER_PRODUCT = " is no longer available.";
     public static final String DESC_CART_REMOVAL = "Unavailable products have been removed from your cart.\nPlease try again.";
     public static final String DESC_REQUIRE_COMPLETE_ACCOUNT = "You must complete your account before you can log in.";
-    public static final String DESC_SEARCH = "Search for product, supplier, campaign's code or campaign's name.";
+    public static final String DESC_UNAVAILABLE_ADDRESS = "Please select a different address.";
 
     public static final String MES_SUCCESSFUL_REGISTRATION = "Your new account is ready!";
     public static final String MES_SUCCESSFUL_UPDATE_PASSWORD = "Your password has been reset!";
@@ -98,4 +98,7 @@ public class StringUtils {
     public static final String MES_SUCCESSFUL_ADD_CART = "The product has been add to your shopping cart!";
     public static final String MES_SUCCESSFUL_ADD_REVIEW = "Your review has been submitted.";
     public static final String MES_SUCCESSFUL_PAYMENT = "Your payment has been completed.";
+    public static final String MES_SUCCESSFUL_ADD_ADDRESS = "The address has been added.";
+    public static final String MES_SUCCESSFUL_UPDATE_ADDRESS = "The address has been updated.";
+    public static final String MES_SUCCESSFUL_DELETE_ADDRESS = "The address has been deleted.";
 }

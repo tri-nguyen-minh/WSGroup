@@ -55,7 +55,7 @@ public class Notification implements Serializable {
         notification.setMessage(data.getString("message"));
         notification.setLink(data.getString("link"));
         notification.setNotificationRead(data.getString("status").equals("read"));
-        notification.setCreatedDate(data.getString("createdat"));
+        notification.setCreatedDate(data.getString("createdAt"));
         return notification;
     }
 }

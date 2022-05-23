@@ -38,33 +38,39 @@ public class RecViewMessageListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_message_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtSupplierName.setText(conversationList.get(position).getSupplier().getName());
-        Glide.with(context)
-             .load(conversationList.get(position).getSupplier().getAvatarLink())
-             .into(holder.imgAvatar);
-        if (conversationList.get(position).getLastMessage() != null) {
+        conversation = conversationList.get(position);
+        holder.txtSupplierName.setText(conversation.getSupplier().getName());
+        if (conversation.getSupplier().getName().equals("Customer Service")) {
+            Glide.with(context)
+                 .load(R.drawable.img_customer_service)
+                 .into(holder.imgAvatar);
+            holder.imgAvatar.setScaleX((float) 0.9);
+            holder.imgAvatar.setScaleY((float) 0.9);
+        } else {
+            Glide.with(context)
+                 .load(conversation.getSupplier().getAvatarLink())
+                 .into(holder.imgAvatar);
+        }
+        if (conversation.getLastMessage() != null) {
             holder.txtMessageDate
-                  .setText(MethodUtils.formatDateWithTime(conversationList.get(position)
-                                                                          .getLastMessage()
-                                                                          .getCreateDate()));
-            if (conversationList.get(position).getUserMessageStatus()) {
+                  .setText(MethodUtils.formatDate(conversation.getLastMessage().getCreateDate(), true));
+            if (conversation.getUserMessageStatus()) {
                 senderName = "You";
             } else {
-                senderName = conversationList.get(position).getSupplier().getName();
+                senderName = conversation.getSupplier().getName();
             }
             holder.lblSender.setText(senderName);
-            lastMessage = conversationList.get(position).getLastMessage().getMessage();
+            lastMessage = conversation.getLastMessage().getMessage();
             if (lastMessage.equals("null")) {
                 lastMessage = "sent an image";
             }
             holder.txtMessage.setText(lastMessage);
-            if (!conversationList.get(position).getReadStatus()) {
+            if (!conversation.getReadStatus()) {
                 holder.txtSupplierName.setTextColor(context.getResources().getColor(R.color.black));
                 holder.txtMessageDate.setTextColor(context.getResources().getColor(R.color.black));
                 holder.lblSender.setTextColor(context.getResources().getColor(R.color.black));
@@ -78,7 +84,7 @@ public class RecViewMessageListAdapter
             holder.layoutMessageDate.setVisibility(View.INVISIBLE);
             holder.lblMessageSeparator.setVisibility(View.GONE);
             holder.lblSender.setText("Message");
-            holder.txtMessage.setText(conversationList.get(position).getSupplier().getName());
+            holder.txtMessage.setText(conversation.getSupplier().getName());
             holder.imgStatusCheck.setVisibility(View.INVISIBLE);
         }
         holder.layoutParent.setOnClickListener(new View.OnClickListener() {

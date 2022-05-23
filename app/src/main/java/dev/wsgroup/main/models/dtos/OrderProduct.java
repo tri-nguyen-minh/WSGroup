@@ -100,10 +100,6 @@ public class OrderProduct implements Serializable {
         this.typeList = typeList;
     }
 
-    public boolean getInCampaign() {
-        return inCampaign;
-    }
-
     public void setInCampaign(boolean inCampaign) {
         this.inCampaign = inCampaign;
     }
@@ -119,23 +115,20 @@ public class OrderProduct implements Serializable {
     public static OrderProduct getObjectFromJSON(JSONObject jsonObject) throws Exception {
         OrderProduct orderProduct = new OrderProduct();
         orderProduct.setId(jsonObject.getString("id"));
-        orderProduct.setNote(jsonObject.getString("notes"));
-        orderProduct.setPrice(jsonObject.getDouble("price"));
-        orderProduct.setTotalPrice(jsonObject.getDouble("totalprice"));
-        orderProduct.setQuantity(jsonObject.getInt("quantity"));
-        orderProduct.setOrderCode(jsonObject.getString("ordercode"));
-        Product product = new Product();
-        product.setProductId(jsonObject.getString("productid"));
-        product.setImageLink(jsonObject.getString("image"));
-        product.setName(jsonObject.getString("productname"));
-        orderProduct.setProduct(product);
-        orderProduct.setInCampaign(jsonObject.getBoolean("incampaign"));
-        String stringObject = jsonObject.getString("campaignid");
-        if (!stringObject.equals("null")) {
-            Campaign campaign = new Campaign();
-            campaign.setId(stringObject);
-            orderProduct.setCampaign(campaign);
+        try {
+            orderProduct.setNote(jsonObject.getString("notes"));
+        } catch (Exception e) {
+            orderProduct.setNote(jsonObject.getString("note"));
         }
+        orderProduct.setPrice(jsonObject.getDouble("price"));
+        orderProduct.setTotalPrice(jsonObject.getDouble("totalPrice"));
+        orderProduct.setQuantity(jsonObject.getInt("quantity"));
+        orderProduct.setOrderCode(jsonObject.getString("orderCode"));
+        Product product = new Product();
+        product.setProductId(jsonObject.getString("productId"));
+        product.setImageLink(jsonObject.getString("image"));
+        product.setName(jsonObject.getString("productName"));
+        orderProduct.setProduct(product);
         return orderProduct;
     }
 }

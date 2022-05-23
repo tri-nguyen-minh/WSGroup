@@ -41,7 +41,7 @@ import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewCampaignSearchAdapter;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
@@ -49,7 +49,7 @@ import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.NotificationActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
 import dev.wsgroup.main.views.activities.message.MessageListActivity;
-import dev.wsgroup.main.views.activities.productviews.PrepareProductActivity;
+import dev.wsgroup.main.views.activities.order.PrepareOrderActivity;
 import dev.wsgroup.main.views.activities.productviews.SearchProductActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
@@ -81,7 +81,7 @@ public class HomeTab extends Fragment {
     private List<Campaign> tempList;
     private RecViewProductListAdapter productAdapter;
     private RecViewCampaignSearchAdapter campaignAdapter;
-    private FirebaseDatabaseReferences firebaseReferences;
+    private FirebaseReferences firebaseReferences;
     private DialogBoxLoading dialogBoxLoading;
 
     @Override
@@ -124,7 +124,7 @@ public class HomeTab extends Fragment {
 
         cartCount = 0;
         setData();
-        getProductLists();
+        getLists();
 
         constraintLayoutMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,7 +175,7 @@ public class HomeTab extends Fragment {
         lblRetryGetProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getProductLists();
+                getLists();
             }
         });
 
@@ -193,13 +193,14 @@ public class HomeTab extends Fragment {
         if (getActivity() == null) {
             setFailedState();
         } else {
+            System.out.println("set data");
             sharedPreferences = getActivity().getSharedPreferences("PREFERENCE",
                     Context.MODE_PRIVATE);
             userId = sharedPreferences.getString("USER_ID", "");
             accountId = sharedPreferences.getString("ACCOUNT_ID", "");
             token = sharedPreferences.getString("TOKEN", "");
             if (!userId.isEmpty()) {
-                firebaseReferences = new FirebaseDatabaseReferences();
+                firebaseReferences = new FirebaseReferences();
                 editCartCountByUser();
                 editUnreadMessageCountByUser();
                 editUnreadNotificationCountByUser();
@@ -208,89 +209,66 @@ public class HomeTab extends Fragment {
         }
     }
 
-    private void getProductLists() {
+    private void getLists() {
+        System.out.println("get list");
         listCount = 50;
         setLoadingState();
-        getSharingCampaignList();
-        getSingleCampaignList();
-        getOngoingList();
+        getCampaignList();
+        getInCampaignList();
         getMostOrderedList();
         getNewList();
         getAllList();
     }
 
-    private void getSharingCampaignList() {
+    private void getCampaignList() {
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APICampaignCaller.searchCampaign(null, "",
-                    getActivity().getApplication(), new APIListener() {
+            APICampaignCaller.searchCampaign("", getActivity().getApplication(),
+                    new APIListener() {
                 @Override
                 public void onCampaignListFound(List<Campaign> campaignList) {
-                    if (campaignList.size() > 0) {
-                        for (int i = campaignList.size() - 1; i >= 0; i--) {
-                            if (!campaignList.get(i).getShareFlag()) {
-                                campaignList.remove(i);
-                            }
-                        }
-                        MethodUtils.sortSharingCampaign(campaignList);
-                        setupCampaignRecView(campaignList, recViewSharingCampaign, layoutSharingCampaign);
-                    } else {
-                        listCount -= 5;
-                        finalizeView();
-                    }
-                }
-
-                @Override
-                public void onFailedAPICall(int code) {
-                    listCount -= 5;
-                    finalizeView();
-                }
-            });
-        }
-    }
-
-    private void getSingleCampaignList() {
-        if (getActivity() == null) {
-            setFailedState();
-        } else {
-            APICampaignCaller.searchCampaign(null, "",
-                    getActivity().getApplication(), new APIListener() {
-                @Override
-                public void onCampaignListFound(List<Campaign> campaignList) {
+                    System.out.println("camp " + campaignList.size());
+                    List<Campaign> shareCampaign = new ArrayList<>();
+                    List<Campaign> singleCampaign = new ArrayList<>();
                     if (campaignList.size() > 0) {
                         for (int i = campaignList.size() - 1; i >= 0; i--) {
                             if (campaignList.get(i).getShareFlag()) {
-                                campaignList.remove(i);
+                                shareCampaign.add(campaignList.get(i));
+                            } else {
+                                singleCampaign.add(campaignList.get(i));
                             }
                         }
-                        MethodUtils.sortSingleCampaign(campaignList);
-                        setupCampaignRecView(campaignList, recViewSingleCampaign, layoutSingleCampaign);
+                        MethodUtils.sortSharingCampaign(shareCampaign);
+                        MethodUtils.sortSingleCampaign(singleCampaign);
+                        setupCampaignRecView(shareCampaign, recViewSharingCampaign, layoutSharingCampaign);
+                        setupCampaignRecView(singleCampaign, recViewSingleCampaign, layoutSingleCampaign);
                     } else {
-                        listCount -= 5;
+                        listCount -= 10;
                         finalizeView();
                     }
                 }
 
                 @Override
                 public void onFailedAPICall(int code) {
-                    listCount -= 5;
+                    listCount -= 10;
                     finalizeView();
                 }
             });
         }
     }
 
-    private void getOngoingList() {
+    private void getInCampaignList() {
         orderCountOngoing = false;
         ratingOngoing = false;
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APIProductCaller.getProductsByProductStatus(null, "incampaign",
+            APIProductCaller.getProductsByProductStatus("incampaign",
                     getActivity().getApplication(), new APIListener() {
                 @Override
                 public void onProductListFound(List<Product> productList) {
+                    System.out.println("incamp " + productList.size());
                     if (!productList.isEmpty()) {
                         APIListener ongoingListener = new APIListener() {
                             @Override
@@ -358,10 +336,11 @@ public class HomeTab extends Fragment {
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APIProductCaller.getProductsWithCompletedOrders(null,
-                    getActivity().getApplication(), new APIListener() {
+            APIProductCaller.getProductsWithCompletedOrders(getActivity().getApplication(),
+                                                            new APIListener() {
                 @Override
                 public void onProductListFound(List<Product> productList) {
+                    System.out.println("most " + productList.size());
                     if (!productList.isEmpty()) {
                         APIListener mostOrderedListener = new APIListener() {
                             @Override
@@ -429,10 +408,11 @@ public class HomeTab extends Fragment {
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APIProductCaller.getNewProductsCurrentWeek(null,
-                    getActivity().getApplication(), new APIListener() {
+            APIProductCaller.getNewProductsCurrentWeek(getActivity().getApplication(),
+                                                       new APIListener() {
                 @Override
                 public void onProductListFound(List<Product> productList) {
+                    System.out.println("new " + productList.size());
                     if (!productList.isEmpty()) {
                         APIListener newListener = new APIListener() {
                             @Override
@@ -500,10 +480,10 @@ public class HomeTab extends Fragment {
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APIProductCaller.getAllProduct(null,
-                    getActivity().getApplication(), new APIListener() {
+            APIProductCaller.getAllProduct(getActivity().getApplication(), new APIListener() {
                 @Override
                 public void onProductListFound(List<Product> productList) {
+                    System.out.println("all " + productList.size());
                     if (!productList.isEmpty()) {
                         APIListener newListener = new APIListener() {
                             @Override
@@ -584,7 +564,7 @@ public class HomeTab extends Fragment {
         if (list.size() > 0) {
             campaignAdapter = new RecViewCampaignSearchAdapter(getContext(), getActivity()) {
                 @Override
-                public void executeOnCampaignSelected(Campaign campaign) {
+                public void onCampaignSelected(Campaign campaign) {
                     if (userId.isEmpty()) {
                         Intent signInIntent = new Intent(getContext(), SignInActivity.class);
                         signInIntent.putExtra("MAIN_TAB_POSITION", 0);
@@ -607,6 +587,7 @@ public class HomeTab extends Fragment {
     }
 
     private void finalizeView() {
+        System.out.println(listCount);
         if (listCount == 0) {
             if ((layoutSharingCampaign.getVisibility() == View.VISIBLE)
                     || (layoutSingleCampaign.getVisibility() == View.VISIBLE)
@@ -629,80 +610,92 @@ public class HomeTab extends Fragment {
         String productId = campaign.getProduct().getProductId();
         APIProductCaller.getProductById(productId, getActivity().getApplication(), new APIListener() {
             @Override
-            public void onProductFound(Product product) {
-                product.setCampaign(campaign);
-                APICampaignCaller.getCampaignListByProductId(productId, "active",
-                        null, getActivity().getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(campaignList);
-                        } else if (campaignList.size() > 0) {
-                            tempList = product.getCampaignList();
-                            for (Campaign campaign : campaignList) {
-                                tempList.add(campaign);
-                            }
-                            product.setCampaignList(tempList);
-                        }
-                        activeCampaignStatus = true;
-                        finishSetup(product);
+            public void onProductListFound(List<Product> productList) {
+                if (productList.size() > 0) {
+                    Product product = productList.get(0);
+                    product.setCampaign(campaign);
+                    getExtraCampaignData(product);
+                } else {
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
                     }
+                    MethodUtils.displayErrorAPIMessage(getActivity());
+                }
+            }
 
-                    @Override
-                    public void onNoJSONFound() {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(new ArrayList<>());
-                        }
-                        activeCampaignStatus = true;
-                        finishSetup(product);
-                    }
+            @Override
+            public void onFailedAPICall(int code) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                MethodUtils.displayErrorAPIMessage(getActivity());
+            }
+        });
+    }
 
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
-                        MethodUtils.displayErrorAPIMessage(getActivity());
+    private void getExtraCampaignData(Product product) {
+        APICampaignCaller.getCampaignListByProductId(product.getProductId(),"active",
+                getActivity().getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(campaignList);
+                } else if (campaignList.size() > 0) {
+                    tempList = product.getCampaignList();
+                    for (Campaign campaign : campaignList) {
+                        tempList.add(campaign);
                     }
-                });
-                APICampaignCaller.getCampaignListByProductId(productId, "ready",
-                        null, getActivity().getApplication(), new APIListener() {
-                    @Override
-                    public void onCampaignListFound(List<Campaign> campaignList) {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(campaignList);
-                        } else if (campaignList.size() > 0) {
-                            tempList = product.getCampaignList();
-                            for (Campaign campaign : campaignList) {
-                                tempList.add(campaign);
-                            }
-                            product.setCampaignList(tempList);
-                        }
-                        readyCampaignStatus = true;
-                        finishSetup(product);
-                    }
+                    product.setCampaignList(tempList);
+                }
+                activeCampaignStatus = true;
+                finishSetup(product);
+            }
 
-                    @Override
-                    public void onNoJSONFound() {
-                        if (product.getCampaignList() == null
-                                || product.getCampaignList().size() == 0) {
-                            product.setCampaignList(new ArrayList<>());
-                        }
-                        readyCampaignStatus = true;
-                        finishSetup(product);
-                    }
+            @Override
+            public void onNoJSONFound() {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(new ArrayList<>());
+                }
+                activeCampaignStatus = true;
+                finishSetup(product);
+            }
 
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
-                        MethodUtils.displayErrorAPIMessage(getActivity());
+            @Override
+            public void onFailedAPICall(int code) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                MethodUtils.displayErrorAPIMessage(getActivity());
+            }
+        });
+        APICampaignCaller.getCampaignListByProductId(product.getProductId(),"ready",
+                getActivity().getApplication(), new APIListener() {
+            @Override
+            public void onCampaignListFound(List<Campaign> campaignList) {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(campaignList);
+                } else if (campaignList.size() > 0) {
+                    tempList = product.getCampaignList();
+                    for (Campaign campaign : campaignList) {
+                        tempList.add(campaign);
                     }
-                });
+                    product.setCampaignList(tempList);
+                }
+                readyCampaignStatus = true;
+                finishSetup(product);
+            }
+
+            @Override
+            public void onNoJSONFound() {
+                if (product.getCampaignList() == null
+                        || product.getCampaignList().size() == 0) {
+                    product.setCampaignList(new ArrayList<>());
+                }
+                readyCampaignStatus = true;
+                finishSetup(product);
             }
 
             @Override
@@ -718,7 +711,7 @@ public class HomeTab extends Fragment {
     private void finishSetup(Product product) {
         if (activeCampaignStatus && readyCampaignStatus) {
             Intent campaignSelectIntent
-                    = new Intent(getContext(), PrepareProductActivity.class);
+                    = new Intent(getContext(), PrepareOrderActivity.class);
             campaignSelectIntent.putExtra("PRODUCT", product);
             if (dialogBoxLoading.isShowing()) {
                 dialogBoxLoading.dismiss();
@@ -779,7 +772,7 @@ public class HomeTab extends Fragment {
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APIChatCaller.getCustomerChatMessages(token, null,
+            APIChatCaller.getCustomerChatMessages(token,
                     getActivity().getApplication(), new APIListener() {
                 @Override
                 public void onMessageListFound(List<Message> list) {
@@ -862,7 +855,7 @@ public class HomeTab extends Fragment {
     }
 
     private void setRealtimeFirebase() {
-        firebaseReferences = new FirebaseDatabaseReferences();
+        System.out.println("start firebase");
         firebaseReferences.getUserMessages(accountId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -885,5 +878,6 @@ public class HomeTab extends Fragment {
             @Override
             public void onCancelled(DatabaseError error) { }
         });
+        System.out.println("done firebase");
     }
 }

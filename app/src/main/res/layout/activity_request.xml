@@ -27,8 +27,7 @@
         <TextView
             android:id="@+id/txtHeader"
             style="@style/style_txt_header"
-            android:text=""
-            android:visibility="gone"
+            android:text="RETURN  REQUEST"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/imgBackFromReturnRequest"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -51,7 +50,6 @@
         android:layout_height="0dp"
         android:gravity="center"
         android:background="@color/gray_background"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/layoutReturnHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -68,7 +66,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone"
         android:gravity="center">
 
         <TextView
@@ -135,6 +132,7 @@
                     android:id="@+id/txtOrderCode"
                     android:textSize="16sp"
                     android:layout_marginLeft="10dp"
+                    android:gravity="right|center"
                     app:layout_constraintLeft_toRightOf="@+id/lblCode"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -169,6 +167,7 @@
                     android:id="@+id/txtSupplier"
                     android:textSize="16sp"
                     android:layout_marginLeft="10dp"
+                    android:gravity="right|center"
                     app:layout_constraintLeft_toRightOf="@+id/lblSupplier"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -204,6 +203,7 @@
                     android:textSize="16sp"
                     android:layout_marginLeft="10dp"
                     android:textColor="@color/red"
+                    android:gravity="right|center"
                     app:layout_constraintLeft_toRightOf="@+id/lblPrice"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -238,6 +238,7 @@
                     android:id="@+id/txtRecipient"
                     android:textSize="16sp"
                     android:layout_marginLeft="10dp"
+                    android:gravity="right|center"
                     app:layout_constraintLeft_toRightOf="@+id/lblRecipient"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintRight_toRightOf="parent"

@@ -35,7 +35,7 @@ import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.dtos.User;
-import dev.wsgroup.main.models.services.FirebaseDatabaseReferences;
+import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
@@ -44,7 +44,7 @@ import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.DiscountActivity;
 import dev.wsgroup.main.views.activities.NotificationActivity;
 import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
-import dev.wsgroup.main.views.activities.account.DeliveryAddressActivity;
+import dev.wsgroup.main.views.activities.address.AddressListActivity;
 import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
 import dev.wsgroup.main.views.activities.message.MessageListActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
@@ -67,7 +67,7 @@ public class ProfileTab extends Fragment {
     private int cartCount, messageCount, notificationCount;
     private boolean messageLoading, notificationLoading;
 
-    private FirebaseDatabaseReferences firebaseReferences;
+    private FirebaseReferences firebaseReferences;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -163,7 +163,7 @@ public class ProfileTab extends Fragment {
         layoutDeliveryAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent accountInfoIntent = new Intent(getContext(), DeliveryAddressActivity.class);
+                Intent accountInfoIntent = new Intent(getContext(), AddressListActivity.class);
                 accountInfoIntent.putExtra("MAIN_TAB_POSITION", 2);
                 startActivityForResult(accountInfoIntent, IntegerUtils.REQUEST_COMMON);
             }
@@ -235,7 +235,7 @@ public class ProfileTab extends Fragment {
     }
 
     private void setRealtimeFirebase() {
-        firebaseReferences = new FirebaseDatabaseReferences();
+        firebaseReferences = new FirebaseReferences();
         firebaseReferences.getUserMessages(accountId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -265,7 +265,7 @@ public class ProfileTab extends Fragment {
         if (getActivity() == null) {
             setFailedState();
         } else {
-            APIChatCaller.getCustomerChatMessages(token, null,
+            APIChatCaller.getCustomerChatMessages(token,
                     getActivity().getApplication(), new APIListener() {
                 @Override
                 public void onMessageListFound(List<Message> list) {

@@ -51,6 +51,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/layoutIdentifier"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -93,8 +94,6 @@
             android:text="Order required full payment before processing"
             android:textColor="@color/gray_dark"
             android:textSize="15sp"
-            android:maxLines="2"
-            android:ellipsize="end"
             android:textStyle="bold"/>
 
     </LinearLayout>

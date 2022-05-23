@@ -21,6 +21,7 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.dtos.OrderProduct;
+import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Review;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxOrderNote;
@@ -31,6 +32,8 @@ public class RecViewOrderProductListAdapter
 
     private Order order;
     private List<OrderProduct> orderProductList;
+    private OrderProduct orderProduct;
+    private Product product;
     private Context context;
     private Activity activity;
     private int requestState;
@@ -50,34 +53,36 @@ public class RecViewOrderProductListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_order_product_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if(orderProductList.get(position).getProduct().getImageList().size() > 0) {
+        orderProduct = orderProductList.get(position);
+        product = orderProduct.getProduct();
+        if(product.getImageList().size() > 0) {
             Glide.with(context)
-                 .load(orderProductList.get(position).getProduct().getImageList().get(0))
+                 .load(product.getImageList().get(0))
                  .into(holder.imgRecViewProduct);
         }
-        holder.txtRecViewProductOrderName.setText(orderProductList.get(position).getProduct().getName());
+        holder.txtRecViewProductOrderName.setText(product.getName());
         holder.txtProductPrice
-                .setText(MethodUtils.formatPriceString(orderProductList.get(position).getPrice()));
-        holder.txtOrderQuantity.setText(orderProductList.get(position).getQuantity() + "");
+                .setText(MethodUtils.formatPriceString(orderProduct.getPrice()));
+        holder.txtOrderQuantity.setText(orderProduct.getQuantity() + "");
         holder.txtTotalPrice
-                .setText(MethodUtils.formatPriceString(orderProductList.get(position).getTotalPrice()));
+                .setText(MethodUtils.formatPriceString(orderProduct.getTotalPrice()));
         holder.btnNote.setText("Note");
         holder.btnNote.setEnabled(true);
         holder.btnNote.getBackground().setTint(context.getResources().getColor(R.color.blue_main));
         holder.btnNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                orderProduct = orderProductList.get(position);
                 DialogBoxOrderNote dialogBox = new DialogBoxOrderNote(activity, context,
-                        orderProductList.get(position), requestState) {
+                        orderProduct, requestState) {
                     @Override
                     public void onConfirmNote(String note) {
-                        orderProductList.get(position).setNote(note);
+                        orderProduct.setNote(note);
                     }
                 };
                 dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -88,14 +93,15 @@ public class RecViewOrderProductListAdapter
             if (order.getStatus().equals("completed")) {
                 holder.layoutReview.setVisibility(View.VISIBLE);
                 holder.txtReviewStatus.setText("Write Review");
-                if (orderProductList.get(position).getReview() != null) {
+                if (orderProduct.getReview() != null) {
                     holder.txtReviewStatus.setText("View Review");
                 }
                 holder.layoutReview.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        orderProduct = orderProductList.get(position);
                         DialogBoxReview dialogBox = new DialogBoxReview(activity, context,
-                                orderProductList.get(position)) {
+                                orderProduct) {
                             @Override
                             public void onConfirmReview(Review review) {
                                 addingReview(review, position);
@@ -121,12 +127,12 @@ public class RecViewOrderProductListAdapter
         return orderProductList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imgRecViewProduct;
-        private TextView txtRecViewProductOrderName, txtOrderQuantity,
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView imgRecViewProduct;
+        private final TextView txtRecViewProductOrderName, txtOrderQuantity,
                 txtProductPrice, txtTotalPrice, txtReviewStatus;
-        private Button btnNote;
-        private ConstraintLayout layoutReview;
+        private final Button btnNote;
+        private final ConstraintLayout layoutReview;
 
         public ViewHolder(View view) {
             super(view);

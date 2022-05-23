@@ -9,12 +9,10 @@ import java.util.List;
 
 public class Product implements Serializable {
 
-    private String productId, name, description, categoryId, status;
+    private String productId, name, description, categoryId, status, imageLink;
     private Supplier supplier;
-    private double retailPrice;
+    private double retailPrice, weight, rating;
     private int quantity, orderCount, reviewCount;
-    private double rating;
-    private String imageLink;
     private List<String> imageList;
     private Campaign campaign;
     private List<Campaign> campaignList;
@@ -47,12 +45,73 @@ public class Product implements Serializable {
         this.description = description;
     }
 
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getImageLink() {
+        return imageLink;
+    }
+
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
+        List<String> imageList = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(imageLink);
+            if(jsonArray.length() > 0) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    imageList.add(jsonArray.getJSONObject(i).getString("url"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            imageList = new ArrayList<>();
+        }
+        setImageList(imageList);
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
+
     public double getRetailPrice() {
         return retailPrice;
     }
 
     public void setRetailPrice(double retailPrice) {
         this.retailPrice = retailPrice;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
     public int getQuantity() {
@@ -79,73 +138,12 @@ public class Product implements Serializable {
         this.reviewCount = reviewCount;
     }
 
-    public String getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
     public List<String> getImageList() {
         return imageList;
     }
 
     public void setImageList(List<String> imageList) {
         this.imageList = imageList;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
-    public List<Campaign> getCampaignList() {
-        return campaignList;
-    }
-
-    public void setCampaignList(List<Campaign> campaignList) {
-        this.campaignList = campaignList;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public String getImageLink() {
-        return imageLink;
-    }
-
-    public void setImageLink(String imageLink) {
-        this.imageLink = imageLink;
-        List<String> imageList = new ArrayList<>();
-        try {
-            JSONArray jsonArray = new JSONArray(imageLink);
-            if(jsonArray.length() > 0) {
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    imageList.add(jsonArray.getJSONObject(i).getString("url"));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            imageList = new ArrayList<>();
-        }
-        setImageList(imageList);
     }
 
     public Campaign getCampaign() {
@@ -156,6 +154,14 @@ public class Product implements Serializable {
         this.campaign = campaign;
     }
 
+    public List<Campaign> getCampaignList() {
+        return campaignList;
+    }
+
+    public void setCampaignList(List<Campaign> campaignList) {
+        this.campaignList = campaignList;
+    }
+
     public List<Review> getReviewList() {
         return reviewList;
     }
@@ -164,12 +170,11 @@ public class Product implements Serializable {
         this.reviewList = reviewList;
     }
 
-    public static Product getObjectFromJSON(JSONObject jsonObject, boolean simpleForm)
+    public static Product getObjectFromJSON(JSONObject jsonObject, boolean searchForm)
                                                                             throws Exception {
         Product product = new Product();
         product.setProductId(jsonObject.getString("id"));
         product.setName(jsonObject.getString("name"));
-//        product.setCategoryId(jsonObject.getString("categoryId"));
         product.setCategoryId(jsonObject.getString("categoryid"));
         product.setDescription(jsonObject.getString("description"));
         product.setQuantity(jsonObject.getInt("quantity"));
@@ -177,12 +182,13 @@ public class Product implements Serializable {
         product.setStatus(jsonObject.getString("status"));
         Supplier supplier = new Supplier();
         supplier.setId(jsonObject.getString("supplierid"));
-        if (!simpleForm) {
+        if (!searchForm) {
             supplier.setName(jsonObject.getString("suppliername"));
-            supplier.setAddress(jsonObject.getString("supplieraddress"));
+            supplier.setAddressString(jsonObject.getString("supplieraddress"));
         }
         product.setSupplier(supplier);
         product.setImageLink(jsonObject.getString("image"));
+        product.setWeight(jsonObject.getDouble("weight"));
         product.setOrderCount(0);
         product.setReviewCount(0);
         product.setRating(0);

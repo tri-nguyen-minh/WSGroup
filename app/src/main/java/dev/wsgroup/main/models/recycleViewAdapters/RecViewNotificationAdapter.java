@@ -1,10 +1,12 @@
 package dev.wsgroup.main.models.recycleViewAdapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -15,7 +17,9 @@ import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Notification;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
 
 public class RecViewNotificationAdapter
         extends RecyclerView.Adapter<RecViewNotificationAdapter.ViewHolder> {
@@ -39,8 +43,7 @@ public class RecViewNotificationAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_notification, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -48,15 +51,19 @@ public class RecViewNotificationAdapter
         if (notificationList.size() > 0) {
             notification = notificationList.get(position);
             holder.txtNotificationDate
-                    .setText(MethodUtils.formatDateWithTime(notification.getCreatedDate()));
+                  .setText(MethodUtils.formatDate(notification.getCreatedDate(), true));
             checkNotificationStatus(holder, notification);
             if (notification.getMessage().toLowerCase().contains("campaign")) {
+                holder.layoutIdentifier.setVisibility(View.VISIBLE);
                 holder.lblOrderCode.setText("Campaign:");
                 message = "Campaign has ended.";
-            } else if (notification.getMessage().toLowerCase().contains("discount")) {
+                holder.txtOrderCode.setText(notification.getLink());
+            }
+            if (notification.getMessage().toLowerCase().contains("discount")) {
+                holder.layoutIdentifier.setVisibility(View.VISIBLE);
                 message = notification.getMessage();
                 message = message.substring(message.indexOf(":") + 1);
-                holder.lblOrderCode.setText("New Discount Code:" + message);
+                holder.lblOrderCode.setText("New Discount Code:");
                 message = "You received a new discount code.";
                 holder.layoutParent.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -64,7 +71,22 @@ public class RecViewNotificationAdapter
                         onDiscountNotificationClicked(notificationList.get(position));
                     }
                 });
-            } else {
+                holder.txtOrderCode.setText(message);
+            }
+            if (notification.getMessage().toLowerCase().contains("ewallet required")) {
+                holder.layoutIdentifier.setVisibility(View.GONE);
+                message = "You have not set your E-Wallet Account." +
+                        "\nYour E-Wallet Account is required to process order's refund.";
+                holder.layoutParent.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onEWalletNotificationClicked(notificationList.get(position));
+                    }
+                });
+                holder.txtOrderCode.setText(notification.getLink());
+            }
+            if (notification.getMessage().toLowerCase().contains("order")) {
+                holder.layoutIdentifier.setVisibility(View.VISIBLE);
                 holder.lblOrderCode.setText("Order:");
                 setupNotificationStatus(notification);
                 holder.layoutParent.setOnClickListener(new View.OnClickListener() {
@@ -73,8 +95,8 @@ public class RecViewNotificationAdapter
                         onOrderNotificationClicked(notificationList.get(position));
                     }
                 });
+                holder.txtOrderCode.setText(notification.getLink());
             }
-            holder.txtOrderCode.setText(notification.getLink());
             holder.txtMessage.setText(message);
         }
     }
@@ -82,23 +104,23 @@ public class RecViewNotificationAdapter
     private void checkNotificationStatus(ViewHolder holder, Notification notification) {
         if (notification.getNotificationRead()) {
             holder.txtNotificationDate
-                    .setTextColor(context.getResources().getColor(R.color.gray_darker));
+                  .setTextColor(context.getResources().getColor(R.color.gray_darker));
             holder.txtOrderCode
-                    .setTextColor(context.getResources().getColor(R.color.gray_darker));
+                  .setTextColor(context.getResources().getColor(R.color.gray_darker));
             holder.txtMessage
-                    .setTextColor(context.getResources().getColor(R.color.gray_darker));
+                  .setTextColor(context.getResources().getColor(R.color.gray_darker));
             holder.lblOrderCode
-                    .setTextColor(context.getResources().getColor(R.color.gray_darker));
+                  .setTextColor(context.getResources().getColor(R.color.gray_darker));
             holder.imgStatusCheck.setVisibility(View.GONE);
         } else {
             holder.txtNotificationDate
-                    .setTextColor(context.getResources().getColor(R.color.black));
+                  .setTextColor(context.getResources().getColor(R.color.black));
             holder.txtOrderCode
-                    .setTextColor(context.getResources().getColor(R.color.black));
+                  .setTextColor(context.getResources().getColor(R.color.black));
             holder.txtMessage
-                    .setTextColor(context.getResources().getColor(R.color.black));
+                  .setTextColor(context.getResources().getColor(R.color.black));
             holder.lblOrderCode
-                    .setTextColor(context.getResources().getColor(R.color.black));
+                  .setTextColor(context.getResources().getColor(R.color.black));
             holder.imgStatusCheck.setVisibility(View.VISIBLE);
         }
     }
@@ -119,8 +141,6 @@ public class RecViewNotificationAdapter
             message = "Order has been successfully returned.";
         } else if (notification.getMessage().toLowerCase().contains("cancelled")) {
             message = "Order has been cancelled.";
-        } else if (notification.getMessage().toLowerCase().contains("cancelled")) {
-            message = "Order has been cancelled.";
         } else if (notification.getMessage().toLowerCase().contains("requestrejected")) {
             message = "Return request has been rejected.";
         } else if (notification.getMessage().toLowerCase().contains("requestaccepted")) {
@@ -129,6 +149,8 @@ public class RecViewNotificationAdapter
             message = "Order has been collected by Delivery.";
         } else if (notification.getMessage().toLowerCase().contains("finishreturning")) {
             message = "Order has been delivered to Supplier.";
+        } else if (notification.getMessage().toLowerCase().contains("milestone")) {
+            message = "The joined campaign\nhas reached a new milestone.\nOrder's price has been updated.";
         }
     }
 
@@ -136,16 +158,20 @@ public class RecViewNotificationAdapter
 
     public void onDiscountNotificationClicked(Notification notification) { }
 
+    public void onEWalletNotificationClicked(Notification notification) {
+    }
+
     @Override
     public int getItemCount() {
         return notificationList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ConstraintLayout layoutParent;
-        private TextView txtNotificationDate, txtOrderCode, txtMessage, lblOrderCode;
-        private ImageView imgStatusCheck;
+        private final ConstraintLayout layoutParent;
+        private final TextView txtNotificationDate, txtOrderCode, txtMessage, lblOrderCode;
+        private final ImageView imgStatusCheck;
+        private final LinearLayout layoutIdentifier;
 
         public ViewHolder(View view) {
             super(view);
@@ -155,6 +181,7 @@ public class RecViewNotificationAdapter
             txtMessage = view.findViewById(R.id.txtMessage);
             lblOrderCode = view.findViewById(R.id.lblOrderCode);
             imgStatusCheck = view.findViewById(R.id.imgStatusCheck);
+            layoutIdentifier = view.findViewById(R.id.layoutIdentifier);
         }
     }
 }

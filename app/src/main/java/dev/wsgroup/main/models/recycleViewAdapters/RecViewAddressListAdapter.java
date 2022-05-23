@@ -1,15 +1,13 @@
 package dev.wsgroup.main.models.recycleViewAdapters;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,67 +16,42 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Address;
 import dev.wsgroup.main.models.utils.IntegerUtils;
-import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.views.dialogbox.DialogBoxAddress;
 
 public class RecViewAddressListAdapter
         extends RecyclerView.Adapter<RecViewAddressListAdapter.ViewHolder> {
 
     private Context context;
-    private Activity activity;
     private int request;
     private List<Address> addressList;
 
-    public RecViewAddressListAdapter(Context context, Activity activity, int request) {
+    public RecViewAddressListAdapter(Context context, int request) {
         this.context = context;
-        this.activity = activity;
         this.request = request;
     }
 
     public void setAddressList(List<Address> addressList) {
         this.addressList = addressList;
+        notifyDataSetChanged();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_address_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.txtAddressStreet.setText(addressList.get(position).getStreet());
+        holder.txtAddressDistrict.setText(addressList.get(position).getDistrictString());
         holder.txtAddressProvince.setText(addressList.get(position).getProvince());
         if (request == IntegerUtils.REQUEST_COMMON) {
             holder.checkboxAddress.setVisibility(View.GONE);
             holder.layoutParent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DialogBoxAddress dialogBoxAddress = new DialogBoxAddress(activity, context,
-                            addressList.get(position), false) {
-                        @Override
-                        public void onAddressUpdate(Address address) {
-                            onAddressChange(address, position, IntegerUtils.ADDRESS_ACTION_UPDATE);
-                            notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onAddressDelete() {
-                            onAddressChange(addressList.get(position), position,
-                                    IntegerUtils.ADDRESS_ACTION_DELETE);
-                            notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onUpdateFailed() {
-                            MethodUtils.displayErrorAPIMessage(activity);
-                        }
-                    };
-                    dialogBoxAddress.getWindow()
-                                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialogBoxAddress.show();
+                    onAddressSelected(addressList.get(position));
                 }
             });
         } else {
@@ -98,33 +71,14 @@ public class RecViewAddressListAdapter
             holder.layoutParent.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    DialogBoxAddress dialogBoxAddress = new DialogBoxAddress(activity, context,
-                            addressList.get(position), false) {
-                        @Override
-                        public void onAddressUpdate(Address address) {
-                            super.onAddressUpdate(address);
-                            onAddressChange(address, position, IntegerUtils.ADDRESS_ACTION_UPDATE);
-                            notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onAddressDelete() {
-                            super.onAddressDelete();
-                            onAddressChange(addressList.get(position), position,
-                                    IntegerUtils.ADDRESS_ACTION_DELETE);
-                            notifyDataSetChanged();
-                        }
-                    };
-                    dialogBoxAddress.getWindow()
-                                    .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialogBoxAddress.show();
+                    onAddressSelected(addressList.get(position));
                     return true;
                 }
             });
         }
     }
 
-    public void onAddressChange(Address address, int position, int action) {}
+    public void onAddressSelected(Address address) {}
 
     public void onCheckboxSelected(ImageView view, int position) {}
 
@@ -133,15 +87,16 @@ public class RecViewAddressListAdapter
         return addressList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ConstraintLayout layoutParent;
-        private TextView txtAddressStreet, txtAddressProvince;
-        private ImageView checkboxAddress;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ConstraintLayout layoutParent;
+        private final TextView txtAddressStreet, txtAddressDistrict, txtAddressProvince;
+        private final ImageView checkboxAddress;
 
         public ViewHolder(View view) {
             super(view);
             layoutParent = view.findViewById(R.id.layoutParent);
             txtAddressStreet = view.findViewById(R.id.txtAddressStreet);
+            txtAddressDistrict = view.findViewById(R.id.txtAddressDistrict);
             txtAddressProvince = view.findViewById(R.id.txtAddressProvince);
             checkboxAddress = view.findViewById(R.id.checkboxAddress);
         }

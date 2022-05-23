@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public class ObjectSerializer {
 
-    public static String serialize(Serializable obj) throws IOException {
+    public static String serialize(Serializable obj) throws Exception {
         if (obj == null) return "";
         ByteArrayOutputStream serialObj = new ByteArrayOutputStream();
         ObjectOutputStream objStream = new ObjectOutputStream(serialObj);
@@ -18,14 +18,14 @@ public class ObjectSerializer {
         return encodeBytes(serialObj.toByteArray());
     }
 
-    public static Object deserialize(String str) throws IOException, ClassNotFoundException {
-        if (str == null || str.length() == 0) return null;
-        ByteArrayInputStream serialObj = new ByteArrayInputStream(decodeBytes(str));
+    public static Object deserialize(String string) throws Exception {
+        if (string == null || string.length() == 0) return null;
+        ByteArrayInputStream serialObj = new ByteArrayInputStream(decodeBytes(string));
         ObjectInputStream objStream = new ObjectInputStream(serialObj);
         return objStream.readObject();
     }
 
-    public static String encodeBytes(byte[] bytes) {
+    private static String encodeBytes(byte[] bytes) {
         StringBuffer strBuf = new StringBuffer();
 
         for (int i = 0; i < bytes.length; i++) {
@@ -36,12 +36,12 @@ public class ObjectSerializer {
         return strBuf.toString();
     }
 
-    public static byte[] decodeBytes(String str) {
-        byte[] bytes = new byte[str.length() / 2];
-        for (int i = 0; i < str.length(); i+=2) {
-            char c = str.charAt(i);
+    private static byte[] decodeBytes(String string) {
+        byte[] bytes = new byte[string.length() / 2];
+        for (int i = 0; i < string.length(); i+=2) {
+            char c = string.charAt(i);
             bytes[i/2] = (byte) ((c - 'a') << 4);
-            c = str.charAt(i+1);
+            c = string.charAt(i+1);
             bytes[i/2] += (c - 'a');
         }
         return bytes;

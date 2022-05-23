@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -39,7 +38,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private int requestCode;
-    private String username, accountId, token, errorMessage;
+    private String username, accountId, errorMessage;
     private DialogBoxLoading dialogBoxLoading;
 
     @Override
@@ -61,7 +60,6 @@ public class PasswordChangeActivity extends AppCompatActivity {
         requestCode = getIntent().getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON);
         username = sharedPreferences.getString("USERNAME", "");
         accountId = getIntent().getStringExtra("ACCOUNT_ID");
-        token = sharedPreferences.getString("TOKEN", "");
 
         if (requestCode == IntegerUtils.REQUEST_PASSWORD_UPDATE) {
             layoutOldPassword.setVisibility(View.VISIBLE);
@@ -142,7 +140,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                 dialogBoxLoading.show();
                 errorMessage = checkValidInput();
                 if(errorMessage != null) {
-                    alertError();
+                    displayErrorMessage();
                 } else {
                     String newPassword = editNewPassword.getText().toString();
                     if (requestCode == IntegerUtils.REQUEST_PASSWORD_UPDATE) {
@@ -153,7 +151,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                             public void onUserFound(User user, String message) {
                                 if (oldPassword.equals(newPassword)) {
                                     errorMessage = StringUtils.MES_ERROR_DUPLICATE_OLD_PASSWORD;
-                                    alertError();
+                                    displayErrorMessage();
                                 } else {
                                     APIUserCaller.updatePassword(user.getAccountId(), newPassword,
                                             getApplication(), new APIListener() {
@@ -168,7 +166,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                                         @Override
                                         public void onFailedAPICall(int code) {
                                             errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
-                                            alertError();
+                                            displayErrorMessage();
                                         }
                                     });
                                 }
@@ -180,7 +178,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                                 } else {
                                     errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
                                 }
-                                alertError();
+                                displayErrorMessage();
                             }
                         });
                     } else {
@@ -197,7 +195,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
                             @Override
                             public void onFailedAPICall(int code) {
                                 errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
-                                alertError();
+                                displayErrorMessage();
                             }
                         });
                     }
@@ -222,7 +220,7 @@ public class PasswordChangeActivity extends AppCompatActivity {
         dialogBox.show();
     }
 
-    private void alertError() {
+    private void displayErrorMessage() {
         if (dialogBoxLoading.isShowing()) {
             dialogBoxLoading.dismiss();
         }

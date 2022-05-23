@@ -8,8 +8,7 @@ public class Conversation implements Serializable {
     private boolean readStatus, userMessageStatus;
     private Message lastMessage;
 
-    public Conversation() {
-    }
+    public Conversation() { }
 
     public User getMainUser() {
         return mainUser;

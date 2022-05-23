@@ -1,4 +1,4 @@
-package dev.wsgroup.main.views.activities.productviews;
+package dev.wsgroup.main.views.activities.order;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +22,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +40,12 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
-import dev.wsgroup.main.views.activities.order.ConfirmOrderActivity;
+import dev.wsgroup.main.views.activities.productviews.CampaignListActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 
-public class PrepareProductActivity extends AppCompatActivity {
+public class PrepareOrderActivity extends AppCompatActivity {
 
     private ConstraintLayout layoutParent, layoutSelectCampaign, layoutBasePrice;
     private LinearLayout layoutCampaign, layoutNextMilestone,
@@ -77,7 +76,7 @@ public class PrepareProductActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_prepare_product);
+        setContentView(R.layout.activity_prepare_order);
         this.getSupportActionBar().hide();
 
         layoutParent = findViewById(R.id.layoutParent);
@@ -122,7 +121,6 @@ public class PrepareProductActivity extends AppCompatActivity {
                      .into(imgProduct);
             }
             setupPurchasePriceAndQuantity();
-            calculateTotalPrice();
         }
 
         imgBackFromPrepareProduct.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +187,7 @@ public class PrepareProductActivity extends AppCompatActivity {
                     } else if (quantity > maxQuantity) {
                         editProductQuantity.setText(maxQuantity + "");
                     } else {
-                        setSharingCampaignLayout();
+                        checkSharedCampaignStatus();
                         setupQuantityButtons();
                         calculateTotalPrice();
                     }
@@ -218,7 +216,7 @@ public class PrepareProductActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-                dialogBoxLoading = new DialogBoxLoading(PrepareProductActivity.this);
+                dialogBoxLoading = new DialogBoxLoading(PrepareOrderActivity.this);
                 dialogBoxLoading.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
@@ -234,12 +232,13 @@ public class PrepareProductActivity extends AppCompatActivity {
                 if (cartId == null) {
                     addCartProduct(cartProduct);
                 } else {
+
                     cartProduct.setId(cartId);
                     if (dialogBoxLoading.isShowing()) {
                         dialogBoxLoading.dismiss();
                     }
                     DialogBoxConfirm confirmLogoutBox
-                            = new DialogBoxConfirm(PrepareProductActivity.this,
+                            = new DialogBoxConfirm(PrepareOrderActivity.this,
                             StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
                         @Override
                         public void onYesClicked() {
@@ -257,7 +256,7 @@ public class PrepareProductActivity extends AppCompatActivity {
         btnConfirmPurchase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(PrepareProductActivity.this,
+                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(PrepareOrderActivity.this,
                         StringUtils.MES_CONFIRM_IMMEDIATE_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
@@ -270,132 +269,6 @@ public class PrepareProductActivity extends AppCompatActivity {
                 dialogBoxConfirm.show();
             }
         });
-    }
-
-    private void startInstantOrder() {
-        CartProduct cartProduct = getCartProduct();
-        int request = cartProduct.getCampaignFlag()
-                ? IntegerUtils.REQUEST_ORDER_CAMPAIGN : IntegerUtils.REQUEST_ORDER_RETAIL;
-        ArrayList<Order> ordersList = new ArrayList<>();
-        List<OrderProduct> selectedProductList = new ArrayList<>();
-        OrderProduct orderProduct = new OrderProduct();
-        orderProduct.setProduct(cartProduct.getProduct());
-        orderProduct.setQuantity(cartProduct.getQuantity());
-        orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
-        totalPrice = cartProduct.getQuantity() * cartProduct.getProduct().getRetailPrice();
-        orderProduct.setTotalPrice(totalPrice);
-        orderProduct.setCartProduct(cartProduct);
-        orderProduct.setCampaign(cartProduct.getCampaign());
-        selectedProductList.add(orderProduct);
-        Order order = new Order();
-        order.setTotalPrice(totalPrice);
-        order.setCampaign(cartProduct.getCampaign());
-        order.setSupplier(product.getSupplier());
-        order.setInCart(false);
-        order.setOrderProductList(selectedProductList);
-        order.setLoyaltyDiscountPercent(0);
-        ordersList.add(order);
-        Intent confirmOrderIntent = new Intent(getApplicationContext(), ConfirmOrderActivity.class);
-        confirmOrderIntent.putExtra("ORDER_LIST", ordersList);
-        confirmOrderIntent.putExtra("REQUEST_CODE", request);
-        startActivityForResult(confirmOrderIntent, IntegerUtils.REQUEST_COMMON);
-    }
-
-    private CartProduct getCartProduct() {
-        CartProduct cartProduct = new CartProduct();
-        cartProduct.setProduct(product);
-        cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
-        cartProduct.setCampaign(campaign);
-        cartProduct.setCampaignFlag(campaign != null);
-        return cartProduct;
-    }
-
-    private void addCartProduct(CartProduct cartProduct) {
-        APICartCaller.addCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
-                getApplication(), new APIListener() {
-            @Override
-            public void onAddCartItemSuccessful(CartProduct cartProduct) {
-                System.out.println(cartProduct.getProduct().getName());
-                cartList.add(cartProduct);
-                System.out.println("added");
-                for (CartProduct c : cartList) {
-                    System.out.println(c.getProduct().getName());
-                }
-                try {
-                    sharedPreferences.edit()
-                            .putString(cartTag,
-                                    ObjectSerializer.serialize((Serializable) cartList))
-                            .commit();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                displaySuccessMessage();
-            }
-
-            @Override
-            public void onFailedAPICall(int code) {
-                if (dialogBoxLoading.isShowing()) {
-                    dialogBoxLoading.dismiss();
-                }
-                if (code == IntegerUtils.ERROR_NO_USER) {
-                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-                            PrepareProductActivity.this);
-                } else {
-                    MethodUtils.displayErrorAPIMessage(PrepareProductActivity.this);
-                }
-            }
-        });
-    }
-
-    private void updateCartProduct(CartProduct cartProduct) {
-        APICartCaller.updateCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
-                getApplication(), new APIListener() {
-                    @Override
-                    public void onUpdateSuccessful() {
-                        displaySuccessMessage();
-                    }
-
-                    @Override
-                    public void onFailedAPICall(int code) {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
-                        if (code == IntegerUtils.ERROR_NO_USER) {
-                            MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-                                    PrepareProductActivity.this);
-                        } else {
-                            MethodUtils.displayErrorAPIMessage(PrepareProductActivity.this);
-                        }
-                    }
-                });
-    }
-
-    private void displaySuccessMessage() {
-        if (dialogBoxLoading.isShowing()) {
-            dialogBoxLoading.dismiss();
-        }
-        DialogBoxAlert dialogBox =
-                new DialogBoxAlert(PrepareProductActivity.this,
-                        IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
-                        StringUtils.MES_SUCCESSFUL_ADD_CART,"") {
-                    @Override
-                    public void onClickAction() {
-                        setResult(RESULT_OK);
-                        finish();
-                    }
-                };
-        dialogBox.show();
-    }
-
-    private void setClickableQuantityButton(ImageView view, boolean clickable) {
-        view.setEnabled(clickable);
-        if (clickable) {
-            view.setColorFilter(getApplicationContext().getResources()
-                                                       .getColor(R.color.gray_dark));
-        } else {
-            view.setColorFilter(getApplicationContext().getResources()
-                                                       .getColor(R.color.gray_light));
-        }
     }
 
     private void setupPurchasePriceAndQuantity() {
@@ -428,11 +301,12 @@ public class PrepareProductActivity extends AppCompatActivity {
         getQuantity();
         editProductQuantity.setText(quantity + "");
         txtNumberInStorage.setText(maxQuantity + "");
-        setSharingCampaignLayout();
+        checkSharedCampaignStatus();
         setupQuantityButtons();
+        calculateTotalPrice();
     }
 
-    private void setSharingCampaignLayout() {
+    private void checkSharedCampaignStatus() {
         if (campaign != null && campaign.getShareFlag()) {
             txtCampaignTag.setText("Sharing Campaign");
             milestoneList = campaign.getMilestoneList();
@@ -466,7 +340,6 @@ public class PrepareProductActivity extends AppCompatActivity {
             txtCampaignQuantityBar.setText(milestoneQuantity + "");
             progressBarQuantityCount.setMax(milestoneQuantity);
             progressBarQuantityCount.setProgress(quantity);
-            calculateTotalPrice();
         }
     }
 
@@ -502,6 +375,122 @@ public class PrepareProductActivity extends AppCompatActivity {
         txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
     }
 
+    private CartProduct getCartProduct() {
+        CartProduct cartProduct = new CartProduct();
+        cartProduct.setProduct(product);
+        cartProduct.setQuantity(Integer.parseInt(editProductQuantity.getText().toString()));
+        cartProduct.setCampaign(campaign);
+        cartProduct.setCampaignFlag(campaign != null);
+        return cartProduct;
+    }
+
+    private void startInstantOrder() {
+        CartProduct cartProduct = getCartProduct();
+        ArrayList<Order> ordersList = new ArrayList<>();
+        List<OrderProduct> selectedProductList = new ArrayList<>();
+        OrderProduct orderProduct = new OrderProduct();
+        orderProduct.setProduct(cartProduct.getProduct());
+        orderProduct.setQuantity(cartProduct.getQuantity());
+        orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
+        totalPrice = cartProduct.getQuantity() * cartProduct.getProduct().getRetailPrice();
+        orderProduct.setTotalPrice(totalPrice);
+        orderProduct.setCartProduct(cartProduct);
+        orderProduct.setCampaign(cartProduct.getCampaign());
+        selectedProductList.add(orderProduct);
+        Order order = new Order();
+        order.setTotalPrice(totalPrice);
+        order.setCampaign(cartProduct.getCampaign());
+        order.setSupplier(product.getSupplier());
+        order.setInCart(false);
+        order.setOrderProductList(selectedProductList);
+        order.setLoyaltyDiscountPercent(0);
+        ordersList.add(order);
+        int request = cartProduct.getCampaignFlag()
+                ? IntegerUtils.REQUEST_ORDER_CAMPAIGN : IntegerUtils.REQUEST_ORDER_RETAIL;
+        Intent confirmOrderIntent = new Intent(getApplicationContext(), ConfirmOrderActivity.class);
+        confirmOrderIntent.putExtra("ORDER_LIST", ordersList);
+        confirmOrderIntent.putExtra("REQUEST_CODE", request);
+        startActivityForResult(confirmOrderIntent, IntegerUtils.REQUEST_COMMON);
+    }
+
+    private void addCartProduct(CartProduct cartProduct) {
+        APICartCaller.addCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
+                getApplication(), new APIListener() {
+            @Override
+            public void onAddCartItemSuccessful(CartProduct cartProduct) {
+                cartList.add(cartProduct);
+                try {
+                    sharedPreferences.edit()
+                            .putString(cartTag, ObjectSerializer.serialize((Serializable) cartList))
+                            .apply();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                displaySuccessMessage();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            PrepareOrderActivity.this);
+                } else {
+                    MethodUtils.displayErrorAPIMessage(PrepareOrderActivity.this);
+                }
+            }
+        });
+    }
+
+    private void updateCartProduct(CartProduct cartProduct) {
+        APICartCaller.updateCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
+                getApplication(), new APIListener() {
+            @Override
+            public void onUpdateSuccessful() {
+                displaySuccessMessage();
+            }
+
+            @Override
+            public void onFailedAPICall(int code) {
+                if (dialogBoxLoading.isShowing()) {
+                    dialogBoxLoading.dismiss();
+                }
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            PrepareOrderActivity.this);
+                } else {
+                    MethodUtils.displayErrorAPIMessage(PrepareOrderActivity.this);
+                }
+            }
+        });
+    }
+
+    private String checkDuplicateCartProduct() {
+        for (CartProduct cartProduct : cartList) {
+            if (cartProduct.getProduct().getProductId().equals(product.getProductId())) {
+                if (campaign == null) {
+                    return cartProduct.getId();
+                } else if (cartProduct.getCampaign().getId().equals(campaign.getId())) {
+                    return cartProduct.getId();
+                }
+            }
+        }
+        return null;
+    }
+
+    private void setClickableQuantityButton(ImageView view, boolean clickable) {
+        view.setEnabled(clickable);
+        if (clickable) {
+            view.setColorFilter(getApplicationContext().getResources()
+                    .getColor(R.color.gray_dark));
+        } else {
+            view.setColorFilter(getApplicationContext().getResources()
+                    .getColor(R.color.gray_light));
+        }
+    }
+
     private void setupQuantityButtons() {
         if (quantity == maxQuantity) {
             setClickableQuantityButton(imgProductQuantityMinus, true);
@@ -517,13 +506,20 @@ public class PrepareProductActivity extends AppCompatActivity {
         }
     }
 
-    private String checkDuplicateCartProduct() {
-        for (CartProduct cartProduct : cartList) {
-            if (cartProduct.getProduct().getProductId().equals(product.getProductId())) {
-                return cartProduct.getId();
-            }
+    private void displaySuccessMessage() {
+        if (dialogBoxLoading.isShowing()) {
+            dialogBoxLoading.dismiss();
         }
-        return null;
+        DialogBoxAlert dialogBox = new DialogBoxAlert(PrepareOrderActivity.this,
+                IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
+                StringUtils.MES_SUCCESSFUL_ADD_CART,"") {
+            @Override
+            public void onClickAction() {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        };
+        dialogBox.show();
     }
 
     @Override

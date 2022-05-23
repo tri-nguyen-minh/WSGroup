@@ -19,6 +19,7 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.dtos.Discount;
+import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
@@ -30,6 +31,7 @@ public class RecViewDiscountListAdapter
     private int identifier;
     private CustomerDiscount customerDiscount;
     private Discount discount;
+    private Supplier supplier;
 
     public RecViewDiscountListAdapter(Context context, int identifier) {
         this.context = context;
@@ -53,7 +55,8 @@ public class RecViewDiscountListAdapter
     public void onBindViewHolder(RecViewDiscountListAdapter.ViewHolder holder, int position) {
         customerDiscount = discountList.get(position);
         discount = customerDiscount.getDiscount();
-        holder.txtDiscountEndDate.setText(MethodUtils.formatDate(discount.getEndDate()));
+        supplier = discount.getSupplier();
+        holder.txtDiscountEndDate.setText(MethodUtils.formatDate(discount.getEndDate(), false));
         if (!discount.getDescription().equals("null")) {
             holder.txtDiscountDescription.setVisibility(View.VISIBLE);
             holder.txtDiscountDescription.setText(discount.getDescription());
@@ -63,10 +66,10 @@ public class RecViewDiscountListAdapter
         holder.txtDiscountPrice.setText(MethodUtils.formatPriceString(discount.getDiscountPrice()));
         holder.txtDiscountCode.setText(discount.getCode());
         holder.txtDiscountCondition.setText(MethodUtils.formatPriceString(discount.getMinPrice()));
-        holder.txtSupplierName.setText(discount.getSupplier().getName());
-        holder.txtSupplierAddress.setText(discount.getSupplier().getAddress());
+        holder.txtSupplierName.setText(supplier.getName());
+        holder.txtSupplierAddress.setText(supplier.getAddress().getFullAddressString());
         Glide.with(context)
-             .load(discount.getSupplier().getAvatarLink())
+             .load(supplier.getAvatarLink())
              .into(holder.imgSupplierAvatar);
         holder.btnSelect.setVisibility(View.INVISIBLE);
         if (identifier == IntegerUtils.IDENTIFIER_DISCOUNT_SELECT) {
@@ -91,13 +94,12 @@ public class RecViewDiscountListAdapter
         return discountList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtDiscountEndDate, txtDiscountDescription, txtDiscountCode,
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView txtDiscountEndDate, txtDiscountDescription, txtDiscountCode,
                 txtDiscountPrice, txtDiscountCondition, txtSupplierName, txtSupplierAddress;
-        private Button btnSelect;
-        private RelativeLayout layoutParent;
-        private ConstraintLayout layoutSupplier;
-        private ImageView imgSupplierAvatar;
+        private final Button btnSelect;
+        private final ConstraintLayout layoutSupplier;
+        private final ImageView imgSupplierAvatar;
 
         public ViewHolder(View view) {
             super(view);
@@ -109,7 +111,6 @@ public class RecViewDiscountListAdapter
             txtSupplierName = view.findViewById(R.id.txtSupplierName);
             txtSupplierAddress = view.findViewById(R.id.txtSupplierAddress);
             btnSelect = view.findViewById(R.id.btnSelect);
-            layoutParent = view.findViewById(R.id.layoutParent);
             layoutSupplier = view.findViewById(R.id.layoutSupplier);
             imgSupplierAvatar = view.findViewById(R.id.imgSupplierAvatar);
         }

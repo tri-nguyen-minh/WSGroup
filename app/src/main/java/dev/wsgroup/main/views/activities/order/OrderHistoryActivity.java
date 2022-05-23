@@ -1,8 +1,6 @@
 package dev.wsgroup.main.views.activities.order;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,8 +31,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
     private RelativeLayout layoutLoading;
     private RecyclerView recViewOrderHistory;
 
-    private SharedPreferences sharedPreferences;
-    private String token, orderCode;
+    private String orderCode;
     private Order order;
     private RecViewOrderHistoryAdapter adapter;
 
@@ -79,8 +76,6 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
     private void setupOrder() {
         setLoadingState();
-        sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("TOKEN", "");
         orderCode = getIntent().getStringExtra("ORDER_CODE");
         APIOrderCaller.getOrderByOrderCode(orderCode, getApplication(), new APIListener() {
             @Override
@@ -94,7 +89,6 @@ public class OrderHistoryActivity extends AppCompatActivity {
                         @Override
                         public void onOrderHistoryFound(List<OrderHistory> historyList) {
                             if (historyList.size() > 0) {
-
                                 setupList(historyList);
                                 setListViewState();
                             } else {
@@ -126,7 +120,6 @@ public class OrderHistoryActivity extends AppCompatActivity {
         recViewOrderHistory.setAdapter(adapter);
         recViewOrderHistory.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false));
-//        recViewOrderHistory.scrollToPosition(historyList.size() - 1);
         recViewOrderHistory.scrollToPosition(0);
     }
 

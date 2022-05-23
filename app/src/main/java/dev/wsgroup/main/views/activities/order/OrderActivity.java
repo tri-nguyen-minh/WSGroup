@@ -1,6 +1,5 @@
 package dev.wsgroup.main.views.activities.order;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -58,18 +57,18 @@ public class OrderActivity extends AppCompatActivity {
             txtTotalDiscount, txtAdvanced, lblRetryGetOrder, txtFullPayment,
             txtDiscountEndDate, txtMilestonePrice, txtCampaignOrderCount,
             txtCampaignQuantityCount, txtCampaignQuantityBar, txtCampaignNote,
-            lblProductOrderCount, txtLoyaltyDiscount;
+            lblProductOrderCount, txtLoyaltyDiscount, txtShipping;
     private RelativeLayout layoutLoading;
     private LinearLayout layoutNoOrder, layoutAction, layoutCampaign;
     private RecyclerView recViewOrderProduct, recViewCampaignMilestone;
     private ConstraintLayout layoutDiscount, layoutAdvance, layoutStatus,
-            layoutOrderSupplier, layoutCampaignMilestone, layoutLoyalty;
+            layoutOrderSupplier, layoutLoyalty, layoutShipping;
     private NestedScrollView scrollViewMain;
     private Button btnFirstAction, btnSecondAction;
     private ProgressBar progressBarQuantityCount;
 
     private String token, userId, orderCode, status, description;
-    private double totalPrice, discountPrice, advancedFee;
+    private double totalPrice, discountPrice, advancedFee, shippingFee;
     private int productCount;
     private Intent intent;
     private Order order;
@@ -115,6 +114,7 @@ public class OrderActivity extends AppCompatActivity {
         txtCampaignNote = findViewById(R.id.txtCampaignNote);
         lblProductOrderCount = findViewById(R.id.lblProductOrderCount);
         txtLoyaltyDiscount = findViewById(R.id.txtLoyaltyDiscount);
+        txtShipping = findViewById(R.id.txtShipping);
         layoutLoading = findViewById(R.id.layoutLoading);
         layoutNoOrder = findViewById(R.id.layoutNoOrder);
         recViewOrderProduct = findViewById(R.id.recViewOrderProduct);
@@ -123,8 +123,8 @@ public class OrderActivity extends AppCompatActivity {
         layoutAdvance = findViewById(R.id.layoutAdvance);
         layoutStatus = findViewById(R.id.layoutStatus);
         layoutOrderSupplier = findViewById(R.id.layoutOrderSupplier);
-        layoutCampaignMilestone = findViewById(R.id.layoutCampaignMilestone);
         layoutLoyalty = findViewById(R.id.layoutLoyalty);
+        layoutShipping = findViewById(R.id.layoutShipping);
         layoutAction = findViewById(R.id.layoutAction);
         layoutCampaign = findViewById(R.id.layoutCampaign);
         scrollViewMain = findViewById(R.id.scrollViewMain);
@@ -140,47 +140,51 @@ public class OrderActivity extends AppCompatActivity {
             public void onClick(View view) {
                 getIntent().putExtra("MAIN_TAB_POSITION", 1);
                 int historyTabPosition = 0;
-                switch (order.getStatus()) {
-                    case "unpaid": {
-                        historyTabPosition = 0;
-                        break;
+                try {
+                    switch (order.getStatus()) {
+                        case "unpaid": {
+                            historyTabPosition = 0;
+                            break;
+                        }
+                        case "advanced": {
+                            historyTabPosition = 1;
+                            break;
+                        }
+                        case "created": {
+                            historyTabPosition = 2;
+                            break;
+                        }
+                        case "processing": {
+                            historyTabPosition = 3;
+                            break;
+                        }
+                        case "delivering": {
+                            historyTabPosition = 4;
+                            break;
+                        }
+                        case "delivered": {
+                            historyTabPosition = 5;
+                            break;
+                        }
+                        case "completed": {
+                            historyTabPosition = 6;
+                            break;
+                        }
+                        case "returning": {
+                            historyTabPosition = 7;
+                            break;
+                        }
+                        case "returned": {
+                            historyTabPosition = 8;
+                            break;
+                        }
+                        case "cancelled": {
+                            historyTabPosition = 9;
+                            break;
+                        }
                     }
-                    case "advanced": {
-                        historyTabPosition = 1;
-                        break;
-                    }
-                    case "created": {
-                        historyTabPosition = 2;
-                        break;
-                    }
-                    case "processing": {
-                        historyTabPosition = 3;
-                        break;
-                    }
-                    case "delivering": {
-                        historyTabPosition = 4;
-                        break;
-                    }
-                    case "delivered": {
-                        historyTabPosition = 5;
-                        break;
-                    }
-                    case "completed": {
-                        historyTabPosition = 6;
-                        break;
-                    }
-                    case "returning": {
-                        historyTabPosition = 7;
-                        break;
-                    }
-                    case "returned": {
-                        historyTabPosition = 8;
-                        break;
-                    }
-                    case "cancelled": {
-                        historyTabPosition = 9;
-                        break;
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 getIntent().putExtra("HISTORY_TAB_POSITION", historyTabPosition);
                 setResult(RESULT_OK, getIntent());
@@ -234,14 +238,13 @@ public class OrderActivity extends AppCompatActivity {
                         APICampaignCaller.getCampaignById(order.getCampaign().getId(),
                                 getApplication(), new APIListener() {
                             @Override
-                            public void onCampaignFound(Campaign campaign) {
-                                order.setCampaign(campaign);
-                                setupData();
-                            }
-
-                            @Override
-                            public void onNoJSONFound() {
-                                setNoOrderState();
+                            public void onCampaignListFound(List<Campaign> campaignList) {
+                                if (campaignList.size() > 0) {
+                                    order.setCampaign(campaignList.get(0));
+                                    setupData();
+                                } else {
+                                    setNoOrderState();
+                                }
                             }
 
                             @Override
@@ -277,7 +280,7 @@ public class OrderActivity extends AppCompatActivity {
         Glide.with(getApplicationContext())
              .load(order.getSupplier().getAvatarLink())
              .into(imgSupplierAvatar);
-        txtSupplierAddress.setText(order.getSupplier().getAddress());
+        txtSupplierAddress.setText(order.getSupplier().getAddress().getFullAddressString());
         discountPrice = order.getDiscountPrice();
         if (discountPrice == 0) {
             layoutDiscount.setVisibility(View.GONE);
@@ -286,30 +289,28 @@ public class OrderActivity extends AppCompatActivity {
         }
         txtTotalDiscount.setText(MethodUtils.formatPriceString(order.getDiscountPrice()));
         advancedFee = order.getAdvanceFee();
-        if (order.getAdvanceFee() == 0) {
+        if (advancedFee == 0) {
             layoutAdvance.setVisibility(View.GONE);
         } else {
             layoutAdvance.setVisibility(View.VISIBLE);
         }
+        shippingFee = order.getShippingFee();
+        layoutShipping.setVisibility(View.VISIBLE);
         layoutCampaign.setVisibility(View.GONE);
         if (order.getStatus().equals("advanced")) {
             sharingCampaign = order.getCampaign();
             layoutCampaign.setVisibility(View.VISIBLE);
-            recViewCampaignMilestone.setVisibility(View.GONE);
             txtCampaignNote.setText(sharingCampaign.getDescription());
-            txtDiscountEndDate
-                    .setText(MethodUtils.formatDate(sharingCampaign.getEndDate()));
+            txtDiscountEndDate.setText(MethodUtils.formatDate(sharingCampaign.getEndDate(), false));
             imgExpand.setImageResource(R.drawable.ic_direction_down);
             milestone = MethodUtils.getReachedCampaignMilestone(
                     sharingCampaign.getMilestoneList(),
                     sharingCampaign.getQuantityCount());
-            String price = "";
             if (milestone == null) {
-                price = MethodUtils.formatPriceString(sharingCampaign.getPrice());
+                txtMilestonePrice.setText(MethodUtils.formatPriceString(sharingCampaign.getPrice()));
             } else {
-                price = MethodUtils.formatPriceString(milestone.getPrice());
+                txtMilestonePrice.setText(MethodUtils.formatPriceString(milestone.getPrice()));
             }
-            txtMilestonePrice.setText(price);
             txtCampaignOrderCount.setText(sharingCampaign.getOrderCount() + "");
             txtCampaignQuantityCount.setText(sharingCampaign.getQuantityCount() + "");
             txtCampaignQuantityBar.setText(sharingCampaign.getMaxQuantity() + "");
@@ -320,20 +321,6 @@ public class OrderActivity extends AppCompatActivity {
             progressBarQuantityCount.getProgressDrawable()
                     .setColorFilter(getResources().getColor(R.color.blue_main),
                             android.graphics.PorterDuff.Mode.SRC_IN);
-            layoutCampaignMilestone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    System.out.println("VISIBLE: " + (recViewCampaignMilestone.getVisibility() == View.VISIBLE));
-                    System.out.println(recViewCampaignMilestone.getAdapter().getItemCount());
-                    if (recViewCampaignMilestone.getVisibility() == View.GONE) {
-                        recViewCampaignMilestone.setVisibility(View.VISIBLE);
-                        imgExpand.setImageResource(R.drawable.ic_direction_up);
-                    } else {
-                        recViewCampaignMilestone.setVisibility(View.GONE);
-                        imgExpand.setImageResource(R.drawable.ic_direction_down);
-                    }
-                }
-            });
             milestoneAdapter = new RecViewCampaignMilestoneListAdapter(getApplicationContext(),
                     order.getOrderProductList().get(0).getPrice());
             milestoneAdapter.setCampaign(sharingCampaign);
@@ -351,7 +338,8 @@ public class OrderActivity extends AppCompatActivity {
         }
         txtTotalPrice.setText(MethodUtils.formatPriceString(order.getTotalPrice()));
         txtAdvanced.setText(MethodUtils.formatPriceString(advancedFee));
-        totalPrice = order.getTotalPrice() - discountPrice - advancedFee;
+        txtShipping.setText(MethodUtils.formatPriceString(shippingFee));
+        totalPrice = order.getTotalPrice() - discountPrice - advancedFee + shippingFee;
         txtFinalPrice.setText(MethodUtils.formatPriceString(totalPrice));
         if (order.getStatus().equals("completed")) {
             checkOrderReview();
@@ -436,12 +424,13 @@ public class OrderActivity extends AppCompatActivity {
 
     private void checkOrderReview() {
         if (order.getCampaign() != null) {
-            APIReviewCaller.getReviewByOrderProductId(order.getId(), true,
+            APIReviewCaller.getReviewByOrderId(order.getId(), true,
                     getApplication(), new APIListener() {
                 @Override
-                public void onReviewFound(Review review) {
-                    order.getOrderProductList().get(0).setReview(review);
-                    productCount--;
+                public void onReviewListFound(List<Review> reviewList) {
+                    if (reviewList.size() > 0) {
+                        order.getOrderProductList().get(0).setReview(reviewList.get(0));
+                    }
                     setupRecViewOrderList();
                 }
 
@@ -454,11 +443,13 @@ public class OrderActivity extends AppCompatActivity {
             orderProductList = order.getOrderProductList();
             productCount = orderProductList.size();
             for (OrderProduct orderProduct : orderProductList) {
-                APIReviewCaller.getReviewByOrderProductId(orderProduct.getId(), false,
+                APIReviewCaller.getReviewByOrderId(orderProduct.getId(), false,
                         getApplication(), new APIListener() {
                     @Override
-                    public void onReviewFound(Review review) {
-                        orderProduct.setReview(review);
+                    public void onReviewListFound(List<Review> reviewList) {
+                        if (reviewList.size() > 0) {
+                            orderProduct.setReview(reviewList.get(0));
+                        }
                         productCount--;
                         if (productCount == 0) {
                             setupRecViewOrderList();
@@ -478,8 +469,8 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void setupRecViewOrderList() {
-        adapter = new RecViewOrderProductListAdapter(getApplicationContext(),OrderActivity.this,
-                IntegerUtils.REQUEST_NOTE_READ_ONLY) {
+        adapter = new RecViewOrderProductListAdapter(getApplicationContext(),
+                OrderActivity.this, IntegerUtils.REQUEST_NOTE_READ_ONLY) {
             @Override
             public void addingReview(Review review, int position) {
                 dialogBoxLoading = new DialogBoxLoading(OrderActivity.this);
@@ -498,7 +489,7 @@ public class OrderActivity extends AppCompatActivity {
                 APIReviewCaller.addReview(review, token, isCampaign,
                         getApplication(), new APIListener() {
                     @Override
-                    public void onReviewFound(Review review) {
+                    public void onReviewAdded(Review review) {
                         dialogBoxAlert = new DialogBoxAlert(OrderActivity.this,
                                 IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS,
                                 StringUtils.MES_SUCCESSFUL_ADD_REVIEW,"") {
@@ -543,15 +534,15 @@ public class OrderActivity extends AppCompatActivity {
             order.getOrderProductList().get(0).setReview(review);
         } else {
             orderProductList = order.getOrderProductList();
-            int count;
-            for (count = 0; count < orderProductList.size(); count++) {
-                orderProduct = orderProductList.get(count);
+            int index;
+            for (index = 0; index < orderProductList.size(); index++) {
+                orderProduct = orderProductList.get(index);
                 if (review.getOrderId().equals(orderProduct.getId())) {
                     orderProduct.setReview(review);
                     break;
                 }
             }
-            orderProductList.set(count, orderProduct);
+            orderProductList.set(index, orderProduct);
             order.setOrderProductList(orderProductList);
         }
     }
@@ -569,12 +560,12 @@ public class OrderActivity extends AppCompatActivity {
                         "online payment", "online payment",
                         getApplication(), new APIListener() {
                     @Override
-                    public void onGettingPaymentURL(String url) {
+                    public void onResultStringFound(String url) {
                         DialogBoxPayment dialogBox = new DialogBoxPayment(OrderActivity.this, url) {
                             @Override
                             public void onCompletedPayment(String vnpRef) {
-                                APIOrderCaller.updateOrderPaymentStatus(token, order, status,
-                                        false, totalPrice, getUpdatedPrice(), vnpRef,
+                                APIOrderCaller.updateOrderPaymentStatus(token, order,
+                                        status,false, totalPrice, vnpRef,
                                         getApplication(), new APIListener() {
                                     @Override
                                     public void onUpdateSuccessful() {
@@ -657,15 +648,6 @@ public class OrderActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private double getUpdatedPrice() {
-        if (order.getCampaign() != null && order.getCampaign().getShareFlag()) {
-            List<CampaignMilestone> milestoneList = order.getCampaign().getMilestoneList();
-            int quantity = order.getOrderProductList().get(0).getQuantity();
-            return MethodUtils.getReachedCampaignMilestone(milestoneList, quantity).getPrice();
-        }
-        return 0;
     }
 
     private void displayCancelMessage() {

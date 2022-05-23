@@ -66,13 +66,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.getSupportActionBar().hide();
 
-//        DisplayMetrics displayMetrics = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        int height = displayMetrics.heightPixels;
-//        int width = displayMetrics.widthPixels;
-//        System.out.println("width: " + width);
-//        System.out.println("height: " + height);
-
         tabLayout = findViewById(R.id.mainTabLayout);
         viewPager = findViewById(R.id.mainViewPager);
         layoutMainPage = findViewById(R.id.layoutMainPage);
@@ -104,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
             setupTabLayout(0);
         } else {
             token = sharedPreferences.getString("TOKEN", "");
-            System.out.println(token);
             APIUserCaller.findUserByToken(token, getApplication(), new APIListener() {
                 @Override
                 public void onUserFound(User user, String message) {
@@ -159,8 +151,8 @@ public class MainActivity extends AppCompatActivity {
                             ObjectSerializer.serialize((Serializable) retailCartProductList))
                     .putString("CAMPAIGN_CART",
                             ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .commit();
-        } catch (IOException e) {
+                    .apply();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         setupTabLayout(tabPosition);
@@ -206,8 +198,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setTabTextColors(getResources().getColor(R.color.black), getResources().getColor(R.color.black));
 
-        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(),
-                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 switch (position) {

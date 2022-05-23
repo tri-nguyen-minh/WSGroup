@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +17,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +31,6 @@ import dev.wsgroup.main.models.apis.callers.APICategoryCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
 import dev.wsgroup.main.models.dtos.Category;
-import dev.wsgroup.main.models.dtos.Discount;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
@@ -44,26 +39,25 @@ import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.SupplierActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
 import dev.wsgroup.main.views.activities.productviews.CampaignListActivity;
-import dev.wsgroup.main.views.activities.productviews.PrepareProductActivity;
+import dev.wsgroup.main.views.activities.order.PrepareOrderActivity;
 import dev.wsgroup.main.views.activities.productviews.SearchProductActivity;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 public class DetailTab extends Fragment {
 
-    private TextView txtProductQuantity, txtProductCategory, txtProductDescription,
-            txtSupplierName, txtMoreSuppliersProductsName;
     private RecyclerView recViewMoreSuppliersProducts;
     private ViewFlipper viewFlipperProduct;
     private ImageView imgCommonFlipper, imgProductCategory, imgProduct;
-    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount,
-            txtRatingProduct, txtRetailPrice, txtCampaignCount, lblDescriptionLength,
-            txtLoyaltyDiscount, lblCampaignCount;
+    private TextView txtProductName, txtProductOrderCount, txtProductReviewCount, txtRatingProduct,
+            txtRetailPrice, txtCampaignCount, lblDescriptionLength, txtLoyaltyDiscount,
+            lblCampaignCount, txtProductQuantity, txtProductCategory, txtProductDescription,
+            txtSupplierName, txtMoreSuppliersProductsName, txtProductWeight;
     private MaterialRatingBar ratingProduct;
     private LinearLayout linearLayoutCampaign;
     private ConstraintLayout constraintLayoutSupplierName, layoutSelectCampaign,
             layoutLoyalty, constraintLayoutProductCategory;
     private Button btnPurchaseProduct;
-    private LinearLayout layoutProductQuantityWithCampaign, layoutMoreSuppliersProducts;
+    private LinearLayout layoutMoreSuppliersProducts;
 
     private SharedPreferences sharedPreferences;
     private Intent intent;
@@ -82,15 +76,11 @@ public class DetailTab extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        txtProductQuantity = view.findViewById(R.id.txtProductQuantity);
-        txtProductCategory = view.findViewById(R.id.txtProductCategory);
-        txtProductDescription = view.findViewById(R.id.txtProductDescription);
-        txtSupplierName = view.findViewById(R.id.txtSupplierName);
-        txtMoreSuppliersProductsName = view.findViewById(R.id.txtMoreSuppliersProductsName);
         recViewMoreSuppliersProducts = view.findViewById(R.id.recViewMoreSuppliersProducts);
         viewFlipperProduct = view.findViewById(R.id.viewFlipperProduct);
         imgProductCategory = view.findViewById(R.id.imgProductCategory);
         imgProduct = view.findViewById(R.id.imgProduct);
+
         txtProductName = view.findViewById(R.id.txtProductName);
         txtProductOrderCount = view.findViewById(R.id.txtProductOrderCount);
         txtProductReviewCount = view.findViewById(R.id.txtProductReviewCount);
@@ -100,6 +90,12 @@ public class DetailTab extends Fragment {
         lblDescriptionLength = view.findViewById(R.id.lblDescriptionLength);
         txtLoyaltyDiscount = view.findViewById(R.id.txtLoyaltyDiscount);
         lblCampaignCount = view.findViewById(R.id.lblCampaignCount);
+        txtProductQuantity = view.findViewById(R.id.txtProductQuantity);
+        txtProductCategory = view.findViewById(R.id.txtProductCategory);
+        txtProductDescription = view.findViewById(R.id.txtProductDescription);
+        txtSupplierName = view.findViewById(R.id.txtSupplierName);
+        txtMoreSuppliersProductsName = view.findViewById(R.id.txtMoreSuppliersProductsName);
+        txtProductWeight = view.findViewById(R.id.txtProductWeight);
         ratingProduct = view.findViewById(R.id.ratingProduct);
         linearLayoutCampaign = view.findViewById(R.id.linearLayoutCampaign);
         constraintLayoutSupplierName = view.findViewById(R.id.constraintLayoutSupplierName);
@@ -107,7 +103,6 @@ public class DetailTab extends Fragment {
         layoutLoyalty = view.findViewById(R.id.layoutLoyalty);
         constraintLayoutProductCategory = view.findViewById(R.id.constraintLayoutProductCategory);
         btnPurchaseProduct = view.findViewById(R.id.btnPurchaseProduct);
-        layoutProductQuantityWithCampaign = view.findViewById(R.id.layoutProductQuantityWithCampaign);
         layoutMoreSuppliersProducts = view.findViewById(R.id.layoutMoreSuppliersProducts);
 
         sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
@@ -164,10 +159,11 @@ public class DetailTab extends Fragment {
 
     private void setProduct() {
         txtProductName.setText(product.getName());
-        txtRatingProduct.setText(product.getRating() + "");
+        txtRatingProduct.setText(MethodUtils.formatDecimalString(product.getRating()));
         txtRetailPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         txtProductOrderCount.setText(MethodUtils.formatOrderOrReviewCount(product.getOrderCount()));
         txtProductReviewCount.setText(MethodUtils.formatOrderOrReviewCount(product.getReviewCount()));
+        txtProductWeight.setText(MethodUtils.formatWeightString(product.getWeight()));
         ratingProduct.setRating((float) product.getRating());
         ratingProduct.setIsIndicator(true);
         if(product.getImageList() != null && !product.getImageList().isEmpty()) {
@@ -202,7 +198,6 @@ public class DetailTab extends Fragment {
             }
         });
         txtProductQuantity.setVisibility(View.VISIBLE);
-        layoutProductQuantityWithCampaign.setVisibility(View.GONE);
         txtProductQuantity.setText(getAvailableQuantity() + "");
         int count = getActiveCampaignCount();
         if(count > 0) {
@@ -233,9 +228,9 @@ public class DetailTab extends Fragment {
         APICategoryCaller.getCategoryById(product.getCategoryId(),
                 getActivity().getApplication(), new APIListener() {
             @Override
-            public void onCategoryFound(Category category) {
-                if (category != null) {
-                    txtProductCategory.setText(category.getName());
+            public void onCategoryListFound(List<Category> categoryList) {
+                if (categoryList.size() > 0) {
+                    txtProductCategory.setText(categoryList.get(0).getName());
                     imgProductCategory.setVisibility(View.VISIBLE);
                     constraintLayoutProductCategory.setOnClickListener(null);
                     constraintLayoutProductCategory.setOnClickListener(new View.OnClickListener() {
@@ -244,8 +239,9 @@ public class DetailTab extends Fragment {
                             Intent searchIntent
                                     = new Intent(getContext(), SearchProductActivity.class);
                             searchIntent.putExtra("IDENTIFIER",
-                                                    IntegerUtils.IDENTIFIER_SEARCH_CATEGORY);
-                            searchIntent.putExtra("SEARCH_STRING", category.getCategoryId());
+                                                  IntegerUtils.IDENTIFIER_SEARCH_CATEGORY);
+                            searchIntent.putExtra("SEARCH_STRING",
+                                                  categoryList.get(0).getCategoryId());
                             startActivityForResult(searchIntent, IntegerUtils.REQUEST_COMMON);
                         }
                     });
@@ -280,7 +276,7 @@ public class DetailTab extends Fragment {
 
     private void getSupplierProductList() {
         APIProductCaller.getProductListBySupplierId(product.getSupplier().getId(),
-                null, getActivity().getApplication(), new APIListener() {
+                getActivity().getApplication(), new APIListener() {
             @Override
             public void onProductListFound(List<Product> productList) {
                 if(productList.size() > 1) {
@@ -360,7 +356,7 @@ public class DetailTab extends Fragment {
             Intent SignInIntent = new Intent(getContext(), SignInActivity.class);
             startActivityForResult(SignInIntent, IntegerUtils.REQUEST_LOGIN);
         } else {
-            Intent campaignSelectIntent = new Intent(getContext(), PrepareProductActivity.class);
+            Intent campaignSelectIntent = new Intent(getContext(), PrepareOrderActivity.class);
             campaignSelectIntent.putExtra("PRODUCT", product);
             startActivityForResult(campaignSelectIntent, IntegerUtils.REQUEST_MAKE_PURCHASE);
         }

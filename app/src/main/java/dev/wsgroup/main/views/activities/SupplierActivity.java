@@ -43,7 +43,7 @@ public class SupplierActivity extends AppCompatActivity {
     private NestedScrollView scrollViewMain;
     private RelativeLayout layoutLoading, layoutLoadingCategory, layoutLoadingProduct;
     private RecyclerView recViewCategory, recViewProduct;
-    private TextView txtSupplierName, txtSupplierAddress, txtSupplierMail,
+    private TextView txtSupplierName, txtStreet, txtDistrict, txtProvince, txtSupplierMail,
             lblRetryGetSupplier, lblSupplierChat;
     private LinearLayout layoutCategory, layoutProduct, layoutFailedGettingSupplier;
 
@@ -77,7 +77,9 @@ public class SupplierActivity extends AppCompatActivity {
         recViewCategory = findViewById(R.id.recViewCategory);
         recViewProduct = findViewById(R.id.recViewProduct);
         txtSupplierName = findViewById(R.id.txtSupplierName);
-        txtSupplierAddress = findViewById(R.id.txtSupplierAddress);
+        txtStreet = findViewById(R.id.txtStreet);
+        txtDistrict = findViewById(R.id.txtDistrict);
+        txtProvince = findViewById(R.id.txtProvince);
         txtSupplierMail = findViewById(R.id.txtSupplierMail);
         lblRetryGetSupplier = findViewById(R.id.lblRetryGetSupplier);
         lblSupplierChat = findViewById(R.id.lblSupplierChat);
@@ -130,9 +132,9 @@ public class SupplierActivity extends AppCompatActivity {
         setLoadingState();
         APISupplierCaller.getSupplierById(supplierId, getApplication(), new APIListener() {
             @Override
-            public void onSupplierFound(Supplier supplierFound) {
-                supplier = supplierFound;
-                if (supplier != null) {
+            public void onSupplierListFound(List<Supplier> supplierList) {
+                if (supplierList.size() > 0) {
+                    supplier = supplierList.get(0);
                     setupSupplier();
                     APIListener listener = new APIListener() {
                         @Override
@@ -178,14 +180,10 @@ public class SupplierActivity extends AppCompatActivity {
                             };
                             if (list.size() > 0) {
                                 productList = list;
-
-                                orderCountCheck = true; ratingCheck = true;
-                                setupProductList();
-
-//                                APIProductCaller.getOrderCountByProductList(productList,
-//                                        getApplication(), mostPopularListener);
-//                                APIProductCaller.getRatingByProductIdList(productList,
-//                                        getApplication(), mostPopularListener);
+                                APIProductCaller.getOrderCountByProductList(productList,
+                                        getApplication(), mostPopularListener);
+                                APIProductCaller.getRatingByProductIdList(productList,
+                                        getApplication(), mostPopularListener);
                             } else {
                                 layoutLoadingProduct.setVisibility(View.GONE);
                                 layoutProduct.setVisibility(View.GONE);
@@ -194,7 +192,7 @@ public class SupplierActivity extends AppCompatActivity {
                     };
                     APICategoryCaller.getCategoryListBySupplierId(supplierId,
                             getApplication(), listener);
-                    APIProductCaller.getProductListBySupplierId(supplierId, null,
+                    APIProductCaller.getProductListBySupplierId(supplierId,
                             getApplication(), listener);
                 } else {
                     setFailedSupplierState();
@@ -209,7 +207,9 @@ public class SupplierActivity extends AppCompatActivity {
 
     private void setupSupplier() {
         txtSupplierName.setText(supplier.getName());
-        txtSupplierAddress.setText(supplier.getAddress());
+        txtStreet.setText(supplier.getAddress().getStreet());
+        txtDistrict.setText(supplier.getAddress().getDistrictString());
+        txtProvince.setText(supplier.getAddress().getProvince());
         txtSupplierMail.setText(supplier.getMail());
         if (!supplier.getAvatarLink().equals("null")) {
             Glide.with(getApplicationContext()).load(supplier.getAvatarLink())
@@ -221,7 +221,7 @@ public class SupplierActivity extends AppCompatActivity {
             Glide.with(getApplicationContext()).load(R.drawable.ic_profile)
                     .override(5, 5)
                     .into(imgSupplierBackground);
-            Glide.with(getApplicationContext()).load(R.drawable.ic_profile)
+            Glide.with(getApplicationContext()).load(R.color.white)
                     .into(imgSupplierAvatar);
         }
         setSupplierLoadedState();

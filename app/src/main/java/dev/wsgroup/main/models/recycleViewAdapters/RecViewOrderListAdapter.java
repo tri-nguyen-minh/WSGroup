@@ -29,7 +29,9 @@ public class RecViewOrderListAdapter
     private Context context;
     private Activity activity;
     private List<Order> orderList;
+    private Order order;
     private double totalPrice;
+    private RecViewOrderingProductPriceAdapter adapter;
 
     public void setOrderList(List<Order> orderList) {
         this.orderList = orderList;
@@ -44,31 +46,31 @@ public class RecViewOrderListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_order_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        totalPrice = orderList.get(position).getTotalPrice();
-        totalPrice -= (orderList.get(position).getDiscountPrice()
-                        + orderList.get(position).getAdvanceFee());
+        order = orderList.get(position);
+        totalPrice = order.getTotalPrice();
+        totalPrice -= order.getDiscountPrice();
+        totalPrice -= order.getAdvanceFee();
         holder.txtOrderPrice
-                .setText(MethodUtils.formatPriceString(totalPrice));
-        holder.txtSupplier.setText(orderList.get(position).getSupplier().getName());
-        int productCount = orderList.get(position).getOrderProductList().size();
+              .setText(MethodUtils.formatPriceString(totalPrice));
+        holder.txtSupplier.setText(order.getSupplier().getName());
+        int productCount = order.getOrderProductList().size();
         holder.txtProductCount.setText(productCount + "");
         holder.lblProduct.setText((productCount == 1) ? "product" : "products");
-        RecViewOrderingProductPriceAdapter adapter = new RecViewOrderingProductPriceAdapter(context);
-        adapter.setOrderProductList(orderList.get(position).getOrderProductList());
+        adapter = new RecViewOrderingProductPriceAdapter(context);
+        adapter.setOrderProductList(order.getOrderProductList());
         holder.recViewOrderProduct.setAdapter(adapter);
         holder.recViewOrderProduct.setLayoutManager(new LinearLayoutManager(context,
                 LinearLayoutManager.VERTICAL, false));
-
         holder.layoutParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToOrderDetail(orderList.get(position).getCode());
+                order = orderList.get(position);
+                goToOrderDetail(order.getCode());
             }
         });
     }
@@ -85,11 +87,11 @@ public class RecViewOrderListAdapter
         return orderList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private RelativeLayout layoutParent;
-        private TextView txtOrderPrice, txtSupplier, txtProductCount, lblProduct;
-        private RecyclerView recViewOrderProduct;
+        private final RelativeLayout layoutParent;
+        private final TextView txtOrderPrice, txtSupplier, txtProductCount, lblProduct;
+        private final RecyclerView recViewOrderProduct;
 
 
         public ViewHolder(View view) {

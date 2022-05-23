@@ -26,6 +26,7 @@ public class RecViewOrderHistoryAdapter
     private OrderHistory orderHistory;
     private String message;
     private String reason;
+    private RecViewImageAdapter adapter;
 
     public RecViewOrderHistoryAdapter(Context context, Activity activity) {
         this.context = context;
@@ -40,19 +41,17 @@ public class RecViewOrderHistoryAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_order_history_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtDate.setText(MethodUtils.formatDateWithTime(orderHistoryList.get(position)
-                                                                              .getCreateDate()));
-        if (orderHistoryList.get(position).getImageList().size() > 0) {
+        orderHistory = orderHistoryList.get(position);
+        holder.txtDate.setText(MethodUtils.formatDate(orderHistory.getCreateDate(), true));
+        if (orderHistory.getImageList().size() > 0) {
             holder.recViewImage.setVisibility(View.VISIBLE);
-            RecViewImageAdapter adapter = new RecViewImageAdapter(context, activity,
-                    R.layout.recycle_view_image_small);
-            adapter.setImageList(orderHistoryList.get(position).getImageList());
+            adapter = new RecViewImageAdapter(context, activity, R.layout.recycle_view_image_small);
+            adapter.setImageList(orderHistory.getImageList());
             holder.recViewImage.setAdapter(adapter);
             holder.recViewImage.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));
@@ -63,7 +62,6 @@ public class RecViewOrderHistoryAdapter
     }
 
     private void setHistoryDescription(ViewHolder holder, int position) {
-        orderHistory = orderHistoryList.get(position);
         switch (orderHistory.getStatus()) {
             case "unpaid": {
                 holder.txtStatus.setText(MethodUtils.displayStatus(orderHistory.getStatus()));
@@ -114,11 +112,6 @@ public class RecViewOrderHistoryAdapter
             case "returning": {
                 holder.txtStatus.setText("Return request submitted");
                 message = "Return request submitted";
-//                if (orderHistory.getDescription().contains("Supplier")) {
-//                    message += "Supplier";
-//                } else {
-//                    message += "Customer Service";
-//                }
                 holder.txtStatus.setText(message);
                 reason = MethodUtils.getStatusChangedReason(orderHistory.getDescription());
                 break;
@@ -155,6 +148,12 @@ public class RecViewOrderHistoryAdapter
                 reason = null;
                 break;
             }
+            case "requestRefund": {
+                holder.txtStatus.setText("Waiting for refund");
+                message = "Order's payment will soon be refunded.";
+                reason = null;
+                break;
+            }
             default: {
                 holder.txtStatus.setText(MethodUtils.displayStatus(orderHistory.getStatus()));
                 message = "Order " + orderHistory.getDescription();
@@ -164,9 +163,9 @@ public class RecViewOrderHistoryAdapter
         }
         holder.txtMessage.setText(message);
         if (reason == null || reason.isEmpty()) {
-            holder.layoutReason.setVisibility(View.GONE);
+            holder.txtReason.setVisibility(View.GONE);
         } else {
-            holder.layoutReason.setVisibility(View.VISIBLE);
+            holder.txtReason.setVisibility(View.VISIBLE);
             holder.txtReason.setText(reason);
         }
     }
@@ -176,20 +175,17 @@ public class RecViewOrderHistoryAdapter
         return orderHistoryList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtStatus, txtDate, txtMessage, lblReason, txtReason;
-        private RecyclerView recViewImage;
-        private LinearLayout layoutReason;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView txtStatus, txtDate, txtMessage, txtReason;
+        private final RecyclerView recViewImage;
 
         public ViewHolder(View view) {
             super(view);
             txtStatus = view.findViewById(R.id.txtStatus);
             txtDate = view.findViewById(R.id.txtDate);
             txtMessage = view.findViewById(R.id.txtMessage);
-            lblReason = view.findViewById(R.id.lblReason);
             txtReason = view.findViewById(R.id.txtReason);
             recViewImage = view.findViewById(R.id.recViewImage);
-            layoutReason = view.findViewById(R.id.layoutReason);
         }
     }
 }

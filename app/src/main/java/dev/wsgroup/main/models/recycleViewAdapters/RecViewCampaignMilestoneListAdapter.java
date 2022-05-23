@@ -46,8 +46,7 @@ public class RecViewCampaignMilestoneListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.recycle_view_campaign_milestone_list, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -73,10 +72,10 @@ public class RecViewCampaignMilestoneListAdapter
         return milestoneList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView txtCampaignNextMilestone, txtDiscountPrice, txtCampaignPrice;
-        private ImageView imgCheck;
-        private FrameLayout layoutParent;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView txtCampaignNextMilestone, txtDiscountPrice, txtCampaignPrice;
+        private final ImageView imgCheck;
+        private final FrameLayout layoutParent;
 
         public ViewHolder(View view) {
             super(view);

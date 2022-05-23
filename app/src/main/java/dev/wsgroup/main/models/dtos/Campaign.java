@@ -196,7 +196,8 @@ public class Campaign implements Serializable {
         product.setRetailPrice(data.getDouble("productretailprice"));
         product.setImageLink(data.getString("productimage"));
         Supplier supplier = new Supplier();
-        supplier.setId(data.getString("supplierid"));
+        supplier.setId(data.getString("supplierId"));
+        supplier.setId(data.getString("name"));
         product.setSupplier(supplier);
         campaign.setProduct(product);
         campaign.setCode(data.getString("code"));
@@ -230,16 +231,5 @@ public class Campaign implements Serializable {
             campaign.setMilestoneList(milestoneList);
         }
         return campaign;
-    }
-
-    @Override
-    public String toString() {
-        return "Campaign{" +
-                "startDate='" + startDate + '\'' +
-                ", endDate='" + endDate + '\'' +
-                ", code='" + code + '\'' +
-                ", orderCount=" + orderCount +
-                ", quantityCount=" + quantityCount +
-                '}';
     }
 }

@@ -104,9 +104,7 @@ public class FirebasePhoneAuthService {
                 });
     }
 
-    public void onOTPSentFailed(int errorCode) {
-
-    }
+    public void onOTPSentFailed(int errorCode) {}
 
     public void onOTPSent() {}
 

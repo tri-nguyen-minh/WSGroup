@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,8 +37,9 @@ public class PhoneInputActivity extends AppCompatActivity {
     private ConstraintLayout layoutParent;
 
     private int requestCode;
-    private String errorMessage;
+    private String errorMessage, phoneString;
     private DialogBoxLoading dialogBoxLoading;
+    private DialogBoxAlert dialogBoxAlert;
     private User user;
 
     @Override
@@ -63,7 +63,6 @@ public class PhoneInputActivity extends AppCompatActivity {
             layoutExistingAccount.setVisibility(View.INVISIBLE);
         }
 
-//        editPhone.setText("091392173");
         btnSendOTP.setEnabled(false);
         btnSendOTP.getBackground().setTint(getResources().getColor(R.color.gray_light));
 
@@ -75,6 +74,7 @@ public class PhoneInputActivity extends AppCompatActivity {
                 }
             }
         });
+
         editPhone.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -83,8 +83,8 @@ public class PhoneInputActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String stringPhone = "0" + editPhone.getText().toString();
-                if(!stringPhone.matches(StringUtils.PHONE_REGEX)) {
+                phoneString = MethodUtils.formatPhoneWithCountryCode(editPhone.getText().toString());
+                if(!phoneString.matches(StringUtils.PHONE_REGEX)) {
                     btnSendOTP.setEnabled(false);
                     btnSendOTP.getBackground()
                               .setTint(getResources()
@@ -133,14 +133,20 @@ public class PhoneInputActivity extends AppCompatActivity {
                 dialogBoxLoading.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                String stringPhone = "0" + editPhone.getText().toString();
-                APIUserCaller.findUserByPhoneNumber(stringPhone,
+                phoneString = MethodUtils.formatPhoneWithCountryCode(editPhone.getText().toString());
+                APIUserCaller.findUserByPhoneNumber(phoneString,
                         getApplication(), new APIListener() {
                     @Override
                     public void onUserFound(User foundUser, String message) {
                         user = foundUser;
                         if(requestCode != IntegerUtils.REQUEST_REGISTER) {
-                            sendOTP(stringPhone);
+                            if (foundUser.getGoogleId() == null
+                                    || foundUser.getGoogleId().equals("null")) {
+                                sendOTP();
+                            } else {
+                                errorMessage = StringUtils.MES_ALERT_PHONE_LINKED_GOOGLE;
+                                displayError();
+                            }
                         } else {
                             errorMessage = StringUtils.MES_ERROR_DUPLICATE_NUMBER;
                             displayError();
@@ -148,7 +154,6 @@ public class PhoneInputActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onFailedAPICall(int errorCode) {
-                        super.onFailedAPICall(errorCode);
                         switch (errorCode) {
                             case IntegerUtils.ERROR_API:
                             case IntegerUtils.ERROR_PARSING_JSON: {
@@ -162,8 +167,8 @@ public class PhoneInputActivity extends AppCompatActivity {
                                     displayError();
                                 } else {
                                     user = new User();
-                                    user.setPhoneNumber(stringPhone);
-                                    sendOTP(stringPhone);
+                                    user.setPhoneNumber(phoneString);
+                                    sendOTP();
                                 }
                                 break;
                             }
@@ -182,9 +187,9 @@ public class PhoneInputActivity extends AppCompatActivity {
         });
     }
 
-    private void sendOTP(String stringPhone) {
+    private void sendOTP() {
         DialogBoxOTP dialogBoxOTP = new DialogBoxOTP(PhoneInputActivity.this,
-                getApplicationContext(), stringPhone) {
+                getApplicationContext(), phoneString) {
             @Override
             public void onVerificationSuccessful() {
                 DialogBoxAlert dialogBox = new DialogBoxAlert(PhoneInputActivity.this,
@@ -206,7 +211,7 @@ public class PhoneInputActivity extends AppCompatActivity {
                                                         IntegerUtils.REQUEST_PASSWORD_FORGET);
                                 }
                                 nextIntent.putExtra("USER", user);
-                                nextIntent.putExtra("PHONE", stringPhone);
+                                nextIntent.putExtra("PHONE", phoneString);
                                 startActivityForResult(nextIntent, requestCode);
                             }
                         };
@@ -226,6 +231,12 @@ public class PhoneInputActivity extends AppCompatActivity {
                     dialogBoxLoading.dismiss();
                 }
             }
+
+            @Override
+            public void onSendOTPFailed() {
+                errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                displayError();
+            }
         };
         dialogBoxOTP.getWindow()
                     .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -236,9 +247,10 @@ public class PhoneInputActivity extends AppCompatActivity {
         if (dialogBoxLoading.isShowing()) {
             dialogBoxLoading.dismiss();
         }
-        DialogBoxAlert dialogBox = new DialogBoxAlert(PhoneInputActivity.this,
+        dialogBoxAlert = new DialogBoxAlert(PhoneInputActivity.this,
                         IntegerUtils.CONFIRM_ACTION_CODE_FAILED, errorMessage,"");
-        dialogBox.show();
+        dialogBoxAlert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogBoxAlert.show();
     }
 
     @Override
