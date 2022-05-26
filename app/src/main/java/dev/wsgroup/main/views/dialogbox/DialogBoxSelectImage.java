@@ -2,18 +2,14 @@ package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.cardview.widget.CardView;
 
 import dev.wsgroup.main.R;
-import dev.wsgroup.main.models.dtos.Campaign;
 
 public class DialogBoxSelectImage extends Dialog {
 

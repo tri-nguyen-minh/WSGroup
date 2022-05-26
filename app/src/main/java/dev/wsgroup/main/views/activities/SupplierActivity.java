@@ -47,7 +47,6 @@ public class SupplierActivity extends AppCompatActivity {
             lblRetryGetSupplier, lblSupplierChat;
     private LinearLayout layoutCategory, layoutProduct, layoutFailedGettingSupplier;
 
-
     private SharedPreferences sharedPreferences;
     private String supplierId;
     private Supplier supplier;

@@ -4,12 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
@@ -38,8 +37,8 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.views.activities.SupplierActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
-import dev.wsgroup.main.views.activities.productviews.CampaignListActivity;
 import dev.wsgroup.main.views.activities.order.PrepareOrderActivity;
+import dev.wsgroup.main.views.activities.productviews.CampaignListActivity;
 import dev.wsgroup.main.views.activities.productviews.SearchProductActivity;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 

@@ -16,7 +16,6 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.CustomerDiscount;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewDiscountListAdapter;
-import dev.wsgroup.main.models.utils.IntegerUtils;
 
 public class DialogBoxDiscountList extends Dialog {
 

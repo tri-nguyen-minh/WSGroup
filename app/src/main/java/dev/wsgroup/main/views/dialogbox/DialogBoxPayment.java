@@ -2,7 +2,6 @@ package dev.wsgroup.main.views.dialogbox;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,16 +11,9 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-
-import dev.wsgroup.main.models.dtos.Discount;
-import dev.wsgroup.main.models.dtos.Order;
 import dev.wsgroup.main.models.utils.MethodUtils;
 
 public class DialogBoxPayment extends Dialog {
