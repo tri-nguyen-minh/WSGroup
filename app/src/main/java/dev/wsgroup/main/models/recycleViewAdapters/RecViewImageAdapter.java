@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import dev.wsgroup.main.R;
+import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.views.dialogbox.DialogBoxImage;
 
 public class RecViewImageAdapter
@@ -73,6 +74,19 @@ public class RecViewImageAdapter
                 }
             });
         }
+        if (layoutId == R.layout.recycle_view_image_large) {
+            if (imageList.get(position) == null) {
+                holder.imgRemove.setVisibility(View.GONE);
+            } else {
+                holder.imgRemove.setVisibility(View.VISIBLE);
+                holder.imgRemove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onRemoveImage(position);
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -85,16 +99,22 @@ public class RecViewImageAdapter
         notifyDataSetChanged();
     }
 
+    public void onRemoveImage(int position) {
+        imageList.remove(position);
+        notifyDataSetChanged();
+    }
+
     public void selectImage() {}
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView imgProof;
+        private final ImageView imgProof, imgRemove;
         private final CardView cardViewParent;
 
 
         public ViewHolder(View view) {
             super(view);
             imgProof = view.findViewById(R.id.imgProof);
+            imgRemove = view.findViewById(R.id.imgRemove);
             cardViewParent = view.findViewById(R.id.cardViewParent);
         }
     }

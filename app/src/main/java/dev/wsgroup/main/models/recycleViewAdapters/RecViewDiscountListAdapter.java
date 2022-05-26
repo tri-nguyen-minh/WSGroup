@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -72,7 +71,7 @@ public class RecViewDiscountListAdapter
              .load(supplier.getAvatarLink())
              .into(holder.imgSupplierAvatar);
         holder.btnSelect.setVisibility(View.INVISIBLE);
-        if (identifier == IntegerUtils.IDENTIFIER_DISCOUNT_SELECT) {
+        if (identifier == IntegerUtils.IDENTIFIER_EXECUTABLE) {
             holder.layoutSupplier.setVisibility(View.GONE);
             holder.btnSelect.setVisibility(View.VISIBLE);
             holder.btnSelect.setOnClickListener(new View.OnClickListener() {

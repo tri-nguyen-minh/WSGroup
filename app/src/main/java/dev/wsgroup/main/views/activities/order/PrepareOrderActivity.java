@@ -22,7 +22,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import dev.wsgroup.main.models.dtos.OrderProduct;
 import dev.wsgroup.main.models.dtos.Product;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.productviews.CampaignListActivity;
@@ -61,16 +59,17 @@ public class PrepareOrderActivity extends AppCompatActivity {
     private Button btnConfirmAddToCart, btnConfirmPurchase;
     private ProgressBar progressBarQuantityCount;
 
+    private SharedPreferences sharedPreferences;
+    private String token;
     private Product product;
     private Campaign campaign;
     private CampaignMilestone currentCampaignMilestone;
     private int milestoneQuantity;
     private List<CampaignMilestone> milestoneList;
-    private SharedPreferences sharedPreferences;
-    private String cartTag;
     private int quantity, minQuantity, maxQuantity;
     private double price, totalPrice;
     private DialogBoxLoading dialogBoxLoading;
+    private DialogBoxConfirm dialogBoxConfirm;
     private List<CartProduct> cartList;
 
     @Override
@@ -216,47 +215,61 @@ public class PrepareOrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+                token = sharedPreferences.getString("TOKEN", "");
                 dialogBoxLoading = new DialogBoxLoading(PrepareOrderActivity.this);
                 dialogBoxLoading.getWindow()
                                 .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialogBoxLoading.show();
-                cartTag = (campaign != null) ? "CAMPAIGN_CART" : "RETAIL_CART";
-                try {
-                    cartList = (List<CartProduct>) ObjectSerializer
-                            .deserialize(sharedPreferences.getString(cartTag, ""));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                CartProduct cartProduct = getCartProduct();
-                String cartId = checkDuplicateCartProduct();
-                if (cartId == null) {
-                    addCartProduct(cartProduct);
-                } else {
-
-                    cartProduct.setId(cartId);
-                    if (dialogBoxLoading.isShowing()) {
-                        dialogBoxLoading.dismiss();
-                    }
-                    DialogBoxConfirm confirmLogoutBox
-                            = new DialogBoxConfirm(PrepareOrderActivity.this,
-                            StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
-                        @Override
-                        public void onYesClicked() {
-                            dialogBoxLoading.show();
-                            updateCartProduct(cartProduct);
+                APICartCaller.getCartList(token, getApplication(), new APIListener() {
+                    @Override
+                    public void onCartListFound(ArrayList<CartProduct> retailCartProductList,
+                                                ArrayList<CartProduct> campaignCartProductList) {
+                        cartList = new ArrayList<>();
+                        if (campaign == null) {
+                            for (CartProduct cartProduct : retailCartProductList) {
+                                cartList.add(cartProduct);
+                            }
+                        } else  {
+                            for (CartProduct cartProduct : campaignCartProductList) {
+                                cartList.add(cartProduct);
+                            }
                         }
-                    };
-                    confirmLogoutBox.getWindow()
+                        CartProduct cartProduct = getCartProduct();
+                        String cartId = checkDuplicateCartProduct();
+                        if (cartId == null) {
+                            addCartProduct(cartProduct);
+                        } else {
+                            cartProduct.setId(cartId);
+                            if (dialogBoxLoading.isShowing()) {
+                                dialogBoxLoading.dismiss();
+                            }
+
+                            dialogBoxConfirm= new DialogBoxConfirm(PrepareOrderActivity.this,
+                                    StringUtils.MES_CONFIRM_DUPLICATE_CART_PRODUCT) {
+                                @Override
+                                public void onYesClicked() {
+                                    dialogBoxLoading.show();
+                                    updateCartProduct(cartProduct);
+                                }
+                            };
+                            dialogBoxConfirm.getWindow()
                                     .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    confirmLogoutBox.show();
-                }
+                            dialogBoxConfirm.show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailedAPICall(int code) {
+                        MethodUtils.displayErrorAPIMessage(PrepareOrderActivity.this);
+                    }
+                });
             }
         });
 
         btnConfirmPurchase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogBoxConfirm dialogBoxConfirm = new DialogBoxConfirm(PrepareOrderActivity.this,
+                dialogBoxConfirm = new DialogBoxConfirm(PrepareOrderActivity.this,
                         StringUtils.MES_CONFIRM_IMMEDIATE_CHECKOUT) {
                     @Override
                     public void onYesClicked() {
@@ -414,18 +427,11 @@ public class PrepareOrderActivity extends AppCompatActivity {
     }
 
     private void addCartProduct(CartProduct cartProduct) {
-        APICartCaller.addCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
+        APICartCaller.addCartItem(token, cartProduct,
                 getApplication(), new APIListener() {
             @Override
             public void onAddCartItemSuccessful(CartProduct cartProduct) {
                 cartList.add(cartProduct);
-                try {
-                    sharedPreferences.edit()
-                            .putString(cartTag, ObjectSerializer.serialize((Serializable) cartList))
-                            .apply();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 displaySuccessMessage();
             }
 
@@ -445,7 +451,7 @@ public class PrepareOrderActivity extends AppCompatActivity {
     }
 
     private void updateCartProduct(CartProduct cartProduct) {
-        APICartCaller.updateCartItem(sharedPreferences.getString("TOKEN", ""), cartProduct,
+        APICartCaller.updateCartItem(token, cartProduct,
                 getApplication(), new APIListener() {
             @Override
             public void onUpdateSuccessful() {
@@ -515,7 +521,7 @@ public class PrepareOrderActivity extends AppCompatActivity {
                 StringUtils.MES_SUCCESSFUL_ADD_CART,"") {
             @Override
             public void onClickAction() {
-                setResult(RESULT_CANCELED);
+                setResult(RESULT_OK);
                 finish();
             }
         };

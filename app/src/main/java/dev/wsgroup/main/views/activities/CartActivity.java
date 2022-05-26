@@ -1,15 +1,8 @@
 package dev.wsgroup.main.views.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,12 +10,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -31,7 +27,6 @@ import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.fragments.tabs.cart.CampaignTab;
 import dev.wsgroup.main.views.fragments.tabs.cart.RetailTab;
 
@@ -48,7 +43,6 @@ public class CartActivity extends AppCompatActivity {
 
     private String token;
     private SharedPreferences sharedPreferences;
-    private List<CartProduct> retailCartProductList, campaignCartProductList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +93,11 @@ public class CartActivity extends AppCompatActivity {
         if (!token.isEmpty()) {
             APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
-            public void onCartListFound(List<CartProduct> retailList,
-                                        List<CartProduct> campaignList) {
-                retailCartProductList = retailList;
-                campaignCartProductList = campaignList;
-                putCartToSession();
+            public void onCartListFound(ArrayList<CartProduct> retailList,
+                                        ArrayList<CartProduct> campaignList) {
+                getIntent().putExtra("RETAIL_CART", (Serializable) retailList);
+                getIntent().putExtra("CAMPAIGN_CART", (Serializable) campaignList);
+                setupTabLayout();
                 setLoadedState();
             }
             @Override
@@ -114,26 +108,13 @@ public class CartActivity extends AppCompatActivity {
                 } else if (code == IntegerUtils.ERROR_API) {
                     setFailedState();
                 } else {
-                    retailCartProductList = new ArrayList<>();
-                    campaignCartProductList = new ArrayList<>();
-                    putCartToSession();
-                    setupEmptyState();
+                    getIntent().putExtra("RETAIL_CART", (Serializable) new ArrayList<>());
+                    getIntent().putExtra("CAMPAIGN_CART", (Serializable) new ArrayList<>());
+                    setupTabLayout();
+                    setEmptyCartState();
                 }
             }
         });
-        }
-    }
-
-    private void putCartToSession() {
-        try {
-            sharedPreferences.edit()
-                    .putString("RETAIL_CART",
-                            ObjectSerializer.serialize((Serializable) retailCartProductList))
-                    .putString("CAMPAIGN_CART",
-                            ObjectSerializer.serialize((Serializable) campaignCartProductList))
-                    .apply();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -182,8 +163,6 @@ public class CartActivity extends AppCompatActivity {
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getIcon() != null)
-                    tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
@@ -205,10 +184,9 @@ public class CartActivity extends AppCompatActivity {
         layoutFailedGettingCart.setVisibility(View.INVISIBLE);
         layoutNoShoppingCart.setVisibility(View.INVISIBLE);
         layoutCart.setVisibility(View.VISIBLE);
-        setupTabLayout();
     }
 
-    private void setupEmptyState() {
+    private void setEmptyCartState() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutFailedGettingCart.setVisibility(View.INVISIBLE);
         layoutNoShoppingCart.setVisibility(View.VISIBLE);
@@ -230,10 +208,6 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutFailedGettingCart.setVisibility(View.INVISIBLE);
-        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
-        layoutCart.setVisibility(View.INVISIBLE);
         setUpShoppingCart();
     }
 }

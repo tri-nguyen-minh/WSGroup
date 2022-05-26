@@ -46,7 +46,7 @@ public class CustomerDiscount implements Serializable {
     public static CustomerDiscount getObjectFromJSON(JSONObject data) throws Exception {
         CustomerDiscount customerDiscount = new CustomerDiscount();
         customerDiscount.setId(data.getString("id"));
-        customerDiscount.setStatus(data.getString("customerDiscountCodeStatus"));
+        customerDiscount.setStatus(data.getString("customerdiscountcodestatus"));
         Discount discount = Discount.getObjectFromJSON(data);
         customerDiscount.setDiscount(discount);
         return customerDiscount;

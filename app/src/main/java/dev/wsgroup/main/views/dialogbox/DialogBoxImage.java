@@ -38,8 +38,6 @@ public class DialogBoxImage extends Dialog {
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
         imgDisplay = findViewById(R.id.imgDisplay);
 
-        System.out.println(imageLink);
-
         imgCloseDialogBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

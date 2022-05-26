@@ -947,7 +947,7 @@
 
                         <TextView
                             android:id="@+id/lblShipping"
-                            android:text="Advanced Fee"
+                            android:text="Shipping Fee"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"

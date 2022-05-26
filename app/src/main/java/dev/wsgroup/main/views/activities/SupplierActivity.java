@@ -5,20 +5,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -144,7 +144,6 @@ public class SupplierActivity extends AppCompatActivity {
                         }
                         @Override
                         public void onProductListFound(List<Product> list) {
-
                             orderCountCheck = false; ratingCheck = false;
                             APIListener mostPopularListener = new APIListener() {
                                 @Override
@@ -195,12 +194,12 @@ public class SupplierActivity extends AppCompatActivity {
                     APIProductCaller.getProductListBySupplierId(supplierId,
                             getApplication(), listener);
                 } else {
-                    setFailedSupplierState();
+                    setFailedState();
                 }
             }
             @Override
             public void onFailedAPICall(int code) {
-                setFailedSupplierState();
+                setFailedState();
             }
         });
     }
@@ -224,7 +223,7 @@ public class SupplierActivity extends AppCompatActivity {
             Glide.with(getApplicationContext()).load(R.color.white)
                     .into(imgSupplierAvatar);
         }
-        setSupplierLoadedState();
+        setLoadedState();
     }
 
     private void setLoadingState() {
@@ -233,7 +232,7 @@ public class SupplierActivity extends AppCompatActivity {
         layoutFailedGettingSupplier.setVisibility(View.GONE);
     }
 
-    private void setSupplierLoadedState() {
+    private void setLoadedState() {
         layoutCategory.setVisibility(View.GONE);
         layoutProduct.setVisibility(View.GONE);
         layoutLoadingProduct.setVisibility(View.VISIBLE);
@@ -243,7 +242,7 @@ public class SupplierActivity extends AppCompatActivity {
         layoutFailedGettingSupplier.setVisibility(View.GONE);
     }
 
-    private void setFailedSupplierState() {
+    private void setFailedState() {
         layoutLoading.setVisibility(View.GONE);
         scrollViewMain.setVisibility(View.GONE);
         layoutFailedGettingSupplier.setVisibility(View.VISIBLE);
@@ -271,6 +270,12 @@ public class SupplierActivity extends AppCompatActivity {
 
     private void setupProductList() {
         if (orderCountCheck && ratingCheck) {
+            Collections.sort(productList, new Comparator<Product>() {
+                @Override
+                public int compare(Product product1, Product product2) {
+                    return product2.getOrderCount() - product1.getOrderCount();
+                }
+            });
             layoutLoadingProduct.setVisibility(View.GONE);
             layoutProduct.setVisibility(View.VISIBLE);
             productAdapter = new RecViewProductListAdapter(getApplicationContext(),

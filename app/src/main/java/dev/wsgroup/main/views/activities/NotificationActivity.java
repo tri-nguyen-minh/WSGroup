@@ -1,9 +1,5 @@
 package dev.wsgroup.main.views.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -140,7 +140,8 @@ public class NotificationActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         accountId = sharedPreferences.getString("ACCOUNT_ID", "");
         databaseReferences = new FirebaseReferences();
-        databaseReferences.getUserNotifications(accountId).addValueEventListener(new ValueEventListener() {
+        databaseReferences.getUserNotifications(accountId)
+                          .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!notificationLoading) {
@@ -231,7 +232,7 @@ public class NotificationActivity extends AppCompatActivity {
     private void selectOrderNotification(Notification notification) {
         dialogBoxLoading = new DialogBoxLoading(NotificationActivity.this);
         dialogBoxLoading.getWindow()
-                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogBoxLoading.show();
         if (!notification.getNotificationRead()) {
             notificationList = new ArrayList<>();
@@ -362,7 +363,7 @@ public class NotificationActivity extends AppCompatActivity {
                 } else {
                     dialogBoxDiscount = new DialogBoxDiscountList( NotificationActivity.this,
                             getApplicationContext(), discountList,
-                            IntegerUtils.IDENTIFIER_DISCOUNT_VIEW);
+                            IntegerUtils.IDENTIFIER_VIEW_ONLY);
                     dialogBoxDiscount.getWindow()
                                      .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialogBoxDiscount.show();

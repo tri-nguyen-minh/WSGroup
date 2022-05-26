@@ -35,7 +35,6 @@ import dev.wsgroup.main.models.apis.callers.APIChatCaller;
 import dev.wsgroup.main.models.apis.callers.APINotificationCaller;
 import dev.wsgroup.main.models.apis.callers.APIProductCaller;
 import dev.wsgroup.main.models.dtos.Campaign;
-import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.dtos.Product;
@@ -44,7 +43,6 @@ import dev.wsgroup.main.models.recycleViewAdapters.RecViewProductListAdapter;
 import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.NotificationActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
@@ -69,7 +67,6 @@ public class HomeTab extends Fragment {
             recViewSharingCampaign, recViewSingleCampaign;
 
     private SharedPreferences sharedPreferences;
-    private List<CartProduct> retailList, campaignList;
     private String userId, accountId, token;
     private int cartCount, messageCount, notificationCount, listCount;
     private boolean messageLoading, notificationLoading,
@@ -570,7 +567,7 @@ public class HomeTab extends Fragment {
                         signInIntent.putExtra("MAIN_TAB_POSITION", 0);
                         startActivityForResult(signInIntent, IntegerUtils.REQUEST_COMMON);
                     } else {
-                        onCampaignSelected(campaign);
+                        HomeTab.this.onCampaignSelected(campaign);
                     }
                 }
             };
@@ -746,24 +743,12 @@ public class HomeTab extends Fragment {
 
 
     private void editCartCountByUser() {
-        try {
-            retailList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-            campaignList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(retailList == null && campaignList == null) {
-            cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
+        cartCount = getActivity().getIntent().getIntExtra("CART_COUNT", 0);
+        if (cartCount > 0) {
+            cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
+            txtProductDetailCartCount.setText(cartCount + "");
         } else {
-            if (retailList.size() > 0 || campaignList.size() > 0) {
-                cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
-                cartCount = retailList.size() + campaignList.size();
-                txtProductDetailCartCount.setText(cartCount + "");
-            } else {
-                cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
-            }
+            cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
         }
     }
 

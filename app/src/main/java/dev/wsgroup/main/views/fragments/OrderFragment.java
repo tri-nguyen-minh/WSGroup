@@ -53,8 +53,6 @@ public class OrderFragment extends Fragment {
     private boolean notificationLoading;
     private final List<String> sortData;
 
-//    private final String[] sortData = {"Last Ordered", "Last Updated"};
-
     public OrderFragment(String orderStatus) {
         if (orderStatus.toLowerCase().equals("ordered")) {
             this.orderStatus = "created";
@@ -64,8 +62,8 @@ public class OrderFragment extends Fragment {
             this.orderStatus = orderStatus.toLowerCase();
         }
         sortData = new ArrayList<>();
-        sortData.add("Last Ordered");
         sortData.add("Last Updated");
+        sortData.add("Last Ordered");
     }
 
     @Override

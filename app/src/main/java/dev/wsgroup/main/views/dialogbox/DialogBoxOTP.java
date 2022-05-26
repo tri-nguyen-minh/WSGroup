@@ -28,7 +28,8 @@ import dev.wsgroup.main.models.utils.StringUtils;
 
 public class DialogBoxOTP extends Dialog {
 
-    private TextView txtOTPHeader, txtPhoneNumber, txtResendOTP, txtCountdownClock;
+    private TextView txtOTPHeader, txtPhoneNumber,
+            txtResendOTP, txtCountdownClock;
     private EditText editOTP;
     private Button btnConfirmOTP;
     private ProgressBar progressBarLoadOTP;
@@ -53,9 +54,9 @@ public class DialogBoxOTP extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_otp);
-        setCancelable(false);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
+        setCancelable(false);
 
         txtOTPHeader = findViewById(R.id.txtOTPHeader);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);

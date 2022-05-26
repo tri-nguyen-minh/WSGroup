@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class Discount implements Serializable {
 
-    private String id, code, description, endDate, productId;
+    private String id, code, description, endDate;
     private Supplier supplier;
     private boolean status;
     private double discountPrice, minPrice;
@@ -54,14 +54,6 @@ public class Discount implements Serializable {
         this.endDate = endDate;
     }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
     public double getDiscountPrice() {
         return discountPrice;
     }
@@ -104,17 +96,18 @@ public class Discount implements Serializable {
 
     public static Discount getObjectFromJSON(JSONObject data) throws Exception {
         Discount discount = new Discount();
-        discount.setId(data.getString("discountCodeId"));
+        discount.setId(data.getString("discountcodeid"));
         Supplier supplier = new Supplier();
-        supplier.setId(data.getString("supplierId"));
+        supplier.setId(data.getString("supplierid"));
+        supplier.setAddressString(data.getString("supplieraddress"));
+        supplier.setAvatarLink(data.getString("supplieravt"));
         discount.setSupplier(supplier);
         discount.setCode(data.getString("code"));
         discount.setDescription(data.getString("description"));
         discount.setEndDate(data.getString("enddate"));
-        discount.setProductId(data.getString("productId"));
         discount.setStatusByString(data.getString("status"));
-        discount.setDiscountPrice(data.getDouble("discountPrice"));
-        discount.setMinPrice(data.getDouble("minimunPriceCondition"));
+        discount.setDiscountPrice(data.getDouble("discountprice"));
+        discount.setMinPrice(data.getDouble("minimumpricecondition"));
         discount.setQuantity(data.getInt("quantity"));
         return discount;
     }

@@ -48,7 +48,7 @@ public class RecViewReviewAdapter
         review = reviewList.get(position);
         if (!review.isRemoved()) {
             user = review.getUser();
-            if (user.getAvatarLink().equals("null")) {
+            if (!user.getAvatarLink().equals("null")) {
                 Glide.with(context).load(user.getAvatarLink()).into(holder.imgAccountAvatar);
             }
             holder.txtDate.setText(MethodUtils.formatDate(review.getDate(), true));

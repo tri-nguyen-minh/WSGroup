@@ -55,9 +55,11 @@ import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.MainActivity;
+import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxAlert;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
+import dev.wsgroup.main.views.dialogbox.DialogBoxSelectImage;
 
 public class RequestActivity extends AppCompatActivity {
 
@@ -67,7 +69,7 @@ public class RequestActivity extends AppCompatActivity {
     private ConstraintLayout layoutParent;
     private RelativeLayout layoutLoading;
     private TextView txtOrderCode, txtLetterCount, lblLetterSeparator, lblLetterCount,
-            lblRetry, lblSelectImage, txtSupplier, txtPrice, txtRecipient;
+            lblRetry, txtSupplier, txtPrice, txtRecipient;
     private RecyclerView recViewImage;
     private Button btnSubmitRequest;
 
@@ -105,7 +107,6 @@ public class RequestActivity extends AppCompatActivity {
         lblLetterSeparator = findViewById(R.id.lblLetterSeparator);
         lblLetterCount = findViewById(R.id.lblLetterCount);
         lblRetry = findViewById(R.id.lblRetry);
-        lblSelectImage = findViewById(R.id.lblSelectImage);
         txtSupplier = findViewById(R.id.txtSupplier);
         txtPrice = findViewById(R.id.txtPrice);
         txtRecipient = findViewById(R.id.txtRecipient);
@@ -121,12 +122,25 @@ public class RequestActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void selectImage() {
-                if (checkSelfPermission(Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[] {Manifest.permission.CAMERA}, 101);
-                } else {
-                    takeImage();
-                }
+                DialogBoxSelectImage dialogBox
+                        = new DialogBoxSelectImage(RequestActivity.this) {
+                    @Override
+                    public void executeTakePhoto() {
+                        if (checkSelfPermission(Manifest.permission.CAMERA)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(new String[] {Manifest.permission.CAMERA}, 101);
+                        } else {
+                            takeImage();
+                        }
+                    }
+
+                    @Override
+                    public void executeSelectPhoto() {
+                        RequestActivity.this.selectImage();
+                    }
+                };
+                dialogBox.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialogBox.show();
             }
         };
         adapter.setImageList(imageList);
@@ -188,13 +202,6 @@ public class RequestActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 setupRequest();
-            }
-        });
-
-        lblSelectImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImage();
             }
         });
 

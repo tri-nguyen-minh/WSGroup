@@ -62,6 +62,7 @@ public class AddressListSelectActivity extends AppCompatActivity {
         lblRetry = findViewById(R.id.lblRetry);
         recViewAddress = findViewById(R.id.recViewAddress);
 
+        currentAddress = (Address) getIntent().getSerializableExtra("ADDRESS");
         getAddress();
 
         imgBackFromDeliveryAddress.setOnClickListener(new View.OnClickListener() {
@@ -115,15 +116,13 @@ public class AddressListSelectActivity extends AppCompatActivity {
     }
 
     private void getAddress() {
+        setLoadingState();
         sharedPreferences = getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
-        currentAddress = (Address) getIntent().getSerializableExtra("ADDRESS");
-        setLoadingState();
-        setupLayout();
-        if (currentAddress != null) {
-            APIAddressCaller.getAllAddress(token, getApplication(), new APIListener() {
-                @Override
-                public void onAddressListFound(List<Address> addressList) {
+        APIAddressCaller.getAllAddress(token, getApplication(), new APIListener() {
+            @Override
+            public void onAddressListFound(List<Address> addressList) {
+                if (addressList.size() > 0) {
                     customerAddressList = addressList;
                     for (Address address : customerAddressList) {
                         if (address.getDefaultFlag()) {
@@ -134,25 +133,22 @@ public class AddressListSelectActivity extends AppCompatActivity {
                     setupDefaultCheckBox(true);
                     currentAddress = defaultAddress;
                     customerAddressList.remove(defaultAddress);
-                    setupAddressList();
-                    setViewState();
                 }
+                setupLayout();
+                setupAddressList();
+                setViewState();
+            }
 
-                @Override
-                public void onFailedAPICall(int code) {
-                    if (code == IntegerUtils.ERROR_NO_USER) {
-                        MethodUtils.displayErrorAccountMessage(getApplicationContext(),
-                                AddressListSelectActivity.this);
-                    } else {
-                        setFailedState();
-                    }
+            @Override
+            public void onFailedAPICall(int code) {
+                if (code == IntegerUtils.ERROR_NO_USER) {
+                    MethodUtils.displayErrorAccountMessage(getApplicationContext(),
+                            AddressListSelectActivity.this);
+                } else {
+                    setFailedState();
                 }
-            });
-        } else {
-            customerAddressList = new ArrayList<>();
-            setupAddressList();
-            setViewState();
-        }
+            }
+        });
     }
 
     private void setupAddressList() {
@@ -249,6 +245,7 @@ public class AddressListSelectActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+            currentAddress = (Address) data.getSerializableExtra("ADDRESS");
             getAddress();
         }
     }

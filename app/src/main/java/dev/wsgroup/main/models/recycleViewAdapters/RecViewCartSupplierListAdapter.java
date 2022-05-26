@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import dev.wsgroup.main.models.dtos.Supplier;
 public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecViewCartSupplierListAdapter.ViewHolder> {
 
     private List<Supplier> supplierList;
-    private HashMap<String, List<CartProduct>> shoppingCart;
+    private HashMap<String, ArrayList<CartProduct>> shoppingCart;
 
     private Activity activity;
     private Context context;
@@ -34,7 +35,8 @@ public class RecViewCartSupplierListAdapter extends RecyclerView.Adapter<RecView
         this.identifier = identifier;
     }
 
-    public void setCartList(List<Supplier> supplierList, HashMap<String, List<CartProduct>> productList) {
+    public void setCartList(List<Supplier> supplierList,
+                            HashMap<String, ArrayList<CartProduct>> productList) {
         this.supplierList = supplierList;
         this.shoppingCart = productList;
     }

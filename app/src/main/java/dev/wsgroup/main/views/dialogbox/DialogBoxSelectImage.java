@@ -10,13 +10,15 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import androidx.cardview.widget.CardView;
+
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.Campaign;
 
 public class DialogBoxSelectImage extends Dialog {
 
     private ImageView imgCloseDialogBox;
-    private Button btnTakePhoto, btnSelectPhoto;
+    private CardView cardViewTakeImage, cardViewSelectImage;
 
     public DialogBoxSelectImage(Activity activity) {
         super(activity);
@@ -30,8 +32,8 @@ public class DialogBoxSelectImage extends Dialog {
         setCancelable(false);
 
         imgCloseDialogBox = findViewById(R.id.imgCloseDialogBox);
-        btnTakePhoto = findViewById(R.id.btnTakePhoto);
-        btnSelectPhoto = findViewById(R.id.btnSelectPhoto);
+        cardViewTakeImage = findViewById(R.id.cardViewTakeImage);
+        cardViewSelectImage = findViewById(R.id.cardViewSelectImage);
 
         imgCloseDialogBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,14 +42,14 @@ public class DialogBoxSelectImage extends Dialog {
             }
         });
 
-        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+        cardViewTakeImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();
                 executeTakePhoto();
             }
         });
-        btnSelectPhoto.setOnClickListener(new View.OnClickListener() {
+        cardViewSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();

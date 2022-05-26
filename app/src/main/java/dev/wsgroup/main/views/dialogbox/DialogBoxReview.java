@@ -86,6 +86,7 @@ public class DialogBoxReview extends Dialog {
             btnConfirmReview.setText("SUBMIT");
             checkLetterCount();
             enablingButton();
+
             ratingReview.setOnRatingChangeListener(new MaterialRatingBar.OnRatingChangeListener() {
                 @Override
                 public void onRatingChanged(MaterialRatingBar ratingBar, float barRating) {

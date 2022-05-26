@@ -154,6 +154,12 @@ public class RecViewOrderHistoryAdapter
                 reason = null;
                 break;
             }
+            case "successRefund": {
+                holder.txtStatus.setText("Refund completed");
+                message = "Order has been refunded.";
+                reason = null;
+                break;
+            }
             default: {
                 holder.txtStatus.setText(MethodUtils.displayStatus(orderHistory.getStatus()));
                 message = "Order " + orderHistory.getDescription();

@@ -40,8 +40,8 @@ public class APICartCaller {
                 @Override
                 public void onResponse(JSONObject response) {
                     CartProduct cartProduct;
-                    List<CartProduct> retailList = new ArrayList<>();
-                    List<CartProduct> campaignList = new ArrayList<>();
+                    ArrayList<CartProduct> retailList = new ArrayList<>();
+                    ArrayList<CartProduct> campaignList = new ArrayList<>();
                     try {
                         JSONArray jsonArray = response.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length();i++) {

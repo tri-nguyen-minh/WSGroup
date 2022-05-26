@@ -36,7 +36,8 @@ public class DialogBoxOrderNote extends Dialog {
     private Context context;
     private OrderProduct orderProduct;
 
-    public DialogBoxOrderNote(Activity activity, Context context, OrderProduct orderProduct, int requestCode) {
+    public DialogBoxOrderNote(Activity activity, Context context,
+                              OrderProduct orderProduct, int requestCode) {
         super(activity);
         this.context = context;
         this.requestCode = requestCode;
@@ -59,7 +60,6 @@ public class DialogBoxOrderNote extends Dialog {
         lblLetterSeparator = findViewById(R.id.lblLetterSeparator);
         lblLetterCount = findViewById(R.id.lblLetterCount);
 
-
         if (requestCode == IntegerUtils.REQUEST_NOTE_READ_ONLY) {
             editNote.setEnabled(false);
             if (orderProduct.getNote().equals("null")) {
@@ -76,6 +76,7 @@ public class DialogBoxOrderNote extends Dialog {
             layoutLetterCount.setVisibility(View.VISIBLE);
             btnConfirmNote.setVisibility(View.VISIBLE);
         }
+
         btnConfirmNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -52,8 +52,7 @@ public class DiscountFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        sharedPreferences = getActivity()
-                            .getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "");
         return inflater.inflate(R.layout.fragment_discount, container, false);
     }
@@ -112,7 +111,7 @@ public class DiscountFragment extends Fragment {
                     });
                     setupList(discountList);
                 } else {
-                    setNoListState();
+                    setEmptyListState();
                 }
             }
 
@@ -129,12 +128,12 @@ public class DiscountFragment extends Fragment {
 
     private void setupList(List<CustomerDiscount> discountList) {
         adapter = new RecViewDiscountListAdapter(getContext(),
-                                                IntegerUtils.IDENTIFIER_DISCOUNT_VIEW);
+                                                IntegerUtils.IDENTIFIER_VIEW_ONLY);
         adapter.setDiscountList(discountList);
         recViewDiscountList.setAdapter(adapter);
         recViewDiscountList.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
-        setListLoadedState();
+        setLoadedState();
     }
 
     private void setLoadingState() {
@@ -144,14 +143,14 @@ public class DiscountFragment extends Fragment {
         layoutList.setVisibility(View.INVISIBLE);
     }
 
-    private void setListLoadedState() {
+    private void setLoadedState() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutFailedGettingDiscount.setVisibility(View.INVISIBLE);
         layoutNoDiscount.setVisibility(View.INVISIBLE);
         layoutList.setVisibility(View.VISIBLE);
     }
 
-    private void setNoListState() {
+    private void setEmptyListState() {
         layoutLoading.setVisibility(View.INVISIBLE);
         layoutFailedGettingDiscount.setVisibility(View.INVISIBLE);
         layoutNoDiscount.setVisibility(View.VISIBLE);

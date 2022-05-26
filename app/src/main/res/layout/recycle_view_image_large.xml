@@ -1,27 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardViewParent"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="5dp"
-    android:backgroundTint="@color/gray"
-    app:cardCornerRadius="10dp"
     android:layout_marginTop="5dp">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="1dp"
-        app:cardCornerRadius="10dp">
+    <ImageView
+        android:id="@+id/imgRemove"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="2dp"
+        android:elevation="2dp"
+        android:scaleX="1.1"
+        android:scaleY="1.1"
+        android:src="@drawable/ic_cross"
+        android:tint="@color/red"/>
 
-        <ImageView
-            android:id="@+id/imgProof"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_camera"/>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewParent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/gray"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="1dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            app:cardCornerRadius="10dp">
+
+            <ImageView
+                android:id="@+id/imgProof"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_camera"/>
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.cardview.widget.CardView>
 
-</androidx.cardview.widget.CardView>
+</FrameLayout>

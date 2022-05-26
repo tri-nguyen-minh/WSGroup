@@ -64,7 +64,7 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxSetupPayment;
 public class OrderInfoActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
-    private ConstraintLayout layoutMain, layoutAddress, layoutCampaignSaving;
+    private ConstraintLayout layoutMain, layoutAddress, layoutAddressDetail, layoutCampaignSaving;
     private TextView txtPhoneNumber, txtAddressStreet, txtAddressDistrict,
             txtAddressProvince, lblDeliveryAddress, txtTotalPrice, txtCampaignSaving,
             txtFinalPrice, lblShipping, txtDeliveryPrice, lblDiscountPrice;
@@ -106,6 +106,7 @@ public class OrderInfoActivity extends AppCompatActivity {
         imgCheckoutHome = findViewById(R.id.imgCheckoutHome);
         layoutMain = findViewById(R.id.layoutMain);
         layoutAddress = findViewById(R.id.layoutAddress);
+        layoutAddressDetail = findViewById(R.id.layoutAddressDetail);
         layoutCampaignSaving = findViewById(R.id.layoutCampaignSaving);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
         txtAddressStreet = findViewById(R.id.txtAddressStreet);
@@ -259,7 +260,7 @@ public class OrderInfoActivity extends AppCompatActivity {
     private void setupConfirmAddress() {
         if (currentAddress != null) {
             lblDeliveryAddress.setVisibility(View.INVISIBLE);
-            layoutAddress.setVisibility(View.VISIBLE);
+            layoutAddressDetail.setVisibility(View.VISIBLE);
             txtAddressStreet.setText(currentAddress.getStreet());
             txtAddressDistrict.setText(currentAddress.getDistrictString());
             txtAddressProvince.setText(currentAddress.getProvince());
@@ -287,8 +288,9 @@ public class OrderInfoActivity extends AppCompatActivity {
             }
         } else {
             addressLoaded = true;
+            shippingFeeFailed = true;
             lblDeliveryAddress.setVisibility(View.VISIBLE);
-            layoutAddress.setVisibility(View.INVISIBLE);
+            layoutAddressDetail.setVisibility(View.INVISIBLE);
             loadReceipt();
         }
     }
@@ -375,7 +377,7 @@ public class OrderInfoActivity extends AppCompatActivity {
                     txtDeliveryPrice.setText(MethodUtils.formatPriceString(deliveryPrice));
                 } else {
                     lblShipping.setVisibility(View.GONE);
-                    txtDeliveryPrice.setText("Un-calculated");
+                    txtDeliveryPrice.setText("TBA");
                 }
                 txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
                 if (campaign == null) {

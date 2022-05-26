@@ -113,6 +113,7 @@ public class DetailTab extends Fragment {
         if(product != null) {
             setProduct();
         }
+
         lblDescriptionLength.setText("Show more");
         txtProductDescription.setMaxLines(4);
         imgProductCategory.setVisibility(View.GONE);

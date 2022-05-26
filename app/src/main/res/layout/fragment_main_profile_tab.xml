@@ -352,25 +352,6 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:visibility="gone"
-                    android:id="@+id/layoutLoyalty"
-                    android:background="@color/white"
-                    style="@style/style_profile_tab"
-                    android:layout_marginBottom="2dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="35dp"
-                        android:layout_marginHorizontal="10dp"
-                        android:src="@drawable/ic_dollar" />
-
-                    <TextView
-                        android:text="Loyal Customer Status"
-                        style="@style/style_profile_text"/>
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/layoutAccountInfo"
                     android:background="@color/white"
                     style="@style/style_profile_tab"

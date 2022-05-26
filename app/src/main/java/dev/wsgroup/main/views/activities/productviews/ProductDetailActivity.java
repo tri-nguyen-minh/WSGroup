@@ -17,7 +17,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.navigationAdapters.NavigationAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.MainActivity;
 import dev.wsgroup.main.views.activities.account.SignInActivity;
@@ -62,7 +60,6 @@ public class ProductDetailActivity extends AppCompatActivity {
     private int cartCount;
     private Product product;
     private Supplier supplier;
-    private List<CartProduct> retailCartList, campaignCartList;
     private List<Campaign> currentCampaignList;
     private boolean activeCampaignCheck, readyCampaignCheck,
             reviewListCheck, orderCountCheck, loyaltyStatusCheck;
@@ -348,29 +345,12 @@ public class ProductDetailActivity extends AppCompatActivity {
         setLoadedState();
     }
 
-    private void getShoppingCart() {
-        try {
-            retailCartList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-            campaignCartList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void editShoppingCart() {
-        getShoppingCart();
-        if(retailCartList == null && campaignCartList == null) {
-            cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
+        if (cartCount > 0) {
+            cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
+            txtProductDetailCartCount.setText(cartCount + "");
         } else {
-            if (retailCartList.size() > 0 || campaignCartList.size() > 0) {
-                cardViewProductDetailCartCount.setVisibility(View.VISIBLE);
-                cartCount = retailCartList.size() + campaignCartList.size();
-                txtProductDetailCartCount.setText(cartCount + "");
-            } else {
-                cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
-            }
+            cardViewProductDetailCartCount.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -378,9 +358,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         token = sharedPreferences.getString("TOKEN", "");
         APICartCaller.getCartList(token, getApplication(), new APIListener() {
             @Override
-            public void onCartListFound(List<CartProduct> retailList,
-                                        List<CartProduct> campaignList) {
-                putSessionCart(retailList, campaignList);
+            public void onCartListFound(ArrayList<CartProduct> retailList,
+                                        ArrayList<CartProduct> campaignList) {
+                cartCount = retailList.size() + campaignList.size();
                 editShoppingCart();
             }
 
@@ -390,25 +370,11 @@ public class ProductDetailActivity extends AppCompatActivity {
                     MethodUtils.displayErrorAccountMessage(getApplicationContext(),
                             ProductDetailActivity.this);
                 } else {
-                    putSessionCart(new ArrayList<>(), new ArrayList<>());
+                    cartCount = 0;
                     editShoppingCart();
                 }
             }
         });
-    }
-
-    private void putSessionCart(List<CartProduct> retailList,
-                                List<CartProduct> campaignList) {
-        try {
-            sharedPreferences.edit()
-                    .putString("RETAIL_CART",
-                            ObjectSerializer.serialize((Serializable) retailList))
-                    .putString("CAMPAIGN_CART",
-                            ObjectSerializer.serialize((Serializable) campaignList))
-                    .apply();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void setLoadingState() {

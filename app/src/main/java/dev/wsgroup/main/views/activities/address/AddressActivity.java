@@ -365,7 +365,6 @@ public class AddressActivity extends AppCompatActivity {
             spinnerDistrict.setSelection(districtIndex);
             spinnerWard.setSelection(wardIndex);
             setViewState();
-            System.out.println("done initial");
         }
     }
 

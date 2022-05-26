@@ -34,6 +34,7 @@ public class DialogBoxConfirm extends Dialog {
         setContentView(R.layout.dialog_box_confirm);
         setCancelable(false);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         btnConfirm = findViewById(R.id.btnYes);
         btnCancel = findViewById(R.id.btnNo);
         txtConfirmContent = findViewById(R.id.txtConfirmContent);
@@ -48,6 +49,7 @@ public class DialogBoxConfirm extends Dialog {
                 txtConfirmDescription.setText(description);
             }
         }
+
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,6 +57,7 @@ public class DialogBoxConfirm extends Dialog {
                 onYesClicked();
             }
         });
+
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

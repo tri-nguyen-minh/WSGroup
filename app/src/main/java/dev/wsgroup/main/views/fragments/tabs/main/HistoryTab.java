@@ -111,8 +111,6 @@ public class HistoryTab extends Fragment {
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getIcon() != null)
-                    tab.getIcon().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_IN);
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {

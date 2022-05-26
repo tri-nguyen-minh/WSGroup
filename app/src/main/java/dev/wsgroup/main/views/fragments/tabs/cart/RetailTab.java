@@ -6,12 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +13,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.Serializable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +35,6 @@ import dev.wsgroup.main.models.dtos.Supplier;
 import dev.wsgroup.main.models.recycleViewAdapters.RecViewCartSupplierListAdapter;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.order.ConfirmOrderActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
@@ -55,9 +52,9 @@ public class RetailTab extends Fragment {
     private SharedPreferences sharedPreferences;
     private RecViewCartSupplierListAdapter adapter;
     private List<Supplier> supplierRetailList;
-    private HashMap<String, List<CartProduct>> retailCart;
+    private HashMap<String, ArrayList<CartProduct>> retailCart;
     private HashMap<String, List<Campaign>> activeCampaignMap, readyCampaignMap;
-    private List<CartProduct> cartList, tempCartList;
+    private ArrayList<CartProduct> cartList, tempCartList;
     private List<Campaign> campaignList, tempCampaignList;
     private DialogBoxLoading dialogBoxLoading;
     private int activeCampaignCount, readyCampaignCount;
@@ -85,9 +82,9 @@ public class RetailTab extends Fragment {
         txtTotalCartPrice = view.findViewById(R.id.txtTotalCartPrice);
         btnCheckout = view.findViewById(R.id.btnCheckout);
 
+        sharedPreferences = getActivity().getSharedPreferences("PREFERENCE", Context.MODE_PRIVATE);
+
         setupCartView();
-        setupTotalPrice();
-        setupCheckoutButton();
 
         btnCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +102,8 @@ public class RetailTab extends Fragment {
                             orderProduct.setProduct(cartProduct.getProduct());
                             orderProduct.setQuantity(cartProduct.getQuantity());
                             orderProduct.setPrice(cartProduct.getProduct().getRetailPrice());
-                            totalPrice = cartProduct.getQuantity() * cartProduct.getProduct().getRetailPrice();
+                            totalPrice = cartProduct.getQuantity();
+                            totalPrice *= cartProduct.getProduct().getRetailPrice();
                             orderTotalPrice += totalPrice;
                             orderProduct.setTotalPrice(totalPrice);
                             orderProduct.setCartProduct(cartProduct);
@@ -141,28 +139,16 @@ public class RetailTab extends Fragment {
         });
     }
 
-    private void getCartFromSession() {
-        try {
-            sharedPreferences = getActivity().getSharedPreferences("PREFERENCE",
-                                                                    Context.MODE_PRIVATE);
-            cartList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void setupCartView() {
-        getCartFromSession();
-        if (cartList.size() > 0) {
-            layoutNoShoppingCart.setVisibility(View.INVISIBLE);
-            layoutLoading.setVisibility(View.VISIBLE);
-            layoutCartDetail.setVisibility(View.VISIBLE);
+        setLoadingState();
+        cartList = (ArrayList<CartProduct>)
+                getActivity().getIntent().getSerializableExtra("RETAIL_CART");
+        setupTotalPrice();
+        setupCheckoutButton();
+        if (cartList != null && cartList.size() > 0) {
             findCampaign();
         } else {
-            layoutNoShoppingCart.setVisibility(View.VISIBLE);
-            layoutLoading.setVisibility(View.INVISIBLE);
-            layoutCartDetail.setVisibility(View.INVISIBLE);
+            setEmptyState();
         }
     }
     private void findCampaign() {
@@ -215,7 +201,6 @@ public class RetailTab extends Fragment {
     }
 
     private void setupAdapter() {
-        layoutLoading.setVisibility(View.INVISIBLE);
         adaptList();
         adapter = new RecViewCartSupplierListAdapter(getContext(), getActivity(),
                 IntegerUtils.IDENTIFIER_RETAIL_CART) {
@@ -238,14 +223,6 @@ public class RetailTab extends Fragment {
                         int index = findCartProductIndexById(cartProductId);
                         if (index >= 0) {
                             cartList.remove(index);
-                        }
-                        try {
-                            sharedPreferences.edit()
-                                    .putString("RETAIL_CART",
-                                            ObjectSerializer.serialize((Serializable) cartList))
-                                    .apply();
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                         if (dialogBoxLoading.isShowing()) {
                             dialogBoxLoading.dismiss();
@@ -315,6 +292,7 @@ public class RetailTab extends Fragment {
         recViewCartSupplier.setAdapter(adapter);
         recViewCartSupplier.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
+        setLoadedState();
     }
 
     private void adaptList() {
@@ -400,5 +378,23 @@ public class RetailTab extends Fragment {
             }
         }
         return false;
+    }
+
+    private void setLoadingState() {
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutCartDetail.setVisibility(View.INVISIBLE);
+        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
+    }
+
+    private void setLoadedState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutCartDetail.setVisibility(View.VISIBLE);
+        layoutNoShoppingCart.setVisibility(View.INVISIBLE);
+    }
+
+    private void setEmptyState() {
+        layoutLoading.setVisibility(View.INVISIBLE);
+        layoutCartDetail.setVisibility(View.INVISIBLE);
+        layoutNoShoppingCart.setVisibility(View.VISIBLE);
     }
 }

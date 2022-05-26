@@ -151,7 +151,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
-                            android:text="Code:"
+                            android:text="Quantity:"
                             android:textColor="@color/gray_dark"
                             android:textSize="14sp"
                             android:textStyle="bold"/>

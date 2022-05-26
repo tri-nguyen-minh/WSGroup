@@ -31,8 +31,8 @@ public class IntegerUtils {
     public static final int CONFIRM_ACTION_CODE_FAILED = 2;
     public static final int CONFIRM_ACTION_CODE_ALERT = 3;
 
-    public static final int IDENTIFIER_DISCOUNT_SELECT = 1;
-    public static final int IDENTIFIER_DISCOUNT_VIEW = 2;
+    public static final int IDENTIFIER_EXECUTABLE = 1;
+    public static final int IDENTIFIER_VIEW_ONLY = 2;
 
     public static final int IDENTIFIER_RETAIL_CART = 1;
     public static final int IDENTIFIER_CAMPAIGN_CART = 2;

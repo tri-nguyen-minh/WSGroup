@@ -127,9 +127,6 @@ public class RecViewOrderSupplierListAdapter
                                     activity.getApplication(), new APIListener() {
                                 @Override
                                 public void onDiscountListFound(List<CustomerDiscount> discountList) {
-                                    if (discountList.size() > 0) {
-                                        checkUnwantedDiscount(orderList.get(position), discountList);
-                                    }
                                     if (discountList.size() == 0) {
                                         setupNoDiscountState(holder);
                                         price = getTotalPrice(position);
@@ -185,16 +182,13 @@ public class RecViewOrderSupplierListAdapter
                         if (dialogBoxLoading.isShowing()) {
                             dialogBoxLoading.dismiss();
                         }
-                        if (discountList.size() > 0) {
-                            checkUnwantedDiscount(order, discountList);
-                        }
                         if (discountList.size() == 0) {
                             displayNoDiscountAlert();
                         } else {
                             customerDiscountList = discountList;
                             DialogBoxDiscountList dialogBox = new DialogBoxDiscountList( activity,
                                     context, customerDiscountList,
-                                    IntegerUtils.IDENTIFIER_DISCOUNT_SELECT) {
+                                    IntegerUtils.IDENTIFIER_EXECUTABLE) {
                                 @Override
                                 public void setSelectedDiscount(CustomerDiscount discount) {
                                     setupDiscountFoundState(holder);
@@ -251,44 +245,6 @@ public class RecViewOrderSupplierListAdapter
         } else {
             return campaign.getPrice();
         }
-    }
-
-    private void checkUnwantedDiscount(Order order, List<CustomerDiscount> discountList) {
-        markedForDeleteList = new ArrayList<>();
-        for (CustomerDiscount customerDiscount : discountList) {
-            if (checkValidDiscount(order, customerDiscount.getDiscount()) == 0) {
-                markedForDeleteList.add(customerDiscount);
-            }
-        }
-        if (markedForDeleteList.size() > 0) {
-            for (CustomerDiscount customerDiscount : markedForDeleteList) {
-                discountList.remove(customerDiscount);
-            }
-        }
-    }
-
-    private int checkValidDiscount(Order order, Discount discount) {
-        int count = 0;
-        if (discount.getMinPrice() == 0 && !discount.getProductId().equals("null")) {
-            for (OrderProduct orderProduct : order.getOrderProductList()) {
-                if (orderProduct.getProduct().getProductId().equals(discount.getProductId())) {
-                    count++;
-                }
-            }
-        } else if (discount.getMinPrice() > 0 && discount.getProductId().equals("null")) {
-            if (order.getTotalPrice() >= discount.getMinPrice()) {
-                count = 1;
-            }
-        } else {
-            if (order.getTotalPrice() >= discount.getMinPrice()) {
-                for (OrderProduct orderProduct : order.getOrderProductList()) {
-                    if (orderProduct.getProduct().getProductId().equals(discount.getProductId())) {
-                        count++;
-                    }
-                }
-            }
-        }
-        return count;
     }
 
     private void applyDiscount(ViewHolder holder, Discount discount, int position) {

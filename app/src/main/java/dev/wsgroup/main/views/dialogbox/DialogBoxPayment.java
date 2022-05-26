@@ -79,8 +79,7 @@ public class DialogBoxPayment extends Dialog {
 
     }
 
-    public void onCancelDialogBox() {
-    }
+    public void onCancelDialogBox() { }
 
     public void onStartPaymentFailed() {}
 

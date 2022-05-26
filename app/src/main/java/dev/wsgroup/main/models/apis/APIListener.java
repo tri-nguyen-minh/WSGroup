@@ -1,5 +1,6 @@
 package dev.wsgroup.main.models.apis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,8 @@ public class APIListener {
 
     public void onAddCartItemSuccessful(CartProduct cartProduct) {}
 
-    public void onCartListFound(List<CartProduct> retailCartProductList,
-                                List<CartProduct> campaignCartProductList) {}
+    public void onCartListFound(ArrayList<CartProduct> retailCartProductList,
+                                ArrayList<CartProduct> campaignCartProductList) {}
 
     public void onProductListFound(List<Product> productList) {}
 

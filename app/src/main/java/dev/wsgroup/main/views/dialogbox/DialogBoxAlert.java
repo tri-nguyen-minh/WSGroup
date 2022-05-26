@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 
-public class DialogBoxAlert extends Dialog implements View.OnClickListener {
+public class DialogBoxAlert extends Dialog {
 
     private Button btnConfirmRegister;
     private TextView lblConfirmText, lblDescription;
@@ -42,11 +42,12 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_box_alert);
         setCancelable(false);
+
         btnConfirmRegister = findViewById(R.id.btnConfirmRegister);
         lblConfirmText = findViewById(R.id.lblConfirmText);
         lblDescription = findViewById(R.id.lblDescription);
         imgDialogConfirm = findViewById(R.id.imgDialogConfirm);
-        btnConfirmRegister.setOnClickListener(this);
+
         switch (requestCode) {
             case IntegerUtils.CONFIRM_ACTION_CODE_SUCCESS: {
                 imgDialogConfirm.setImageResource(R.drawable.ic_check);
@@ -61,7 +62,6 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
             }
             case IntegerUtils.CONFIRM_ACTION_CODE_ALERT: {
                 imgDialogConfirm.setVisibility(View.GONE);
-                imgDialogConfirm.setColorFilter(ContextCompat.getColor(getContext(), R.color.red));
                 break;
             }
         }
@@ -77,12 +77,14 @@ public class DialogBoxAlert extends Dialog implements View.OnClickListener {
             lblDescription.setVisibility(View.VISIBLE);
             lblDescription.setText(description);
         }
-    }
 
-    @Override
-    public void onClick(View v) {
-        dismiss();
-        onClickAction();
+        btnConfirmRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+                onClickAction();
+            }
+        });
     }
 
     public void onClickAction() {}

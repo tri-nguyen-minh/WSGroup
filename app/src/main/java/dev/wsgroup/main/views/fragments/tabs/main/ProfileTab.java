@@ -6,11 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +13,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
@@ -27,25 +26,23 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 import dev.wsgroup.main.R;
+import dev.wsgroup.main.models.apis.APIListener;
 import dev.wsgroup.main.models.apis.callers.APIChatCaller;
 import dev.wsgroup.main.models.apis.callers.APINotificationCaller;
 import dev.wsgroup.main.models.apis.callers.APIUserCaller;
-import dev.wsgroup.main.models.apis.APIListener;
-import dev.wsgroup.main.models.dtos.CartProduct;
 import dev.wsgroup.main.models.dtos.Message;
 import dev.wsgroup.main.models.dtos.Notification;
 import dev.wsgroup.main.models.dtos.User;
 import dev.wsgroup.main.models.services.FirebaseReferences;
 import dev.wsgroup.main.models.utils.IntegerUtils;
 import dev.wsgroup.main.models.utils.MethodUtils;
-import dev.wsgroup.main.models.utils.ObjectSerializer;
 import dev.wsgroup.main.models.utils.StringUtils;
 import dev.wsgroup.main.views.activities.CartActivity;
 import dev.wsgroup.main.views.activities.DiscountActivity;
 import dev.wsgroup.main.views.activities.NotificationActivity;
 import dev.wsgroup.main.views.activities.account.AccountInformationActivity;
-import dev.wsgroup.main.views.activities.address.AddressListActivity;
 import dev.wsgroup.main.views.activities.account.PasswordChangeActivity;
+import dev.wsgroup.main.views.activities.address.AddressListActivity;
 import dev.wsgroup.main.views.activities.message.MessageListActivity;
 import dev.wsgroup.main.views.dialogbox.DialogBoxConfirm;
 
@@ -54,16 +51,15 @@ public class ProfileTab extends Fragment {
     private ImageView imgAccountAvatar;
     private TextView txtProfileTabUsername, txtNotificationCount,
             txtMessageCount, txtCartCount, lblRetry;
-    private LinearLayout layoutProfileAvatar, layoutDiscount, layoutLoyalty, layoutAccountInfo,
-            layoutChangePassword, layoutDeliveryAddress, layoutLogout, layoutNotification,
+    private LinearLayout layoutDiscount, layoutAccountInfo, layoutChangePassword,
+            layoutDeliveryAddress, layoutLogout, layoutNotification,
             layoutMessage, layoutCart, layoutFailed;
     private CardView cardViewNotificationCount, cardViewMessageCount, cardViewCartCount;
     private ConstraintLayout layoutScreen;
     private RelativeLayout layoutLoading;
 
     private SharedPreferences sharedPreferences;
-    private List<CartProduct> retailList, campaignList;
-    private String token, username, accountId, googleId;
+    private String token, accountId, googleId;
     private int cartCount, messageCount, notificationCount;
     private boolean messageLoading, notificationLoading;
 
@@ -85,9 +81,7 @@ public class ProfileTab extends Fragment {
         txtMessageCount = view.findViewById(R.id.txtMessageCount);
         txtCartCount = view.findViewById(R.id.txtCartCount);
         lblRetry = view.findViewById(R.id.lblRetry);
-        layoutProfileAvatar = view.findViewById(R.id.layoutProfileAvatar);
         layoutDiscount = view.findViewById(R.id.layoutDiscount);
-        layoutLoyalty = view.findViewById(R.id.layoutLoyalty);
         layoutAccountInfo = view.findViewById(R.id.layoutAccountInfo);
         layoutChangePassword = view.findViewById(R.id.layoutChangePassword);
         layoutDeliveryAddress = view.findViewById(R.id.layoutDeliveryAddress);
@@ -206,7 +200,6 @@ public class ProfileTab extends Fragment {
                     @Override
                     public void onUserFound(User user, String message) {
                         user.setToken(token);
-                        username = user.getUsername();
                         accountId = user.getAccountId();
                         googleId = user.getGoogleId();
                         txtProfileTabUsername.setText(user.getDisplayName());
@@ -236,7 +229,8 @@ public class ProfileTab extends Fragment {
 
     private void setRealtimeFirebase() {
         firebaseReferences = new FirebaseReferences();
-        firebaseReferences.getUserMessages(accountId).addValueEventListener(new ValueEventListener() {
+        firebaseReferences.getUserMessages(accountId)
+                          .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!messageLoading) {
@@ -247,7 +241,8 @@ public class ProfileTab extends Fragment {
             @Override
             public void onCancelled(DatabaseError error) { }
         });
-        firebaseReferences.getUserNotifications(accountId).addValueEventListener(new ValueEventListener() {
+        firebaseReferences.getUserNotifications(accountId)
+                          .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!notificationLoading) {
@@ -347,24 +342,12 @@ public class ProfileTab extends Fragment {
     }
 
     private void editCartCountByUser() {
-        try {
-            retailList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("RETAIL_CART", ""));
-            campaignList = (List<CartProduct>) ObjectSerializer
-                    .deserialize(sharedPreferences.getString("CAMPAIGN_CART", ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (retailList == null && campaignList == null) {
-            cardViewCartCount.setVisibility(View.INVISIBLE);
+        cartCount = getActivity().getIntent().getIntExtra("CART_COUNT", 0);
+        if (cartCount > 0) {
+            cardViewCartCount.setVisibility(View.VISIBLE);
+            txtCartCount.setText(cartCount + "");
         } else {
-            if (retailList.size() > 0 || campaignList.size() > 0) {
-                cardViewCartCount.setVisibility(View.VISIBLE);
-                cartCount = retailList.size() + campaignList.size();
-                txtCartCount.setText(cartCount + "");
-            } else {
-                cardViewCartCount.setVisibility(View.INVISIBLE);
-            }
+            cardViewCartCount.setVisibility(View.INVISIBLE);
         }
     }
 

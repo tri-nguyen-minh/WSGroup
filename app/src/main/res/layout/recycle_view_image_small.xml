@@ -19,6 +19,8 @@
             android:id="@+id/imgProof"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:scaleX="0.8"
+            android:scaleY="0.8"
             android:src="@drawable/ic_camera"/>
 
     </androidx.cardview.widget.CardView>

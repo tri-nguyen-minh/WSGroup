@@ -23,16 +23,13 @@ public class DialogBoxDiscountList extends Dialog {
     private ImageView imgCloseDialogBox;
     private RecyclerView recViewDiscountList;
 
-    private Activity activity;
     private Context context;
     private List<CustomerDiscount> customerDiscountList;
-    private RecViewDiscountListAdapter adapter;
     private int identifier;
 
     public DialogBoxDiscountList(Activity activity, Context context,
                                  List<CustomerDiscount> customerDiscountList, int identifier) {
         super(activity);
-        this.activity = activity;
         this.context = context;
         this.customerDiscountList = customerDiscountList;
         this.identifier = identifier;
@@ -54,7 +51,7 @@ public class DialogBoxDiscountList extends Dialog {
             }
         });
 
-        adapter = new RecViewDiscountListAdapter(context, identifier) {
+        RecViewDiscountListAdapter adapter = new RecViewDiscountListAdapter(context, identifier) {
             @Override
             public void onDiscountSelected(CustomerDiscount discount) {
                 dismiss();

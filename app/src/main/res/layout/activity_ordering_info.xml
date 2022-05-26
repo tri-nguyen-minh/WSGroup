@@ -119,6 +119,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     style="@style/style_profile_tab"
+                    android:id="@+id/layoutAddress"
                     android:background="@color/white"
                     android:paddingVertical="10dp"
                     android:paddingHorizontal="0dp"
@@ -142,7 +143,7 @@
                         style="@style/style_txt_account_info" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/layoutAddress"
+                        android:id="@+id/layoutAddressDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
@@ -153,7 +154,7 @@
 
                         <TextView
                             android:id="@+id/txtAddressStreet"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="10dp"
                             android:fontFamily="@font/montserratr"
@@ -163,7 +164,8 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"/>
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"/>
 
                         <TextView
                             android:id="@+id/txtAddressDistrict"
@@ -180,6 +182,7 @@
                             android:ellipsize="end"
                             app:layout_constraintTop_toBottomOf="@id/txtAddressStreet"
                             app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintBottom_toTopOf="@id/txtAddressProvince"/>
 
                         <TextView
@@ -197,6 +200,7 @@
                             android:ellipsize="end"
                             app:layout_constraintTop_toBottomOf="@id/txtAddressDistrict"
                             app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
