@@ -22,6 +22,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -127,7 +130,13 @@ public class MessageListActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(Task<DataSnapshot> task) {
                     if (task.isSuccessful()) {
-                        customerServiceId = String.valueOf(task.getResult().getValue());
+                        try {
+                            customerServiceId = ((JSONObject) JSONObject.wrap(task.getResult()
+                                                                                  .getValue()))
+                                                                                  .getString("id");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         getMessageList();
                     } else {
                         setFailedState();

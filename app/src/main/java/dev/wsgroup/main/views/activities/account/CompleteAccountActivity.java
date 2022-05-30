@@ -82,8 +82,16 @@ public class CompleteAccountActivity extends AppCompatActivity {
             editPhoneNumber.setText(StringUtils.VIETNAM_COUNTRY_CODE);
             layoutUsername.setVisibility(View.GONE);
             layoutPassword.setVisibility(View.GONE);
-            editFirstName.setText(user.getFirstName());
-            editLastName.setText(user.getLastName());
+            if (user.getFirstName().isEmpty() || user.getFirstName().equals("null")) {
+                editFirstName.setText("");
+            } else {
+                editFirstName.setText(user.getFirstName());
+            }
+            if (user.getLastName().isEmpty() || user.getLastName().equals("null")) {
+                editFirstName.setText("");
+            } else {
+                editFirstName.setText(user.getLastName());
+            }
             editMail.setText(user.getMail());
             editMail.setEnabled(false);
         }
