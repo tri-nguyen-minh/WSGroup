@@ -418,7 +418,6 @@ public class APIProductCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("fail rating");
                     System.out.println(error);
                     System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     APIListener.onFailedAPICall(IntegerUtils.ERROR_API);
@@ -524,7 +523,6 @@ public class APIProductCaller {
             Response.ErrorListener errorListener = new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("fail review");
                     System.out.println(error);
                     System.out.println(MethodUtils.getVolleyErrorMessage(error));
                     if(error.toString().contains("NoConnectionError")) {

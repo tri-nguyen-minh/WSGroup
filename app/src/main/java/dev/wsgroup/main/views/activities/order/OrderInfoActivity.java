@@ -65,9 +65,9 @@ public class OrderInfoActivity extends AppCompatActivity {
 
     private ImageView imgBackFromCheckout, imgCheckoutHome;
     private ConstraintLayout layoutMain, layoutAddress, layoutAddressDetail, layoutCampaignSaving;
-    private TextView txtPhoneNumber, txtAddressStreet, txtAddressDistrict,
-            txtAddressProvince, lblDeliveryAddress, txtTotalPrice, txtCampaignSaving,
-            txtFinalPrice, lblShipping, txtDeliveryPrice, lblDiscountPrice;
+    private TextView txtPhoneNumber, txtAddressStreet, txtAddressProvince,
+            lblDeliveryAddress, txtTotalPrice, txtCampaignSaving, txtFinalPrice,
+            lblShipping, txtDeliveryPrice, lblDiscountPrice;
     private RecyclerView recViewOrderProductPrice, recViewLoyalStatusList, recViewDiscountList;
     private Button btnConfirmOrder;
     private Spinner spinnerPayment;
@@ -110,7 +110,6 @@ public class OrderInfoActivity extends AppCompatActivity {
         layoutCampaignSaving = findViewById(R.id.layoutCampaignSaving);
         txtPhoneNumber = findViewById(R.id.txtPhoneNumber);
         txtAddressStreet = findViewById(R.id.txtAddressStreet);
-        txtAddressDistrict = findViewById(R.id.txtAddressDistrict);
         txtAddressProvince = findViewById(R.id.txtAddressProvince);
         lblDeliveryAddress = findViewById(R.id.lblDeliveryAddress);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
@@ -261,8 +260,7 @@ public class OrderInfoActivity extends AppCompatActivity {
         if (currentAddress != null) {
             lblDeliveryAddress.setVisibility(View.INVISIBLE);
             layoutAddressDetail.setVisibility(View.VISIBLE);
-            txtAddressStreet.setText(currentAddress.getStreet());
-            txtAddressDistrict.setText(currentAddress.getDistrictString());
+            txtAddressStreet.setText(currentAddress.getStreetString());
             txtAddressProvince.setText(currentAddress.getProvince());
             shippingFeeFailed = false;
             deliveryCount = orderList.size();

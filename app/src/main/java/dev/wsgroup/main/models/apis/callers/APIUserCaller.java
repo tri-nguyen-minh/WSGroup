@@ -92,6 +92,8 @@ public class APIUserCaller {
         try {
             jsonObject.put("googleId", user.getGoogleId());
             jsonObject.put("firstName", user.getFirstName());
+            System.out.println("first: " + user.getFirstName());
+            System.out.println("last: " + user.getLastName());
             jsonObject.put("lastName", user.getLastName());
             jsonObject.put("phone", user.getPhoneNumber());
             jsonObject.put("email", user.getMail());

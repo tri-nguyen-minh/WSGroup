@@ -50,6 +50,7 @@
         android:layout_height="0dp"
         android:gravity="center"
         android:paddingVertical="20dp"
+        android:background="@color/gray_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutAccountInfoHeader">
 
@@ -67,6 +68,7 @@
         android:layout_height="0dp"
         android:gravity="center"
         android:orientation="vertical"
+        android:background="@color/gray_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutAccountInfoHeader">
 

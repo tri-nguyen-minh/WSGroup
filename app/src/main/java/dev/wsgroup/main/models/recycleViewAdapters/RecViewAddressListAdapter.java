@@ -43,8 +43,7 @@ public class RecViewAddressListAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtAddressStreet.setText(addressList.get(position).getStreet());
-        holder.txtAddressDistrict.setText(addressList.get(position).getDistrictString());
+        holder.txtAddressStreet.setText(addressList.get(position).getStreetString());
         holder.txtAddressProvince.setText(addressList.get(position).getProvince());
         if (request == IntegerUtils.REQUEST_COMMON) {
             holder.checkboxAddress.setVisibility(View.GONE);
@@ -89,14 +88,13 @@ public class RecViewAddressListAdapter
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ConstraintLayout layoutParent;
-        private final TextView txtAddressStreet, txtAddressDistrict, txtAddressProvince;
+        private final TextView txtAddressStreet, txtAddressProvince;
         private final ImageView checkboxAddress;
 
         public ViewHolder(View view) {
             super(view);
             layoutParent = view.findViewById(R.id.layoutParent);
             txtAddressStreet = view.findViewById(R.id.txtAddressStreet);
-            txtAddressDistrict = view.findViewById(R.id.txtAddressDistrict);
             txtAddressProvince = view.findViewById(R.id.txtAddressProvince);
             checkboxAddress = view.findViewById(R.id.checkboxAddress);
         }

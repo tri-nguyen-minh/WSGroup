@@ -147,10 +147,10 @@ public class ConfirmOrderActivity extends AppCompatActivity {
                 layoutCampaignCount.setVisibility(View.VISIBLE);
                 progressBarQuantityCount.setVisibility(View.VISIBLE);
                 txtCampaignOrderCount.setText(campaign.getOrderCount() + "");
-                txtCampaignOrderQuantityCount.setText(campaign.getQuantityCount() + "");
+                txtCampaignOrderQuantityCount.setText((campaign.getQuantityCount() + orderProduct.getQuantity()) + "");
                 txtCampaignQuantityCount.setText(campaign.getMaxQuantity() + "");
                 progressBarQuantityCount.setMax(campaign.getMaxQuantity());
-                progressBarQuantityCount.setProgress(campaign.getQuantityCount());
+                progressBarQuantityCount.setProgress(campaign.getQuantityCount() + orderProduct.getQuantity());
                 lblProductOrderCount.setText((campaign.getOrderCount() == 1) ? "order" : "orders");
                 lblQuantityCountSeparator.setText("/");
             } else {

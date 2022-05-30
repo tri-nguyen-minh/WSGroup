@@ -451,7 +451,7 @@ public class RequestActivity extends AppCompatActivity {
                 "returning", getApplication(), new APIListener() {
                     @Override
                     public void onUpdateSuccessful() {
-                        displayFinalMessage(StringUtils.MES_SUCCESSFUL_UPDATE_ORDER);
+                        displayFinalMessage(StringUtils.MES_SUCCESSFUL_REQUEST_SENT);
                     }
 
                     @Override

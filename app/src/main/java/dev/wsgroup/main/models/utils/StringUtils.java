@@ -101,4 +101,5 @@ public class StringUtils {
     public static final String MES_SUCCESSFUL_ADD_ADDRESS = "The address has been added.";
     public static final String MES_SUCCESSFUL_UPDATE_ADDRESS = "The address has been updated.";
     public static final String MES_SUCCESSFUL_DELETE_ADDRESS = "The address has been deleted.";
+    public static final String MES_SUCCESSFUL_REQUEST_SENT = "Return request has been submitted!";
 }

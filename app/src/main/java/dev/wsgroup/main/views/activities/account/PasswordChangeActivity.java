@@ -12,10 +12,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.apis.APIListener;
@@ -31,10 +34,10 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 public class PasswordChangeActivity extends AppCompatActivity {
 
     private ImageView imgBackFromChangePassword, imgChangePasswordHome;
-    private EditText editOldPassword, editNewPassword, editConfirmPassword;
+    private TextInputEditText editOldPassword, editNewPassword, editConfirmPassword;
     private Button btnSaveEdit;
     private ConstraintLayout layoutParent;
-    private RelativeLayout layoutOldPassword;
+    private LinearLayout layoutOldPassword;
 
     private SharedPreferences sharedPreferences;
     private int requestCode;

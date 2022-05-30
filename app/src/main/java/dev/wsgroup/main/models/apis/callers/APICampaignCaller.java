@@ -158,7 +158,6 @@ public class APICampaignCaller {
             requestQueue = Volley.newRequestQueue(application);
         }
         String url = StringUtils.CAMPAIGN_API_URL + campaignId;
-        System.out.println(url);
         try {
             Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                 @Override

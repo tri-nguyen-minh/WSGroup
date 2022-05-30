@@ -318,6 +318,8 @@ public class SignInActivity extends AppCompatActivity {
                     newUser.setGoogleId(googleAccount.getId());
                     newUser.setFirstName(googleAccount.getGivenName());
                     newUser.setLastName(googleAccount.getFamilyName());
+                    System.out.println("first: " + googleAccount.getGivenName());
+                    System.out.println("last: " + googleAccount.getFamilyName());
                     newUser.setPhoneNumber(googleAccount.getId());
                     newUser.setMail(googleAccount.getEmail());
                     APIUserCaller.findUserByMail(googleAccount.getEmail(),

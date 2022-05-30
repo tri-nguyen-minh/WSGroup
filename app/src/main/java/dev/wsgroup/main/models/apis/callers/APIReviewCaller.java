@@ -148,7 +148,6 @@ public class APIReviewCaller {
                 public void onResponse(JSONObject response) {
                     try {
                         Review review;
-                        System.out.println(response);
                         JSONArray jsonArray = response.getJSONArray("data");
                         reviewList = new ArrayList<>();
                         if (jsonArray != null) {

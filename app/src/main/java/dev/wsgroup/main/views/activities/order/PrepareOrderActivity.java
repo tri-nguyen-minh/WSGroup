@@ -46,8 +46,7 @@ import dev.wsgroup.main.views.dialogbox.DialogBoxLoading;
 public class PrepareOrderActivity extends AppCompatActivity {
 
     private ConstraintLayout layoutParent, layoutSelectCampaign, layoutBasePrice;
-    private LinearLayout layoutCampaign, layoutNextMilestone,
-            layoutPreviousMilestone, layoutCampaignInfo;
+    private LinearLayout layoutCampaign, layoutNextMilestone, layoutCampaignInfo;
     private ImageView imgBackFromPrepareProduct,imgPrepareProductHome, imgProduct,
             imgProductQuantityMinus, imgProductQuantityPlus;
     private EditText editProductQuantity;
@@ -55,7 +54,7 @@ public class PrepareOrderActivity extends AppCompatActivity {
             txtPricingDescription, txtCampaignTag, txtCampaignNote, txtCampaignNextMilestone,
             lblCampaignNextMilestone, txtCampaignPrice, txtCampaignQuantityCount,
             txtCampaignQuantityBar, lblQuantityCountSeparator, txtProductPriceORG,
-            txtCampaignPreviousMilestone;
+            txtOrderCount, lblOrderCount;
     private Button btnConfirmAddToCart, btnConfirmPurchase;
     private ProgressBar progressBarQuantityCount;
 
@@ -83,7 +82,6 @@ public class PrepareOrderActivity extends AppCompatActivity {
         layoutBasePrice = findViewById(R.id.layoutBasePrice);
         layoutCampaign = findViewById(R.id.layoutCampaign);
         layoutNextMilestone = findViewById(R.id.layoutNextMilestone);
-        layoutPreviousMilestone = findViewById(R.id.layoutPreviousMilestone);
         layoutCampaignInfo = findViewById(R.id.layoutCampaignInfo);
         imgBackFromPrepareProduct = findViewById(R.id.imgBackFromPrepareProduct);
         imgPrepareProductHome = findViewById(R.id.imgPrepareProductHome);
@@ -95,6 +93,7 @@ public class PrepareOrderActivity extends AppCompatActivity {
         txtNumberInStorage = findViewById(R.id.txtNumberInStorage);
         txtProductPrice = findViewById(R.id.txtProductPrice);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
+        txtPricingDescription = findViewById(R.id.txtPricingDescription);
         txtCampaignTag = findViewById(R.id.txtCampaignTag);
         txtCampaignNote = findViewById(R.id.txtCampaignNote);
         txtCampaignNextMilestone = findViewById(R.id.txtCampaignNextMilestone);
@@ -104,8 +103,8 @@ public class PrepareOrderActivity extends AppCompatActivity {
         txtCampaignQuantityBar = findViewById(R.id.txtCampaignQuantityBar);
         lblQuantityCountSeparator = findViewById(R.id.lblQuantityCountSeparator);
         txtProductPriceORG = findViewById(R.id.txtProductPriceORG);
-        txtCampaignPreviousMilestone = findViewById(R.id.txtCampaignPreviousMilestone);
-        txtPricingDescription = findViewById(R.id.txtPricingDescription);
+        txtOrderCount = findViewById(R.id.txtOrderCount);
+        lblOrderCount = findViewById(R.id.lblOrderCount);
         btnConfirmAddToCart = findViewById(R.id.btnConfirmAddToCart);
         btnConfirmPurchase = findViewById(R.id.btnConfirmPurchase);
         progressBarQuantityCount = findViewById(R.id.progressBarQuantityCount);
@@ -295,13 +294,17 @@ public class PrepareOrderActivity extends AppCompatActivity {
             lblQuantityCountSeparator.setText("/");
             if (!campaign.getShareFlag()) {
                 txtCampaignTag.setText("Single Campaign");
-                layoutNextMilestone.setVisibility(View.GONE);
-                layoutPreviousMilestone.setVisibility(View.GONE);
                 layoutCampaignInfo.setVisibility(View.GONE);
                 price = campaign.getPrice();
                 txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
                 txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
                 txtCampaignQuantityBar.setText(campaign.getMinQuantity() + "");
+            } else {
+                layoutCampaignInfo.setVisibility(View.VISIBLE);
+                txtOrderCount.setText(campaign.getOrderCount() + "");
+                lblOrderCount.setText((campaign.getOrderCount() > 1) ? "Orders" : "Order");
+                txtCampaignQuantityBar.setText(campaign.getMaxQuantity() + "");
+                progressBarQuantityCount.setMax(campaign.getMaxQuantity());
             }
         } else {
             layoutBasePrice.setVisibility(View.VISIBLE);
@@ -326,14 +329,12 @@ public class PrepareOrderActivity extends AppCompatActivity {
             quantity += campaign.getQuantityCount();
             currentCampaignMilestone = MethodUtils.getReachedCampaignMilestone(milestoneList, quantity);
             layoutNextMilestone.setVisibility(View.VISIBLE);
-            layoutPreviousMilestone.setVisibility(View.VISIBLE);
             layoutCampaignInfo.setVisibility(View.VISIBLE);
             if (currentCampaignMilestone == null) {
                 price = campaign.getPrice();
                 lblCampaignNextMilestone.setText("Next milestone:");
                 milestoneQuantity = milestoneList.get(0).getQuantity();
                 txtCampaignNextMilestone.setText(milestoneQuantity + "");
-                layoutPreviousMilestone.setVisibility(View.GONE);
             } else {
                 price = currentCampaignMilestone.getPrice();
                 if (currentCampaignMilestone.equals(milestoneList.get(milestoneList.size() - 1))) {
@@ -343,15 +344,12 @@ public class PrepareOrderActivity extends AppCompatActivity {
                 } else {
                     lblCampaignNextMilestone.setText("Next milestone:");
                     milestoneQuantity = milestoneList.get(milestoneList.indexOf(currentCampaignMilestone) + 1)
-                            .getQuantity();
-                    txtCampaignPreviousMilestone.setText(currentCampaignMilestone.getQuantity() + "");
+                                                     .getQuantity();
                     txtCampaignNextMilestone.setText(milestoneQuantity + "");
                 }
             }
             txtCampaignPrice.setText(MethodUtils.formatPriceString(price));
             txtCampaignQuantityCount.setText(quantity + "");
-            txtCampaignQuantityBar.setText(milestoneQuantity + "");
-            progressBarQuantityCount.setMax(milestoneQuantity);
             progressBarQuantityCount.setProgress(quantity);
         }
     }

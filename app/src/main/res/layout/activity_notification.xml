@@ -53,7 +53,8 @@
             android:id="@+id/layoutLoading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@color/gray_background">
 
             <ProgressBar
                 android:id="@+id/progressBarLoading"
@@ -73,7 +74,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@color/gray_background">
 
             <TextView
                 android:text="AN ERROR HAS OCCURRED"

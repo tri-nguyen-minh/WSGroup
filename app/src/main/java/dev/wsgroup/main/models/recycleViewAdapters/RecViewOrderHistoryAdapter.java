@@ -16,6 +16,7 @@ import java.util.List;
 import dev.wsgroup.main.R;
 import dev.wsgroup.main.models.dtos.OrderHistory;
 import dev.wsgroup.main.models.utils.MethodUtils;
+import dev.wsgroup.main.models.utils.StringUtils;
 
 public class RecViewOrderHistoryAdapter
         extends RecyclerView.Adapter<RecViewOrderHistoryAdapter.ViewHolder> {
@@ -111,8 +112,7 @@ public class RecViewOrderHistoryAdapter
             }
             case "returning": {
                 holder.txtStatus.setText("Return request submitted");
-                message = "Return request submitted";
-                holder.txtStatus.setText(message);
+                message = StringUtils.MES_SUCCESSFUL_REQUEST_SENT;
                 reason = MethodUtils.getStatusChangedReason(orderHistory.getDescription());
                 break;
             }

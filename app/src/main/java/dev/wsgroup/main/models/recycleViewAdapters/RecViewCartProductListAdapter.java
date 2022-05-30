@@ -108,13 +108,19 @@ public class RecViewCartProductListAdapter
                 holder.checkboxCartProduct.setVisibility(View.GONE);
                 if (!campaign.getShareFlag()) {
                     holder.txtCampaignTag.setText("Single Campaign");
-                    holder.layoutNextMilestone.setVisibility(View.GONE);
-                    holder.layoutPreviousMilestone.setVisibility(View.GONE);
                     holder.layoutCampaignInfo.setVisibility(View.GONE);
                     price = campaign.getPrice();
                     holder.txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
                     holder.txtCampaignQuantityCount.setText(campaign.getQuantityCount() + "");
                     holder.txtCampaignQuantityBar.setText(campaign.getMinQuantity() + "");
+                } else {
+                    holder.layoutCampaignInfo.setVisibility(View.VISIBLE);
+                    if (campaign.getOrderCount() > 0) {
+                        holder.txtOrderCount.setText(campaign.getOrderCount() + "");
+                        holder.lblOrderCount.setText((campaign.getOrderCount() > 1) ? "Orders" : "Order");
+                    }
+                    holder.txtCampaignQuantityBar.setText(campaign.getMaxQuantity() + "");
+                    holder.progressBarQuantityCount.setMax(campaign.getMaxQuantity());
                 }
                 if (campaign.getStatus().equals("active")) {
                     holder.lblCampaignEnded.setVisibility(View.GONE);
@@ -273,14 +279,12 @@ public class RecViewCartProductListAdapter
                 milestone = MethodUtils.getReachedCampaignMilestone(campaign.getMilestoneList(),
                         milestoneQuantity);
                 holder.layoutNextMilestone.setVisibility(View.VISIBLE);
-                holder.layoutPreviousMilestone.setVisibility(View.VISIBLE);
                 holder.layoutCampaignInfo.setVisibility(View.VISIBLE);
                 if (milestone == null) {
                     price = campaign.getPrice();
                     holder.lblCampaignNextMilestone.setText("Next milestone:");
                     milestoneQuantity = campaign.getMilestoneList().get(0).getQuantity();
                     holder.txtCampaignNextMilestone.setText(milestoneQuantity + "");
-                    holder.layoutPreviousMilestone.setVisibility(View.GONE);
                 } else {
                     price = milestone.getPrice();
                     if (milestone.equals(campaign.getMilestoneList()
@@ -293,7 +297,6 @@ public class RecViewCartProductListAdapter
                         milestoneQuantity = campaign.getMilestoneList()
                                                     .get(campaign.getMilestoneList().indexOf(milestone) + 1)
                                                     .getQuantity();
-                        holder.txtCampaignPreviousMilestone.setText(milestone.getQuantity() + "");
                         holder.txtCampaignNextMilestone.setText(milestoneQuantity + "");
                     }
                 }
@@ -303,8 +306,6 @@ public class RecViewCartProductListAdapter
                     quantity = campaign.getMaxQuantity();
                 }
                 holder.txtCampaignQuantityCount.setText(quantity + "");
-                holder.txtCampaignQuantityBar.setText(milestoneQuantity + "");
-                holder.progressBarQuantityCount.setMax(milestoneQuantity);
                 holder.progressBarQuantityCount.setProgress(quantity);
             }
         }
@@ -418,15 +419,14 @@ public class RecViewCartProductListAdapter
         private final TextView txtRecViewCartProductName, txtNumberInStorage,
                 txtPricingDescription, txtProductPrice, txtTotalPrice, txtCampaignTag,
                 txtCampaignNote, txtProductPriceORG, txtCampaignPrice, lblCampaignNextMilestone,
-                txtCampaignNextMilestone, txtCampaignPreviousMilestone, txtCampaignQuantityCount,
+                txtCampaignNextMilestone, txtOrderCount, lblOrderCount, txtCampaignQuantityCount,
                 txtCampaignQuantityBar, lblQuantityCountSeparator, txtCampaignCode,
                 txtCampaignEndDate, lblCampaignEnded;
         private final Button btnDeleteCartProducts, btnCheckout;
         private final EditText editProductQuantity;
         private final RelativeLayout layoutParent;
         private final ConstraintLayout layoutBasePrice;
-        private final LinearLayout layoutCampaign, layoutNextMilestone,
-                layoutPreviousMilestone, layoutCampaignInfo;
+        private final LinearLayout layoutCampaign, layoutNextMilestone, layoutCampaignInfo;
         private final ProgressBar progressBarQuantityCount;
 
         public ViewHolder(View view) {
@@ -446,7 +446,8 @@ public class RecViewCartProductListAdapter
             txtCampaignPrice = view.findViewById(R.id.txtCampaignPrice);
             lblCampaignNextMilestone = view.findViewById(R.id.lblCampaignNextMilestone);
             txtCampaignNextMilestone = view.findViewById(R.id.txtCampaignNextMilestone);
-            txtCampaignPreviousMilestone = view.findViewById(R.id.txtCampaignPreviousMilestone);
+            txtOrderCount = view.findViewById(R.id.txtOrderCount);
+            lblOrderCount = view.findViewById(R.id.lblOrderCount);
             txtCampaignQuantityCount = view.findViewById(R.id.txtCampaignQuantityCount);
             txtCampaignQuantityBar = view.findViewById(R.id.txtCampaignQuantityBar);
             lblQuantityCountSeparator = view.findViewById(R.id.lblQuantityCountSeparator);
@@ -460,7 +461,6 @@ public class RecViewCartProductListAdapter
             layoutBasePrice = view.findViewById(R.id.layoutBasePrice);
             layoutCampaign = view.findViewById(R.id.layoutCampaign);
             layoutNextMilestone = view.findViewById(R.id.layoutNextMilestone);
-            layoutPreviousMilestone = view.findViewById(R.id.layoutPreviousMilestone);
             layoutCampaignInfo = view.findViewById(R.id.layoutCampaignInfo);
             progressBarQuantityCount = view.findViewById(R.id.progressBarQuantityCount);
         }

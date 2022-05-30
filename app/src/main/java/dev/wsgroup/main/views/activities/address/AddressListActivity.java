@@ -32,7 +32,7 @@ public class AddressListActivity extends AppCompatActivity {
     private RelativeLayout layoutLoading;
     private ConstraintLayout layoutNoDefaultAddress, layoutDefaultAddress, layoutAddAddress;
     private LinearLayout layoutOtherAddress, layoutScreen, layoutFailed;
-    private TextView txtAddressStreet, txtAddressDistrict, txtAddressProvince, lblRetry;
+    private TextView txtAddressStreet, txtAddressProvince, lblRetry;
     private RecyclerView recViewAddress;
 
     private SharedPreferences sharedPreferences;
@@ -57,7 +57,6 @@ public class AddressListActivity extends AppCompatActivity {
         layoutScreen = findViewById(R.id.layoutScreen);
         layoutFailed = findViewById(R.id.layoutFailed);
         txtAddressStreet = findViewById(R.id.txtAddressStreet);
-        txtAddressDistrict = findViewById(R.id.txtAddressDistrict);
         txtAddressProvince = findViewById(R.id.txtAddressProvince);
         lblRetry = findViewById(R.id.lblRetry);
         recViewAddress = findViewById(R.id.recViewAddress);
@@ -179,8 +178,7 @@ public class AddressListActivity extends AppCompatActivity {
 
     private void setupDefaultAddress(Address address) {
         defaultAddress = address;
-        txtAddressStreet.setText(defaultAddress.getStreet());
-        txtAddressDistrict.setText(defaultAddress.getDistrictString());
+        txtAddressStreet.setText(defaultAddress.getStreetString());
         txtAddressProvince.setText(defaultAddress.getProvince());
     }
 

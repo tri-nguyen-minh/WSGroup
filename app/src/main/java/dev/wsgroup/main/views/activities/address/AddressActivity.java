@@ -390,7 +390,6 @@ public class AddressActivity extends AppCompatActivity {
     }
 
     private void getDistrictList() {
-        System.out.println("get d list");
         APIAddressCaller.getDistrictList(currentAddress.getProvinceId(),
                 getApplication(), new APIListener() {
             @Override
@@ -503,7 +502,6 @@ public class AddressActivity extends AppCompatActivity {
     }
 
     private void selectProvince(int position) {
-        System.out.println("selected p");
         selectedAddress = provinceList.get(position);
         currentAddress.setProvinceId(selectedAddress.getProvinceId());
         currentAddress.setProvince(selectedAddress.getProvince());
@@ -515,7 +513,6 @@ public class AddressActivity extends AppCompatActivity {
     }
 
     private void selectDistrict(int position) {
-        System.out.println("selected d");
         selectedAddress = districtList.get(position);
         currentAddress.setDistrictId(selectedAddress.getDistrictId());
         currentAddress.setDistrict(selectedAddress.getDistrict());
@@ -527,7 +524,6 @@ public class AddressActivity extends AppCompatActivity {
     }
 
     private void selectWard(int position) {
-        System.out.println("selected w");
         selectedAddress = wardList.get(position);
         currentAddress.setWardId(selectedAddress.getWardId());
         currentAddress.setWard(selectedAddress.getWard());

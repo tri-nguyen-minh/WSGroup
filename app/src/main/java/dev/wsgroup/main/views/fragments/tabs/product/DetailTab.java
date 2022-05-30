@@ -337,7 +337,6 @@ public class DetailTab extends Fragment {
 
     private void setupMoreProductView(List<Product> productList) {
         if (orderCountCheck && ratingCheck) {
-            System.out.println("supplier list: " + productList.size());
             layoutMoreSuppliersProducts.setVisibility(View.VISIBLE);
             RecViewProductListAdapter adapter = new RecViewProductListAdapter(getContext(), getActivity());
             adapter.setProductsList(productList);

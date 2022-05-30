@@ -75,6 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="center"
+        android:background="@color/gray_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -93,6 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:background="@color/gray_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -149,6 +151,7 @@
                             android:id="@+id/lblRetailQuantity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginRight="7dp"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
                             android:text="Quantity:"
@@ -160,7 +163,6 @@
                             android:id="@+id/txtRetailQuantity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="7dp"
                             android:fontFamily="@font/montserratr"
                             android:gravity="left"
                             android:text=""
@@ -558,7 +560,7 @@
                                     android:layout_marginTop="1dp">
 
                                     <TextView
-                                        android:text="View campaign's milestones"
+                                        android:text="Campaign's milestones"
                                         style="@style/style_label_account_info"
                                         android:paddingVertical="10dp"
                                         android:paddingHorizontal="10dp"
@@ -585,15 +587,13 @@
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/gray"
-                                android:paddingBottom="2dp">
+                                android:layout_height="wrap_content">
 
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/recViewCampaignMilestone"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:background="@color/gray"
+                                    android:background="@color/gray_background"
                                     android:nestedScrollingEnabled="false"/>
 
                             </RelativeLayout>

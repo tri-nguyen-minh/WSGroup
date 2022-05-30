@@ -112,8 +112,8 @@ public class Address implements Serializable {
         return ward + ", " + district;
     }
 
-    public String getProvinceString() {
-        return ward + ", " + district + ", " + province;
+    public String getStreetString() {
+        return street + ", " + ward + ", " + district;
     }
 
     public String getFullAddressString() {

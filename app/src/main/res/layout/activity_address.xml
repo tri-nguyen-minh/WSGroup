@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="center"
-        android:background="@color/white"
+        android:background="@color/gray_background"
         app:layout_constraintTop_toBottomOf="@id/layoutHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -55,6 +55,7 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:gravity="center"
+        android:background="@color/gray_background"
         app:layout_constraintTop_toBottomOf="@id/layoutHeader"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -201,7 +202,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutAddress"
             style="@style/style_profile_tab"
-            android:layout_marginVertical="2dp"
             android:padding="0dp"
             android:background="@color/white">
 
@@ -215,7 +215,7 @@
                 app:hintTextColor="@color/blue_dark"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/lblUsernameAlert"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -225,21 +225,6 @@
                     android:singleLine="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/lblUsernameAlert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserratr"
-                android:layout_marginRight="15dp"
-                android:text="!"
-                android:textStyle="bold"
-                android:textSize="30sp"
-                android:textColor="@color/red"
-                android:visibility="gone"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

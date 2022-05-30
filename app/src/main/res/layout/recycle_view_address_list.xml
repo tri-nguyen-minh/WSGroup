@@ -19,7 +19,7 @@
 
         <TextView
             android:id="@+id/txtAddressStreet"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:fontFamily="@font/montserratr"
@@ -32,25 +32,8 @@
             app:layout_constraintLeft_toLeftOf="parent"/>
 
         <TextView
-            android:id="@+id/txtAddressDistrict"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:fontFamily="@font/montserratr"
-            android:gravity="left"
-            android:text="tese"
-            android:textColor="@color/gray"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/txtAddressStreet"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/txtAddressProvince"/>
-
-        <TextView
             android:id="@+id/txtAddressProvince"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:fontFamily="@font/montserratr"
@@ -59,9 +42,7 @@
             android:textColor="@color/gray"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/txtAddressDistrict"
+            app:layout_constraintTop_toBottomOf="@id/txtAddressStreet"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
