@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,8 +55,7 @@ public class RecViewOrderHistoryAdapter
             adapter = new RecViewImageAdapter(context, activity, R.layout.recycle_view_image_small);
             adapter.setImageList(orderHistory.getImageList());
             holder.recViewImage.setAdapter(adapter);
-            holder.recViewImage.setLayoutManager(new LinearLayoutManager(context,
-                    LinearLayoutManager.HORIZONTAL, false));
+            holder.recViewImage.setLayoutManager(new GridLayoutManager(context, 6));
         } else {
             holder.recViewImage.setVisibility(View.GONE);
         }

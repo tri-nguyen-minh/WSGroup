@@ -335,6 +335,7 @@ public class MessageActivity extends AppCompatActivity {
                 editWriteMessage.setEnabled(true);
                 txtSend.setEnabled(true);
                 adapter.updateMessage(newMessage);
+                setListFoundState();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

@@ -132,6 +132,7 @@
                     <TextView
                         android:id="@+id/txtOrderCode"
                         android:textSize="17sp"
+                        android:gravity="center|right"
                         android:layout_marginLeft="10dp"
                         app:layout_constraintLeft_toRightOf="@+id/lblOrderCode"
                         app:layout_constraintTop_toTopOf="parent"

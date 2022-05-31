@@ -203,7 +203,15 @@ public class ProfileTab extends Fragment {
                         accountId = user.getAccountId();
                         googleId = user.getGoogleId();
                         txtProfileTabUsername.setText(user.getDisplayName());
-                        Glide.with(getContext()).load(user.getAvatarLink()).into(imgAccountAvatar);
+                        if (!user.getAvatarLink().equals("null")) {
+                            Glide.with(getContext()).load(user.getAvatarLink()).into(imgAccountAvatar);
+                        } else {
+                            Glide.with(getContext())
+                                 .load(R.drawable.ic_profile_circle)
+                                 .into(imgAccountAvatar);
+                            imgAccountAvatar.setScaleX((float) 1.1);
+                            imgAccountAvatar.setScaleY((float) 1.1);
+                        }
                         if (!googleId.isEmpty() && !googleId.equals("null") ) {
                             layoutChangePassword.setVisibility(View.GONE);
                         }

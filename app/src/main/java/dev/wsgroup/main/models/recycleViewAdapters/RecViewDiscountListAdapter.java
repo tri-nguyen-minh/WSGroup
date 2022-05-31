@@ -67,9 +67,17 @@ public class RecViewDiscountListAdapter
         holder.txtDiscountCondition.setText(MethodUtils.formatPriceString(discount.getMinPrice()));
         holder.txtSupplierName.setText(supplier.getName());
         holder.txtSupplierAddress.setText(supplier.getAddress().getFullAddressString());
-        Glide.with(context)
-             .load(supplier.getAvatarLink())
-             .into(holder.imgSupplierAvatar);
+        if (!supplier.getAvatarLink().equals("null")) {
+            Glide.with(context)
+                 .load(supplier.getAvatarLink())
+                 .into(holder.imgSupplierAvatar);
+        } else {
+            Glide.with(context)
+                 .load(R.drawable.ic_profile_circle)
+                 .into(holder.imgSupplierAvatar);
+            holder.imgSupplierAvatar.setScaleX((float) 1.1);
+            holder.imgSupplierAvatar.setScaleY((float) 1.1);
+        }
         holder.btnSelect.setVisibility(View.INVISIBLE);
         if (identifier == IntegerUtils.IDENTIFIER_EXECUTABLE) {
             holder.layoutSupplier.setVisibility(View.GONE);

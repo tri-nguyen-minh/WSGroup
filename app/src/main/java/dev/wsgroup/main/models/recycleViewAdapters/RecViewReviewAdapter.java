@@ -50,6 +50,12 @@ public class RecViewReviewAdapter
             user = review.getUser();
             if (!user.getAvatarLink().equals("null")) {
                 Glide.with(context).load(user.getAvatarLink()).into(holder.imgAccountAvatar);
+            } else {
+                Glide.with(context)
+                     .load(R.drawable.ic_profile_circle)
+                     .into(holder.imgAccountAvatar);
+                holder.imgAccountAvatar.setScaleX((float) 1.1);
+                holder.imgAccountAvatar.setScaleY((float) 1.1);
             }
             holder.txtDate.setText(MethodUtils.formatDate(review.getDate(), true));
             holder.txtCustomerName.setText(user.getDisplayName());

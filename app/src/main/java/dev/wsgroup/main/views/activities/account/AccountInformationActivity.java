@@ -290,7 +290,15 @@ public class AccountInformationActivity extends AppCompatActivity {
                 editAccountInfoWalletSecret.setText(user.getWalletSecret().equals("null") ?
                         "" : user.getWalletSecret());
                 if (!avatarLink.equals("null")) {
-                    Glide.with(getApplicationContext()).load(avatarLink).into(imgAccountInfoAvatar);
+                    Glide.with(getApplicationContext())
+                         .load(avatarLink)
+                         .into(imgAccountInfoAvatar);
+                } else {
+                    Glide.with(getApplicationContext())
+                         .load(R.drawable.ic_profile_circle)
+                         .into(imgAccountInfoAvatar);
+                    imgAccountInfoAvatar.setScaleX((float) 1.1);
+                    imgAccountInfoAvatar.setScaleY((float) 1.1);
                 }
                 if (requestCode == IntegerUtils.REQUEST_UPDATE_E_WALLET) {
                     editAccountInfoWalletCode.requestFocus();
