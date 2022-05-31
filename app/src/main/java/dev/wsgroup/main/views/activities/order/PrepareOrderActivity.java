@@ -179,6 +179,7 @@ public class PrepareOrderActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 try {
+                    System.out.println("min: " + minQuantity + " - max: " + maxQuantity);
                     quantity = Integer.parseInt(editProductQuantity.getText().toString());
                     if (quantity < minQuantity) {
                         editProductQuantity.setText(minQuantity + "");
@@ -496,6 +497,7 @@ public class PrepareOrderActivity extends AppCompatActivity {
     }
 
     private void setupQuantityButtons() {
+        quantity = Integer.parseInt(editProductQuantity.getText().toString());
         if (quantity == maxQuantity) {
             setClickableQuantityButton(imgProductQuantityMinus, true);
             setClickableQuantityButton(imgProductQuantityPlus, false);

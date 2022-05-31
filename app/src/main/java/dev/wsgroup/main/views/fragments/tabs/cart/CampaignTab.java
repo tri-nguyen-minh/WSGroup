@@ -229,7 +229,6 @@ public class CampaignTab extends Fragment {
             tempCartList.add(cartProduct);
             campaignCart.put(supplier.getId(), tempCartList);
         }
-        setupAdapter();
     }
 
     private int findCartProductIndexById(String id) {

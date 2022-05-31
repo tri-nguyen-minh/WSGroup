@@ -327,6 +327,7 @@ public class RecViewCartProductListAdapter
     }
 
     private void setupQuantityButtons(ViewHolder holder) {
+        quantity = Integer.parseInt(holder.editProductQuantity.getText().toString());
         if (quantity == maxQuantity) {
             setClickableQuantityButton(holder.imgProductQuantityMinus, true);
             setClickableQuantityButton(holder.imgProductQuantityPlus, false);

@@ -61,7 +61,6 @@ public class StringUtils {
     public static final String MES_ERROR_INVALID_PASSWORD = "Your password is invalid.";
     public static final String MES_ERROR_INCORRECT_CONFIRM_PASSWORD = "Please re-enter your password correctly.";
     public static final String MES_ERROR_INVALID_OTP = "The OTP is incorrect.";
-    public static final String MES_ERROR_OUT_OF_STOCK = "There are not enough products in stock to make this purchase.";
     public static final String MES_ERROR_WRONG_OLD_PASSWORD = "Your old password is incorrect.";
     public static final String MES_ERROR_DUPLICATE_OLD_PASSWORD = "Your new password cannot be the same as your old password.";
     public static final String MES_ERROR_NO_DISCOUNT = "There is no applicable discount for this order.";
@@ -78,7 +77,6 @@ public class StringUtils {
     public static final String MES_ALERT_ADD_REVIEW_DESCRIPTION = "Your review cannot be changed or removed later.";
     public static final String MES_ALERT_PHONE_LINKED_GOOGLE = "This number is linked to a Google Account.";
 
-    public static final String DESC_PHONE_LINKED_GOOGLE = "Please login using your Google Account.";
     public static final String DESC_IRREVERSIBLE_ACTION = "This action cannot be undone.";
     public static final String DESC_ABANDON_ORDER = "Your current order will be lost!";
     public static final String DESC_INVALID_ORDER_SUPPLIER_SUSPENDED = "'s account has been suspended.";

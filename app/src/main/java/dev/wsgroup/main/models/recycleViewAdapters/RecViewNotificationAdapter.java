@@ -150,7 +150,7 @@ public class RecViewNotificationAdapter
         } else if (notification.getMessage().toLowerCase().contains("finishreturning")) {
             message = "Order has been delivered to Supplier.";
         } else if (notification.getMessage().toLowerCase().contains("milestone")) {
-            message = "The joined campaign\nhas reached a new milestone.\nOrder's price has been updated.";
+            message = "The joined campaign has reached a new milestone.\nOrder's price has been updated.";
         }
     }
 
