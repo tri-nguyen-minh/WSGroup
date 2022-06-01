@@ -215,17 +215,11 @@ public class RetailTab extends Fragment {
                         getActivity().getApplication(), new APIListener() {
                     @Override
                     public void onUpdateSuccessful() {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
                         layoutCartDetail.setVisibility(View.INVISIBLE);
                         layoutLoading.setVisibility(View.VISIBLE);
                         int index = findCartProductIndexById(cartProductId);
                         if (index >= 0) {
                             cartList.remove(index);
-                        }
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
                         }
                         if (cartList.size() > 0) {
                             adaptList();
@@ -238,6 +232,9 @@ public class RetailTab extends Fragment {
                             layoutNoShoppingCart.setVisibility(View.VISIBLE);
                             layoutLoading.setVisibility(View.INVISIBLE);
                             layoutCartDetail.setVisibility(View.INVISIBLE);
+                        }
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
                         }
                     }
 

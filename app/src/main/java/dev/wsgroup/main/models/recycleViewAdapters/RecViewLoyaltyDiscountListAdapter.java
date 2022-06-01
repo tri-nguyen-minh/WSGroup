@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -39,9 +40,14 @@ public class RecViewLoyaltyDiscountListAdapter
     @Override
     public void onBindViewHolder(RecViewLoyaltyDiscountListAdapter.ViewHolder holder, int position) {
         loyaltyStatus = loyaltyStatusList.get(position);
-        holder.txtSupplierName.setText(loyaltyStatus.getSupplier().getName());
-        holder.txtDiscountPrice
-              .setText(MethodUtils.formatPriceString(loyaltyStatus.getDiscountPrice()));
+        holder.layoutMain.setVisibility(View.VISIBLE);
+        if (loyaltyStatus != null && loyaltyStatus.getDiscountPrice() != 0) {
+            holder.txtSupplierName.setText(loyaltyStatus.getSupplier().getName());
+            holder.txtDiscountPrice
+                    .setText(MethodUtils.formatPriceString(loyaltyStatus.getDiscountPrice()));
+        } else {
+            holder.layoutMain.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -52,11 +58,13 @@ public class RecViewLoyaltyDiscountListAdapter
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView txtSupplierName, txtDiscountPrice;
+        private final ConstraintLayout layoutMain;
 
         public ViewHolder(View view) {
             super(view);
             txtSupplierName = view.findViewById(R.id.txtSupplierName);
             txtDiscountPrice = view.findViewById(R.id.txtDiscountPrice);
+            layoutMain = view.findViewById(R.id.layoutMain);
         }
     }
 }

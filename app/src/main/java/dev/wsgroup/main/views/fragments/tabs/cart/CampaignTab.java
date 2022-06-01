@@ -144,14 +144,12 @@ public class CampaignTab extends Fragment {
                         new APIListener() {
                     @Override
                     public void onUpdateSuccessful() {
-                        if (dialogBoxLoading.isShowing()) {
-                            dialogBoxLoading.dismiss();
-                        }
-                        layoutCartDetail.setVisibility(View.INVISIBLE);
-                        layoutLoading.setVisibility(View.VISIBLE);
                         int index = findCartProductIndexById(cartProductId);
                         if (index >= 0) {
                             cartList.remove(index);
+                        }
+                        if (dialogBoxLoading.isShowing()) {
+                            dialogBoxLoading.dismiss();
                         }
                     }
 

@@ -142,6 +142,7 @@ public class DialogBoxReview extends Dialog {
             ratingReview.setRating(((float) review.getRating()));
             editReviewRating.setText(((float) review.getRating()) + "");
             editReview.setText(review.getReview());
+            System.out.println("date: " + review.getDate());
             txtDate.setText(MethodUtils.formatDate(review.getDate(), true));
         }
         imgCloseDialogBox.setOnClickListener(closeListener);

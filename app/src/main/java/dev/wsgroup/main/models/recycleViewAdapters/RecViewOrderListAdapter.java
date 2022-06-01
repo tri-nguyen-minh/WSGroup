@@ -55,8 +55,14 @@ public class RecViewOrderListAdapter
         totalPrice = order.getTotalPrice();
         totalPrice -= order.getDiscountPrice();
         totalPrice -= order.getAdvanceFee();
-        holder.txtOrderPrice
-              .setText(MethodUtils.formatPriceString(totalPrice));
+        totalPrice += order.getShippingFee();
+        holder.txtOrderCode.setText(order.getCode());
+        if (order.getPaymentMethod().equals("cod")) {
+            holder.txtPayment.setText("Payment on Delivery");
+        } else {
+            holder.txtPayment.setText("Payment via VNPAY");
+        }
+        holder.txtOrderPrice.setText(MethodUtils.formatPriceString(totalPrice));
         holder.txtSupplier.setText(order.getSupplier().getName());
         int productCount = order.getOrderProductList().size();
         holder.txtProductCount.setText(productCount + "");
@@ -90,13 +96,16 @@ public class RecViewOrderListAdapter
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final RelativeLayout layoutParent;
-        private final TextView txtOrderPrice, txtSupplier, txtProductCount, lblProduct;
+        private final TextView txtOrderCode, txtPayment, txtOrderPrice,
+                txtSupplier, txtProductCount, lblProduct;
         private final RecyclerView recViewOrderProduct;
 
 
         public ViewHolder(View view) {
             super(view);
             layoutParent = view.findViewById(R.id.layoutParent);
+            txtOrderCode = view.findViewById(R.id.txtOrderCode);
+            txtPayment = view.findViewById(R.id.txtPayment);
             txtOrderPrice = view.findViewById(R.id.txtOrderPrice);
             txtSupplier = view.findViewById(R.id.txtSupplier);
             txtProductCount = view.findViewById(R.id.txtProductCount);

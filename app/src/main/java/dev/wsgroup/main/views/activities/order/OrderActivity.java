@@ -69,7 +69,7 @@ public class OrderActivity extends AppCompatActivity {
 
     private String token, userId, orderCode, status, description;
     private double totalPrice, discountPrice, advancedFee, shippingFee;
-    private int productCount;
+    private int productCount, index;
     private Intent intent;
     private Order order;
     private OrderProduct orderProduct;
@@ -277,9 +277,17 @@ public class OrderActivity extends AppCompatActivity {
         }
         txtStatus.setText(MethodUtils.displayStatus(order.getStatus()));
         txtSupplierName.setText(order.getSupplier().getName());
-        Glide.with(getApplicationContext())
-             .load(order.getSupplier().getAvatarLink())
-             .into(imgSupplierAvatar);
+        if (!order.getSupplier().getAvatarLink().equals("null")) {
+            Glide.with(getApplicationContext())
+                 .load(order.getSupplier().getAvatarLink())
+                 .into(imgSupplierAvatar);
+        } else {
+            Glide.with(getApplicationContext())
+                 .load(R.drawable.ic_profile_circle)
+                 .into(imgSupplierAvatar);
+            imgSupplierAvatar.setScaleX((float) 1.1);
+            imgSupplierAvatar.setScaleY((float) 1.1);
+        }
         txtSupplierAddress.setText(order.getSupplier().getAddress().getFullAddressString());
         discountPrice = order.getDiscountPrice();
         if (discountPrice == 0) {
@@ -496,10 +504,6 @@ public class OrderActivity extends AppCompatActivity {
                             @Override
                             public void onClickAction() {
                                 applyReview(review);
-                                notifyDataSetChanged();
-                                if (dialogBoxLoading.isShowing()) {
-                                    dialogBoxLoading.dismiss();
-                                }
                             }
                         };
                         dialogBoxAlert.getWindow()
@@ -531,18 +535,58 @@ public class OrderActivity extends AppCompatActivity {
 
     private void applyReview(Review review) {
         if (order.getCampaign() != null) {
+            APIReviewCaller.getReviewByOrderId(order.getId(), true, getApplication(), new APIListener() {
+                @Override
+                public void onReviewListFound(List<Review> reviewList) {
+                    if (reviewList.size() > 0) {
+                        order.getOrderProductList().get(0).setReview(reviewList.get(0));
+                    }
+                    adapter.notifyDataSetChanged();
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
+                    }
+                }
+
+                @Override
+                public void onFailedAPICall(int code) {
+                    MethodUtils.displayErrorAPIMessage(OrderActivity.this);
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
+                    }
+                }
+            });
             order.getOrderProductList().get(0).setReview(review);
         } else {
             orderProductList = order.getOrderProductList();
-            int index;
             for (index = 0; index < orderProductList.size(); index++) {
                 orderProduct = orderProductList.get(index);
                 if (review.getOrderId().equals(orderProduct.getId())) {
-                    orderProduct.setReview(review);
                     break;
                 }
             }
-            orderProductList.set(index, orderProduct);
+            APIReviewCaller.getReviewByOrderId(orderProduct.getId(), true,
+                    getApplication(), new APIListener() {
+                @Override
+                public void onReviewListFound(List<Review> reviewList) {
+                    if (reviewList.size() > 0) {
+                        orderProduct.setReview(reviewList.get(0));
+                        orderProductList.set(index, orderProduct);
+                    }
+                    adapter.notifyDataSetChanged();
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
+                    }
+                }
+
+                @Override
+                public void onFailedAPICall(int code) {
+                    MethodUtils.displayErrorAPIMessage(OrderActivity.this);
+                    adapter.notifyDataSetChanged();
+                    if (dialogBoxLoading.isShowing()) {
+                        dialogBoxLoading.dismiss();
+                    }
+                }
+            });
             order.setOrderProductList(orderProductList);
         }
     }
