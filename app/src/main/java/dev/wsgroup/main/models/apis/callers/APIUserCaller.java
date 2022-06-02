@@ -162,6 +162,8 @@ public class APIUserCaller {
                             JSONObject data = response.getJSONObject("data");
                             if (data != null) {
                                 APIListener.onUpdateSuccessful();
+                            } else {
+                                APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);
                             }
                         } catch (JSONException e) {
                             APIListener.onFailedAPICall(IntegerUtils.ERROR_PARSING_JSON);

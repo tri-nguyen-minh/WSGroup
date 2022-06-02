@@ -191,7 +191,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="7dp"
                         android:layout_marginHorizontal="5dp"
-                        android:text="One-time Campaigns"
+                        android:text="Single Campaigns"
                         android:fontFamily="@font/montserratr"
                         android:textStyle="bold"
                         android:textSize="17sp"

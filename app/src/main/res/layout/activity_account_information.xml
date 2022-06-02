@@ -337,7 +337,7 @@
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/editAccountInfoMail"
                                 style="@style/style_text_input_edit"
-                                android:maxLength="20"
+                                android:maxLength="50"
                                 android:singleLine="true" />
 
                         </com.google.android.material.textfield.TextInputLayout>

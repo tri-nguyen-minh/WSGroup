@@ -67,7 +67,7 @@ public class OrderInfoActivity extends AppCompatActivity {
     private ConstraintLayout layoutMain, layoutAddress, layoutAddressDetail, layoutCampaignSaving;
     private TextView txtPhoneNumber, txtAddressStreet, txtAddressProvince,
             lblDeliveryAddress, txtTotalPrice, txtCampaignSaving, txtFinalPrice,
-            lblShipping, txtDeliveryPrice, lblDiscountPrice;
+            txtTotalWeight, lblShipping, txtDeliveryPrice, lblDiscountPrice;
     private RecyclerView recViewOrderProductPrice, recViewLoyalStatusList, recViewDiscountList;
     private Button btnConfirmOrder;
     private Spinner spinnerPayment;
@@ -115,6 +115,7 @@ public class OrderInfoActivity extends AppCompatActivity {
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
         txtCampaignSaving = findViewById(R.id.txtCampaignSaving);
         txtFinalPrice = findViewById(R.id.txtFinalPrice);
+        txtTotalWeight = findViewById(R.id.txtTotalWeight);
         lblShipping = findViewById(R.id.lblShipping);
         txtDeliveryPrice = findViewById(R.id.txtDeliveryPrice);
         lblDiscountPrice = findViewById(R.id.lblDiscountPrice);
@@ -364,6 +365,7 @@ public class OrderInfoActivity extends AppCompatActivity {
                 campaign = orderList.get(0).getCampaign();
             }
             if (orderProductList.size() > 0) {
+                txtTotalWeight.setText(MethodUtils.formatWeightString(totalWeight));
                 if (!shippingFeeFailed) {
                     for (OrderProduct orderProduct : orderProductList) {
                         totalPrice += orderProduct.getProduct().getRetailPrice()

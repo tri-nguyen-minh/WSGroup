@@ -163,7 +163,7 @@ public class DetailTab extends Fragment {
         txtRetailPrice.setText(MethodUtils.formatPriceString(product.getRetailPrice()));
         txtProductOrderCount.setText(MethodUtils.formatOrderOrReviewCount(product.getOrderCount()));
         txtProductReviewCount.setText(MethodUtils.formatOrderOrReviewCount(product.getReviewCount()));
-        txtProductWeight.setText(MethodUtils.formatWeightString(product.getWeight()));
+        txtProductWeight.setText(MethodUtils.formatWeightString(product.getWeight()) + " per unit");
         ratingProduct.setRating((float) product.getRating());
         ratingProduct.setIsIndicator(true);
         if(product.getImageList() != null && !product.getImageList().isEmpty()) {

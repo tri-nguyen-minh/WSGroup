@@ -223,9 +223,35 @@ public class CompleteAccountActivity extends AppCompatActivity {
                     newUser.setLastName(editLastName.getText().toString());
                     newUser.setMail(editMail.getText().toString());
                     newUser.setAvatarLink(user.getAvatarLink());
-                    registerUser(newUser);
+                    checkDuplicateMail(newUser);
                 } else {
                     checkDuplicatePhone();
+                }
+            }
+        });
+    }
+
+    private void checkDuplicateMail(User user) {
+        APIUserCaller.findUserByMail(editMail.getText().toString(),
+                getApplication(), new APIListener() {
+            @Override
+            public void onUserFound(User user, String message) {
+                errorMessage = StringUtils.MES_ERROR_DUPLICATE_MAIL;
+                displayErrorMessage();
+            }
+            @Override
+            public void onFailedAPICall(int errorCode) {
+                switch (errorCode) {
+                    case IntegerUtils.ERROR_API:
+                    case IntegerUtils.ERROR_PARSING_JSON: {
+                        errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                        displayErrorMessage();
+                        break;
+                    }
+                    case IntegerUtils.ERROR_NO_USER: {
+                        registerUser(user);
+                        break;
+                    }
                 }
             }
         });
@@ -350,7 +376,11 @@ public class CompleteAccountActivity extends AppCompatActivity {
 
             @Override
             public void onFailedAPICall(int errorCode) {
-                errorMessage = StringUtils.MES_ERROR_DUPLICATE_USERNAME;
+                if (errorCode == IntegerUtils.ERROR_PARSING_JSON) {
+                    errorMessage = StringUtils.MES_ERROR_DUPLICATE_USERNAME;
+                } else {
+                    errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                }
                 displayErrorMessage();
             }
         });

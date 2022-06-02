@@ -51,9 +51,9 @@ public class MethodUtils {
     public static String formatWeightString(double weight) {
         if (weight < 1) {
             weight *= 1000;
-            return ((int) weight) + "g per unit";
+            return ((int) weight) + "g";
         } else {
-            return formatDecimalString(weight) + "kg per unit";
+            return formatDecimalString(weight) + "kg";
         }
     }
 

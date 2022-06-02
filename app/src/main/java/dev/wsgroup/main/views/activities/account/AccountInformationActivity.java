@@ -70,7 +70,7 @@ public class AccountInformationActivity extends AppCompatActivity {
     private ScrollView scrollViewMain;
 
     private SharedPreferences sharedPreferences;
-    private String token, username, phone, avatarLink, googleId, errorMessage;
+    private String token, username, phone, mail, avatarLink, googleId, errorMessage;
     private int requestCode;
     private User user;
     private Uri uri;
@@ -355,6 +355,40 @@ public class AccountInformationActivity extends AppCompatActivity {
                           .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialogBoxAlert.show();
         } else {
+            checkEmail();
+        }
+    }
+
+    private void checkEmail() {
+        mail = editAccountInfoMail.getText().toString();
+        if (!mail.equals(user.getMail())) {
+            APIUserCaller.findUserByMail(mail, getApplication(), new APIListener() {
+                @Override
+                public void onUserFound(User user, String message) {
+                    errorMessage = StringUtils.MES_ERROR_DUPLICATE_MAIL;
+                    displayError();
+                }
+                @Override
+                public void onFailedAPICall(int errorCode) {
+                    switch (errorCode) {
+                        case IntegerUtils.ERROR_API:
+                        case IntegerUtils.ERROR_PARSING_JSON: {
+                            errorMessage = StringUtils.MES_ERROR_FAILED_API_CALL;
+                            displayError();
+                            break;
+                        }
+                        case IntegerUtils.ERROR_NO_USER: {
+                            if (!checkAvatarChanged()) {
+                                checkEmptyWallet();
+                            } else {
+                                uploadImageToFirebase();
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+        } else {
             if (!checkAvatarChanged()) {
                 checkEmptyWallet();
             } else {
@@ -579,11 +613,7 @@ public class AccountInformationActivity extends AppCompatActivity {
                         StringUtils.MES_SUCCESSFUL_OTP,"") {
                     @Override
                     public void onClickAction() {
-                        if (!checkAvatarChanged()) {
-                            checkEmptyWallet();
-                        } else {
-                            uploadImageToFirebase();
-                        }
+                        checkEmail();
                     }
                 };
                 dialogBoxAlert.getWindow()

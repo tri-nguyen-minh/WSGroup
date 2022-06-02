@@ -154,7 +154,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
                 lblProductOrderCount.setText((campaign.getOrderCount() == 1) ? "order" : "orders");
                 lblQuantityCountSeparator.setText("/");
             } else {
-                txtCampaignTag.setText("One-time Campaign");
+                txtCampaignTag.setText("Single Campaign");
                 txtCampaignPrice.setText(MethodUtils.formatPriceString(campaign.getPrice()));
                 layoutCampaignCount.setVisibility(View.GONE);
                 progressBarQuantityCount.setVisibility(View.GONE);
