@@ -216,10 +216,10 @@ public class SupplierActivity extends AppCompatActivity {
             Glide.with(getApplicationContext()).load(supplier.getAvatarLink())
                     .into(imgSupplierAvatar);
         } else {
+//            Glide.with(getApplicationContext()).load(R.drawable.ic_profile)
+//                    .override(5, 5)
+//                    .into(imgSupplierBackground);
             Glide.with(getApplicationContext()).load(R.drawable.ic_profile)
-                    .override(5, 5)
-                    .into(imgSupplierBackground);
-            Glide.with(getApplicationContext()).load(R.color.white)
                     .into(imgSupplierAvatar);
         }
         setLoadedState();

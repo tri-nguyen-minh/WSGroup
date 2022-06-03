@@ -365,12 +365,14 @@ public class OrderInfoActivity extends AppCompatActivity {
                 campaign = orderList.get(0).getCampaign();
             }
             if (orderProductList.size() > 0) {
+                totalWeight = 0;
+                for (Order order : orderList) {
+                    for (OrderProduct orderProduct : order.getOrderProductList()) {
+                        totalWeight += (orderProduct.getQuantity() * orderProduct.getProduct().getWeight());
+                    }
+                }
                 txtTotalWeight.setText(MethodUtils.formatWeightString(totalWeight));
                 if (!shippingFeeFailed) {
-                    for (OrderProduct orderProduct : orderProductList) {
-                        totalPrice += orderProduct.getProduct().getRetailPrice()
-                                      * orderProduct.getQuantity();
-                    }
                     for (Order order : orderList) {
                         deliveryPrice += order.getShippingFee();
                     }
@@ -378,6 +380,10 @@ public class OrderInfoActivity extends AppCompatActivity {
                 } else {
                     lblShipping.setVisibility(View.GONE);
                     txtDeliveryPrice.setText("TBA");
+                }
+                for (OrderProduct orderProduct : orderProductList) {
+                    totalPrice += orderProduct.getProduct().getRetailPrice()
+                            * orderProduct.getQuantity();
                 }
                 txtTotalPrice.setText(MethodUtils.formatPriceString(totalPrice));
                 if (campaign == null) {

@@ -150,7 +150,8 @@ public class APIOrderCaller {
                             Order order; Supplier supplier;
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 order = Order.getObjectFromJSON(jsonArray.getJSONObject(i));
-                                supplier = Supplier.getObjectFromJSON(jsonArray.getJSONObject(i));
+                                supplier = new Supplier();
+                                supplier.setName(jsonArray.getJSONObject(i).getString("name"));
                                 order.setSupplier(supplier);
                                 if (order.getStatus().equals(status)) {
                                     orderList.add(order);

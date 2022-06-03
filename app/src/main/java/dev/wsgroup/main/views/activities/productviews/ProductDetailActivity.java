@@ -56,6 +56,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private LinearLayout layoutFailed;
 
     private SharedPreferences sharedPreferences;
+    private Campaign campaign;
     private String userId, productId, token;
     private int cartCount;
     private Product product;
@@ -408,11 +409,12 @@ public class ProductDetailActivity extends AppCompatActivity {
             if (requestCode == IntegerUtils.REQUEST_LOGIN_FOR_CART) {
                 constraintLayoutShoppingCart.performClick();
             } else if (requestCode == IntegerUtils.REQUEST_LOGIN) {
+                product.setCampaign(campaign);
                 prepareOrder();
             } else if (data != null) {
                 if (data.getIntExtra("REQUEST_CODE", IntegerUtils.REQUEST_COMMON)
                         == IntegerUtils.REQUEST_SELECT_CAMPAIGN) {
-                    Campaign campaign = (Campaign) data.getSerializableExtra("CAMPAIGN_SELECTED");
+                    campaign = (Campaign) data.getSerializableExtra("CAMPAIGN_SELECTED");
                     product.setCampaign(campaign);
                     prepareOrder();
                 }

@@ -131,6 +131,7 @@
 
                     <TextView
                         android:id="@+id/txtOrderCode"
+                        android:layout_height="wrap_content"
                         android:textSize="17sp"
                         android:gravity="center|right"
                         android:layout_marginLeft="15dp"
@@ -166,7 +167,7 @@
                     <TextView
                         android:id="@+id/txtDeliveryAddress"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
                         android:paddingVertical="10dp"
                         android:gravity="center|right"
@@ -174,11 +175,9 @@
                         android:fontFamily="@font/montserratr"
                         android:textColor="@color/gray_dark"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintLeft_toRightOf="@+id/lblAddress"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -204,6 +203,7 @@
 
                     <TextView
                         android:id="@+id/txtPayment"
+                        android:layout_height="wrap_content"
                         android:gravity="center|right"
                         android:textSize="17sp"
                         android:ellipsize="end"

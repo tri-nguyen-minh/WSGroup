@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -19,12 +20,16 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +63,7 @@ public class HomeTab extends Fragment {
     private TextView lblRetryGetProduct, txtProductDetailCartCount,
             txtMessageCount, txtNotificationCount, editSearchProduct;
     private CardView cardViewProductDetailCartCount, cardViewMessageCount, cardViewNotificationCount;
-    private ScrollView scrollViewHomeFragment;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ConstraintLayout constraintLayoutShoppingCart, constraintLayoutMessage,
             constraintLayoutNotification;
     private LinearLayout layoutOngoing, layoutMostOrdered, layoutNew, layoutAll,
@@ -69,7 +74,8 @@ public class HomeTab extends Fragment {
     private SharedPreferences sharedPreferences;
     private String userId, accountId, token;
     private int cartCount, messageCount, notificationCount, listCount;
-    private boolean messageLoading, notificationLoading,
+    private boolean dataLoading,
+            messageLoading, notificationLoading,
             orderCountOngoing, ratingOngoing,
             orderCountMostOrdered, ratingMostOrdered,
             orderCountNew, ratingNew,
@@ -80,6 +86,7 @@ public class HomeTab extends Fragment {
     private RecViewCampaignSearchAdapter campaignAdapter;
     private FirebaseReferences firebaseReferences;
     private DialogBoxLoading dialogBoxLoading;
+    private ViewTreeObserver.OnScrollChangedListener scrollListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -102,7 +109,7 @@ public class HomeTab extends Fragment {
         cardViewProductDetailCartCount = view.findViewById(R.id.cardViewProductDetailCartCount);
         cardViewMessageCount = view.findViewById(R.id.cardViewMessageCount);
         cardViewNotificationCount = view.findViewById(R.id.cardViewNotificationCount);
-        scrollViewHomeFragment = view.findViewById(R.id.scrollViewHomeFragment);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         constraintLayoutShoppingCart = view.findViewById(R.id.constraintLayoutShoppingCart);
         constraintLayoutMessage = view.findViewById(R.id.constraintLayoutMessage);
         constraintLayoutNotification = view.findViewById(R.id.constraintLayoutNotification);
@@ -122,6 +129,16 @@ public class HomeTab extends Fragment {
         cartCount = 0;
         setData();
         getLists();
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+                cartCount = 0;
+                setData();
+                getLists();
+            }
+        });
 
         constraintLayoutMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,7 +168,6 @@ public class HomeTab extends Fragment {
                     startActivityForResult(notificationIntent, IntegerUtils.REQUEST_COMMON);
                 }
             }
-
         });
 
         constraintLayoutShoppingCart.setOnClickListener(new View.OnClickListener() {
@@ -207,7 +223,6 @@ public class HomeTab extends Fragment {
     }
 
     private void getLists() {
-        System.out.println("get list");
         listCount = 50;
         setLoadingState();
         getCampaignList();
@@ -225,15 +240,14 @@ public class HomeTab extends Fragment {
                     new APIListener() {
                 @Override
                 public void onCampaignListFound(List<Campaign> campaignList) {
-                    System.out.println("camp " + campaignList.size());
                     List<Campaign> shareCampaign = new ArrayList<>();
                     List<Campaign> singleCampaign = new ArrayList<>();
                     if (campaignList.size() > 0) {
-                        for (int i = campaignList.size() - 1; i >= 0; i--) {
-                            if (campaignList.get(i).getShareFlag()) {
-                                shareCampaign.add(campaignList.get(i));
+                        for (Campaign campaign : campaignList) {
+                            if (campaign.getShareFlag()) {
+                                shareCampaign.add(campaign);
                             } else {
-                                singleCampaign.add(campaignList.get(i));
+                                singleCampaign.add(campaign);
                             }
                         }
                         MethodUtils.sortSharingCampaign(shareCampaign);
@@ -717,31 +731,6 @@ public class HomeTab extends Fragment {
         }
     }
 
-    private void setLoadingState() {
-        layoutLoading.setVisibility(View.VISIBLE);
-        layoutNoProductFound.setVisibility(View.INVISIBLE);
-        scrollViewHomeFragment.setVisibility(View.INVISIBLE);
-        layoutSharingCampaign.setVisibility(View.GONE);
-        layoutSingleCampaign.setVisibility(View.GONE);
-        layoutOngoing.setVisibility(View.GONE);
-        layoutMostOrdered.setVisibility(View.GONE);
-        layoutNew.setVisibility(View.GONE);
-        layoutAll.setVisibility(View.GONE);
-    }
-
-    private void setFailedState() {
-        layoutNoProductFound.setVisibility(View.VISIBLE);
-        layoutLoading.setVisibility(View.INVISIBLE);
-        scrollViewHomeFragment.setVisibility(View.INVISIBLE);
-    }
-
-    private void setLoadedState() {
-        layoutNoProductFound.setVisibility(View.INVISIBLE);
-        layoutLoading.setVisibility(View.INVISIBLE);
-        scrollViewHomeFragment.setVisibility(View.VISIBLE);
-    }
-
-
     private void editCartCountByUser() {
         cartCount = getActivity().getIntent().getIntExtra("CART_COUNT", 0);
         if (cartCount > 0) {
@@ -864,5 +853,48 @@ public class HomeTab extends Fragment {
             public void onCancelled(DatabaseError error) { }
         });
         System.out.println("done firebase");
+    }
+
+    private void setLoadingState() {
+        dataLoading = true;
+        layoutLoading.setVisibility(View.VISIBLE);
+        layoutNoProductFound.setVisibility(View.INVISIBLE);
+        swipeRefreshLayout.setVisibility(View.GONE);
+        layoutSharingCampaign.setVisibility(View.GONE);
+        layoutSingleCampaign.setVisibility(View.GONE);
+        layoutOngoing.setVisibility(View.GONE);
+        layoutMostOrdered.setVisibility(View.GONE);
+        layoutNew.setVisibility(View.GONE);
+        layoutAll.setVisibility(View.GONE);
+    }
+
+    private void setFailedState() {
+        layoutNoProductFound.setVisibility(View.VISIBLE);
+        layoutLoading.setVisibility(View.INVISIBLE);
+        swipeRefreshLayout.setVisibility(View.GONE);
+    }
+
+    private void setLoadedState() {
+        layoutNoProductFound.setVisibility(View.INVISIBLE);
+        layoutLoading.setVisibility(View.INVISIBLE);
+        swipeRefreshLayout.setVisibility(View.VISIBLE);
+//        dataLoading = false;
+//        if (scrollListener == null) {
+//            scrollListener = new ViewTreeObserver.OnScrollChangedListener() {
+//                @Override
+//                public void onScrollChanged() {
+//                    if (scrollViewHomeFragment.getScrollY() == 0) {
+//                        System.out.println("dataLoading " + listCount);
+//                        System.out.println("dataLoading " + dataLoading);
+////                    if (!dataLoading) {
+////                        cartCount = 0;
+////                        setData();
+////                        getLists();
+////                    }
+//                    }
+//                }
+//            };
+//            scrollViewHomeFragment.getViewTreeObserver().addOnScrollChangedListener(scrollListener);
+//        }
     }
 }
